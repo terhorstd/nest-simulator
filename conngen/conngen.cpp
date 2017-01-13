@@ -32,7 +32,7 @@
 #include "exceptions.h"
 #include "kernel_manager.h"
 #include "modelrange.h"
-#include "subnet.h"
+#include "gid_collection.h"
 
 // Includes from sli:
 #include "token.h"
@@ -44,12 +44,12 @@ nest::cg_connect( nest::ConnectionGeneratorDatum& cg,
   const DictionaryDatum& params_map,
   const Name& synmodel_name )
 {
-  Subnet* sources =
-    dynamic_cast< Subnet* >( kernel().node_manager.get_node( source_id ) );
+  GIDCollection* sources =
+    dynamic_cast< GIDCollection* >( kernel().node_manager.get_node( source_id ) );
   if ( sources == NULL )
   {
-    LOG( M_ERROR, "CGConnect_cg_i_i_D_l", "sources must be a subnet." );
-    throw SubnetExpected();
+    LOG( M_ERROR, "CGConnect_cg_i_i_D_l", "sources must be a GIDCollection." );
+    throw GIDCollectionExpected();
   }
   if ( !sources->is_homogeneous() )
   {
@@ -66,12 +66,12 @@ nest::cg_connect( nest::ConnectionGeneratorDatum& cg,
     throw BadProperty();
   }
 
-  Subnet* targets =
-    dynamic_cast< Subnet* >( kernel().node_manager.get_node( target_id ) );
+  GIDCollection* targets =
+    dynamic_cast< GIDCollection* >( kernel().node_manager.get_node( target_id ) );
   if ( targets == NULL )
   {
-    LOG( M_ERROR, "CGConnect_cg_i_i_D_l", "targets must be a subnet." );
-    throw SubnetExpected();
+    LOG( M_ERROR, "CGConnect_cg_i_i_D_l", "targets must be a GIDCollection." );
+    throw GIDCollectionExpected();
   }
   if ( !targets->is_homogeneous() )
   {

@@ -43,7 +43,6 @@ namespace nest
 
 class SiblingContainer;
 class Node;
-class Subnet;
 class Model;
 
 class NodeManager : public ManagerInterface

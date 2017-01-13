@@ -313,7 +313,7 @@ change_subnet( const index node_gid )
   }
   else
   {
-    throw SubnetExpected();
+    throw GIDCollectionExpected();
   }
 }
 
@@ -333,7 +333,7 @@ get_nodes( const index node_id,
   Subnet* subnet =
     dynamic_cast< Subnet* >( kernel().node_manager.get_node( node_id ) );
   if ( subnet == NULL )
-    throw SubnetExpected();
+    throw GIDCollectionExpected();
 
   LocalNodeList localnodes( *subnet );
   std::vector< MPIManager::NodeAddressingData > globalnodes;
@@ -381,7 +381,7 @@ get_leaves( const index node_id,
     dynamic_cast< Subnet* >( kernel().node_manager.get_node( node_id ) );
   if ( subnet == NULL )
   {
-    throw SubnetExpected();
+    throw GIDCollectionExpected();
   }
 
   LocalLeafList localnodes( *subnet );
@@ -420,7 +420,7 @@ get_children( const index node_id,
     dynamic_cast< Subnet* >( kernel().node_manager.get_node( node_id ) );
   if ( subnet == NULL )
   {
-    throw SubnetExpected();
+    throw GIDCollectionExpected();
   }
 
   LocalChildList localnodes( *subnet );

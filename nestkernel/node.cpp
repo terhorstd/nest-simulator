@@ -29,7 +29,6 @@
 // Includes from nestkernel:
 #include "exceptions.h"
 #include "kernel_manager.h"
-#include "subnet.h"
 
 // Includes from sli:
 #include "arraydatum.h"

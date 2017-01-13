@@ -35,8 +35,6 @@
 #include "kernel_manager.h"
 #include "model_manager_impl.h"
 #include "proxynode.h"
-#include "sibling_container.h"
-#include "subnet.h"
 
 
 namespace nest
@@ -49,8 +47,6 @@ ModelManager::ModelManager()
   , prototypes_()
   , modeldict_( new Dictionary )
   , synapsedict_( new Dictionary )
-  , subnet_model_( 0 )
-  , siblingcontainer_model_( 0 )
   , proxynode_model_( 0 )
   , proxy_nodes_()
   , dummy_spike_sources_()
@@ -79,24 +75,8 @@ ModelManager::~ModelManager()
 void
 ModelManager::initialize()
 {
-  if ( subnet_model_ == 0 && siblingcontainer_model_ == 0
-    && proxynode_model_ == 0 )
+  if ( proxynode_model_ == 0 )
   {
-    // initialize these models only once outside of the constructor
-    // as the node model asks for the # of threads to setup slipools
-    // but during construction of ModelManager, the KernelManager is not created
-    subnet_model_ = new GenericModel< Subnet >( "subnet",
-      /* deprecation_info */ "NEST 3.0" );
-    subnet_model_->set_type_id( 0 );
-    pristine_models_.push_back(
-      std::pair< Model*, bool >( subnet_model_, false ) );
-
-    siblingcontainer_model_ =
-      new GenericModel< SiblingContainer >( std::string( "siblingcontainer" ),
-        /* deprecation_info */ "" );
-    siblingcontainer_model_->set_type_id( 1 );
-    pristine_models_.push_back(
-      std::pair< Model*, bool >( siblingcontainer_model_, true ) );
 
     proxynode_model_ =
       new GenericModel< proxynode >( "proxynode", /* deprecation_info */ "" );

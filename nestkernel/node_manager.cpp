@@ -559,7 +559,7 @@ NodeManager::go_to( index n )
   if ( Subnet* target = dynamic_cast< Subnet* >( get_node( n ) ) )
     current_ = target;
   else
-    throw SubnetExpected();
+    throw GIDCollectionExpected();
 }
 
 Node* NodeManager::get_node( index n, thread thr ) // no_p
@@ -864,7 +864,7 @@ NodeManager::print( index p, int depth )
   if ( target != NULL )
     std::cout << target->print_network( depth + 1, 0 );
   else
-    throw SubnetExpected();
+    throw GIDCollectionExpected();
 }
 
 

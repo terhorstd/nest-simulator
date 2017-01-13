@@ -25,7 +25,6 @@
 
 // Includes from nestkernel:
 #include "node.h"
-#include "subnet.h"
 
 namespace nest
 {
@@ -84,13 +83,6 @@ public:
   empty() const
   {
     return subnet_.local_empty();
-  }
-
-  //! Returns subnet wrapped by NodeList
-  Subnet&
-  get_subnet() const
-  {
-    return subnet_;
   }
 
 private:
@@ -233,7 +225,7 @@ private:
     std::vector< Node* >::iterator const& list_end )
     : base_it_( node, list_end )
   {
-    while ( not base_it_.is_end_() && not is_leaf_( *base_it_ ) )
+    while ( not base_it_.is_end_() ) // && not is_leaf_( *base_it_ ) )
       ++base_it_;
   }
 
@@ -260,12 +252,6 @@ public:
 
 private:
   LocalNodeListIterator base_it_; //<! we use this one for the basic iteration
-
-  static bool
-  is_leaf_( Node* n )
-  {
-    return not dynamic_cast< Subnet* >( n );
-  }
 };
 
 template <>

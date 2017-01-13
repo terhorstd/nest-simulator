@@ -1,0 +1,31 @@
+#
+# To aid in removing subnets, this graph shows some selected #include-
+# relations. Includes that were removed already are marked in red.
+# To view this graph type
+#     dot -Tx11 removal-notes
+#
+# This file should be removed before merging back to master.
+#
+
+digraph g {
+	rankdir=LR
+	#label="Modules including subnet.h"
+	node [shape="none"]
+	ellipsis [label="..."]
+	layer -> {free_layer grid_layer topology topology_module}
+	subnet -> {conngen connection_manager nest}
+	subnet -> {nestmodule node_manager nodelist proxynode layer }
+	connection_manager -> {kernel_manager}
+	model_manager -> kernel_manager
+	nest -> ellipsis
+	nodelist -> {connection_manager mpi_manager nest nestmodule}
+	node_manager -> {kernel_manager}
+	conngen -> conngenmodule
+	proxynode -> model_manager
+	sibling_container -> { multimeter spike_detector spin_detector weight_recorder }
+	sibling_container -> { common_synapse_properties node_manager simulation_manager }
+
+	edge [color="#ff8080"]
+	sibling_container -> model_manager
+	subnet -> { model_manager node_ }
+}

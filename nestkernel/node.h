@@ -48,7 +48,6 @@
 namespace nest
 {
 class Model;
-class Subnet;
 class Archiving_Node;
 
 
@@ -100,7 +99,6 @@ class Archiving_Node;
 class Node
 {
   friend class NodeManager;
-  friend class Subnet;
   friend class proxynode;
   friend class Synapse;
   friend class Model;

@@ -245,7 +245,7 @@ nest::DistributionError::message()
 }
 
 std::string
-nest::SubnetExpected::message()
+nest::GIDCollectionExpected::message()
 {
   return std::string();
 }

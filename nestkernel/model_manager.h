@@ -87,16 +87,6 @@ public:
   /**
    *
    */
-  Model* get_subnet_model();
-
-  /**
-   *
-   */
-  Model* get_siblingcontainer_model();
-
-  /**
-   *
-   */
   Node* get_proxy_node( thread tid, index gid );
 
   /**
@@ -373,8 +363,6 @@ private:
    */
   DictionaryDatum synapsedict_; //!< Dictionary of all synapse models
 
-  Model* subnet_model_;
-  Model* siblingcontainer_model_;
   Model* proxynode_model_;
 
   //! Placeholders for remote nodes, one per thread
@@ -393,18 +381,6 @@ ModelManager::get_model( index m ) const
     throw UnknownModelID( m );
 
   return models_[ m ];
-}
-
-inline Model*
-ModelManager::get_subnet_model()
-{
-  return subnet_model_;
-}
-
-inline Model*
-ModelManager::get_siblingcontainer_model()
-{
-  return siblingcontainer_model_;
 }
 
 inline Node*

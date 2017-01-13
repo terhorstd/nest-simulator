@@ -616,14 +616,14 @@ public:
  * is given to a function
  * @ingroup KernelExceptions
  */
-class SubnetExpected : public KernelException
+class GIDCollectionExpected : public KernelException
 {
 public:
-  SubnetExpected()
-    : KernelException( "SubnetExpected" )
+  GIDCollectionExpected()
+    : KernelException( "GIDCollectionExpected" )
   {
   }
-  ~SubnetExpected() throw()
+  ~GIDCollectionExpected() throw()
   {
   }
 
