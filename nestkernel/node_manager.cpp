@@ -133,10 +133,14 @@ GIDCollectionPTR
 NodeManager::add_node( index mod, long n )
 {
   if ( mod >= kernel().model_manager.get_num_node_models() )
+  {
     throw UnknownModelID( mod );
+  }
 
   if ( n < 1 )
+  {
     throw BadProperty();
+  }
 
   const thread n_threads = kernel().vp_manager.get_num_threads();
   assert( n_threads > 0 );
@@ -385,7 +389,9 @@ NodeManager::restore_nodes( const ArrayDatum& node_list )
   Token* first = node_list.begin();
   const Token* end = node_list.end();
   if ( first == end )
+  {
     return;
+  }
 
   for ( Token* node_t = first; node_t != end; ++node_t )
   {
@@ -405,7 +411,9 @@ NodeManager::init_state( index GID )
 {
   Node* n = get_node( GID );
   if ( n == 0 )
+  {
     throw UnknownNode( GID );
+  }
 
   n->init_state();
 }
@@ -451,10 +459,14 @@ Node* NodeManager::get_node( index n, thread thr ) // no_p
   }
 
   if ( node->num_thread_siblings() == 0 )
+  {
     return node; // plain node
+  }
 
   if ( thr < 0 || thr >= static_cast< thread >( node->num_thread_siblings() ) )
+  {
     throw UnknownNode();
+  }
 
   return node->get_thread_sibling( thr );
 }
@@ -464,7 +476,9 @@ NodeManager::get_thread_siblings( index n ) const
 {
   Node* node = local_nodes_.get_node_by_gid( n );
   if ( node->num_thread_siblings() == 0 )
+  {
     throw NoThreadSiblingsAvailable( n );
+  }
   const SiblingContainer* siblings = dynamic_cast< SiblingContainer* >( node );
   assert( siblings != 0 );
 
@@ -479,7 +493,9 @@ NodeManager::ensure_valid_thread_local_ids()
   // test also covers that case that nodes have been deleted
   // by reset.
   if ( size() == nodes_vec_network_size_ )
+  {
     return;
+  }
 
 #ifdef _OPENMP
 #pragma omp critical( update_nodes_vec )
@@ -516,11 +532,13 @@ NodeManager::ensure_valid_thread_local_ids()
         {
           Node* node = local_nodes_.get_node_by_index( idx );
           if ( static_cast< index >( node->get_thread() ) == t
-               or node->num_thread_siblings() > 0 )
+            or node->num_thread_siblings() > 0 )
           {
             num_thread_local_nodes++;
             if ( node->node_uses_wfr() )
+            {
               num_thread_local_wfr_nodes++;
+            }
           }
         }
         nodes_vec_[ t ].reserve( num_thread_local_nodes );
@@ -546,7 +564,9 @@ NodeManager::ensure_valid_thread_local_ids()
             nodes_vec_[ t ].push_back( node );
 
             if ( node->node_uses_wfr() )
+            {
               wfr_nodes_vec_[ t ].push_back( node );
+            }
           }
         }
       } // end of for threads
@@ -560,8 +580,12 @@ NodeManager::ensure_valid_thread_local_ids()
       // step, because gather_events() has to be done in a
       // openmp single section
       for ( index t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
+      {
         if ( wfr_nodes_vec_[ t ].size() > 0 )
+        {
           wfr_is_used_ = true;
+        }
+      }
     }
 #ifdef _OPENMP
   } // end of omp critical region
@@ -580,7 +604,9 @@ NodeManager::destruct_nodes_()
     Node* node = local_nodes_.get_node_by_index( n );
     assert( node != 0 );
     for ( size_t t = 0; t < node->num_thread_siblings(); ++t )
+    {
       node->get_thread_sibling( t )->~Node();
+    }
     node->~Node();
   }
 
@@ -596,7 +622,9 @@ NodeManager::set_status_single_node_( Node& target,
   if ( not target.is_proxy() )
   {
     if ( clear_flags )
+    {
       d->clear_access_flags();
+    }
     target.set_status_base( d );
 
     // TODO: Not sure this check should be at single neuron level; advantage is
@@ -650,7 +678,9 @@ NodeManager::prepare_nodes()
         {
           ++num_active_nodes;
           if ( ( *it )->node_uses_wfr() )
+          {
             ++num_active_wfr_nodes;
+          }
         }
       }
     }
@@ -665,8 +695,12 @@ NodeManager::prepare_nodes()
 
   // check if any exceptions have been raised
   for ( index thr = 0; thr < kernel().vp_manager.get_num_threads(); ++thr )
+  {
     if ( exceptions_raised.at( thr ).valid() )
+    {
       throw WrappedThreadException( *( exceptions_raised.at( thr ) ) );
+    }
+  }
 
   std::ostringstream os;
   std::string tmp_str = num_active_nodes == 1 ? " node" : " nodes";
@@ -734,7 +768,7 @@ void
 NodeManager::print( std::ostream& ) const
 {
   // TODO480
-  throw KernelException("PrintNetwork is currently not supported.");
+  throw KernelException( "PrintNetwork is currently not supported." );
 }
 
 
@@ -751,8 +785,11 @@ NodeManager::set_status( index gid, const DictionaryDatum& d )
     {
       // node is local
       if ( target->num_thread_siblings() == 0 )
+      {
         set_status_single_node_( *target, d );
+      }
       else
+      {
         for ( size_t t = 0; t < target->num_thread_siblings(); ++t )
         {
           // non-root container for devices without proxies and subnets
@@ -760,6 +797,7 @@ NodeManager::set_status( index gid, const DictionaryDatum& d )
           assert( target->get_thread_sibling( t ) != 0 );
           set_status_single_node_( *( target->get_thread_sibling( t ) ), d );
         }
+      }
     }
     return;
   }

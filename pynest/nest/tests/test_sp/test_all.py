@@ -31,7 +31,7 @@ from . import test_disconnect_multiple
 from . import test_enable_multithread
 HAVE_MPI = nest.sli_func("statusdict/have_mpi ::")
 if HAVE_MPI:
-    print ("Testing with MPI")
+    print("Testing with MPI")
     from subprocess import call
     import sys
     import os
@@ -46,12 +46,12 @@ def suite():
             # Get the MPI command
             command = nest.sli_func(
                 "mpirun", 2, "python", "test_sp/mpitest_issue_578_sp.py")
-            print ("Executing test with command: " + command)
+            print("Executing test with command: " + command)
             command = command.split()
             call(command)
         except:
-            print (sys.exc_info()[0])
-            print ("Test call with MPI ended in error")
+            print(sys.exc_info()[0])
+            print("Test call with MPI ended in error")
             raise
     test_suite = unittest.TestSuite()
 

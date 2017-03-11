@@ -176,12 +176,12 @@ public:
   static const int M_INFO;
   static const int M_DEPRECATED; //!< Predefined error level for deprecation
                                  //!< warnings
-  static const int M_PROGRESS;   //!< Predefined error level for progress messages
-  static const int M_WARNING; //!< Predefined error level for warning messages
-  static const int M_ERROR;   //!< Predefined error level for error messages
-  static const int M_FATAL;   //!< Predefined error level for failure messages
-  static const int M_QUIET;   //!< An error level above all others. Use to turn
-                              //!< off messages completely.
+  static const int M_PROGRESS; //!< Predefined error level for progress messages
+  static const int M_WARNING;  //!< Predefined error level for warning messages
+  static const int M_ERROR;    //!< Predefined error level for error messages
+  static const int M_FATAL;    //!< Predefined error level for failure messages
+  static const int M_QUIET;    //!< An error level above all others. Use to turn
+                               //!< off messages completely.
   /** @} */
 
 private:
@@ -386,9 +386,9 @@ public:
    * calls during debugging.
    */
   void
-  set_call_depth( int l )
+  set_call_depth( int depth )
   {
-    call_depth_ = l;
+    call_depth_ = depth;
   }
 
   /**
@@ -914,7 +914,9 @@ inline void
 SLIInterpreter::assert_stack_load( size_t n )
 {
   if ( OStack.load() < n )
+  {
     throw StackUnderflow( n, OStack.load() );
+  }
 }
 
 

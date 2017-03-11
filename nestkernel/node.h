@@ -760,7 +760,7 @@ public:
   }
 
 private:
-  void set_gid_( index );      //!< Set global node id
+  void set_gid_( index ); //!< Set global node id
 
   /** Return a new dictionary datum .
    *
@@ -812,7 +812,7 @@ protected:
   const ConcreteNode& downcast( const Node& );
 
 private:
-  index gid_;          //!< Global element id (within network).
+  index gid_; //!< Global element id (within network).
 
   /**
    * Local id of this node in the thread-local vector of nodes.
