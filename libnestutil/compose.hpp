@@ -136,7 +136,7 @@ Composition::arg( const T& obj )
 
   std::string rep = os.str();
 
-  if ( not rep.empty() )
+  if ( !rep.empty() )
   { // manipulators don't produce output
     for ( specification_map::const_iterator i = specs.lower_bound( arg_no ),
                                             end = specs.upper_bound( arg_no );
@@ -206,9 +206,7 @@ inline Composition::Composition( std::string fmt )
   }
 
   if ( i - b > 0 ) // add the rest of the string
-  {
     output.push_back( fmt.substr( b, i - b ) );
-  }
 }
 
 inline std::string
@@ -220,9 +218,7 @@ Composition::str() const
   for ( output_list::const_iterator i = output.begin(), end = output.end();
         i != end;
         ++i )
-  {
     str += *i;
-  }
 
   return str;
 }
