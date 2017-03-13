@@ -309,8 +309,13 @@ private:
 inline void
 nest::Multimeter::get_status( DictionaryDatum& d ) const
 {
-  // get the data from the device
   device_.get_status( d );
+  P_.get( d );
+
+  if ( is_model_prototype() )
+  {
+    return; // no data to collect
+  }
 
   // we need to add analog data to the events dictionary
   DictionaryDatum dd = getValue< DictionaryDatum >( d, names::events );
@@ -329,8 +334,6 @@ nest::Multimeter::get_status( DictionaryDatum& d ) const
       ( *sibling )->get_status( d );
     }
   }
-
-  P_.get( d );
 }
 
 inline void
