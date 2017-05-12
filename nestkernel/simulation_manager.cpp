@@ -639,13 +639,14 @@ nest::SimulationManager::update_()
   bool done_all = true;
   delay old_to_step;
   exit_on_user_signal_ = false;
-
+  int num_threads= kernel().vp_manager.get_num_threads();
+  
   std::vector< lockPTR< WrappedThreadException > > exceptions_raised(
     kernel().vp_manager.get_num_threads() );
 // parallel section begins
-#pragma omp parallel
-  {
-    const int thrd = kernel().vp_manager.get_thread_id();
+//#pragma omp parallel
+  //{
+//    const int thrd = kernel().vp_manager.get_thread_id();
 
     do
     {
@@ -659,30 +660,38 @@ nest::SimulationManager::update_()
             % kernel().sp_manager.get_structural_plasticity_update_interval()
           == 0 )
       {
-        for ( std::vector< Node* >::const_iterator i =
-                kernel().node_manager.get_nodes_on_thread( thrd ).begin();
-              i != kernel().node_manager.get_nodes_on_thread( thrd ).end();
-              ++i )
-        {
-          ( *i )->update_synaptic_elements(
-            Time( Time::step( clock_.get_steps() + from_step_ ) ).get_ms() );
+        #pragma omp parallel for
+        for (int thrd =0; thrd< num_threads; thrd++){    
+            for ( std::vector< Node* >::const_iterator i =
+                    kernel().node_manager.get_nodes_on_thread( thrd ).begin();
+                i != kernel().node_manager.get_nodes_on_thread( thrd ).end();
+                ++i )
+             {
+                ( *i )->update_synaptic_elements(
+                Time( Time::step( clock_.get_steps() + from_step_ ) ).get_ms() );
+             }
         }
-#pragma omp barrier
-#pragma omp single
+//#pragma omp barrier
+//#pragma omp single
         {
           kernel().sp_manager.update_structural_plasticity();
         }
         // Remove 10% of the vacant elements
-        for ( std::vector< Node* >::const_iterator i =
-                kernel().node_manager.get_nodes_on_thread( thrd ).begin();
-              i != kernel().node_manager.get_nodes_on_thread( thrd ).end();
-              ++i )
-        {
-          ( *i )->decay_synaptic_elements_vacant();
+        #pragma omp parallel for
+        for (int thrd =0; thrd< num_threads; thrd++){    
+            for ( std::vector< Node* >::const_iterator i =
+                    kernel().node_manager.get_nodes_on_thread( thrd ).begin();
+                i != kernel().node_manager.get_nodes_on_thread( thrd ).end();
+                ++i )
+            {
+               ( *i )->decay_synaptic_elements_vacant();
+            }
         }
       }
 
-
+#pragma omp parallel
+  {
+  const int thrd = kernel().vp_manager.get_thread_id();
       if ( from_step_ == 0 ) // deliver only at beginning of slice
       {
         kernel().event_delivery_manager.deliver_events( thrd );
@@ -857,12 +866,17 @@ nest::SimulationManager::update_()
         }
       }
 // end of master section, all threads have to synchronize at this point
-#pragma omp barrier
-
+//#pragma omp barrier
+} // end of #pragma parallel omp
     } while ( to_do_ > 0 and not exit_on_user_signal_
-      and not exceptions_raised.at( thrd ) );
+      //and not exceptions_raised.at( thrd ) 
+            );
 
     // End of the slice, we update the number of synaptic elements
+#pragma omp parallel
+    {
+    const int thrd = kernel().vp_manager.get_thread_id();
+    
     for ( std::vector< Node* >::const_iterator i =
             kernel().node_manager.get_nodes_on_thread( thrd ).begin();
           i != kernel().node_manager.get_nodes_on_thread( thrd ).end();
@@ -871,8 +885,8 @@ nest::SimulationManager::update_()
       ( *i )->update_synaptic_elements(
         Time( Time::step( clock_.get_steps() + to_step_ ) ).get_ms() );
     }
-
-  } // end of #pragma parallel omp
+  
+    }
 
   // check if any exceptions have been raised
   for ( index thrd = 0; thrd < kernel().vp_manager.get_num_threads(); ++thrd )
