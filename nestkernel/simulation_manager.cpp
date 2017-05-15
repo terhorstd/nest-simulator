@@ -689,12 +689,16 @@ nest::SimulationManager::update_()
         }
       }
 
-#pragma omp parallel
-  {
-  const int thrd = kernel().vp_manager.get_thread_id();
+//#pragma omp parallel
+//  {
+          
+//  const int thrd = kernel().vp_manager.get_thread_id();
       if ( from_step_ == 0 ) // deliver only at beginning of slice
       {
-        kernel().event_delivery_manager.deliver_events( thrd );
+        #pragma omp parallel for
+        for (int thrd =0; thrd< num_threads; thrd++){
+         kernel().event_delivery_manager.deliver_events( thrd );
+        }
 #ifdef HAVE_MUSIC
 // advance the time of music by one step (min_delay * h) must
 // be done after deliver_events_() since it calls
@@ -728,7 +732,7 @@ nest::SimulationManager::update_()
       // preliminary update of nodes that use waveform relaxtion
       if ( kernel().node_manager.wfr_is_used() )
       {
-#pragma omp single
+//#pragma omp single
         {
           // if the end of the simulation is in the middle
           // of a min_delay_ step, we need to make a complete
@@ -744,27 +748,32 @@ nest::SimulationManager::update_()
         }
 
         bool max_iterations_reached = true;
-        const std::vector< Node* >& thread_local_wfr_nodes =
-          kernel().node_manager.get_wfr_nodes_on_thread( thrd );
+        
         for ( long n = 0; n < wfr_max_iterations_; ++n )
         {
-          bool done_p = true;
-
-          // this loop may be empty for those threads
-          // that do not have any nodes requiring wfr_update
-          for ( std::vector< Node* >::const_iterator i =
-                  thread_local_wfr_nodes.begin();
-                i != thread_local_wfr_nodes.end();
-                ++i )
-          {
-            done_p = wfr_update_( *i ) && done_p;
-          }
+            #pragma omp parallel for
+            for (int thrd =0; thrd< num_threads; thrd++){
+                bool done_p = true;
+                const std::vector< Node* >& thread_local_wfr_nodes =
+                    kernel().node_manager.get_wfr_nodes_on_thread( thrd );
+                // this loop may be empty for those threads
+                // that do not have any nodes requiring wfr_update
+                for ( std::vector< Node* >::const_iterator i =
+                    thread_local_wfr_nodes.begin();
+                    i != thread_local_wfr_nodes.end();
+                    ++i )
+                {
+                    done_p = wfr_update_( *i ) && done_p;
+                }
+            
 
 // add done value of thread p to done vector
 #pragma omp critical
           done.push_back( done_p );
+            }
+            
 // parallel section ends, wait until all threads are done -> synchronize
-#pragma omp barrier
+//#pragma omp barrier
 
 // the following block is executed by a single thread
 // the other threads wait at the end of the block
@@ -785,10 +794,15 @@ nest::SimulationManager::update_()
             done.clear();
           }
 
-          // deliver SecondaryEvents generated during wfr_update
-          // returns the done value over all threads
-          done_p = kernel().event_delivery_manager.deliver_events( thrd );
-
+           bool done_p;
+          #pragma omp parallel for
+          for (int thrd =0; thrd< num_threads; thrd++){
+            // deliver SecondaryEvents generated during wfr_update
+              // returns the done value over all threads
+            
+            done_p = kernel().event_delivery_manager.deliver_events( thrd );
+          }
+            
           if ( done_p )
           {
             max_iterations_reached = false;
@@ -812,36 +826,42 @@ nest::SimulationManager::update_()
       } // of if(wfr_is_used)
       // end of preliminary update
 
-      const std::vector< Node* >& thread_local_nodes =
-        kernel().node_manager.get_nodes_on_thread( thrd );
-      for (
-        std::vector< Node* >::const_iterator node = thread_local_nodes.begin();
-        node != thread_local_nodes.end();
-        ++node )
-      {
-        // We update in a parallel region. Therefore, we need to catch
-        // exceptions here and then handle them after the parallel region.
-        try
+//#pragma omp parallel
+//  {
+//const int thrd = kernel().vp_manager.get_thread_id();
+      #pragma omp parallel for
+      for (int thrd =0; thrd< num_threads; thrd++){
+        const std::vector< Node* >& thread_local_nodes =
+          kernel().node_manager.get_nodes_on_thread( thrd );
+        for (
+          std::vector< Node* >::const_iterator node = thread_local_nodes.begin();
+          node != thread_local_nodes.end();
+          ++node )
         {
-          if ( not( *node )->is_frozen() )
+          // We update in a parallel region. Therefore, we need to catch
+          // exceptions here and then handle them after the parallel region.
+          try
           {
-            ( *node )->update( clock_, from_step_, to_step_ );
+            if ( not( *node )->is_frozen() )
+            {
+              ( *node )->update( clock_, from_step_, to_step_ );
+            }
+          }
+          catch ( std::exception& e )
+          {
+            // so throw the exception after parallel region
+            exceptions_raised.at( thrd ) = lockPTR< WrappedThreadException >(
+              new WrappedThreadException( e ) );
           }
         }
-        catch ( std::exception& e )
-        {
-          // so throw the exception after parallel region
-          exceptions_raised.at( thrd ) = lockPTR< WrappedThreadException >(
-            new WrappedThreadException( e ) );
-        }
       }
-
+//} // end of #pragma parallel omp
 // parallel section ends, wait until all threads are done -> synchronize
-#pragma omp barrier
+//#pragma omp barrier
 
 // the following block is executed by the master thread only
 // the other threads are enforced to wait at the end of the block
-#pragma omp master
+//#pragma omp master
       {
         // gather only at end of slice
         if ( to_step_ == kernel().connection_manager.get_min_delay() )
@@ -867,7 +887,7 @@ nest::SimulationManager::update_()
       }
 // end of master section, all threads have to synchronize at this point
 //#pragma omp barrier
-} // end of #pragma parallel omp
+
     } while ( to_do_ > 0 and not exit_on_user_signal_
       //and not exceptions_raised.at( thrd ) 
             );
