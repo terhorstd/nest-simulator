@@ -358,9 +358,10 @@ ModelManager::set_synapse_defaults_( index model_id,
 
   BadProperty* tmp_exception = NULL;
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel for
+  for ( index t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
   {
-    index t = kernel().vp_manager.get_thread_id();
+    //index t = kernel().vp_manager.get_thread_id();
 #else // clang-format off
   for ( index t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
   {

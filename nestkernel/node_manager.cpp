@@ -791,9 +791,10 @@ NodeManager::prepare_nodes()
     kernel().vp_manager.get_num_threads() );
 
 #ifdef _OPENMP
-#pragma omp parallel reduction( + : num_active_nodes, num_active_wfr_nodes )
+#pragma omp parallel for reduction( + : num_active_nodes, num_active_wfr_nodes )
+  for ( index t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
   {
-    size_t t = kernel().vp_manager.get_thread_id();
+    //size_t t = kernel().vp_manager.get_thread_id();
 #else
     for ( index t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
     {
@@ -859,9 +860,10 @@ void
 NodeManager::finalize_nodes()
 {
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel for
+  for ( index t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
   {
-    index t = kernel().vp_manager.get_thread_id();
+    //index t = kernel().vp_manager.get_thread_id();
 #else // clang-format off
   for ( index t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
   {

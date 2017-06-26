@@ -189,7 +189,8 @@ nest::VPManager::set_num_threads( nest::thread n_threads )
   n_threads_ = n_threads;
 
 #ifdef _OPENMP
-  omp_set_num_threads( n_threads_ );
+std::cout << "Trying to set num threads: " << n_threads_ << std::endl;
+//  omp_set_num_threads( n_threads_ );
 #endif
 }
 

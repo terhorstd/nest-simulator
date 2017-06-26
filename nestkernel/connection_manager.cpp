@@ -782,9 +782,10 @@ nest::ConnectionManager::data_connect_single( const index source_id,
     return;
   }
 
-#pragma omp parallel private( di_s )
-  {
-    thread tid = kernel().vp_manager.get_thread_id();
+#pragma omp parallel for private (di_s)
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
+    //thread tid = kernel().vp_manager.get_thread_id();
     DictionaryDatum par_i( new Dictionary() );
 
     size_t n_targets = target_ids.size();
@@ -1049,7 +1050,8 @@ nest::ConnectionManager::get_connections( DictionaryDatum params ) const
   msg = String::compose( "Setting OpenMP num_threads to %1.",
     kernel().vp_manager.get_num_threads() );
   LOG( M_DEBUG, "ConnectionManager::get_connections", msg );
-  omp_set_num_threads( kernel().vp_manager.get_num_threads() );
+  std::cout << "Trying to set num threads: " << kernel().vp_manager.get_num_threads() << std::endl;
+  //omp_set_num_threads( kernel().vp_manager.get_num_threads() );
 #endif
 
   // First we check, whether a synapse model is given.
@@ -1118,9 +1120,9 @@ nest::ConnectionManager::get_connections(
   if ( source == 0 and target == 0 )
   {
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel for
+    for ( thread t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
     {
-      thread t = kernel().vp_manager.get_thread_id();
 #else
     for ( thread t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
     {
@@ -1149,9 +1151,10 @@ nest::ConnectionManager::get_connections(
   else if ( source == 0 and target != 0 )
   {
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel for
+    for ( thread t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
     {
-      thread t = kernel().vp_manager.get_thread_id();
+      //thread t = kernel().vp_manager.get_thread_id();
 #else
     for ( thread t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
     {
@@ -1189,9 +1192,10 @@ nest::ConnectionManager::get_connections(
   else if ( source != 0 )
   {
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel for
+    for ( thread t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
     {
-      size_t t = kernel().vp_manager.get_thread_id();
+      //size_t t = kernel().vp_manager.get_thread_id();
 #else
     for ( thread t = 0; t < kernel().vp_manager.get_num_threads(); ++t )
     {

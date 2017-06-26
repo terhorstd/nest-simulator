@@ -672,10 +672,11 @@ void
 nest::OneToOneBuilder::connect_()
 {
 
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -770,10 +771,11 @@ void
 nest::OneToOneBuilder::disconnect_()
 {
 
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -824,10 +826,11 @@ void
 nest::OneToOneBuilder::sp_connect_()
 {
 
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -877,10 +880,11 @@ void
 nest::OneToOneBuilder::sp_disconnect_()
 {
 
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -916,10 +920,11 @@ void
 nest::AllToAllBuilder::connect_()
 {
 
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -1017,10 +1022,11 @@ nest::AllToAllBuilder::inner_connect_( const int tid,
 void
 nest::AllToAllBuilder::sp_connect_()
 {
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
     try
     {
       // allocate pointer to thread specific random generator
@@ -1068,10 +1074,11 @@ nest::AllToAllBuilder::sp_connect_()
 void
 nest::AllToAllBuilder::disconnect_()
 {
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -1123,10 +1130,11 @@ nest::AllToAllBuilder::disconnect_()
 void
 nest::AllToAllBuilder::sp_disconnect_()
 {
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -1208,10 +1216,11 @@ nest::FixedInDegreeBuilder::FixedInDegreeBuilder( const GIDCollection& sources,
 void
 nest::FixedInDegreeBuilder::connect_()
 {
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -1386,10 +1395,11 @@ nest::FixedOutDegreeBuilder::connect_()
       tgt_ids_.push_back( tgid );
     }
 
-#pragma omp parallel
-    {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
       // get thread id
-      const int tid = kernel().vp_manager.get_thread_id();
+      //const int tid = kernel().vp_manager.get_thread_id();
 
       try
       {
@@ -1543,10 +1553,11 @@ nest::FixedTotalNumberBuilder::connect_()
 
 // end code adapted from gsl 1.8
 
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -1624,10 +1635,11 @@ nest::BernoulliBuilder::BernoulliBuilder( const GIDCollection& sources,
 void
 nest::BernoulliBuilder::connect_()
 {
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
@@ -1779,10 +1791,11 @@ nest::SPBuilder::connect_( GIDCollection sources, GIDCollection targets )
     throw DimensionMismatch();
   }
 
-#pragma omp parallel
-  {
+#pragma omp parallel for
+      for ( int tid = 0; tid < kernel().vp_manager.get_num_threads(); tid++ )
+      {
     // get thread id
-    const int tid = kernel().vp_manager.get_thread_id();
+    //const int tid = kernel().vp_manager.get_thread_id();
 
     try
     {
