@@ -1478,7 +1478,7 @@ nest::ConnectionManager::sort_connections( const thread tid )
       {
         ( *( *connections_[ tid ] )[ syn_id ] )
           .sort_connections(
-            *source_table_.get_thread_local_sources( tid )[ syn_id ] );
+            source_table_.get_thread_local_sources( tid )[ syn_id ] );
       }
     }
     remove_disabled_connections( tid );

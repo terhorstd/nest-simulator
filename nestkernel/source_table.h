@@ -64,7 +64,7 @@ private:
   /**
    * 3D structure storing gids of presynaptic neurons.
    */
-  std::vector< std::vector< std::vector< Source >* >* > sources_;
+  std::vector< std::vector< std::vector< Source > > > sources_;
 
   /**
    * Whether the 3D structure has been deleted.
@@ -171,7 +171,7 @@ public:
    * Returns a reference to all sources local on thread; necessary
    * for sorting.
    */
-  std::vector< std::vector< Source >* >& get_thread_local_sources(
+  std::vector< std::vector< Source > >& get_thread_local_sources(
     const thread tid );
 
   /**
@@ -264,26 +264,22 @@ SourceTable::add_source( const thread tid,
 {
   const Source src( gid, is_primary );
 
-  vector_util::grow( ( *( *sources_[ tid ] )[ syn_id ] ) );
+  vector_util::grow( sources_[ tid ][ syn_id ] );
 
-  ( *sources_[ tid ] )[ syn_id ]->push_back( src );
+  sources_[ tid ][ syn_id ].push_back( src );
 }
 
 inline void
 SourceTable::clear( const thread tid )
 {
-  for ( std::vector< std::vector< Source >* >::iterator it =
-          sources_[ tid ]->begin();
-        it != sources_[ tid ]->end();
+  for ( std::vector< std::vector< Source > >::iterator it =
+          sources_[ tid ].begin();
+        it != sources_[ tid ].end();
         ++it )
   {
-    if ( ( *it ) != NULL )
-    {
-      ( *it )->clear();
-      delete *it;
-    }
+      it->clear();
   }
-  sources_[ tid ]->clear();
+  sources_[ tid ].clear();
   is_cleared_[ tid ] = true;
 }
 
@@ -296,13 +292,9 @@ SourceTable::reject_last_target_data( const thread tid )
   // source_table_impl.h)
   assert( ( *current_positions_[ tid ] ).lcid + 1
     < static_cast< long >(
-            ( *sources_[ ( *current_positions_[ tid ] )
-                           .tid ] )[ ( *current_positions_[ tid ] ).syn_id ]
-              ->size() ) );
+             sources_[ ( *current_positions_[ tid ] ).tid ][ ( *current_positions_[ tid ] ).syn_id ].size() ) );
 
-  ( *( *sources_[ ( *current_positions_[ tid ] )
-                    .tid ] )[ ( *current_positions_[ tid ] )
-                                .syn_id ] )[ ( *current_positions_[ tid ] ).lcid
+  sources_[ ( *current_positions_[ tid ] ).tid ][ ( *current_positions_[ tid ] ).syn_id ][ ( *current_positions_[ tid ] ).lcid
     + 1 ].set_processed( false );
 }
 
@@ -324,9 +316,7 @@ SourceTable::save_entry_point( const thread tid )
       ( *saved_positions_[ tid ] ).lcid = std::min(
         ( *current_positions_[ tid ] ).lcid + 1,
         static_cast< long >(
-          ( *sources_[ ( *current_positions_[ tid ] )
-                         .tid ] )[ ( *current_positions_[ tid ] ).syn_id ]
-            ->size() - 1 ) );
+          sources_[ ( *current_positions_[ tid ] ).tid ][ ( *current_positions_[ tid ] ).syn_id ].size() - 1 ) );
     }
     else
     {
@@ -356,7 +346,7 @@ SourceTable::reset_entry_point( const thread tid )
   if ( ( *saved_positions_[ tid ] ).tid > -1 )
   {
     ( *saved_positions_[ tid ] ).syn_id =
-      ( *sources_[ ( *saved_positions_[ tid ] ).tid ] ).size() - 1;
+      sources_[ ( *saved_positions_[ tid ] ).tid ].size() - 1;
   }
   else
   {
@@ -365,9 +355,7 @@ SourceTable::reset_entry_point( const thread tid )
   if ( ( *saved_positions_[ tid ] ).syn_id > -1 )
   {
     ( *saved_positions_[ tid ] ).lcid =
-      ( *sources_[ ( *saved_positions_[ tid ] )
-                     .tid ] )[ ( *saved_positions_[ tid ] ).syn_id ]->size()
-      - 1;
+      sources_[ ( *saved_positions_[ tid ] ).tid ][ ( *saved_positions_[ tid ] ).syn_id ].size() - 1;
   }
   else
   {
@@ -378,13 +366,13 @@ SourceTable::reset_entry_point( const thread tid )
 inline void
 SourceTable::reset_processed_flags( const thread tid )
 {
-  for ( std::vector< std::vector< Source >* >::iterator it =
-          ( *sources_[ tid ] ).begin();
-        it != ( *sources_[ tid ] ).end();
+  for ( std::vector< std::vector< Source > >::iterator it =
+          sources_[ tid ].begin();
+        it != sources_[ tid ].end();
         ++it )
   {
-    for ( std::vector< Source >::iterator iit = ( *it )->begin();
-          iit != ( *it )->end();
+    for ( std::vector< Source >::iterator iit = it->begin();
+          iit != it->end();
           ++iit )
     {
       iit->set_processed( false );
@@ -407,9 +395,9 @@ SourceTable::find_first_source( const thread tid,
 {
   // binary search in sorted sources
   const std::vector< Source >::const_iterator begin =
-    ( *( *sources_[ tid ] )[ syn_id ] ).begin();
+    sources_[ tid ][ syn_id ].begin();
   const std::vector< Source >::const_iterator end =
-    ( *( *sources_[ tid ] )[ syn_id ] ).end();
+    sources_[ tid ][ syn_id ].end();
   std::vector< Source >::const_iterator it =
     std::lower_bound( begin, end, Source( sgid, true ) );
 
@@ -436,8 +424,8 @@ SourceTable::disable_connection( const thread tid,
 {
   // disabling a source changes its gid to 2^62 -1
   // source here
-  assert( not( *( *sources_[ tid ] )[ syn_id ] )[ lcid ].is_disabled() );
-  ( *( *sources_[ tid ] )[ syn_id ] )[ lcid ].disable();
+  assert( not sources_[ tid ][ syn_id ][ lcid ].is_disabled() );
+  sources_[ tid ][ syn_id ][ lcid ].disable();
 }
 
 inline void
@@ -450,7 +438,7 @@ SourceTable::get_source_gids( const thread tid,
         cit != source_lcids.end();
         ++cit )
   {
-    sources.push_back( ( *( *sources_[ tid ] )[ syn_id ] )[ *cit ].get_gid() );
+    sources.push_back( sources_[ tid ][ syn_id ][ *cit ].get_gid() );
   }
 }
 
@@ -460,8 +448,8 @@ SourceTable::num_unique_sources( const thread tid, const synindex syn_id ) const
   size_t n = 0;
   index last_source = 0;
   for ( std::vector< Source >::const_iterator cit =
-          ( *( *sources_[ tid ] )[ syn_id ] ).begin();
-        cit != ( *( *sources_[ tid ] )[ syn_id ] ).end();
+          sources_[ tid ][ syn_id ].begin();
+        cit != sources_[ tid ][ syn_id ].end();
         ++cit )
   {
     if ( last_source != ( *cit ).get_gid() )
