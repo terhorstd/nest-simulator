@@ -56,8 +56,6 @@ nest::SourceTable::initialize()
     sources_[ tid ] = new std::vector< std::vector< Source >* >(
       kernel().model_manager.get_num_synapse_prototypes(), NULL );
     resize_sources( tid );
-    current_positions_[ tid ] = new SourceTablePosition();
-    saved_positions_[ tid ] = new SourceTablePosition();
     is_cleared_[ tid ] = false;
     saved_entry_point_[ tid ] = false;
   } // of omp parallel
@@ -82,21 +80,7 @@ nest::SourceTable::finalize()
     delete *it;
   }
   sources_.clear();
-  for ( std::vector< SourceTablePosition* >::iterator it =
-          current_positions_.begin();
-        it != current_positions_.end();
-        ++it )
-  {
-    delete *it;
-  }
   current_positions_.clear();
-  for (
-    std::vector< SourceTablePosition* >::iterator it = saved_positions_.begin();
-    it != saved_positions_.end();
-    ++it )
-  {
-    delete *it;
-  }
   saved_positions_.clear();
 }
 
@@ -124,9 +108,9 @@ nest::SourceTable::find_maximal_position() const
   SourceTablePosition max_position( -1, -1, -1 );
   for ( thread tid = 0; tid < kernel().vp_manager.get_num_threads(); ++tid )
   {
-    if ( max_position < ( *saved_positions_[ tid ] ) )
+    if ( max_position < saved_positions_[ tid ] )
     {
-      max_position = ( *saved_positions_[ tid ] );
+      max_position = saved_positions_[ tid ];
     }
   }
   return max_position;
@@ -361,7 +345,7 @@ nest::SourceTable::get_next_target_data( const thread tid,
   thread& source_rank,
   TargetData& next_target_data )
 {
-  SourceTablePosition& current_position = *current_positions_[ tid ];
+  SourceTablePosition& current_position = current_positions_[ tid ];
 
   // we stay in this loop either until we can return a valid
   // TargetData object or we have reached the end of the sources table

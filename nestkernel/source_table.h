@@ -72,9 +72,9 @@ private:
   std::vector< bool > is_cleared_;
 
   //! Needed during readout of sources_.
-  std::vector< SourceTablePosition* > current_positions_;
+  std::vector< SourceTablePosition > current_positions_;
   //! Needed during readout of sources_.
-  std::vector< SourceTablePosition* > saved_positions_;
+  std::vector< SourceTablePosition > saved_positions_;
 
   /**
    * If we detect an overflow in one of the MPI buffer parts, we save
@@ -294,15 +294,12 @@ SourceTable::reject_last_target_data( const thread tid )
   // be inserted into MPI buffer due to overflow. we hence need to
   // correct the processed flag of the last entry (see
   // source_table_impl.h)
-  assert( ( *current_positions_[ tid ] ).lcid + 1
-    < static_cast< long >(
-            ( *sources_[ ( *current_positions_[ tid ] )
-                           .tid ] )[ ( *current_positions_[ tid ] ).syn_id ]
-              ->size() ) );
+  assert( current_positions_[ tid ].lcid + 1
+    < static_cast< long >( ( *sources_[ current_positions_[ tid ].tid ] )
+                             [ current_positions_[ tid ].syn_id ]->size() ) );
 
-  ( *( *sources_[ ( *current_positions_[ tid ] )
-                    .tid ] )[ ( *current_positions_[ tid ] )
-                                .syn_id ] )[ ( *current_positions_[ tid ] ).lcid
+  ( *( *sources_[ current_positions_[ tid ].tid ] )
+      [ current_positions_[ tid ].syn_id ] )[ current_positions_[ tid ].lcid
     + 1 ].set_processed( false );
 }
 
@@ -311,27 +308,27 @@ SourceTable::save_entry_point( const thread tid )
 {
   if ( not saved_entry_point_[ tid ] )
   {
-    ( *saved_positions_[ tid ] ).tid = ( *current_positions_[ tid ] ).tid;
-    ( *saved_positions_[ tid ] ).syn_id = ( *current_positions_[ tid ] ).syn_id;
+    saved_positions_[ tid ].tid = current_positions_[ tid ].tid;
+    saved_positions_[ tid ].syn_id = current_positions_[ tid ].syn_id;
 
     // if tid and syn_id are valid entries, also store valid entry for lcid
-    if ( ( *current_positions_[ tid ] ).tid > -1
-      and ( *current_positions_[ tid ] ).syn_id > -1 )
+    if ( current_positions_[ tid ].tid > -1
+      and current_positions_[ tid ].syn_id > -1 )
     {
       // either store current_position.lcid + 1, since this can
       // contain non-processed entry (see reject_last_target_data()) or
       // store maximal value for lcid.
-      ( *saved_positions_[ tid ] ).lcid = std::min(
-        ( *current_positions_[ tid ] ).lcid + 1,
+      saved_positions_[ tid ].lcid = std::min(
+        current_positions_[ tid ].lcid + 1,
         static_cast< long >(
-          ( *sources_[ ( *current_positions_[ tid ] )
-                         .tid ] )[ ( *current_positions_[ tid ] ).syn_id ]
-            ->size() - 1 ) );
+          ( *sources_[ current_positions_[ tid ]
+                         .tid ] )[ current_positions_[ tid ].syn_id ]->size()
+          - 1 ) );
     }
     else
     {
-      assert( ( *current_positions_[ tid ] ).lcid == -1 );
-      ( *saved_positions_[ tid ] ).lcid = -1;
+      assert( current_positions_[ tid ].lcid == -1 );
+      saved_positions_[ tid ].lcid = -1;
     }
     saved_entry_point_[ tid ] = true;
   }
@@ -340,7 +337,7 @@ SourceTable::save_entry_point( const thread tid )
 inline void
 SourceTable::restore_entry_point( const thread tid )
 {
-  *current_positions_[ tid ] = *saved_positions_[ tid ];
+  current_positions_[ tid ] = saved_positions_[ tid ];
   saved_entry_point_[ tid ] = false;
 }
 
@@ -352,26 +349,25 @@ SourceTable::reset_entry_point( const thread tid )
   // initialize current_positions_ correctly upon calling
   // restore_entry_point. however, this can only be done if other
   // values have valid values.
-  ( *saved_positions_[ tid ] ).tid = sources_.size() - 1;
-  if ( ( *saved_positions_[ tid ] ).tid > -1 )
+  saved_positions_[ tid ].tid = sources_.size() - 1;
+  if ( saved_positions_[ tid ].tid > -1 )
   {
-    ( *saved_positions_[ tid ] ).syn_id =
-      ( *sources_[ ( *saved_positions_[ tid ] ).tid ] ).size() - 1;
+    saved_positions_[ tid ].syn_id =
+      ( *sources_[ saved_positions_[ tid ].tid ] ).size() - 1;
   }
   else
   {
-    ( *saved_positions_[ tid ] ).syn_id = -1;
+    saved_positions_[ tid ].syn_id = -1;
   }
-  if ( ( *saved_positions_[ tid ] ).syn_id > -1 )
+  if ( saved_positions_[ tid ].syn_id > -1 )
   {
-    ( *saved_positions_[ tid ] ).lcid =
-      ( *sources_[ ( *saved_positions_[ tid ] )
-                     .tid ] )[ ( *saved_positions_[ tid ] ).syn_id ]->size()
-      - 1;
+    saved_positions_[ tid ].lcid =
+      ( *sources_[ saved_positions_[ tid ].tid ] )[ saved_positions_[ tid ]
+                                                      .syn_id ]->size() - 1;
   }
   else
   {
-    ( *saved_positions_[ tid ] ).lcid = -1;
+    saved_positions_[ tid ].lcid = -1;
   }
 }
 
@@ -395,9 +391,9 @@ SourceTable::reset_processed_flags( const thread tid )
 inline void
 SourceTable::no_targets_to_process( const thread tid )
 {
-  ( *current_positions_[ tid ] ).tid = -1;
-  ( *current_positions_[ tid ] ).syn_id = -1;
-  ( *current_positions_[ tid ] ).lcid = -1;
+  current_positions_[ tid ].tid = -1;
+  current_positions_[ tid ].syn_id = -1;
+  current_positions_[ tid ].lcid = -1;
 }
 
 inline index
