@@ -53,8 +53,6 @@ nest::SourceTable::initialize()
 #pragma omp parallel
   {
     const thread tid = kernel().vp_manager.get_thread_id();
-    sources_[ tid ].resize(0); // =new std::vector< std::vector< Source > >(
-    //  kernel().model_manager.get_num_synapse_prototypes(), NULL );
     resize_sources( tid );
     is_cleared_[ tid ] = false;
     saved_entry_point_[ tid ] = false;
