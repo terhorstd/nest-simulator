@@ -116,8 +116,8 @@ nest::aeif_cond_alpha_RK5::State_::State_( const State_& s )
   }
 }
 
-nest::aeif_cond_alpha_RK5::State_& nest::aeif_cond_alpha_RK5::State_::operator=(
-  const State_& s )
+nest::aeif_cond_alpha_RK5::State_&
+nest::aeif_cond_alpha_RK5::State_::operator=( const State_& s )
 {
   assert( this != &s ); // would be bad logical error in program
 
@@ -454,8 +454,9 @@ void nest::aeif_cond_alpha_RK5::update( Time const& origin,
         for ( int i = 0; i < S_.STATE_VEC_SIZE; ++i )
         {
           S_.yin[ i ] = S_.y_[ i ]
-            + h * ( 44.0 / 45.0 * S_.k1[ i ] - 56.0 / 15.0 * S_.k2[ i ]
-                    + 32.0 / 9.0 * S_.k3[ i ] );
+            + h
+              * ( 44.0 / 45.0 * S_.k1[ i ] - 56.0 / 15.0 * S_.k2[ i ]
+                  + 32.0 / 9.0 * S_.k3[ i ] );
         }
         ( this->*( V_.model_dynamics ) )( S_.yin, S_.k4 );
 
@@ -474,10 +475,10 @@ void nest::aeif_cond_alpha_RK5::update( Time const& origin,
         for ( int i = 0; i < S_.STATE_VEC_SIZE; ++i )
         {
           S_.yin[ i ] = S_.y_[ i ]
-            + h * ( 9017.0 / 3168.0 * S_.k1[ i ] - 355.0 / 33.0 * S_.k2[ i ]
-                    + 46732.0 / 5247.0 * S_.k3[ i ]
-                    + 49.0 / 176.0 * S_.k4[ i ]
-                    - 5103.0 / 18656.0 * S_.k5[ i ] );
+            + h
+              * ( 9017.0 / 3168.0 * S_.k1[ i ] - 355.0 / 33.0 * S_.k2[ i ]
+                  + 46732.0 / 5247.0 * S_.k3[ i ] + 49.0 / 176.0 * S_.k4[ i ]
+                  - 5103.0 / 18656.0 * S_.k5[ i ] );
         }
         ( this->*( V_.model_dynamics ) )( S_.yin, S_.k6 );
 
@@ -485,10 +486,10 @@ void nest::aeif_cond_alpha_RK5::update( Time const& origin,
         for ( int i = 0; i < S_.STATE_VEC_SIZE; ++i )
         {
           S_.ynew[ i ] = S_.y_[ i ]
-            + h * ( 35.0 / 384.0 * S_.k1[ i ] + 500.0 / 1113.0 * S_.k3[ i ]
-                    + 125.0 / 192.0 * S_.k4[ i ]
-                    - 2187.0 / 6784.0 * S_.k5[ i ]
-                    + 11.0 / 84.0 * S_.k6[ i ] );
+            + h
+              * ( 35.0 / 384.0 * S_.k1[ i ] + 500.0 / 1113.0 * S_.k3[ i ]
+                  + 125.0 / 192.0 * S_.k4[ i ] - 2187.0 / 6784.0 * S_.k5[ i ]
+                  + 11.0 / 84.0 * S_.k6[ i ] );
         }
         ( this->*( V_.model_dynamics ) )( S_.ynew, S_.k7 );
 
@@ -498,10 +499,8 @@ void nest::aeif_cond_alpha_RK5::update( Time const& origin,
           S_.yref[ i ] = S_.y_[ i ]
             + h
               * ( 5179.0 / 57600.0 * S_.k1[ i ] + 7571.0 / 16695.0 * S_.k3[ i ]
-                  + 393.0 / 640.0 * S_.k4[ i ]
-                  - 92097.0 / 339200.0 * S_.k5[ i ]
-                  + 187.0 / 2100.0 * S_.k6[ i ]
-                  + 1.0 / 40.0 * S_.k7[ i ] );
+                  + 393.0 / 640.0 * S_.k4[ i ] - 92097.0 / 339200.0 * S_.k5[ i ]
+                  + 187.0 / 2100.0 * S_.k6[ i ] + 1.0 / 40.0 * S_.k7[ i ] );
         }
 
         err = std::fabs( S_.ynew[ 0 ] - S_.yref[ 0 ] ) / MAXERR

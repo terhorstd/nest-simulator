@@ -389,9 +389,10 @@ iaf_psc_delta_canon::update( Time const& origin,
             if ( S_.with_refr_input_ )
             {
               V_.refr_spikes_buffer_ += ev_weight
-                * std::exp( -( ( S_.last_spike_step_ - T - 1 ) * V_.h_ms_
-                              - ( S_.last_spike_offset_ - ev_offset )
-                              + P_.t_ref_ ) / P_.tau_m_ );
+                * std::exp(
+                    -( ( S_.last_spike_step_ - T - 1 ) * V_.h_ms_
+                      - ( S_.last_spike_offset_ - ev_offset ) + P_.t_ref_ )
+                    / P_.tau_m_ );
             }
           }
           else

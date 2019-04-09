@@ -433,8 +433,9 @@ STDPDopaConnection< targetidentifierT >::update_weight_( double c0,
 {
   const double taus_ = ( cp.tau_c_ + cp.tau_n_ ) / ( cp.tau_c_ * cp.tau_n_ );
   weight_ = weight_
-    - c0 * ( n0 / taus_ * numerics::expm1( taus_ * minus_dt )
-             - cp.b_ * cp.tau_c_ * numerics::expm1( minus_dt / cp.tau_c_ ) );
+    - c0
+      * ( n0 / taus_ * numerics::expm1( taus_ * minus_dt )
+          - cp.b_ * cp.tau_c_ * numerics::expm1( minus_dt / cp.tau_c_ ) );
 
   if ( weight_ < cp.Wmin_ )
   {
@@ -457,16 +458,16 @@ STDPDopaConnection< targetidentifierT >::process_dopa_spikes_(
   // process dopa spikes in (t0, t1]
   // propagate weight from t0 to t1
   if ( ( dopa_spikes.size() > dopa_spikes_idx_ + 1 )
-    && ( t1 - dopa_spikes[ dopa_spikes_idx_ + 1 ].spike_time_ > -1.0
-           * kernel().connection_manager.get_stdp_eps() ) )
+    && ( t1 - dopa_spikes[ dopa_spikes_idx_ + 1 ].spike_time_
+         > -1.0 * kernel().connection_manager.get_stdp_eps() ) )
   {
     // there is at least 1 dopa spike in (t0, t1]
     // propagate weight up to first dopa spike and update dopamine trace
     // weight and eligibility c are at time t0 but dopamine trace n is at time
     // of last dopa spike
-    double n0 =
-      n_ * std::exp( ( dopa_spikes[ dopa_spikes_idx_ ].spike_time_ - t0 )
-             / cp.tau_n_ ); // dopamine trace n at time t0
+    double n0 = n_
+      * std::exp( ( dopa_spikes[ dopa_spikes_idx_ ].spike_time_ - t0 )
+          / cp.tau_n_ ); // dopamine trace n at time t0
     update_weight_(
       c_, n0, t0 - dopa_spikes[ dopa_spikes_idx_ + 1 ].spike_time_, cp );
     update_dopamine_( dopa_spikes, cp );
@@ -474,15 +475,16 @@ STDPDopaConnection< targetidentifierT >::process_dopa_spikes_(
     // process remaining dopa spikes in (t0, t1]
     double cd;
     while ( ( dopa_spikes.size() > dopa_spikes_idx_ + 1 )
-      && ( t1 - dopa_spikes[ dopa_spikes_idx_ + 1 ].spike_time_ > -1.0
-                * kernel().connection_manager.get_stdp_eps() ) )
+      && ( t1 - dopa_spikes[ dopa_spikes_idx_ + 1 ].spike_time_
+           > -1.0 * kernel().connection_manager.get_stdp_eps() ) )
     {
       // propagate weight up to next dopa spike and update dopamine trace
       // weight and dopamine trace n are at time of last dopa spike td but
       // eligibility c is at time
       // t0
-      cd = c_ * std::exp( ( t0 - dopa_spikes[ dopa_spikes_idx_ ].spike_time_ )
-                  / cp.tau_c_ ); // eligibility c at time of td
+      cd = c_
+        * std::exp( ( t0 - dopa_spikes[ dopa_spikes_idx_ ].spike_time_ )
+            / cp.tau_c_ ); // eligibility c at time of td
       update_weight_( cd,
         n_,
         dopa_spikes[ dopa_spikes_idx_ ].spike_time_
@@ -494,8 +496,9 @@ STDPDopaConnection< targetidentifierT >::process_dopa_spikes_(
     // propagate weight up to t1
     // weight and dopamine trace n are at time of last dopa spike td but
     // eligibility c is at time t0
-    cd = c_ * std::exp( ( t0 - dopa_spikes[ dopa_spikes_idx_ ].spike_time_ )
-                / cp.tau_c_ ); // eligibility c at time td
+    cd = c_
+      * std::exp( ( t0 - dopa_spikes[ dopa_spikes_idx_ ].spike_time_ )
+          / cp.tau_c_ ); // eligibility c at time td
     update_weight_(
       cd, n_, dopa_spikes[ dopa_spikes_idx_ ].spike_time_ - t1, cp );
   }
@@ -504,9 +507,9 @@ STDPDopaConnection< targetidentifierT >::process_dopa_spikes_(
     // no dopamine spikes in (t0, t1]
     // weight and eligibility c are at time t0 but dopamine trace n is at time
     // of last dopa spike
-    double n0 =
-      n_ * std::exp( ( dopa_spikes[ dopa_spikes_idx_ ].spike_time_ - t0 )
-             / cp.tau_n_ ); // dopamine trace n at time t0
+    double n0 = n_
+      * std::exp( ( dopa_spikes[ dopa_spikes_idx_ ].spike_time_ - t0 )
+          / cp.tau_n_ ); // dopamine trace n at time t0
     update_weight_( c_, n0, t0 - t1, cp );
   }
 
@@ -632,8 +635,9 @@ STDPDopaConnection< targetidentifierT >::trigger_update_weight( thread t,
   // trace K_plus to time t_trig but do not increment/decrement as there are no
   // spikes to be handled at t_trig
   process_dopa_spikes_( dopa_spikes, t0, t_trig, cp );
-  n_ = n_ * std::exp( ( dopa_spikes[ dopa_spikes_idx_ ].spike_time_ - t_trig )
-              / cp.tau_n_ );
+  n_ = n_
+    * std::exp(
+        ( dopa_spikes[ dopa_spikes_idx_ ].spike_time_ - t_trig ) / cp.tau_n_ );
   Kplus_ = Kplus_ * std::exp( ( t_last_update_ - t_trig ) / cp.tau_plus_ );
 
   t_last_update_ = t_trig;

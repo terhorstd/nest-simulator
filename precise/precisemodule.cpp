@@ -52,9 +52,9 @@
 #include "iaf_psc_alpha_presc.h"
 #include "iaf_psc_delta_canon.h"
 #include "iaf_psc_exp_ps.h"
+#include "iaf_psc_exp_ps_lossless.h"
 #include "parrot_neuron_ps.h"
 #include "poisson_generator_ps.h"
-#include "iaf_psc_exp_ps_lossless.h"
 
 namespace nest
 {

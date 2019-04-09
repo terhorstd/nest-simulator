@@ -130,7 +130,8 @@ public:
   bool operator()( librandom::RngPtr rng, double_t h );
 };
 
-inline bool gainfunction_erfc::operator()( librandom::RngPtr rng, double_t h )
+inline bool
+gainfunction_erfc::operator()( librandom::RngPtr rng, double_t h )
 {
   return rng->drand() < 0.5 * erfc( -( h - theta_ ) / ( sqrt( 2. ) * sigma_ ) );
 }

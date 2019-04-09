@@ -25,6 +25,6 @@
 #include <boost/test/unit_test.hpp>
 
 // Includes from cpptests
+#include "test_block_vector.h"
 #include "test_sort.h"
 #include "test_target_fields.h"
-#include "test_block_vector.h"

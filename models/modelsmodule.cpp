@@ -44,20 +44,25 @@
 
 // Neuron models
 #include "aeif_cond_alpha.h"
+#include "aeif_cond_alpha_RK5.h"
 #include "aeif_cond_alpha_multisynapse.h"
 #include "aeif_cond_beta_multisynapse.h"
-#include "aeif_cond_alpha_RK5.h"
 #include "aeif_cond_exp.h"
 #include "aeif_psc_alpha.h"
-#include "aeif_psc_exp.h"
 #include "aeif_psc_delta.h"
 #include "aeif_psc_delta_clopath.h"
+#include "aeif_psc_exp.h"
 #include "amat2_psc_exp.h"
 #include "erfc_neuron.h"
 #include "gauss_rate.h"
+#include "gif_cond_exp.h"
+#include "gif_cond_exp_multisynapse.h"
+#include "gif_pop_psc_exp.h"
+#include "gif_psc_exp.h"
+#include "gif_psc_exp_multisynapse.h"
 #include "ginzburg_neuron.h"
-#include "hh_cond_exp_traub.h"
 #include "hh_cond_beta_gap_traub.h"
+#include "hh_cond_exp_traub.h"
 #include "hh_psc_alpha.h"
 #include "hh_psc_alpha_clopath.h"
 #include "hh_psc_alpha_gap.h"
@@ -77,8 +82,6 @@
 #include "iaf_tum_2000.h"
 #include "izhikevich.h"
 #include "lin_rate.h"
-#include "tanh_rate.h"
-#include "threshold_lin_rate.h"
 #include "mat2_psc_exp.h"
 #include "mcculloch_pitts_neuron.h"
 #include "parrot_neuron.h"
@@ -87,20 +90,17 @@
 #include "siegert_neuron.h"
 #include "sigmoid_rate.h"
 #include "sigmoid_rate_gg_1998.h"
-#include "gif_psc_exp.h"
-#include "gif_psc_exp_multisynapse.h"
-#include "gif_cond_exp.h"
-#include "gif_cond_exp_multisynapse.h"
-#include "gif_pop_psc_exp.h"
+#include "tanh_rate.h"
+#include "threshold_lin_rate.h"
 
 // Stimulation devices
 #include "ac_generator.h"
 #include "dc_generator.h"
 #include "gamma_sup_generator.h"
+#include "inhomogeneous_poisson_generator.h"
 #include "mip_generator.h"
 #include "noise_generator.h"
 #include "poisson_generator.h"
-#include "inhomogeneous_poisson_generator.h"
 #include "ppd_sup_generator.h"
 #include "pulsepacket_generator.h"
 #include "sinusoidal_gamma_generator.h"
@@ -131,8 +131,8 @@
 #include "ht_connection.h"
 #include "quantal_stp_connection.h"
 #include "quantal_stp_connection_impl.h"
-#include "rate_connection_instantaneous.h"
 #include "rate_connection_delayed.h"
+#include "rate_connection_instantaneous.h"
 #include "spike_dilutor.h"
 #include "static_connection.h"
 #include "static_connection_hom_w.h"
@@ -140,9 +140,9 @@
 #include "stdp_connection_facetshw_hom.h"
 #include "stdp_connection_facetshw_hom_impl.h"
 #include "stdp_connection_hom.h"
-#include "stdp_triplet_connection.h"
 #include "stdp_dopa_connection.h"
 #include "stdp_pl_connection_hom.h"
+#include "stdp_triplet_connection.h"
 #include "tsodyks2_connection.h"
 #include "tsodyks_connection.h"
 #include "tsodyks_connection_hom.h"
@@ -158,10 +158,10 @@
 #include "target_identifier.h"
 
 #ifdef HAVE_MUSIC
-#include "music_event_in_proxy.h"
-#include "music_event_out_proxy.h"
 #include "music_cont_in_proxy.h"
 #include "music_cont_out_proxy.h"
+#include "music_event_in_proxy.h"
+#include "music_event_out_proxy.h"
 #include "music_message_in_proxy.h"
 #endif
 
@@ -478,8 +478,8 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, static_synapse_hom_w, static_synapse_hpc
   */
   kernel()
-    .model_manager
-    .register_connection_model< StaticConnectionHomW< TargetIdentifierPtrRport > >(
+    .model_manager.register_connection_model<
+      StaticConnectionHomW< TargetIdentifierPtrRport > >(
       "static_synapse_hom_w" );
   kernel()
     .model_manager
@@ -491,30 +491,28 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict
   */
   kernel()
-    .model_manager
-    .register_secondary_connection_model< GapJunction< TargetIdentifierPtrRport > >(
-      "gap_junction",
+    .model_manager.register_secondary_connection_model<
+      GapJunction< TargetIdentifierPtrRport > >( "gap_junction",
       /*has_delay=*/false,
       /*requires_symmetric=*/true,
       /*supports_wfr=*/true );
   kernel()
-    .model_manager
-    .register_secondary_connection_model< RateConnectionInstantaneous< TargetIdentifierPtrRport > >(
+    .model_manager.register_secondary_connection_model<
+      RateConnectionInstantaneous< TargetIdentifierPtrRport > >(
       "rate_connection_instantaneous",
       /*has_delay=*/false,
       /*requires_symmetric=*/false,
       /*supports_wfr=*/true );
   kernel()
-    .model_manager
-    .register_secondary_connection_model< RateConnectionDelayed< TargetIdentifierPtrRport > >(
+    .model_manager.register_secondary_connection_model<
+      RateConnectionDelayed< TargetIdentifierPtrRport > >(
       "rate_connection_delayed",
       /*has_delay=*/true,
       /*requires_symmetric=*/false,
       /*supports_wfr=*/false );
   kernel()
-    .model_manager
-    .register_secondary_connection_model< DiffusionConnection< TargetIdentifierPtrRport > >(
-      "diffusion_connection",
+    .model_manager.register_secondary_connection_model<
+      DiffusionConnection< TargetIdentifierPtrRport > >( "diffusion_connection",
       /*has_delay=*/false,
       /*requires_symmetric=*/false,
       /*supports_wfr=*/true );
@@ -547,8 +545,8 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, stdp_pl_synapse_hom, static_synapse_hpc
   */
   kernel()
-    .model_manager
-    .register_connection_model< STDPPLConnectionHom< TargetIdentifierPtrRport > >(
+    .model_manager.register_connection_model<
+      STDPPLConnectionHom< TargetIdentifierPtrRport > >(
       "stdp_pl_synapse_hom" );
   kernel()
     .model_manager
@@ -562,12 +560,12 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, stdp_synapse, static_synapse_hpc
   */
   kernel()
-    .model_manager
-    .register_connection_model< STDPTripletConnection< TargetIdentifierPtrRport > >(
+    .model_manager.register_connection_model<
+      STDPTripletConnection< TargetIdentifierPtrRport > >(
       "stdp_triplet_synapse" );
   kernel()
-    .model_manager
-    .register_connection_model< STDPTripletConnection< TargetIdentifierIndex > >(
+    .model_manager.register_connection_model<
+      STDPTripletConnection< TargetIdentifierIndex > >(
       "stdp_triplet_synapse_hpc" );
 
 
@@ -577,12 +575,12 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, quantal_stp_synapse, static_synapse_hpc
   */
   kernel()
-    .model_manager
-    .register_connection_model< Quantal_StpConnection< TargetIdentifierPtrRport > >(
+    .model_manager.register_connection_model<
+      Quantal_StpConnection< TargetIdentifierPtrRport > >(
       "quantal_stp_synapse" );
   kernel()
-    .model_manager
-    .register_connection_model< Quantal_StpConnection< TargetIdentifierIndex > >(
+    .model_manager.register_connection_model<
+      Quantal_StpConnection< TargetIdentifierIndex > >(
       "quantal_stp_synapse_hpc" );
 
 
@@ -607,12 +605,12 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, stdp_facetshw_synapse_hom, static_synapse_hpc
   */
   kernel()
-    .model_manager
-    .register_connection_model< STDPFACETSHWConnectionHom< TargetIdentifierPtrRport > >(
+    .model_manager.register_connection_model<
+      STDPFACETSHWConnectionHom< TargetIdentifierPtrRport > >(
       "stdp_facetshw_synapse_hom" );
   kernel()
-    .model_manager
-    .register_connection_model< STDPFACETSHWConnectionHom< TargetIdentifierIndex > >(
+    .model_manager.register_connection_model<
+      STDPFACETSHWConnectionHom< TargetIdentifierIndex > >(
       "stdp_facetshw_synapse_hom_hpc" );
 
 
@@ -622,9 +620,8 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, cont_delay_synapse, static_synapse_hpc
   */
   kernel()
-    .model_manager
-    .register_connection_model< ContDelayConnection< TargetIdentifierPtrRport > >(
-      "cont_delay_synapse" );
+    .model_manager.register_connection_model<
+      ContDelayConnection< TargetIdentifierPtrRport > >( "cont_delay_synapse" );
   kernel()
     .model_manager
     .register_connection_model< ContDelayConnection< TargetIdentifierIndex > >(
@@ -652,8 +649,8 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, tsodyks_synapse_hom, static_synapse_hpc
   */
   kernel()
-    .model_manager
-    .register_connection_model< TsodyksConnectionHom< TargetIdentifierPtrRport > >(
+    .model_manager.register_connection_model<
+      TsodyksConnectionHom< TargetIdentifierPtrRport > >(
       "tsodyks_synapse_hom" );
   kernel()
     .model_manager
@@ -667,9 +664,8 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, tsodyks2_synapse, static_synapse_hpc
   */
   kernel()
-    .model_manager
-    .register_connection_model< Tsodyks2Connection< TargetIdentifierPtrRport > >(
-      "tsodyks2_synapse" );
+    .model_manager.register_connection_model<
+      Tsodyks2Connection< TargetIdentifierPtrRport > >( "tsodyks2_synapse" );
   kernel()
     .model_manager
     .register_connection_model< Tsodyks2Connection< TargetIdentifierIndex > >(
@@ -696,8 +692,8 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, stdp_dopamine_synapse, static_synapse_hpc
   */
   kernel()
-    .model_manager
-    .register_connection_model< STDPDopaConnection< TargetIdentifierPtrRport > >(
+    .model_manager.register_connection_model<
+      STDPDopaConnection< TargetIdentifierPtrRport > >(
       "stdp_dopamine_synapse" );
   kernel()
     .model_manager
@@ -711,12 +707,12 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, vogels_sprekeler_synapse
   */
   kernel()
-    .model_manager
-    .register_connection_model< VogelsSprekelerConnection< TargetIdentifierPtrRport > >(
+    .model_manager.register_connection_model<
+      VogelsSprekelerConnection< TargetIdentifierPtrRport > >(
       "vogels_sprekeler_synapse" );
   kernel()
-    .model_manager
-    .register_connection_model< VogelsSprekelerConnection< TargetIdentifierIndex > >(
+    .model_manager.register_connection_model<
+      VogelsSprekelerConnection< TargetIdentifierIndex > >(
       "vogels_sprekeler_synapse_hpc" );
 
   /** @BeginDocumentation
@@ -724,9 +720,8 @@ ModelsModule::init( SLIInterpreter* )
      SeeAlso: synapsedict, static_synapse, static_synapse_hom_w
   */
   kernel()
-    .model_manager
-    .register_connection_model< BernoulliConnection< TargetIdentifierPtrRport > >(
-      "bernoulli_synapse" );
+    .model_manager.register_connection_model<
+      BernoulliConnection< TargetIdentifierPtrRport > >( "bernoulli_synapse" );
 }
 
 } // namespace nest

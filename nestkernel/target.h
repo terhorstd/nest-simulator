@@ -27,9 +27,9 @@
 #include <cassert>
 
 // Includes from nestkernel:
+#include "exceptions.h"
 #include "nest_types.h"
 #include "static_assert.h"
-#include "exceptions.h"
 
 namespace nest
 {

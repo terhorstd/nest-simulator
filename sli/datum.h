@@ -209,8 +209,8 @@ protected:
 };
 
 template < SLIType* slt >
-inline const TypedDatum< slt >& TypedDatum< slt >::operator=(
-  const TypedDatum< slt >& )
+inline const TypedDatum< slt >&
+TypedDatum< slt >::operator=( const TypedDatum< slt >& )
 {
   //  assert( type == d.type );
   return *this;

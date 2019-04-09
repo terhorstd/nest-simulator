@@ -287,9 +287,9 @@ private:
    */
   struct Buffers_
   {
-    Buffers_( hh_psc_alpha_clopath& ); //!<Sets buffer pointers to 0
+    Buffers_( hh_psc_alpha_clopath& ); //!< Sets buffer pointers to 0
     Buffers_( const Buffers_&,
-      hh_psc_alpha_clopath& ); //!<Sets buffer pointers to 0
+      hh_psc_alpha_clopath& ); //!< Sets buffer pointers to 0
 
     //! Logger for all analog data
     UniversalDataLogger< hh_psc_alpha_clopath > logger_;

@@ -135,9 +135,10 @@ aeif_cond_beta_multisynapse_dynamics( double,
         * std::exp( ( V - node.P_.V_th ) / node.P_.Delta_T ) );
 
   // dv/dt
-  f[ S::V_M ] =
-    is_refractory ? 0 : ( -node.P_.g_L * ( V - node.P_.E_L ) + I_spike + I_syn
-                          - w + node.P_.I_e + node.B_.I_stim_ ) / node.P_.C_m;
+  f[ S::V_M ] = is_refractory ? 0
+                              : ( -node.P_.g_L * ( V - node.P_.E_L ) + I_spike
+                                  + I_syn - w + node.P_.I_e + node.B_.I_stim_ )
+      / node.P_.C_m;
 
   // Adaptation current w.
   f[ S::W ] = ( node.P_.a * ( V - node.P_.E_L ) - w ) / node.P_.tau_w;
@@ -191,8 +192,8 @@ aeif_cond_beta_multisynapse::State_::State_( const State_& s )
   y_ = s.y_;
 }
 
-aeif_cond_beta_multisynapse::State_& aeif_cond_beta_multisynapse::State_::
-operator=( const State_& s )
+aeif_cond_beta_multisynapse::State_&
+aeif_cond_beta_multisynapse::State_::operator=( const State_& s )
 {
   assert( this != &s ); // would be bad logical error in program
 
@@ -737,8 +738,9 @@ aeif_cond_beta_multisynapse::set_status( const DictionaryDatum& d )
           ++receptor )
     {
       size_t elem = aeif_cond_beta_multisynapse::State_::G
-        + receptor * aeif_cond_beta_multisynapse::State_::
-                       NUM_STATE_ELEMENTS_PER_RECEPTOR;
+        + receptor
+          * aeif_cond_beta_multisynapse::State_::
+              NUM_STATE_ELEMENTS_PER_RECEPTOR;
       recordablesMap_.insert(
         get_g_receptor_name( receptor ), get_data_access_functor( elem ) );
     }

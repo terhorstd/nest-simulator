@@ -364,9 +364,10 @@ nest::correlomatrix_detector::handle( SpikeEvent& e )
 
         if ( sender_ind <= other_ind )
         {
-          bin = -1. * std::floor( ( 0.5 * P_.delta_tau_.get_steps()
-                                    - std::abs( spike_i - spike_j->timestep_ ) )
-                        / P_.delta_tau_.get_steps() );
+          bin = -1.
+            * std::floor( ( 0.5 * P_.delta_tau_.get_steps()
+                            - std::abs( spike_i - spike_j->timestep_ ) )
+                / P_.delta_tau_.get_steps() );
         }
         else
         {

@@ -23,11 +23,11 @@
 #ifndef PP_POP_PSC_BETA_H
 #define PP_POP_PSC_BETA_H
 
+#include "gsl_binomial_randomdev.h"
 #include "nest.h"
 #include "node.h"
-#include "ring_buffer.h"
 #include "poisson_randomdev.h"
-#include "gsl_binomial_randomdev.h"
+#include "ring_buffer.h"
 #include "universal_data_logger.h"
 
 #ifdef HAVE_GSL

@@ -194,7 +194,7 @@ private:
     Buffers_();                  //!< Initializes default buffer
     Buffers_( const Buffers_& ); //!< Copy constructor for the data buffer
     bool has_targets_; //!< Indicates whether the proxy is recording from any
-                       //!neurons or not
+                       //! neurons or not
     std::vector< double > data_; //!< Recorded data
   };
 

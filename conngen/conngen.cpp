@@ -194,7 +194,7 @@ cg_set_masks( ConnectionGeneratorDatum& cg,
  * same. This could be solved by making the ConnectionGenerator
  * interface MPI aware and communicating the masks during connection
  * setup.
-*/
+ */
 void
 cg_create_masks( std::vector< ConnectionGenerator::Mask >& masks,
   RangeSet& sources,
@@ -211,7 +211,7 @@ cg_create_masks( std::vector< ConnectionGenerator::Mask >& masks,
     const size_t num_elements = source->last - source->first + 1;
     const size_t right = cg_idx_left + num_elements - 1;
     for ( size_t proc = 0; proc
-            < static_cast< size_t >( kernel().mpi_manager.get_num_processes() );
+          < static_cast< size_t >( kernel().mpi_manager.get_num_processes() );
           ++proc )
     {
       masks[ proc ].sources.insert( cg_idx_left, right );
@@ -228,7 +228,7 @@ cg_create_masks( std::vector< ConnectionGenerator::Mask >& masks,
   {
     size_t num_elements = target->last - target->first + 1;
     for ( size_t proc = 0; proc
-            < static_cast< size_t >( kernel().mpi_manager.get_num_processes() );
+          < static_cast< size_t >( kernel().mpi_manager.get_num_processes() );
           ++proc )
     {
       // Make sure that the range is only added on as many ranks as
@@ -251,8 +251,8 @@ cg_create_masks( std::vector< ConnectionGenerator::Mask >& masks,
         // the rank where left acutally is the first neuron fromt
         // the currently looked at range.
         masks[ ( proc + target->first )
-          % kernel().mpi_manager.get_num_processes() ].targets.insert( left,
-          right );
+          % kernel().mpi_manager.get_num_processes() ]
+          .targets.insert( left, right );
       }
     }
 

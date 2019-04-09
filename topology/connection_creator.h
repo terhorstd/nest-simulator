@@ -34,8 +34,8 @@
 #include "position.h"
 #include "selector.h"
 #include "topology_names.h"
-#include "topologymodule.h"
 #include "topology_parameter.h"
+#include "topologymodule.h"
 #include "vose.h"
 
 namespace nest

@@ -85,8 +85,8 @@ Archiving_Node::register_stdp_connection( double t_first_read )
 
   for ( std::deque< histentry >::iterator runner = history_.begin();
         runner != history_.end()
-          and ( t_first_read - runner->t_ > -1.0
-                  * kernel().connection_manager.get_stdp_eps() );
+        and ( t_first_read - runner->t_
+              > -1.0 * kernel().connection_manager.get_stdp_eps() );
         ++runner )
   {
     ( runner->access_counter_ )++;
@@ -343,8 +343,8 @@ nest::Archiving_Node::clear_history()
 
 
 /* ----------------------------------------------------------------
-* Get the number of synaptic_elements
-* ---------------------------------------------------------------- */
+ * Get the number of synaptic_elements
+ * ---------------------------------------------------------------- */
 double
 nest::Archiving_Node::get_synaptic_elements( Name n ) const
 {

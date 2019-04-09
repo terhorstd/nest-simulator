@@ -31,9 +31,9 @@
 #include "nest_types.h"
 #include "stimulating_device.h"
 
-#include <vector>
 #include "nest.h"
 #include "ring_buffer.h"
+#include <vector>
 
 
 namespace nest

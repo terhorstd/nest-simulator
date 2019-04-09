@@ -486,8 +486,8 @@ Position< D, T >::getToken() const
 
 template < int D, class T >
 template < class OT >
-inline Position< D, T > Position< D, T >::operator+(
-  const Position< D, OT >& other ) const
+inline Position< D, T >
+Position< D, T >::operator+( const Position< D, OT >& other ) const
 {
   Position p = *this;
   p += other;
@@ -496,8 +496,8 @@ inline Position< D, T > Position< D, T >::operator+(
 
 template < int D, class T >
 template < class OT >
-inline Position< D, T > Position< D, T >::operator-(
-  const Position< D, OT >& other ) const
+inline Position< D, T >
+Position< D, T >::operator-( const Position< D, OT >& other ) const
 {
   Position p = *this;
   p -= other;
@@ -505,7 +505,8 @@ inline Position< D, T > Position< D, T >::operator-(
 }
 
 template < int D, class T >
-inline Position< D, T > Position< D, T >::operator-() const
+inline Position< D, T >
+Position< D, T >::operator-() const
 {
   Position p;
   p -= *this;
@@ -524,8 +525,8 @@ inline Position< D, T > Position< D, T >::operator*(
 
 template < int D, class T >
 template < class OT >
-inline Position< D, T > Position< D, T >::operator/(
-  const Position< D, OT >& other ) const
+inline Position< D, T >
+Position< D, T >::operator/( const Position< D, OT >& other ) const
 {
   Position p = *this;
   p /= other;
@@ -533,7 +534,8 @@ inline Position< D, T > Position< D, T >::operator/(
 }
 
 template < int D, class T >
-inline Position< D, T > Position< D, T >::operator+( const T& a ) const
+inline Position< D, T >
+Position< D, T >::operator+( const T& a ) const
 {
   Position p = *this;
   p += a;
@@ -541,7 +543,8 @@ inline Position< D, T > Position< D, T >::operator+( const T& a ) const
 }
 
 template < int D, class T >
-inline Position< D, T > Position< D, T >::operator-( const T& a ) const
+inline Position< D, T >
+Position< D, T >::operator-( const T& a ) const
 {
   Position p = *this;
   p -= a;
@@ -557,7 +560,8 @@ inline Position< D, T > Position< D, T >::operator*( const T& a ) const
 }
 
 template < int D, class T >
-inline Position< D, T > Position< D, T >::operator/( const T& a ) const
+inline Position< D, T >
+Position< D, T >::operator/( const T& a ) const
 {
   Position p = *this;
   p /= a;
@@ -566,8 +570,8 @@ inline Position< D, T > Position< D, T >::operator/( const T& a ) const
 
 template < int D, class T >
 template < class OT >
-inline Position< D, T >& Position< D, T >::operator+=(
-  const Position< D, OT >& other )
+inline Position< D, T >&
+Position< D, T >::operator+=( const Position< D, OT >& other )
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -578,8 +582,8 @@ inline Position< D, T >& Position< D, T >::operator+=(
 
 template < int D, class T >
 template < class OT >
-inline Position< D, T >& Position< D, T >::operator-=(
-  const Position< D, OT >& other )
+inline Position< D, T >&
+Position< D, T >::operator-=( const Position< D, OT >& other )
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -590,8 +594,8 @@ inline Position< D, T >& Position< D, T >::operator-=(
 
 template < int D, class T >
 template < class OT >
-inline Position< D, T >& Position< D, T >::operator*=(
-  const Position< D, OT >& other )
+inline Position< D, T >&
+Position< D, T >::operator*=( const Position< D, OT >& other )
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -602,8 +606,8 @@ inline Position< D, T >& Position< D, T >::operator*=(
 
 template < int D, class T >
 template < class OT >
-inline Position< D, T >& Position< D, T >::operator/=(
-  const Position< D, OT >& other )
+inline Position< D, T >&
+Position< D, T >::operator/=( const Position< D, OT >& other )
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -613,7 +617,8 @@ inline Position< D, T >& Position< D, T >::operator/=(
 }
 
 template < int D, class T >
-inline Position< D, T >& Position< D, T >::operator+=( const T& a )
+inline Position< D, T >&
+Position< D, T >::operator+=( const T& a )
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -623,7 +628,8 @@ inline Position< D, T >& Position< D, T >::operator+=( const T& a )
 }
 
 template < int D, class T >
-inline Position< D, T >& Position< D, T >::operator-=( const T& a )
+inline Position< D, T >&
+Position< D, T >::operator-=( const T& a )
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -633,7 +639,8 @@ inline Position< D, T >& Position< D, T >::operator-=( const T& a )
 }
 
 template < int D, class T >
-inline Position< D, T >& Position< D, T >::operator*=( const T& a )
+inline Position< D, T >&
+Position< D, T >::operator*=( const T& a )
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -643,7 +650,8 @@ inline Position< D, T >& Position< D, T >::operator*=( const T& a )
 }
 
 template < int D, class T >
-inline Position< D, T >& Position< D, T >::operator/=( const T& a )
+inline Position< D, T >&
+Position< D, T >::operator/=( const T& a )
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -653,7 +661,8 @@ inline Position< D, T >& Position< D, T >::operator/=( const T& a )
 }
 
 template < int D, class T >
-inline bool Position< D, T >::operator==( const Position< D, T >& y ) const
+inline bool
+Position< D, T >::operator==( const Position< D, T >& y ) const
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -666,7 +675,8 @@ inline bool Position< D, T >::operator==( const Position< D, T >& y ) const
 }
 
 template < int D, class T >
-inline bool Position< D, T >::operator!=( const Position< D, T >& y ) const
+inline bool
+Position< D, T >::operator!=( const Position< D, T >& y ) const
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -679,7 +689,8 @@ inline bool Position< D, T >::operator!=( const Position< D, T >& y ) const
 }
 
 template < int D, class T >
-inline bool Position< D, T >::operator<( const Position< D, T >& y ) const
+inline bool
+Position< D, T >::operator<( const Position< D, T >& y ) const
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -692,7 +703,8 @@ inline bool Position< D, T >::operator<( const Position< D, T >& y ) const
 }
 
 template < int D, class T >
-inline bool Position< D, T >::operator>( const Position< D, T >& y ) const
+inline bool
+Position< D, T >::operator>( const Position< D, T >& y ) const
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -705,7 +717,8 @@ inline bool Position< D, T >::operator>( const Position< D, T >& y ) const
 }
 
 template < int D, class T >
-inline bool Position< D, T >::operator<=( const Position< D, T >& y ) const
+inline bool
+Position< D, T >::operator<=( const Position< D, T >& y ) const
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -718,7 +731,8 @@ inline bool Position< D, T >::operator<=( const Position< D, T >& y ) const
 }
 
 template < int D, class T >
-inline bool Position< D, T >::operator>=( const Position< D, T >& y ) const
+inline bool
+Position< D, T >::operator>=( const Position< D, T >& y ) const
 {
   for ( int i = 0; i < D; ++i )
   {
@@ -762,7 +776,8 @@ Position< D, T >::print( std::ostream& out, char sep ) const
 }
 
 template < int D, class T >
-std::ostream& operator<<( std::ostream& os, const Position< D, T >& pos )
+std::ostream&
+operator<<( std::ostream& os, const Position< D, T >& pos )
 {
   os << "(";
   if ( D > 0 )

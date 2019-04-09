@@ -345,8 +345,8 @@ nest::mat2_psc_exp::update( Time const& origin, const long from, const long to )
 
     if ( S_.r_ == 0 ) // neuron is allowed to fire
     {
-      if ( S_.V_m_ >= P_.omega_ + S_.V_th_2_
-          + S_.V_th_1_ ) // threshold crossing
+      if ( S_.V_m_
+        >= P_.omega_ + S_.V_th_2_ + S_.V_th_1_ ) // threshold crossing
       {
         S_.r_ = V_.RefractoryCountsTot_;
 

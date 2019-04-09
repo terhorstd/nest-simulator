@@ -228,16 +228,16 @@ private:
   {
     double norm_w = ( w / cp.Wmax_ )
       + ( cp.lambda_ * std::pow( 1.0 - ( w / cp.Wmax_ ), cp.mu_plus_ )
-                      * kplus );
+          * kplus );
     return norm_w < 1.0 ? norm_w * cp.Wmax_ : cp.Wmax_;
   }
 
   double
   depress_( double w, double kminus, const STDPHomCommonProperties& cp )
   {
-    double norm_w =
-      ( w / cp.Wmax_ ) - ( cp.alpha_ * cp.lambda_
-                           * std::pow( w / cp.Wmax_, cp.mu_minus_ ) * kminus );
+    double norm_w = ( w / cp.Wmax_ )
+      - ( cp.alpha_ * cp.lambda_ * std::pow( w / cp.Wmax_, cp.mu_minus_ )
+          * kminus );
     return norm_w > 0.0 ? norm_w * cp.Wmax_ : 0.0;
   }
 

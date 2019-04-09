@@ -201,7 +201,8 @@ private:
     /**
      * Greater operator needed for insertion sort.
      */
-    inline bool operator>( const BinaryPulse_& second ) const
+    inline bool
+    operator>( const BinaryPulse_& second ) const
     {
       return t_off_ > second.t_off_;
     }

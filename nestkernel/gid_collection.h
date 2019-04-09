@@ -129,7 +129,8 @@ operator++()
   return *this;
 }
 
-inline bool GIDCollection::const_iterator::operator!=(
+inline bool
+GIDCollection::const_iterator::operator!=(
   const GIDCollection::const_iterator& rhs ) const
 {
   return offset_ != rhs.offset_;
@@ -152,7 +153,8 @@ inline index GIDCollection::operator[]( const size_t pos ) const
   }
 }
 
-inline bool GIDCollection::operator==( const GIDCollection& rhs ) const
+inline bool
+GIDCollection::operator==( const GIDCollection& rhs ) const
 {
   if ( is_range_ )
   {

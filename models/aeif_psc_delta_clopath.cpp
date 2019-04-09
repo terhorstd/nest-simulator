@@ -67,24 +67,24 @@ RecordablesMap< aeif_psc_delta_clopath >::create()
 {
   // use standard names whereever you can for consistency!
   insert_( names::V_m,
-    &aeif_psc_delta_clopath::
-      get_y_elem_< aeif_psc_delta_clopath::State_::V_M > );
+    &aeif_psc_delta_clopath::get_y_elem_<
+      aeif_psc_delta_clopath::State_::V_M > );
   insert_( names::w,
     &aeif_psc_delta_clopath::get_y_elem_< aeif_psc_delta_clopath::State_::W > );
   insert_( names::z,
     &aeif_psc_delta_clopath::get_y_elem_< aeif_psc_delta_clopath::State_::Z > );
   insert_( names::V_th,
-    &aeif_psc_delta_clopath::
-      get_y_elem_< aeif_psc_delta_clopath::State_::V_TH > );
+    &aeif_psc_delta_clopath::get_y_elem_<
+      aeif_psc_delta_clopath::State_::V_TH > );
   insert_( names::u_bar_plus,
-    &aeif_psc_delta_clopath::
-      get_y_elem_< aeif_psc_delta_clopath::State_::U_BAR_PLUS > );
+    &aeif_psc_delta_clopath::get_y_elem_<
+      aeif_psc_delta_clopath::State_::U_BAR_PLUS > );
   insert_( names::u_bar_minus,
-    &aeif_psc_delta_clopath::
-      get_y_elem_< aeif_psc_delta_clopath::State_::U_BAR_MINUS > );
+    &aeif_psc_delta_clopath::get_y_elem_<
+      aeif_psc_delta_clopath::State_::U_BAR_MINUS > );
   insert_( names::u_bar_bar,
-    &aeif_psc_delta_clopath::
-      get_y_elem_< aeif_psc_delta_clopath::State_::U_BAR_BAR > );
+    &aeif_psc_delta_clopath::get_y_elem_<
+      aeif_psc_delta_clopath::State_::U_BAR_BAR > );
 }
 }
 
@@ -134,7 +134,8 @@ nest::aeif_psc_delta_clopath_dynamics( double,
   f[ S::V_M ] = ( is_refractory || is_clamped )
     ? 0.0
     : ( -node.P_.g_L * ( V - node.P_.E_L ) + I_spike - w + z + node.P_.I_e
-        + node.B_.I_stim_ ) / node.P_.C_m;
+        + node.B_.I_stim_ )
+      / node.P_.C_m;
 
   // Adaptation current w.
   f[ S::W ] =
@@ -208,8 +209,8 @@ nest::aeif_psc_delta_clopath::State_::State_( const State_& s )
   }
 }
 
-nest::aeif_psc_delta_clopath::State_& nest::aeif_psc_delta_clopath::State_::
-operator=( const State_& s )
+nest::aeif_psc_delta_clopath::State_&
+nest::aeif_psc_delta_clopath::State_::operator=( const State_& s )
 {
   assert( this != &s ); // would be bad logical error in program
 
@@ -335,8 +336,7 @@ nest::aeif_psc_delta_clopath::Parameters_::set( const DictionaryDatum& d )
   }
 
   if ( tau_w <= 0 or tau_V_th <= 0 or tau_w <= 0 or tau_z <= 0 or tau_plus <= 0
-    or tau_minus <= 0
-    or tau_bar_bar <= 0 )
+    or tau_minus <= 0 or tau_bar_bar <= 0 )
   {
     throw BadProperty( "All time constants must be strictly positive." );
   }
@@ -589,10 +589,10 @@ nest::aeif_psc_delta_clopath::update( const Time& origin,
         S_.y_[ State_::V_TH ] = P_.V_th_max;
 
         /* Initialize clamping step counter.
-        * - We need to add 1 to compensate for count-down immediately after
-        *   while loop.
-        * - If neuron does not use clamping, set to 0
-        */
+         * - We need to add 1 to compensate for count-down immediately after
+         *   while loop.
+         * - If neuron does not use clamping, set to 0
+         */
         S_.clamp_r_ = V_.clamp_counts_ > 0 ? V_.clamp_counts_ + 1 : 0;
 
         set_spiketime( Time::step( origin.get_steps() + lag + 1 ) );
@@ -605,11 +605,11 @@ nest::aeif_psc_delta_clopath::update( const Time& origin,
         S_.clamp_r_ = 0;
 
         /* Initialize refractory step counter.
-        * - We need to add 1 to compensate for count-down immediately after
-        *   while loop.
-        * - If neuron has no refractory time, set to 0 to avoid refractory
-        *   artifact inside while loop.
-        */
+         * - We need to add 1 to compensate for count-down immediately after
+         *   while loop.
+         * - If neuron has no refractory time, set to 0 to avoid refractory
+         *   artifact inside while loop.
+         */
         S_.r_ = V_.refractory_counts_ > 0 ? V_.refractory_counts_ + 1 : 0;
       }
 

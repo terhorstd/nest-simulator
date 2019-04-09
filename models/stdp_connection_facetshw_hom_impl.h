@@ -40,8 +40,8 @@ namespace nest
 //
 
 template < typename targetidentifierT >
-STDPFACETSHWHomCommonProperties< targetidentifierT >::
-  STDPFACETSHWHomCommonProperties()
+STDPFACETSHWHomCommonProperties<
+  targetidentifierT >::STDPFACETSHWHomCommonProperties()
   : CommonSynapseProperties()
   , tau_plus_( 20.0 )
   , tau_minus_( 20.0 )
@@ -121,11 +121,12 @@ STDPFACETSHWHomCommonProperties< targetidentifierT >::
 
 template < typename targetidentifierT >
 void
-STDPFACETSHWHomCommonProperties< targetidentifierT >::
-  calc_readout_cycle_duration_()
+STDPFACETSHWHomCommonProperties<
+  targetidentifierT >::calc_readout_cycle_duration_()
 {
-  readout_cycle_duration_ = int( ( no_synapses_ - 1.0 ) / synapses_per_driver_
-                              + 1.0 ) * driver_readout_time_;
+  readout_cycle_duration_ =
+    int( ( no_synapses_ - 1.0 ) / synapses_per_driver_ + 1.0 )
+    * driver_readout_time_;
   // std::cout << "stdp_connection_facetshw_hom::debug: readout cycle duration
   // changed to " <<
   // readout_cycle_duration_ << std::endl;

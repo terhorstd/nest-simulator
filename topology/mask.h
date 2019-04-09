@@ -527,7 +527,7 @@ public:
   Mask< D >* clone() const;
 
 protected:
-  Mask< D >* mask1_, *mask2_;
+  Mask< D >*mask1_, *mask2_;
 };
 
 /**
@@ -574,7 +574,7 @@ public:
   Mask< D >* clone() const;
 
 protected:
-  Mask< D >* mask1_, *mask2_;
+  Mask< D >*mask1_, *mask2_;
 };
 
 /**
@@ -621,7 +621,7 @@ public:
   Mask< D >* clone() const;
 
 protected:
-  Mask< D >* mask1_, *mask2_;
+  Mask< D >*mask1_, *mask2_;
 };
 
 

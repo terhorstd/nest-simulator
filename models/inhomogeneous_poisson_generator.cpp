@@ -24,15 +24,15 @@
 #include "event_delivery_manager_impl.h"
 #include "kernel_manager.h"
 
+#include "booldatum.h"
 #include "dict.h"
 #include "dictutils.h"
 #include "doubledatum.h"
-#include "booldatum.h"
 
 
+#include "arraydatum.h"
 #include "exceptions.h"
 #include "integerdatum.h"
-#include "arraydatum.h"
 #include "numerics.h"
 #include "universal_data_logger_impl.h"
 

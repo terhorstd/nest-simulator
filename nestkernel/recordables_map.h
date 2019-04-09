@@ -145,7 +145,8 @@ public:
     : parent_( &n )
     , elem_( elem ){};
 
-  double operator()() const
+  double
+  operator()() const
   {
     return parent_->get_state_element( elem_ );
   };

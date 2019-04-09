@@ -25,10 +25,10 @@
 #ifdef HAVE_GSL
 
 // C++ includes:
-#include <limits>
+#include <cstdio>
 #include <iomanip>
 #include <iostream>
-#include <cstdio>
+#include <limits>
 
 // Includes from libnestutil:
 #include "numerics.h"
@@ -41,12 +41,12 @@
 // Includes from sli:
 #include "dict.h"
 #include "dictutils.h"
-#include "integerdatum.h"
 #include "doubledatum.h"
+#include "integerdatum.h"
 
 #include "compose.hpp"
-#include "propagator_stability.h"
 #include "event.h"
+#include "propagator_stability.h"
 
 namespace nest
 {
@@ -98,8 +98,9 @@ nest::gif_cond_exp_dynamics( double, const double y[], double f[], void* pnode )
   const double stc = node.S_.stc_;
 
   // V dot
-  f[ 0 ] = ( -I_L + node.S_.I_stim_ + node.P_.I_e_ - I_syn_exc - I_syn_inh
-             - stc ) / node.P_.c_m_;
+  f[ 0 ] =
+    ( -I_L + node.S_.I_stim_ + node.P_.I_e_ - I_syn_exc - I_syn_inh - stc )
+    / node.P_.c_m_;
 
   f[ 1 ] = -y[ S::G_EXC ] / node.P_.tau_synE_;
   f[ 2 ] = -y[ S::G_INH ] / node.P_.tau_synI_;
@@ -170,8 +171,8 @@ nest::gif_cond_exp::State_::State_( const State_& s )
   }
 }
 
-nest::gif_cond_exp::State_& nest::gif_cond_exp::State_::operator=(
-  const State_& s )
+nest::gif_cond_exp::State_&
+nest::gif_cond_exp::State_::operator=( const State_& s )
 {
   assert( this != &s ); // would be bad logical error in program
   for ( size_t i = 0; i < STATE_VEC_SIZE; ++i )
@@ -549,9 +550,9 @@ nest::gif_cond_exp::update( Time const& origin, const long from, const long to )
     if ( S_.r_ref_ == 0 ) // neuron is not in refractory period
     {
 
-      const double lambda =
-        P_.lambda_0_ * std::exp( ( S_.neuron_state_[ State_::V_M ] - S_.sfa_ )
-                         / P_.Delta_V_ );
+      const double lambda = P_.lambda_0_
+        * std::exp(
+            ( S_.neuron_state_[ State_::V_M ] - S_.sfa_ ) / P_.Delta_V_ );
 
       if ( lambda > 0.0 )
       {

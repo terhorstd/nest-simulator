@@ -247,7 +247,8 @@ index NodeManager::add_node( index mod, long n ) // no_p
     // TODO: This will work reasonably for round-robin. The extra 50 entries
     //       are for subnets and devices.
     local_nodes_.reserve( std::ceil( static_cast< double >( max_gid )
-                            / kernel().mpi_manager.get_num_processes() ) + 50 );
+                            / kernel().mpi_manager.get_num_processes() )
+      + 50 );
     for ( thread tid = 0; tid < n_threads; ++tid )
     {
       // Model::reserve() reserves memory for n ADDITIONAL nodes on thread t
@@ -354,7 +355,8 @@ index NodeManager::add_node( index mod, long n ) // no_p
     // and filled with one instance per thread, in total n * n_thread nodes in
     // n wrappers.
     local_nodes_.reserve( std::ceil( static_cast< double >( max_gid )
-                            / kernel().mpi_manager.get_num_processes() ) + 50 );
+                            / kernel().mpi_manager.get_num_processes() )
+      + 50 );
     for ( index gid = min_gid; gid < max_gid; ++gid )
     {
       const thread tid = kernel().vp_manager.vp_to_thread(

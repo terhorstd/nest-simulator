@@ -138,7 +138,7 @@ nest::DynamicUniversalDataLogger< HostNode >::DataLogger_::init()
 
   data_.resize( 2,
     DataLoggingReply::Container(
-                  recs_per_slice, DataLoggingReply::Item( num_vars_ ) ) );
+      recs_per_slice, DataLoggingReply::Item( num_vars_ ) ) );
 
   next_rec_.resize( 2 );               // just for safety's sake
   next_rec_[ 0 ] = next_rec_[ 1 ] = 0; // start at beginning of buffer
@@ -351,7 +351,7 @@ nest::UniversalDataLogger< HostNode >::DataLogger_::init()
 
   data_.resize( 2,
     DataLoggingReply::Container(
-                  recs_per_slice, DataLoggingReply::Item( num_vars_ ) ) );
+      recs_per_slice, DataLoggingReply::Item( num_vars_ ) ) );
 
   next_rec_.resize( 2 );               // just for safety's sake
   next_rec_[ 0 ] = next_rec_[ 1 ] = 0; // start at beginning of buffer

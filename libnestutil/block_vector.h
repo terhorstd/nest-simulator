@@ -23,11 +23,11 @@
 #ifndef BLOCK_VECTOR_H_
 #define BLOCK_VECTOR_H_
 
+#include <cassert>
 #include <cmath>
-#include <vector>
 #include <iostream>
 #include <iterator>
-#include <cassert>
+#include <vector>
 
 template < typename value_type_ >
 class BlockVector;
@@ -514,8 +514,7 @@ inline bv_iterator< value_type_, ref_, ptr_ >::bv_iterator(
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline bv_iterator< value_type_, ref_, ptr_ >&
-  bv_iterator< value_type_, ref_, ptr_ >::
-  operator++()
+  bv_iterator< value_type_, ref_, ptr_ >::operator++()
 {
   ++block_it_;
   if ( block_it_ == current_block_end_ )
@@ -529,8 +528,7 @@ inline bv_iterator< value_type_, ref_, ptr_ >&
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline bv_iterator< value_type_, ref_, ptr_ >&
-  bv_iterator< value_type_, ref_, ptr_ >::
-  operator--()
+  bv_iterator< value_type_, ref_, ptr_ >::operator--()
 {
   // If we are still within the block, we can just decrement the block iterator.
   // If not, we need to switch to the previous block.
@@ -549,8 +547,7 @@ inline bv_iterator< value_type_, ref_, ptr_ >&
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline bv_iterator< value_type_, ref_, ptr_ >&
-  bv_iterator< value_type_, ref_, ptr_ >::
-  operator+=( difference_type val )
+bv_iterator< value_type_, ref_, ptr_ >::operator+=( difference_type val )
 {
   for ( difference_type i = 0; i < val; ++i )
   {
@@ -561,8 +558,7 @@ inline bv_iterator< value_type_, ref_, ptr_ >&
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline bv_iterator< value_type_, ref_, ptr_ >&
-  bv_iterator< value_type_, ref_, ptr_ >::
-  operator-=( difference_type val )
+bv_iterator< value_type_, ref_, ptr_ >::operator-=( difference_type val )
 {
   for ( difference_type i = 0; i < val; ++i )
   {
@@ -573,7 +569,7 @@ inline bv_iterator< value_type_, ref_, ptr_ >&
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline bv_iterator< value_type_, ref_, ptr_ >
-  bv_iterator< value_type_, ref_, ptr_ >::operator+( difference_type val )
+bv_iterator< value_type_, ref_, ptr_ >::operator+( difference_type val )
 {
   bv_iterator tmp = *this;
   return tmp += val;
@@ -581,7 +577,7 @@ inline bv_iterator< value_type_, ref_, ptr_ >
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline bv_iterator< value_type_, ref_, ptr_ >
-  bv_iterator< value_type_, ref_, ptr_ >::operator-( difference_type val )
+bv_iterator< value_type_, ref_, ptr_ >::operator-( difference_type val )
 {
   bv_iterator tmp = *this;
   return tmp -= val;
@@ -598,8 +594,7 @@ inline bv_iterator< value_type_, ref_, ptr_ >
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline typename bv_iterator< value_type_, ref_, ptr_ >::reference
-  bv_iterator< value_type_, ref_, ptr_ >::
-  operator*() const
+  bv_iterator< value_type_, ref_, ptr_ >::operator*() const
 {
   // TODO: Using const_cast  to remove the constness isn't the most elegant
   // solution. There is probably a better way to do this.
@@ -608,8 +603,7 @@ inline typename bv_iterator< value_type_, ref_, ptr_ >::reference
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline typename bv_iterator< value_type_, ref_, ptr_ >::pointer
-  bv_iterator< value_type_, ref_, ptr_ >::
-  operator->() const
+  bv_iterator< value_type_, ref_, ptr_ >::operator->() const
 {
   // TODO: Again, using const_cast  to remove the constness isn't the most
   // elegant solution. There is probably a better way to do this.
@@ -618,8 +612,7 @@ inline typename bv_iterator< value_type_, ref_, ptr_ >::pointer
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline typename bv_iterator< value_type_, ref_, ptr_ >::difference_type
-  bv_iterator< value_type_, ref_, ptr_ >::
-  operator-( const iterator& other ) const
+bv_iterator< value_type_, ref_, ptr_ >::operator-( const iterator& other ) const
 {
   auto this_element_index =
     block_it_ - block_vector_->blockmap_[ block_index_ ].begin();
@@ -631,8 +624,8 @@ inline typename bv_iterator< value_type_, ref_, ptr_ >::difference_type
 
 template < typename value_type_, typename ref_, typename ptr_ >
 inline typename bv_iterator< value_type_, ref_, ptr_ >::difference_type
-  bv_iterator< value_type_, ref_, ptr_ >::
-  operator-( const const_iterator& other ) const
+bv_iterator< value_type_, ref_, ptr_ >::operator-(
+  const const_iterator& other ) const
 {
   auto this_element_index =
     block_it_ - block_vector_->blockmap_[ block_index_ ].begin();
@@ -643,21 +636,24 @@ inline typename bv_iterator< value_type_, ref_, ptr_ >::difference_type
 }
 
 template < typename value_type_, typename ref_, typename ptr_ >
-inline bool bv_iterator< value_type_, ref_, ptr_ >::operator==(
+inline bool
+bv_iterator< value_type_, ref_, ptr_ >::operator==(
   const bv_iterator< value_type_, ref_, ptr_ >& rhs ) const
 {
   return ( block_index_ == rhs.block_index_ and block_it_ == rhs.block_it_ );
 }
 
 template < typename value_type_, typename ref_, typename ptr_ >
-inline bool bv_iterator< value_type_, ref_, ptr_ >::operator!=(
+inline bool
+bv_iterator< value_type_, ref_, ptr_ >::operator!=(
   const bv_iterator< value_type_, ref_, ptr_ >& rhs ) const
 {
   return ( block_index_ != rhs.block_index_ or block_it_ != rhs.block_it_ );
 }
 
 template < typename value_type_, typename ref_, typename ptr_ >
-inline bool bv_iterator< value_type_, ref_, ptr_ >::operator<(
+inline bool
+bv_iterator< value_type_, ref_, ptr_ >::operator<(
   const bv_iterator& rhs ) const
 {
   return ( block_index_ < rhs.block_index_

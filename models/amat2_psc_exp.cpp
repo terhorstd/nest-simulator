@@ -160,8 +160,7 @@ nest::amat2_psc_exp::Parameters_::set( const DictionaryDatum& d )
     throw BadProperty( "Capacitance must be strictly positive." );
   }
   if ( Tau_ <= 0 || tau_ex_ <= 0 || tau_in_ <= 0 || tau_ref_ <= 0 || tau_1_ <= 0
-    || tau_2_ <= 0
-    || tau_v_ <= 0 )
+    || tau_2_ <= 0 || tau_v_ <= 0 )
   {
     throw BadProperty( "All time constants must be strictly positive." );
   }
@@ -324,13 +323,13 @@ nest::amat2_psc_exp::calibrate()
   V_.P32_ = ( ( eI - em ) * tauI * taum ) / ( c * ( tauI - taum ) );
 
   V_.P60_ = ( beta * ( em - eV ) * taum * tauV ) / ( c * ( taum - tauV ) );
-  V_.P61_ =
-    ( beta * tauE * taum * tauV * ( eV * ( -tauE + taum ) + em * ( tauE - tauV )
-                                    + eE * ( -taum + tauV ) ) )
+  V_.P61_ = ( beta * tauE * taum * tauV
+              * ( eV * ( -tauE + taum ) + em * ( tauE - tauV )
+                  + eE * ( -taum + tauV ) ) )
     / ( c * ( tauE - taum ) * ( tauE - tauV ) * ( taum - tauV ) );
-  V_.P62_ =
-    ( beta * tauI * taum * tauV * ( eV * ( -tauI + taum ) + em * ( tauI - tauV )
-                                    + eI * ( -taum + tauV ) ) )
+  V_.P62_ = ( beta * tauI * taum * tauV
+              * ( eV * ( -tauI + taum ) + em * ( tauI - tauV )
+                  + eI * ( -taum + tauV ) ) )
     / ( c * ( tauI - taum ) * ( tauI - tauV ) * ( taum - tauV ) );
   V_.P63_ = ( beta * ( -em + eV ) * tauV ) / ( taum - tauV );
 
@@ -338,26 +337,27 @@ nest::amat2_psc_exp::calibrate()
     ( beta * taum * tauV
       * ( em * taum * tauV - eV * ( h * ( taum - tauV ) + taum * tauV ) ) )
     / ( c * std::pow( taum - tauV, 2 ) );
-  V_.P71_ =
-    ( beta * tauE * taum * tauV
-      * ( ( em * taum * std::pow( tauE - tauV, 2 )
-            - eE * tauE * std::pow( taum - tauV, 2 ) ) * tauV
-          - eV * ( tauE - taum )
-            * ( h * ( tauE - tauV ) * ( taum - tauV ) + tauE * taum * tauV
-                - std::pow( tauV, 3 ) ) ) )
+  V_.P71_ = ( beta * tauE * taum * tauV
+              * ( ( em * taum * std::pow( tauE - tauV, 2 )
+                    - eE * tauE * std::pow( taum - tauV, 2 ) )
+                    * tauV
+                  - eV * ( tauE - taum )
+                    * ( h * ( tauE - tauV ) * ( taum - tauV )
+                        + tauE * taum * tauV - std::pow( tauV, 3 ) ) ) )
     / ( c * ( tauE - taum ) * std::pow( tauE - tauV, 2 )
         * std::pow( taum - tauV, 2 ) );
-  V_.P72_ =
-    ( beta * tauI * taum * tauV
-      * ( ( em * taum * std::pow( tauI - tauV, 2 )
-            - eI * tauI * std::pow( taum - tauV, 2 ) ) * tauV
-          - eV * ( tauI - taum )
-            * ( h * ( tauI - tauV ) * ( taum - tauV ) + tauI * taum * tauV
-                - std::pow( tauV, 3 ) ) ) )
+  V_.P72_ = ( beta * tauI * taum * tauV
+              * ( ( em * taum * std::pow( tauI - tauV, 2 )
+                    - eI * tauI * std::pow( taum - tauV, 2 ) )
+                    * tauV
+                  - eV * ( tauI - taum )
+                    * ( h * ( tauI - tauV ) * ( taum - tauV )
+                        + tauI * taum * tauV - std::pow( tauV, 3 ) ) ) )
     / ( c * ( tauI - taum ) * std::pow( tauI - tauV, 2 )
         * std::pow( taum - tauV, 2 ) );
-  V_.P73_ = ( beta * tauV * ( -( em * taum * tauV )
-                              + eV * ( h * ( taum - tauV ) + taum * tauV ) ) )
+  V_.P73_ =
+    ( beta * tauV
+      * ( -( em * taum * tauV ) + eV * ( h * ( taum - tauV ) + taum * tauV ) ) )
     / std::pow( taum - tauV, 2 );
   V_.P76_ = eV * h;
 

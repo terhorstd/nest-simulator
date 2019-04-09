@@ -329,7 +329,8 @@ RandomGen::drand( void )
   return drand_();
 }
 
-inline double RandomGen::operator()( void )
+inline double
+RandomGen::operator()( void )
 {
   return drand();
 }

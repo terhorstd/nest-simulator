@@ -296,7 +296,8 @@ nest::UniversalDataLogger< HostNode >::DataLogger_::DataLogger_(
       node_access_.clear();
       throw IllegalConnection(
         "UniversalDataLogger::connect_logging_device(): "
-        "Unknown recordable " + recvars[ j ].toString() );
+        "Unknown recordable "
+        + recvars[ j ].toString() );
     }
 
     node_access_.push_back( rec->second );
@@ -467,8 +468,9 @@ private:
     long next_rec_step_;    //!< next time step at which to record
 
     /** Vector of pointers to member functions for data access. */
-    std::vector< const typename DynamicRecordablesMap< HostNode >::
-        DataAccessFct* > node_access_;
+    std::vector<
+      const typename DynamicRecordablesMap< HostNode >::DataAccessFct* >
+      node_access_;
 
     /**
      * Buffer for data.
@@ -570,7 +572,8 @@ nest::DynamicUniversalDataLogger< HostNode >::DataLogger_::DataLogger_(
       node_access_.clear();
       throw IllegalConnection(
         "DynamicUniversalDataLogger::connect_logging_device(): "
-        "Unknown recordable " + recvars[ j ].toString() );
+        "Unknown recordable "
+        + recvars[ j ].toString() );
     }
 
     node_access_.push_back( &( rec->second ) );

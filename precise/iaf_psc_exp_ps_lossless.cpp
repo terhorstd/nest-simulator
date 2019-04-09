@@ -30,11 +30,11 @@
 #include "universal_data_logger_impl.h"
 
 // Includes from sli:
+#include "arraydatum.h"
 #include "dict.h"
 #include "dictutils.h"
-#include "integerdatum.h"
 #include "doubledatum.h"
-#include "arraydatum.h"
+#include "integerdatum.h"
 
 
 /* ----------------------------------------------------------------
@@ -675,15 +675,16 @@ nest::iaf_psc_exp_ps_lossless::is_spike_( const double dt )
      g and f are interchanged. (compare to Fig.6)
   */
 
-  const double f =
-    ( ( V_.a1_ * I_0 * exp_tau_m_s + exp_tau_m * ( V_.a3_ - I_e * V_.a2_ )
-        + V_.a3_ ) / V_.a4_ );
+  const double f = ( ( V_.a1_ * I_0 * exp_tau_m_s
+                       + exp_tau_m * ( V_.a3_ - I_e * V_.a2_ ) + V_.a3_ )
+    / V_.a4_ );
 
 
   // no-spike, NS_1, (V <= g_h,I_e(I) and V < f_h,I_e(I))
   if ( ( V_0 < ( ( ( I_0 + I_e ) * ( V_.b1_ * exp_tau_m + V_.b2_ * exp_tau_s )
                    + V_.b3_ * ( exp_tau_m - exp_tau_s ) )
-                 / ( V_.b4_ * exp_tau_s ) ) ) and ( V_0 <= f ) )
+                 / ( V_.b4_ * exp_tau_s ) ) )
+    and ( V_0 <= f ) )
   {
     return numerics::nan;
   }
@@ -705,6 +706,6 @@ nest::iaf_psc_exp_ps_lossless::is_spike_( const double dt )
   {
     return ( V_.a1_ / P_.tau_m_ * P_.tau_ex_ )
       * std::log(
-             V_.b1_ * I_0 / ( V_.a2_ * I_e - V_.a1_ * I_0 - V_.a4_ * V_0 ) );
+          V_.b1_ * I_0 / ( V_.a2_ * I_e - V_.a1_ * I_0 - V_.a4_ * V_0 ) );
   }
 }

@@ -32,12 +32,12 @@
 
 // Includes from sli:
 #include "dict.h"
-#include "integerdatum.h"
-#include "doubledatum.h"
 #include "dictutils.h"
+#include "doubledatum.h"
+#include "integerdatum.h"
 
-#include "numerics.h"
 #include "compose.hpp"
+#include "numerics.h"
 #include "propagator_stability.h"
 
 namespace nest

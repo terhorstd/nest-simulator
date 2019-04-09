@@ -28,8 +28,8 @@
  * @file Provide classes to be used as template arguments to Connection<T>.
  */
 
-#include "kernel_manager.h"
 #include "compose.hpp"
+#include "kernel_manager.h"
 
 namespace nest
 {

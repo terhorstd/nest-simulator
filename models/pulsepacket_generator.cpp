@@ -103,8 +103,8 @@ nest::pulsepacket_generator::Parameters_::set( const DictionaryDatum& d,
 }
 
 /* ----------------------------------------------------------------
-* Default and copy constructor for node
-* ---------------------------------------------------------------- */
+ * Default and copy constructor for node
+ * ---------------------------------------------------------------- */
 
 nest::pulsepacket_generator::pulsepacket_generator()
   : Node()
@@ -184,7 +184,8 @@ nest::pulsepacket_generator::update( Time const& T,
   assert( ( to - from ) <= kernel().connection_manager.get_min_delay() );
 
   if ( ( V_.start_center_idx_ == P_.pulse_times_.size()
-         && B_.spiketimes_.empty() ) || ( not device_.is_active( T ) ) )
+         && B_.spiketimes_.empty() )
+    || ( not device_.is_active( T ) ) )
   {
     return; // nothing left to do
   }
@@ -194,7 +195,8 @@ nest::pulsepacket_generator::update( Time const& T,
   {
     while ( V_.stop_center_idx_ < P_.pulse_times_.size()
       && ( Time( Time::ms( P_.pulse_times_.at( V_.stop_center_idx_ ) ) ) - T )
-           .get_ms() <= V_.tolerance )
+           .get_ms()
+        <= V_.tolerance )
     {
       V_.stop_center_idx_++;
     }

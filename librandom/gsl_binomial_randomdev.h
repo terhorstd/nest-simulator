@@ -105,8 +105,8 @@ public:
    * n - number of trials
    */
   void set_p_n( double, unsigned int );
-  void set_p( double );       //!<set p
-  void set_n( unsigned int ); //!<set n
+  void set_p( double );       //!< set p
+  void set_n( unsigned int ); //!< set n
 
   /**
    * Import sets of overloaded virtual functions.
@@ -136,13 +136,14 @@ public:
   void get_status( DictionaryDatum& ) const;
 
 private:
-  double p_;       //!<probability p of binomial distribution
-  unsigned int n_; //!<parameter n in binomial distribution
+  double p_;       //!< probability p of binomial distribution
+  unsigned int n_; //!< parameter n in binomial distribution
 
   gsl_rng* rng_;
 };
 
-inline double GSL_BinomialRandomDev::operator()( RngPtr rthrd ) const
+inline double
+GSL_BinomialRandomDev::operator()( RngPtr rthrd ) const
 {
   return static_cast< double >( ldev( rthrd ) );
 }

@@ -248,9 +248,9 @@ public:
    */
   struct Buffers_
   {
-    Buffers_( aeif_cond_alpha_RK5& ); //!<Sets buffer pointers to 0
+    Buffers_( aeif_cond_alpha_RK5& ); //!< Sets buffer pointers to 0
     Buffers_( const Buffers_&,
-      aeif_cond_alpha_RK5& ); //!<Sets buffer pointers to 0
+      aeif_cond_alpha_RK5& ); //!< Sets buffer pointers to 0
 
     //! Logger for all analog data
     UniversalDataLogger< aeif_cond_alpha_RK5 > logger_;
@@ -433,7 +433,8 @@ aeif_cond_alpha_RK5::aeif_cond_alpha_RK5_dynamics( const double y[],
 
   // dv/dt
   f[ S::V_M ] = ( -P_.g_L * ( ( V - P_.E_L ) - I_spike ) - I_syn_exc - I_syn_inh
-                  - w + P_.I_e + B_.I_stim_ ) / P_.C_m;
+                  - w + P_.I_e + B_.I_stim_ )
+    / P_.C_m;
   f[ S::DG_EXC ] = -dg_ex / P_.tau_syn_ex;
   f[ S::G_EXC ] = dg_ex - g_ex / P_.tau_syn_ex; // Synaptic Conductance (nS)
 
@@ -475,7 +476,8 @@ aeif_cond_alpha_RK5::aeif_cond_alpha_RK5_dynamics_DT0( const double y[],
 
   // dv/dt
   f[ S::V_M ] = ( -P_.g_L * ( V - P_.E_L ) - I_syn_exc - I_syn_inh - w + P_.I_e
-                  + B_.I_stim_ ) / P_.C_m;
+                  + B_.I_stim_ )
+    / P_.C_m;
   f[ S::DG_EXC ] = -dg_ex / P_.tau_syn_ex;
   f[ S::G_EXC ] = dg_ex - g_ex / P_.tau_syn_ex; // Synaptic Conductance (nS)
 

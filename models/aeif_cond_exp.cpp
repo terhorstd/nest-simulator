@@ -121,7 +121,8 @@ nest::aeif_cond_exp_dynamics( double,
   f[ S::V_M ] = is_refractory
     ? 0.
     : ( -node.P_.g_L * ( V - node.P_.E_L ) + I_spike - I_syn_exc - I_syn_inh - w
-        + node.P_.I_e + node.B_.I_stim_ ) / node.P_.C_m;
+        + node.P_.I_e + node.B_.I_stim_ )
+      / node.P_.C_m;
 
   f[ S::G_EXC ] = -g_ex / node.P_.tau_syn_ex; // Synaptic Conductance (nS)
 
@@ -178,8 +179,8 @@ nest::aeif_cond_exp::State_::State_( const State_& s )
   }
 }
 
-nest::aeif_cond_exp::State_& nest::aeif_cond_exp::State_::operator=(
-  const State_& s )
+nest::aeif_cond_exp::State_&
+nest::aeif_cond_exp::State_::operator=( const State_& s )
 {
   assert( this != &s ); // would be bad logical error in program
   for ( size_t i = 0; i < STATE_VEC_SIZE; ++i )

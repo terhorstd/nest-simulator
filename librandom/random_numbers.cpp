@@ -133,51 +133,46 @@ RandomNumbers::init( SLIInterpreter* i )
   i->def( "rdevdict", DictionaryDatum( rdvdict_ ) );
 
   register_rdv_< librandom::BinomialRandomDev >( "binomial", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedRedrawDiscreteRandomDev< librandom::BinomialRandomDev > >(
+  register_rdv_<
+    librandom::ClippedRedrawDiscreteRandomDev< librandom::BinomialRandomDev > >(
     "binomial_clipped", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedToBoundaryDiscreteRandomDev< librandom::BinomialRandomDev > >(
+  register_rdv_< librandom::ClippedToBoundaryDiscreteRandomDev<
+    librandom::BinomialRandomDev > >(
     "binomial_clipped_to_boundary", *rdvdict_ );
   register_rdv_< librandom::PoissonRandomDev >( "poisson", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedRedrawDiscreteRandomDev< librandom::PoissonRandomDev > >(
+  register_rdv_<
+    librandom::ClippedRedrawDiscreteRandomDev< librandom::PoissonRandomDev > >(
     "poisson_clipped", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedToBoundaryDiscreteRandomDev< librandom::PoissonRandomDev > >(
-    "poisson_clipped_to_boundary", *rdvdict_ );
+  register_rdv_< librandom::ClippedToBoundaryDiscreteRandomDev<
+    librandom::PoissonRandomDev > >( "poisson_clipped_to_boundary", *rdvdict_ );
   register_rdv_< librandom::UniformRandomDev >( "uniform", *rdvdict_ );
   register_rdv_< librandom::UniformIntRandomDev >( "uniform_int", *rdvdict_ );
 
   register_rdv_< librandom::NormalRandomDev >( "normal", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedRedrawContinuousRandomDev< librandom::NormalRandomDev > >(
+  register_rdv_<
+    librandom::ClippedRedrawContinuousRandomDev< librandom::NormalRandomDev > >(
     "normal_clipped", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedToBoundaryContinuousRandomDev< librandom::NormalRandomDev > >(
-    "normal_clipped_to_boundary", *rdvdict_ );
+  register_rdv_< librandom::ClippedToBoundaryContinuousRandomDev<
+    librandom::NormalRandomDev > >( "normal_clipped_to_boundary", *rdvdict_ );
   register_rdv_< librandom::LognormalRandomDev >( "lognormal", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedRedrawContinuousRandomDev< librandom::LognormalRandomDev > >(
-    "lognormal_clipped", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedToBoundaryContinuousRandomDev< librandom::LognormalRandomDev > >(
+  register_rdv_< librandom::ClippedRedrawContinuousRandomDev<
+    librandom::LognormalRandomDev > >( "lognormal_clipped", *rdvdict_ );
+  register_rdv_< librandom::ClippedToBoundaryContinuousRandomDev<
+    librandom::LognormalRandomDev > >(
     "lognormal_clipped_to_boundary", *rdvdict_ );
 
   register_rdv_< librandom::ExpRandomDev >( "exponential", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedRedrawContinuousRandomDev< librandom::ExpRandomDev > >(
+  register_rdv_<
+    librandom::ClippedRedrawContinuousRandomDev< librandom::ExpRandomDev > >(
     "exponential_clipped", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedToBoundaryContinuousRandomDev< librandom::ExpRandomDev > >(
-    "exponential_clipped_to_boundary", *rdvdict_ );
+  register_rdv_< librandom::ClippedToBoundaryContinuousRandomDev<
+    librandom::ExpRandomDev > >( "exponential_clipped_to_boundary", *rdvdict_ );
   register_rdv_< librandom::GammaRandomDev >( "gamma", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedRedrawContinuousRandomDev< librandom::GammaRandomDev > >(
+  register_rdv_<
+    librandom::ClippedRedrawContinuousRandomDev< librandom::GammaRandomDev > >(
     "gamma_clipped", *rdvdict_ );
-  register_rdv_< librandom::
-      ClippedToBoundaryContinuousRandomDev< librandom::GammaRandomDev > >(
-    "gamma_clipped_to_boundary", *rdvdict_ );
+  register_rdv_< librandom::ClippedToBoundaryContinuousRandomDev<
+    librandom::GammaRandomDev > >( "gamma_clipped_to_boundary", *rdvdict_ );
 
 #ifdef HAVE_GSL
   register_rdv_< librandom::GSL_BinomialRandomDev >(

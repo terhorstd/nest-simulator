@@ -150,19 +150,18 @@ nest::iaf_cond_alpha_mc_dynamics( double,
     const double I_L = node.P_.g_L[ n ] * ( V - node.P_.E_L[ n ] );
 
     // coupling currents
-    const double I_conn =
-      ( n > N::SOMA
-          ? node.P_.g_conn[ n - 1 ] * ( V - y[ S::idx( n - 1, S::V_M ) ] )
-          : 0 )
+    const double I_conn = ( n > N::SOMA ? node.P_.g_conn[ n - 1 ]
+                                * ( V - y[ S::idx( n - 1, S::V_M ) ] )
+                                        : 0 )
       + ( n < N::NCOMP - 1
             ? node.P_.g_conn[ n ] * ( V - y[ S::idx( n + 1, S::V_M ) ] )
             : 0 );
 
     // derivatives
     // membrane potential
-    f[ S::idx( n, S::V_M ) ] =
-      ( -I_L - I_syn_exc - I_syn_inh - I_conn + node.B_.I_stim_[ n ]
-        + node.P_.I_e[ n ] ) / node.P_.C_m[ n ];
+    f[ S::idx( n, S::V_M ) ] = ( -I_L - I_syn_exc - I_syn_inh - I_conn
+                                 + node.B_.I_stim_[ n ] + node.P_.I_e[ n ] )
+      / node.P_.C_m[ n ];
 
     // excitatory conductance
     f[ S::idx( n, S::DG_EXC ) ] =
@@ -248,8 +247,8 @@ nest::iaf_cond_alpha_mc::Parameters_::Parameters_( const Parameters_& p )
   }
 }
 
-nest::iaf_cond_alpha_mc::Parameters_& nest::iaf_cond_alpha_mc::Parameters_::
-operator=( const Parameters_& p )
+nest::iaf_cond_alpha_mc::Parameters_&
+nest::iaf_cond_alpha_mc::Parameters_::operator=( const Parameters_& p )
 {
   assert( this != &p ); // would be bad logical error in program
 
@@ -303,8 +302,8 @@ nest::iaf_cond_alpha_mc::State_::State_( const State_& s )
   }
 }
 
-nest::iaf_cond_alpha_mc::State_& nest::iaf_cond_alpha_mc::State_::operator=(
-  const State_& s )
+nest::iaf_cond_alpha_mc::State_&
+nest::iaf_cond_alpha_mc::State_::operator=( const State_& s )
 {
   assert( this != &s ); // would be bad logical error in program
   for ( size_t i = 0; i < STATE_VEC_SIZE; ++i )

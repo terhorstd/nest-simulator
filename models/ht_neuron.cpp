@@ -127,9 +127,9 @@ ht_neuron_dynamics( double, const double y[], double f[], void* pnode )
   node.S_.I_h_ = -node.P_.g_peak_h * y[ S::m_Ih ] * ( V - node.P_.E_rev_h );
 
   // delta V
-  f[ S::V_M ] =
-    ( I_Na + I_K + I_syn + node.S_.I_NaP_ + node.S_.I_KNa_ + node.S_.I_T_
-      + node.S_.I_h_ + node.B_.I_stim_ ) / node.P_.tau_m
+  f[ S::V_M ] = ( I_Na + I_K + I_syn + node.S_.I_NaP_ + node.S_.I_KNa_
+                  + node.S_.I_T_ + node.S_.I_h_ + node.B_.I_stim_ )
+      / node.P_.tau_m
     + I_spike;
 
   // delta theta
@@ -234,9 +234,9 @@ nest::ht_neuron::get_g_NMDA_() const
 {
   return S_.y_[ State_::G_NMDA_TIMECOURSE ]
     * m_NMDA_( S_.y_[ State_::V_M ],
-           m_eq_NMDA_( S_.y_[ State_::V_M ] ),
-           S_.y_[ State_::m_fast_NMDA ],
-           S_.y_[ State_::m_slow_NMDA ] );
+        m_eq_NMDA_( S_.y_[ State_::V_M ] ),
+        S_.y_[ State_::m_fast_NMDA ],
+        S_.y_[ State_::m_slow_NMDA ] );
 }
 
 /* ----------------------------------------------------------------
@@ -324,7 +324,8 @@ nest::ht_neuron::State_::State_( const State_& s )
   }
 }
 
-nest::ht_neuron::State_& nest::ht_neuron::State_::operator=( const State_& s )
+nest::ht_neuron::State_&
+nest::ht_neuron::State_::operator=( const State_& s )
 {
   if ( this == &s )
   {

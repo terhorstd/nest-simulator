@@ -30,9 +30,9 @@
 #include "conngendatum.h"
 
 // Includes from nestkernel:
+#include "nest_datums.h"
 #include "nest_names.h"
 #include "nest_types.h"
-#include "nest_datums.h"
 
 // Includes from sli:
 #include "arraydatum.h"

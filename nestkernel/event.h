@@ -24,9 +24,9 @@
 #define EVENT_H
 
 // C++ includes:
+#include <algorithm>
 #include <cassert>
 #include <cstring>
-#include <algorithm>
 #include <vector>
 
 // Includes from libnestutil:
@@ -1051,8 +1051,8 @@ public:
    * The following operator is used to read the information of the
    * DataSecondaryEvent from the buffer in EventDeliveryManager::deliver_events
    */
-  std::vector< unsigned int >::iterator& operator<<(
-    std::vector< unsigned int >::iterator& pos )
+  std::vector< unsigned int >::iterator&
+  operator<<( std::vector< unsigned int >::iterator& pos )
   {
     // The synid can be skipped here as it is stored in a static vector
 
@@ -1073,8 +1073,8 @@ public:
    * All DataSecondaryEvents are identified by the synid of the
    * first element in supported_syn_ids_.
    */
-  std::vector< unsigned int >::iterator& operator>>(
-    std::vector< unsigned int >::iterator& pos )
+  std::vector< unsigned int >::iterator&
+  operator>>( std::vector< unsigned int >::iterator& pos )
   {
     for ( typename std::vector< DataType >::iterator i = coeffarray_as_d_begin_;
           i != coeffarray_as_d_end_;

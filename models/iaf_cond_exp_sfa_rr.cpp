@@ -102,7 +102,8 @@ nest::iaf_cond_exp_sfa_rr_dynamics( double,
 
   // V dot
   f[ S::V_M ] = ( -I_L + node.B_.I_stim_ + node.P_.I_e - I_syn_exc - I_syn_inh
-                  - I_sfa - I_rr ) / node.P_.C_m;
+                  - I_sfa - I_rr )
+    / node.P_.C_m;
 
   f[ S::G_EXC ] = -y[ S::G_EXC ] / node.P_.tau_synE;
   f[ S::G_INH ] = -y[ S::G_INH ] / node.P_.tau_synI;
@@ -157,8 +158,8 @@ nest::iaf_cond_exp_sfa_rr::State_::State_( const State_& s )
   }
 }
 
-nest::iaf_cond_exp_sfa_rr::State_& nest::iaf_cond_exp_sfa_rr::State_::operator=(
-  const State_& s )
+nest::iaf_cond_exp_sfa_rr::State_&
+nest::iaf_cond_exp_sfa_rr::State_::operator=( const State_& s )
 {
   assert( this != &s ); // would be bad logical error in program
   for ( size_t i = 0; i < STATE_VEC_SIZE; ++i )

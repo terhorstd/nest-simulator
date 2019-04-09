@@ -64,23 +64,23 @@ RecordablesMap< hh_cond_beta_gap_traub >::create()
 {
   // use standard names whereever you can for consistency!
   insert_( names::V_m,
-    &hh_cond_beta_gap_traub::
-      get_y_elem_< hh_cond_beta_gap_traub::State_::V_M > );
+    &hh_cond_beta_gap_traub::get_y_elem_<
+      hh_cond_beta_gap_traub::State_::V_M > );
   insert_( names::g_ex,
-    &hh_cond_beta_gap_traub::
-      get_y_elem_< hh_cond_beta_gap_traub::State_::G_EXC > );
+    &hh_cond_beta_gap_traub::get_y_elem_<
+      hh_cond_beta_gap_traub::State_::G_EXC > );
   insert_( names::g_in,
-    &hh_cond_beta_gap_traub::
-      get_y_elem_< hh_cond_beta_gap_traub::State_::G_INH > );
+    &hh_cond_beta_gap_traub::get_y_elem_<
+      hh_cond_beta_gap_traub::State_::G_INH > );
   insert_( names::Act_m,
-    &hh_cond_beta_gap_traub::
-      get_y_elem_< hh_cond_beta_gap_traub::State_::HH_M > );
+    &hh_cond_beta_gap_traub::get_y_elem_<
+      hh_cond_beta_gap_traub::State_::HH_M > );
   insert_( names::Act_h,
-    &hh_cond_beta_gap_traub::
-      get_y_elem_< hh_cond_beta_gap_traub::State_::HH_H > );
+    &hh_cond_beta_gap_traub::get_y_elem_<
+      hh_cond_beta_gap_traub::State_::HH_H > );
   insert_( names::Inact_n,
-    &hh_cond_beta_gap_traub::
-      get_y_elem_< hh_cond_beta_gap_traub::State_::HH_N > );
+    &hh_cond_beta_gap_traub::get_y_elem_<
+      hh_cond_beta_gap_traub::State_::HH_N > );
 }
 
 extern "C" int
@@ -149,7 +149,8 @@ hh_cond_beta_gap_traub_dynamics( double time,
 
   // membrane potential
   f[ S::V_M ] = ( -I_Na - I_K - I_L - I_syn_exc - I_syn_inh + node.B_.I_stim_
-                  + I_gap + node.P_.I_e ) / node.P_.C_m;
+                  + I_gap + node.P_.I_e )
+    / node.P_.C_m;
 
   // channel dynamics
   const double V = y[ S::V_M ] - node.P_.V_T;
@@ -238,8 +239,8 @@ nest::hh_cond_beta_gap_traub::State_::State_( const State_& s )
   }
 }
 
-nest::hh_cond_beta_gap_traub::State_& nest::hh_cond_beta_gap_traub::State_::
-operator=( const State_& s )
+nest::hh_cond_beta_gap_traub::State_&
+nest::hh_cond_beta_gap_traub::State_::operator=( const State_& s )
 {
   assert( this != &s ); // would be bad logical error in program
   for ( size_t i = 0; i < STATE_VEC_SIZE; ++i )

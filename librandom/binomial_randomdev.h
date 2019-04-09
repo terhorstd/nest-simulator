@@ -112,8 +112,8 @@ public:
    * n - number of trials
    */
   void set_p_n( double, unsigned int );
-  void set_p( double );       //!<set p
-  void set_n( unsigned int ); //!<set n
+  void set_p( double );       //!< set p
+  void set_n( unsigned int ); //!< set n
 
   /**
    * Import sets of overloaded virtual functions.
@@ -145,10 +145,10 @@ public:
 private:
   PoissonRandomDev poisson_dev_; //!< source of Poisson random numbers
   ExpRandomDev exp_dev_;         //!< source of exponential random numbers
-  double p_;                     //!<probability p of binomial distribution
+  double p_;                     //!< probability p of binomial distribution
   double phi_;
   long m_;
-  unsigned int n_;          //!<parameter n in binomial distribution
+  unsigned int n_;          //!< parameter n in binomial distribution
   std::vector< double > f_; //!< precomputed table of f
   unsigned int n_tablemax_; //!< current maximal n with precomputed values
 
@@ -156,7 +156,8 @@ private:
   void PrecomputeTable( size_t ); //!< compute the internal lookup table
 };
 
-inline double BinomialRandomDev::operator()( RngPtr rthrd ) const
+inline double
+BinomialRandomDev::operator()( RngPtr rthrd ) const
 {
   return static_cast< double >( ldev( rthrd ) );
 }

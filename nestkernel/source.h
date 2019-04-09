@@ -42,7 +42,7 @@ class Source
 private:
   uint64_t gid_ : 62;  //!< gid of source
   bool processed_ : 1; //!< whether this target has already been moved
-                       //!to the MPI buffer
+                       //! to the MPI buffer
   bool primary_ : 1;
   static constexpr uint64_t GID_DISABLED =
     ( static_cast< uint64_t >( 1 ) << 62 ) - 1; // 2 ** 62 - 1
@@ -153,17 +153,20 @@ Source::is_disabled() const
   return gid_ == GID_DISABLED;
 }
 
-inline bool operator<( const Source& lhs, const Source& rhs )
+inline bool
+operator<( const Source& lhs, const Source& rhs )
 {
   return ( lhs.gid_ < rhs.gid_ );
 }
 
-inline bool operator>( const Source& lhs, const Source& rhs )
+inline bool
+operator>( const Source& lhs, const Source& rhs )
 {
   return operator<( rhs, lhs );
 }
 
-inline bool operator==( const Source& lhs, const Source& rhs )
+inline bool
+operator==( const Source& lhs, const Source& rhs )
 {
   return ( lhs.gid_ == rhs.gid_ );
 }

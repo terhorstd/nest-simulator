@@ -157,7 +157,8 @@ nest::RNGManager::set_status( const DictionaryDatum& d )
       if ( kernel().vp_manager.is_local_vp( i ) )
       {
         rng_[ kernel().vp_manager.vp_to_thread(
-                kernel().vp_manager.suggest_vp_for_gid( i ) ) ]->seed( s );
+                kernel().vp_manager.suggest_vp_for_gid( i ) ) ]
+          ->seed( s );
       }
 
       rng_seeds_[ i ] = s;

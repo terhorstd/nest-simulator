@@ -602,17 +602,17 @@ EllipseMask< 3 >::inside( const Position< 3 >& p ) const
 
   // See https://en.wikipedia.org/wiki/Rotation_matrix for more.
 
-  const double new_x =
-    ( ( p[ 0 ] - center_[ 0 ] ) * azimuth_cos_
-      + ( p[ 1 ] - center_[ 1 ] ) * azimuth_sin_ ) * polar_cos_
+  const double new_x = ( ( p[ 0 ] - center_[ 0 ] ) * azimuth_cos_
+                         + ( p[ 1 ] - center_[ 1 ] ) * azimuth_sin_ )
+      * polar_cos_
     - ( p[ 2 ] - center_[ 2 ] ) * polar_sin_;
 
   const double new_y = ( ( p[ 0 ] - center_[ 0 ] ) * azimuth_sin_
     - ( p[ 1 ] - center_[ 1 ] ) * azimuth_cos_ );
 
-  const double new_z =
-    ( ( p[ 0 ] - center_[ 0 ] ) * azimuth_cos_
-      + ( p[ 1 ] - center_[ 1 ] ) * azimuth_sin_ ) * polar_sin_
+  const double new_z = ( ( p[ 0 ] - center_[ 0 ] ) * azimuth_cos_
+                         + ( p[ 1 ] - center_[ 1 ] ) * azimuth_sin_ )
+      * polar_sin_
     + ( p[ 2 ] - center_[ 2 ] ) * polar_cos_;
 
   return std::pow( new_x, 2 ) * x_scale_ + std::pow( new_y, 2 ) * y_scale_

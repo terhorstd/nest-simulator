@@ -428,8 +428,8 @@ SLIStartup::init( SLIInterpreter* i )
   statusdict->insert(
     prgpatch_name, Token( new StringDatum( NEST_VERSION_PATCHLEVEL ) ) );
   statusdict->insert( prgbuilt_name,
-    Token( new StringDatum(
-      String::compose( "%1 %2", __DATE__, __TIME__ ) ) ) );
+    Token(
+      new StringDatum( String::compose( "%1 %2", __DATE__, __TIME__ ) ) ) );
   statusdict->insert(
     prgdatadir_name, Token( new StringDatum( slihomepath ) ) );
   statusdict->insert( prgdocdir_name, Token( new StringDatum( slidocdir ) ) );

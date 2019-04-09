@@ -1002,10 +1002,10 @@ nest::ConnectionManager::trigger_update_weight( const long vt_id,
 {
   const thread tid = kernel().vp_manager.get_thread_id();
 
-  for (
-    std::vector< ConnectorBase* >::iterator it = connections_[ tid ].begin();
-    it != connections_[ tid ].end();
-    ++it )
+  for ( std::vector< ConnectorBase* >::iterator it =
+          connections_[ tid ].begin();
+        it != connections_[ tid ].end();
+        ++it )
   {
     if ( *it != NULL )
     {
@@ -1272,10 +1272,10 @@ nest::ConnectionManager::get_connections(
         }
       }
 
-      for (
-        std::vector< index >::const_iterator t_gid = target_device_gids.begin();
-        t_gid != target_device_gids.end();
-        ++t_gid )
+      for ( std::vector< index >::const_iterator t_gid =
+              target_device_gids.begin();
+            t_gid != target_device_gids.end();
+            ++t_gid )
       {
         // Then, we get connections to devices.
         target_table_devices_.get_connections_to_devices_(
@@ -1488,9 +1488,8 @@ nest::ConnectionManager::compute_target_data_buffer_size()
     kernel().mpi_manager.get_num_processes() );
   global_num_target_data[ kernel().mpi_manager.get_rank() ] = num_target_data;
   kernel().mpi_manager.communicate( global_num_target_data );
-  const size_t max_num_target_data =
-    *std::max_element(
-      global_num_target_data.begin(), global_num_target_data.end() );
+  const size_t max_num_target_data = *std::max_element(
+    global_num_target_data.begin(), global_num_target_data.end() );
 
   // MPI buffers should have at least two entries per process
   const size_t min_num_target_data =

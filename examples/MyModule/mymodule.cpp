@@ -126,8 +126,9 @@ mynest::MyModule::init( SLIInterpreter* i )
      Kunkel et al, Front Neurofinfom 8:78 (2014), Sec 3.3.2, for details.
   */
   nest::kernel()
-    .model_manager.register_connection_model< DropOddSpikeConnection< nest::
-        TargetIdentifierPtrRport > >( "drop_odd_synapse" );
+    .model_manager.register_connection_model<
+      DropOddSpikeConnection< nest::TargetIdentifierPtrRport > >(
+      "drop_odd_synapse" );
 
   // Register connection rule.
   nest::kernel().connection_manager.register_conn_builder< StepPatternBuilder >(

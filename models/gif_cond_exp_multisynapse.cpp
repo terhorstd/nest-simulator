@@ -25,10 +25,10 @@
 #ifdef HAVE_GSL
 
 // C++ includes:
-#include <limits>
+#include <cstdio>
 #include <iomanip>
 #include <iostream>
-#include <cstdio>
+#include <limits>
 
 // Includes from libnestutil:
 #include "numerics.h"
@@ -41,12 +41,12 @@
 // Includes from sli:
 #include "dict.h"
 #include "dictutils.h"
-#include "integerdatum.h"
 #include "doubledatum.h"
+#include "integerdatum.h"
 
 #include "compose.hpp"
-#include "propagator_stability.h"
 #include "event.h"
+#include "propagator_stability.h"
 
 namespace nest
 {
@@ -66,8 +66,8 @@ RecordablesMap< gif_cond_exp_multisynapse >::create()
 {
   // use standard names wherever you can for consistency!
   insert_( names::V_m,
-    &gif_cond_exp_multisynapse::
-      get_y_elem_< gif_cond_exp_multisynapse::State_::V_M > );
+    &gif_cond_exp_multisynapse::get_y_elem_<
+      gif_cond_exp_multisynapse::State_::V_M > );
   insert_( names::E_sfa, &gif_cond_exp_multisynapse::get_E_sfa_ );
   insert_( names::I_stc, &gif_cond_exp_multisynapse::get_I_stc_ );
 }
@@ -103,8 +103,9 @@ nest::gif_cond_exp_multisynapse_dynamics( double,
   }
 
   // output: dv/dt
-  f[ S::V_M ] = is_refractory ? 0.0 : ( I_L + node.S_.I_stim_ + node.P_.I_e_
-                                        + I_syn - stc ) / node.P_.c_m_;
+  f[ S::V_M ] = is_refractory
+    ? 0.0
+    : ( I_L + node.S_.I_stim_ + node.P_.I_e_ + I_syn - stc ) / node.P_.c_m_;
 
   // outputs: dg/dt
   for ( size_t i = 0; i < node.P_.n_receptors(); i++ )
@@ -176,8 +177,7 @@ nest::gif_cond_exp_multisynapse::State_::State_( const State_& s )
 }
 
 nest::gif_cond_exp_multisynapse::State_&
-  nest::gif_cond_exp_multisynapse::State_::
-  operator=( const State_& s )
+nest::gif_cond_exp_multisynapse::State_::operator=( const State_& s )
 {
   assert( this != &s ); // would be bad logical error in program
 

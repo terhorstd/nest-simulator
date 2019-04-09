@@ -32,8 +32,8 @@
         https://doi.org/10.1371/journal.pcbi.1005507 */
 
 #include "gif_pop_psc_exp.h"
-#include "universal_data_logger_impl.h"
 #include "compose.hpp"
+#include "universal_data_logger_impl.h"
 
 #ifdef HAVE_GSL
 
@@ -570,11 +570,11 @@ nest::gif_pop_psc_exp::update( Time const& origin,
 
     // compute free escape rate
     double lambda_tld = escrate( S_.V_m_ - S_.theta_hat_ ); // line 8 of [1]
-    const double P_free =
-      1 - std::exp( -0.0005 * ( V_.lambda_free_ + lambda_tld )
-            * V_.h_ );                                // line 9 of [1]
-    V_.lambda_free_ = lambda_tld;                     // line 10
-    S_.theta_hat_ -= V_.n_[ 0 ] * V_.theta_tld_[ 0 ]; // line 11
+    const double P_free = 1
+      - std::exp(
+          -0.0005 * ( V_.lambda_free_ + lambda_tld ) * V_.h_ ); // line 9 of [1]
+    V_.lambda_free_ = lambda_tld;                               // line 10
+    S_.theta_hat_ -= V_.n_[ 0 ] * V_.theta_tld_[ 0 ];           // line 11
 
     for ( int k_marked = 0; k_marked < P_.len_kernel_; ++k_marked )
     {

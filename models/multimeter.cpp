@@ -289,13 +289,15 @@ Multimeter::handle( DataLoggingReply& reply )
         assert( j >= inactive_skipped );
         assert( V_.current_request_data_start_ + j - inactive_skipped
           < S_.data_.size() );
-        assert( S_.data_[ V_.current_request_data_start_ + j
-                     - inactive_skipped ].size() == info[ j ].data.size() );
+        assert(
+          S_.data_[ V_.current_request_data_start_ + j - inactive_skipped ]
+            .size()
+          == info[ j ].data.size() );
 
         for ( size_t k = 0; k < info[ j ].data.size(); ++k )
         {
-          S_.data_[ V_.current_request_data_start_ + j
-            - inactive_skipped ][ k ] += info[ j ].data[ k ];
+          S_.data_[ V_.current_request_data_start_ + j - inactive_skipped ]
+                  [ k ] += info[ j ].data[ k ];
         }
       }
     }

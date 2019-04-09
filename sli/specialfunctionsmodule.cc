@@ -346,8 +346,9 @@ SpecialFunctionsModule::GaussDiskConvFunction::execute(
   }
   else if ( y > 1 && r0 > R + sqrt( -log( GSL_DBL_EPSILON / y ) ) )
   { /* tail */
-    result = 0.25 * R / r0 * ( std::exp( -( r0 - R ) * ( r0 - R ) )
-                               - std::exp( -( r0 + R ) * ( r0 + R ) ) );
+    result = 0.25 * R / r0
+      * ( std::exp( -( r0 - R ) * ( r0 - R ) )
+          - std::exp( -( r0 + R ) * ( r0 + R ) ) );
   }
   else
   { /* in all other cases, integration */
@@ -409,7 +410,7 @@ SpecialFunctionsModule::GaussDiskConvFunction::f_( double r, void* params )
   }
 }
 
-// ---------------------------------------------------------------
+  // ---------------------------------------------------------------
 
 #else
 

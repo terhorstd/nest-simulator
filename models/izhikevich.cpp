@@ -214,8 +214,9 @@ nest::izhikevich::update( Time const& origin, const long from, const long to )
     {
       v_old = S_.v_;
       u_old = S_.u_;
-      S_.v_ += h * ( 0.04 * v_old * v_old + 5.0 * v_old + 140.0 - u_old + S_.I_
-                     + P_.I_e_ )
+      S_.v_ += h
+          * ( 0.04 * v_old * v_old + 5.0 * v_old + 140.0 - u_old + S_.I_
+              + P_.I_e_ )
         + B_.spikes_.get_value( lag );
       S_.u_ += h * P_.a_ * ( P_.b_ * v_old - u_old );
     }
@@ -224,10 +225,12 @@ nest::izhikevich::update( Time const& origin, const long from, const long to )
     else
     {
       double I_syn = B_.spikes_.get_value( lag );
-      S_.v_ += h * 0.5 * ( 0.04 * S_.v_ * S_.v_ + 5.0 * S_.v_ + 140.0 - S_.u_
-                           + S_.I_ + P_.I_e_ + I_syn );
-      S_.v_ += h * 0.5 * ( 0.04 * S_.v_ * S_.v_ + 5.0 * S_.v_ + 140.0 - S_.u_
-                           + S_.I_ + P_.I_e_ + I_syn );
+      S_.v_ += h * 0.5
+        * ( 0.04 * S_.v_ * S_.v_ + 5.0 * S_.v_ + 140.0 - S_.u_ + S_.I_ + P_.I_e_
+            + I_syn );
+      S_.v_ += h * 0.5
+        * ( 0.04 * S_.v_ * S_.v_ + 5.0 * S_.v_ + 140.0 - S_.u_ + S_.I_ + P_.I_e_
+            + I_syn );
       S_.u_ += h * P_.a_ * ( P_.b_ * S_.v_ - S_.u_ );
     }
 

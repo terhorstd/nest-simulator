@@ -450,11 +450,13 @@ public:
     {
       return vp_;
     }
-    bool operator<( const NodeAddressingData& other ) const
+    bool
+    operator<( const NodeAddressingData& other ) const
     {
       return this->gid_ < other.gid_;
     }
-    bool operator==( const NodeAddressingData& other ) const
+    bool
+    operator==( const NodeAddressingData& other ) const
     {
       return this->gid_ == other.gid_;
     }
@@ -580,7 +582,7 @@ MPIManager::recv_buffer_pos_to_send_buffer_pos_secondary_events(
 {
   return get_rank() * get_chunk_size_secondary_events_in_int()
     + ( recv_buffer_pos
-           - source_rank * get_chunk_size_secondary_events_in_int() );
+        - source_rank * get_chunk_size_secondary_events_in_int() );
 }
 
 inline bool

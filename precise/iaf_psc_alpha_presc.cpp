@@ -279,8 +279,9 @@ nest::iaf_psc_alpha_presc::calibrate()
   V_.PSCInitialValue_ = 1.0 * numerics::e / P_.tau_syn_;
 
   V_.gamma_ = 1 / P_.c_m_ / ( 1 / P_.tau_syn_ - 1 / P_.tau_m_ );
-  V_.gamma_sq_ = 1 / P_.c_m_ / ( ( 1 / P_.tau_syn_ - 1 / P_.tau_m_ )
-                                 * ( 1 / P_.tau_syn_ - 1 / P_.tau_m_ ) );
+  V_.gamma_sq_ = 1 / P_.c_m_
+    / ( ( 1 / P_.tau_syn_ - 1 / P_.tau_m_ )
+        * ( 1 / P_.tau_syn_ - 1 / P_.tau_m_ ) );
 
   // pre-compute matrix for full time step
   V_.expm1_tau_m_ = numerics::expm1( -V_.h_ms_ / P_.tau_m_ );

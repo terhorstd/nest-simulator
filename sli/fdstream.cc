@@ -67,8 +67,9 @@ fdbuf::open( const char* s, std::ios_base::openmode mode )
   {
     oflag = O_RDWR;
   }
-  else if ( open_mode == ( std::ios_base::in | std::ios_base::out
-                           | std::ios_base::trunc ) ) // corresponds to "w+"
+  else if ( open_mode
+    == ( std::ios_base::in | std::ios_base::out
+         | std::ios_base::trunc ) ) // corresponds to "w+"
   {
     oflag = ( O_RDWR | O_TRUNC | O_CREAT );
   }

@@ -180,7 +180,8 @@ Token::pprint( std::ostream& out ) const
   }
 }
 
-std::ostream& operator<<( std::ostream& o, const Token& c )
+std::ostream&
+operator<<( std::ostream& o, const Token& c )
 {
   if ( not c )
   {
