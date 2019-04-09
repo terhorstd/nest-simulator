@@ -52,67 +52,48 @@
 #include "topology.h"
 #include "topology_parameter.h"
 
-
-namespace nest
-{
+namespace nest {
 SLIType TopologyModule::MaskType;
 SLIType TopologyModule::ParameterType;
 
-TopologyModule::TopologyModule()
-{
-  MaskType.settypename( "masktype" );
-  MaskType.setdefaultaction( SLIInterpreter::datatypefunction );
-  ParameterType.settypename( "parametertype" );
-  ParameterType.setdefaultaction( SLIInterpreter::datatypefunction );
+TopologyModule::TopologyModule() {
+  MaskType.settypename("masktype");
+  MaskType.setdefaultaction(SLIInterpreter::datatypefunction);
+  ParameterType.settypename("parametertype");
+  ParameterType.setdefaultaction(SLIInterpreter::datatypefunction);
 }
 
-TopologyModule::~TopologyModule()
-{
+TopologyModule::~TopologyModule() {}
+
+const std::string TopologyModule::name(void) const {
+  return std::string("TopologyModule"); // Return name of the module
 }
 
-const std::string
-TopologyModule::name( void ) const
-{
-  return std::string( "TopologyModule" ); // Return name of the module
+const std::string TopologyModule::commandstring(void) const {
+  return std::string("(topology-interface) run");
 }
 
-const std::string
-TopologyModule::commandstring( void ) const
-{
-  return std::string( "(topology-interface) run" );
-}
-
-GenericFactory< AbstractMask >&
-TopologyModule::mask_factory_( void )
-{
-  static GenericFactory< AbstractMask > factory;
+GenericFactory<AbstractMask> &TopologyModule::mask_factory_(void) {
+  static GenericFactory<AbstractMask> factory;
   return factory;
 }
 
-GenericFactory< TopologyParameter >&
-TopologyModule::parameter_factory_( void )
-{
-  static GenericFactory< TopologyParameter > factory;
+GenericFactory<TopologyParameter> &TopologyModule::parameter_factory_(void) {
+  static GenericFactory<TopologyParameter> factory;
   return factory;
 }
 
-MaskDatum
-TopologyModule::create_mask( const Token& t )
-{
+MaskDatum TopologyModule::create_mask(const Token &t) {
   // t can be either an existing MaskDatum, or a Dictionary containing
   // mask parameters
-  MaskDatum* maskd = dynamic_cast< MaskDatum* >( t.datum() );
-  if ( maskd )
-  {
+  MaskDatum *maskd = dynamic_cast<MaskDatum *>(t.datum());
+  if (maskd) {
     return *maskd;
-  }
-  else
-  {
+  } else {
 
-    DictionaryDatum* dd = dynamic_cast< DictionaryDatum* >( t.datum() );
-    if ( dd == 0 )
-    {
-      throw BadProperty( "Mask must be masktype or dictionary." );
+    DictionaryDatum *dd = dynamic_cast<DictionaryDatum *>(t.datum());
+    if (dd == 0) {
+      throw BadProperty("Mask must be masktype or dictionary.");
     }
 
     // The dictionary should contain one key which is the name of the
@@ -121,99 +102,76 @@ TopologyModule::create_mask( const Token& t )
     // anchor key will be stored in the anchor_token variable.
     Token anchor_token;
     bool has_anchor = false;
-    AbstractMask* mask = 0;
+    AbstractMask *mask = 0;
 
-    for ( Dictionary::iterator dit = ( *dd )->begin(); dit != ( *dd )->end();
-          ++dit )
-    {
+    for (Dictionary::iterator dit = (*dd)->begin(); dit != (*dd)->end();
+         ++dit) {
 
-      if ( dit->first == names::anchor )
-      {
+      if (dit->first == names::anchor) {
 
         anchor_token = dit->second;
         has_anchor = true;
-      }
-      else
-      {
+      } else {
 
-        if ( mask != 0 )
-        { // mask has already been defined
+        if (mask != 0) { // mask has already been defined
           throw BadProperty(
-            "Mask definition dictionary contains extraneous items." );
+              "Mask definition dictionary contains extraneous items.");
         }
-        mask =
-          create_mask( dit->first, getValue< DictionaryDatum >( dit->second ) );
+        mask = create_mask(dit->first, getValue<DictionaryDatum>(dit->second));
       }
     }
 
-    if ( has_anchor )
-    {
+    if (has_anchor) {
 
       // The anchor may be an array of doubles (a spatial position), or a
       // dictionary containing the keys 'column' and 'row' (for grid
       // masks only)
-      try
-      {
+      try {
 
-        std::vector< double > anchor =
-          getValue< std::vector< double > >( anchor_token );
-        AbstractMask* amask;
+        std::vector<double> anchor =
+            getValue<std::vector<double>>(anchor_token);
+        AbstractMask *amask;
 
-        switch ( anchor.size() )
-        {
+        switch (anchor.size()) {
         case 2:
-          amask = new AnchoredMask< 2 >(
-            dynamic_cast< Mask< 2 >& >( *mask ), anchor );
+          amask = new AnchoredMask<2>(dynamic_cast<Mask<2> &>(*mask), anchor);
           break;
         case 3:
-          amask = new AnchoredMask< 3 >(
-            dynamic_cast< Mask< 3 >& >( *mask ), anchor );
+          amask = new AnchoredMask<3>(dynamic_cast<Mask<3> &>(*mask), anchor);
           break;
         default:
-          throw BadProperty( "Anchor must be 2- or 3-dimensional." );
+          throw BadProperty("Anchor must be 2- or 3-dimensional.");
         }
 
         delete mask;
         mask = amask;
-      }
-      catch ( TypeMismatch& e )
-      {
+      } catch (TypeMismatch &e) {
 
-        DictionaryDatum ad = getValue< DictionaryDatum >( anchor_token );
+        DictionaryDatum ad = getValue<DictionaryDatum>(anchor_token);
 
         int dim = 2;
-        int column = getValue< long >( ad, names::column );
-        int row = getValue< long >( ad, names::row );
+        int column = getValue<long>(ad, names::column);
+        int row = getValue<long>(ad, names::row);
         int layer;
-        if ( ad->known( names::layer ) )
-        {
-          layer = getValue< long >( ad, names::layer );
+        if (ad->known(names::layer)) {
+          layer = getValue<long>(ad, names::layer);
           dim = 3;
         }
-        switch ( dim )
-        {
+        switch (dim) {
         case 2:
-          try
-          {
-            GridMask< 2 >& grid_mask_2d =
-              dynamic_cast< GridMask< 2 >& >( *mask );
-            grid_mask_2d.set_anchor( Position< 2, int >( column, row ) );
-          }
-          catch ( std::bad_cast& e )
-          {
-            throw BadProperty( "Mask must be 2-dimensional grid mask." );
+          try {
+            GridMask<2> &grid_mask_2d = dynamic_cast<GridMask<2> &>(*mask);
+            grid_mask_2d.set_anchor(Position<2, int>(column, row));
+          } catch (std::bad_cast &e) {
+            throw BadProperty("Mask must be 2-dimensional grid mask.");
           }
           break;
         case 3:
-          try
-          {
-            GridMask< 3 >& grid_mask_3d =
-              dynamic_cast< GridMask< 3 >& >( *mask );
-            grid_mask_3d.set_anchor( Position< 3, int >( column, row, layer ) );
-          }
-          catch ( std::bad_cast& e )
-          {
-            throw BadProperty( "Mask must be 3-dimensional grid mask." );
+          try {
+            GridMask<3> &grid_mask_3d = dynamic_cast<GridMask<3> &>(*mask);
+            grid_mask_3d.set_anchor(Position<3, int>(column, row, layer));
+          } catch (std::bad_cast &e) {
+            throw BadProperty("Mask must be 3-dimensional grid mask.");
           }
           break;
         }
@@ -224,72 +182,61 @@ TopologyModule::create_mask( const Token& t )
   }
 }
 
-ParameterDatum
-TopologyModule::create_parameter( const Token& t )
-{
+ParameterDatum TopologyModule::create_parameter(const Token &t) {
   // t can be an existing ParameterDatum, a DoubleDatum containing a
   // constant value for this parameter, or a Dictionary containing
   // parameters
-  ParameterDatum* pd = dynamic_cast< ParameterDatum* >( t.datum() );
-  if ( pd )
-  {
+  ParameterDatum *pd = dynamic_cast<ParameterDatum *>(t.datum());
+  if (pd) {
     return *pd;
   }
 
   // If t is a DoubleDatum, create a ConstantParameter with this value
-  DoubleDatum* dd = dynamic_cast< DoubleDatum* >( t.datum() );
-  if ( dd )
-  {
-    return new ConstantParameter( *dd );
+  DoubleDatum *dd = dynamic_cast<DoubleDatum *>(t.datum());
+  if (dd) {
+    return new ConstantParameter(*dd);
   }
 
-  DictionaryDatum* dictd = dynamic_cast< DictionaryDatum* >( t.datum() );
-  if ( dictd )
-  {
+  DictionaryDatum *dictd = dynamic_cast<DictionaryDatum *>(t.datum());
+  if (dictd) {
 
     // The dictionary should only have a single key, which is the name of
     // the parameter type to create.
-    if ( ( *dictd )->size() != 1 )
-    {
+    if ((*dictd)->size() != 1) {
       throw BadProperty(
-        "Parameter definition dictionary must contain one single key only." );
+          "Parameter definition dictionary must contain one single key only.");
     }
 
-    Name n = ( *dictd )->begin()->first;
-    DictionaryDatum pdict = getValue< DictionaryDatum >( *dictd, n );
-    return create_parameter( n, pdict );
-  }
-  else
-  {
+    Name n = (*dictd)->begin()->first;
+    DictionaryDatum pdict = getValue<DictionaryDatum>(*dictd, n);
+    return create_parameter(n, pdict);
+  } else {
     throw BadProperty(
-      "Parameter must be parametertype, constant or dictionary." );
+        "Parameter must be parametertype, constant or dictionary.");
   }
 }
 
-TopologyParameter*
-TopologyModule::create_parameter( const Name& name, const DictionaryDatum& d )
-{
+TopologyParameter *TopologyModule::create_parameter(const Name &name,
+                                                    const DictionaryDatum &d) {
   // The parameter factory will create the parameter without regard for
   // the anchor
-  TopologyParameter* param = parameter_factory_().create( name, d );
+  TopologyParameter *param = parameter_factory_().create(name, d);
 
   // Wrap the parameter object created above in an AnchoredParameter if
   // the dictionary contains an anchor
-  if ( d->known( names::anchor ) )
-  {
-    std::vector< double > anchor =
-      getValue< std::vector< double > >( d, names::anchor );
-    TopologyParameter* aparam;
-    switch ( anchor.size() )
-    {
+  if (d->known(names::anchor)) {
+    std::vector<double> anchor =
+        getValue<std::vector<double>>(d, names::anchor);
+    TopologyParameter *aparam;
+    switch (anchor.size()) {
     case 2:
-      aparam = new AnchoredParameter< 2 >( *param, anchor );
+      aparam = new AnchoredParameter<2>(*param, anchor);
       break;
     case 3:
-      aparam = new AnchoredParameter< 3 >( *param, anchor );
+      aparam = new AnchoredParameter<3>(*param, anchor);
       break;
     default:
-      throw BadProperty( "Anchor must be 2- or 3-dimensional." );
+      throw BadProperty("Anchor must be 2- or 3-dimensional.");
     }
 
     delete param;
@@ -299,114 +246,104 @@ TopologyModule::create_parameter( const Name& name, const DictionaryDatum& d )
   return param;
 }
 
-
-static AbstractMask*
-create_doughnut( const DictionaryDatum& d )
-{
+static AbstractMask *create_doughnut(const DictionaryDatum &d) {
   // The doughnut (actually an annulus) is created using a DifferenceMask
-  Position< 2 > center( 0, 0 );
-  if ( d->known( names::anchor ) )
-  {
-    center = getValue< std::vector< double > >( d, names::anchor );
+  Position<2> center(0, 0);
+  if (d->known(names::anchor)) {
+    center = getValue<std::vector<double>>(d, names::anchor);
   }
 
-  const double outer = getValue< double >( d, names::outer_radius );
-  const double inner = getValue< double >( d, names::inner_radius );
-  if ( inner >= outer )
-  {
-    throw BadProperty(
-      "topology::create_doughnut: "
-      "inner_radius < outer_radius required." );
+  const double outer = getValue<double>(d, names::outer_radius);
+  const double inner = getValue<double>(d, names::inner_radius);
+  if (inner >= outer) {
+    throw BadProperty("topology::create_doughnut: "
+                      "inner_radius < outer_radius required.");
   }
 
-  BallMask< 2 > outer_circle( center, outer );
-  BallMask< 2 > inner_circle( center, inner );
+  BallMask<2> outer_circle(center, outer);
+  BallMask<2> inner_circle(center, inner);
 
-  return new DifferenceMask< 2 >( outer_circle, inner_circle );
+  return new DifferenceMask<2>(outer_circle, inner_circle);
 }
 
-void
-TopologyModule::init( SLIInterpreter* i )
-{
+void TopologyModule::init(SLIInterpreter *i) {
   // Register the topology functions as SLI commands.
 
-  i->createcommand( "CreateLayer_D", &createlayer_Dfunction );
+  i->createcommand("CreateLayer_D", &createlayer_Dfunction);
 
-  i->createcommand( "GetPosition_i", &getposition_ifunction );
+  i->createcommand("GetPosition_i", &getposition_ifunction);
 
-  i->createcommand( "Displacement_a_i", &displacement_a_ifunction );
+  i->createcommand("Displacement_a_i", &displacement_a_ifunction);
 
-  i->createcommand( "Distance_a_i", &distance_a_ifunction );
+  i->createcommand("Distance_a_i", &distance_a_ifunction);
 
-  i->createcommand( "CreateMask_D", &createmask_Dfunction );
+  i->createcommand("CreateMask_D", &createmask_Dfunction);
 
-  i->createcommand( "Inside_a_M", &inside_a_Mfunction );
+  i->createcommand("Inside_a_M", &inside_a_Mfunction);
 
-  i->createcommand( "and_M_M", &and_M_Mfunction );
+  i->createcommand("and_M_M", &and_M_Mfunction);
 
-  i->createcommand( "or_M_M", &or_M_Mfunction );
+  i->createcommand("or_M_M", &or_M_Mfunction);
 
-  i->createcommand( "sub_M_M", &sub_M_Mfunction );
+  i->createcommand("sub_M_M", &sub_M_Mfunction);
 
-  i->createcommand( "mul_P_P", &mul_P_Pfunction );
+  i->createcommand("mul_P_P", &mul_P_Pfunction);
 
-  i->createcommand( "div_P_P", &div_P_Pfunction );
+  i->createcommand("div_P_P", &div_P_Pfunction);
 
-  i->createcommand( "add_P_P", &add_P_Pfunction );
+  i->createcommand("add_P_P", &add_P_Pfunction);
 
-  i->createcommand( "sub_P_P", &sub_P_Pfunction );
+  i->createcommand("sub_P_P", &sub_P_Pfunction);
 
-  i->createcommand(
-    "GetGlobalChildren_i_M_a", &getglobalchildren_i_M_afunction );
+  i->createcommand("GetGlobalChildren_i_M_a", &getglobalchildren_i_M_afunction);
 
-  i->createcommand( "ConnectLayers_i_i_D", &connectlayers_i_i_Dfunction );
+  i->createcommand("ConnectLayers_i_i_D", &connectlayers_i_i_Dfunction);
 
-  i->createcommand( "CreateParameter_D", &createparameter_Dfunction );
+  i->createcommand("CreateParameter_D", &createparameter_Dfunction);
 
-  i->createcommand( "GetValue_a_P", &getvalue_a_Pfunction );
+  i->createcommand("GetValue_a_P", &getvalue_a_Pfunction);
 
-  i->createcommand( "DumpLayerNodes_os_i", &dumplayernodes_os_ifunction );
+  i->createcommand("DumpLayerNodes_os_i", &dumplayernodes_os_ifunction);
 
-  i->createcommand(
-    "DumpLayerConnections_os_i_l", &dumplayerconnections_os_i_lfunction );
+  i->createcommand("DumpLayerConnections_os_i_l",
+                   &dumplayerconnections_os_i_lfunction);
 
-  i->createcommand( "GetElement_i_ia", &getelement_i_iafunction );
+  i->createcommand("GetElement_i_ia", &getelement_i_iafunction);
 
-  i->createcommand( "cvdict_M", &cvdict_Mfunction );
+  i->createcommand("cvdict_M", &cvdict_Mfunction);
 
-  i->createcommand(
-    "SelectNodesByMask_L_a_M", &selectnodesbymask_L_a_Mfunction );
+  i->createcommand("SelectNodesByMask_L_a_M", &selectnodesbymask_L_a_Mfunction);
 
-  kernel().model_manager.register_node_model< FreeLayer< 2 > >(
-    "topology_layer_free" );
-  kernel().model_manager.register_node_model< FreeLayer< 3 > >(
-    "topology_layer_free_3d" );
-  kernel().model_manager.register_node_model< GridLayer< 2 > >(
-    "topology_layer_grid" );
-  kernel().model_manager.register_node_model< GridLayer< 3 > >(
-    "topology_layer_grid_3d" );
+  kernel().model_manager.register_node_model<FreeLayer<2>>(
+      "topology_layer_free");
+  kernel().model_manager.register_node_model<FreeLayer<3>>(
+      "topology_layer_free_3d");
+  kernel().model_manager.register_node_model<GridLayer<2>>(
+      "topology_layer_grid");
+  kernel().model_manager.register_node_model<GridLayer<3>>(
+      "topology_layer_grid_3d");
 
   // Register mask types
-  register_mask< BallMask< 2 > >();
-  register_mask< BallMask< 3 > >();
-  register_mask< EllipseMask< 2 > >();
-  register_mask< EllipseMask< 3 > >();
-  register_mask< BoxMask< 2 > >();
-  register_mask< BoxMask< 3 > >();
-  register_mask< BoxMask< 3 > >( "volume" ); // For compatibility with topo 2.0
-  register_mask( "doughnut", create_doughnut );
-  register_mask< GridMask< 2 > >();
+  register_mask<BallMask<2>>();
+  register_mask<BallMask<3>>();
+  register_mask<EllipseMask<2>>();
+  register_mask<EllipseMask<3>>();
+  register_mask<BoxMask<2>>();
+  register_mask<BoxMask<3>>();
+  register_mask<BoxMask<3>>("volume"); // For compatibility with topo 2.0
+  register_mask("doughnut", create_doughnut);
+  register_mask<GridMask<2>>();
 
   // Register parameter types
-  register_parameter< ConstantParameter >( "constant" );
-  register_parameter< LinearParameter >( "linear" );
-  register_parameter< ExponentialParameter >( "exponential" );
-  register_parameter< GaussianParameter >( "gaussian" );
-  register_parameter< Gaussian2DParameter >( "gaussian2D" );
-  register_parameter< GammaParameter >( "gamma" );
-  register_parameter< UniformParameter >( "uniform" );
-  register_parameter< NormalParameter >( "normal" );
-  register_parameter< LognormalParameter >( "lognormal" );
+  register_parameter<ConstantParameter>("constant");
+  register_parameter<LinearParameter>("linear");
+  register_parameter<ExponentialParameter>("exponential");
+  register_parameter<GaussianParameter>("gaussian");
+  register_parameter<Gaussian2DParameter>("gaussian2D");
+  register_parameter<GammaParameter>("gamma");
+  register_parameter<UniformParameter>("uniform");
+  register_parameter<NormalParameter>("normal");
+  register_parameter<LognormalParameter>("lognormal");
 }
 
 /** @BeginDocumentation
@@ -430,18 +367,15 @@ TopologyModule::init( SLIInterpreter* i )
 
   Author: Håkon Enger, Kittel Austvoll
 */
-void
-TopologyModule::CreateLayer_DFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void TopologyModule::CreateLayer_DFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  DictionaryDatum layer_dict =
-    getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+  DictionaryDatum layer_dict = getValue<DictionaryDatum>(i->OStack.pick(0));
 
-  index layernode = create_layer( layer_dict );
+  index layernode = create_layer(layer_dict);
 
-  i->OStack.pop( 1 );
-  i->OStack.push( layernode );
+  i->OStack.pop(1);
+  i->OStack.push(layernode);
   i->EStack.pop();
 }
 
@@ -473,17 +407,15 @@ TopologyModule::CreateLayer_DFunction::execute( SLIInterpreter* i ) const
   Author: Kittel Austvoll
 */
 
-void
-TopologyModule::GetPosition_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void TopologyModule::GetPosition_iFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  index node_gid = getValue< long >( i->OStack.pick( 0 ) );
+  index node_gid = getValue<long>(i->OStack.pick(0));
 
-  Token result = get_position( node_gid );
+  Token result = get_position(node_gid);
 
-  i->OStack.pop( 1 );
-  i->OStack.push( result );
+  i->OStack.pop(1);
+  i->OStack.push(result);
   i->EStack.pop();
 }
 
@@ -528,20 +460,18 @@ TopologyModule::GetPosition_iFunction::execute( SLIInterpreter* i ) const
 
   See also: Distance, GetPosition
 */
-void
-TopologyModule::Displacement_a_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::Displacement_a_iFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  std::vector< double > point =
-    getValue< std::vector< double > >( i->OStack.pick( 1 ) );
+  std::vector<double> point = getValue<std::vector<double>>(i->OStack.pick(1));
 
-  index node_gid = getValue< long >( i->OStack.pick( 0 ) );
+  index node_gid = getValue<long>(i->OStack.pick(0));
 
-  Token result = displacement( point, node_gid );
+  Token result = displacement(point, node_gid);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( result );
+  i->OStack.pop(2);
+  i->OStack.push(result);
   i->EStack.pop();
 }
 
@@ -586,20 +516,17 @@ TopologyModule::Displacement_a_iFunction::execute( SLIInterpreter* i ) const
 
   See also: Displacement, GetPosition
 */
-void
-TopologyModule::Distance_a_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::Distance_a_iFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  std::vector< double > point =
-    getValue< std::vector< double > >( i->OStack.pick( 1 ) );
+  std::vector<double> point = getValue<std::vector<double>>(i->OStack.pick(1));
 
-  index node_gid = getValue< long >( i->OStack.pick( 0 ) );
+  index node_gid = getValue<long>(i->OStack.pick(0));
 
-  Token result = distance( point, node_gid );
+  Token result = distance(point, node_gid);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( result );
+  i->OStack.pop(2);
+  i->OStack.push(result);
   i->EStack.pop();
 }
 
@@ -621,18 +548,16 @@ TopologyModule::Distance_a_iFunction::execute( SLIInterpreter* i ) const
 
   Author: Håkon Enger
 */
-void
-TopologyModule::CreateMask_DFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void TopologyModule::CreateMask_DFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
   const DictionaryDatum mask_dict =
-    getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+      getValue<DictionaryDatum>(i->OStack.pick(0));
 
-  MaskDatum datum = nest::create_mask( mask_dict );
+  MaskDatum datum = nest::create_mask(mask_dict);
 
-  i->OStack.pop( 1 );
-  i->OStack.push( datum );
+  i->OStack.pop(1);
+  i->OStack.push(datum);
   i->EStack.pop();
 }
 
@@ -649,143 +574,122 @@ TopologyModule::CreateMask_DFunction::execute( SLIInterpreter* i ) const
   Returns:
   bool - true if the point is inside the mask
 */
-void
-TopologyModule::Inside_a_MFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::Inside_a_MFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  std::vector< double > point =
-    getValue< std::vector< double > >( i->OStack.pick( 1 ) );
-  MaskDatum mask = getValue< MaskDatum >( i->OStack.pick( 0 ) );
+  std::vector<double> point = getValue<std::vector<double>>(i->OStack.pick(1));
+  MaskDatum mask = getValue<MaskDatum>(i->OStack.pick(0));
 
-  bool ret = inside( point, mask );
+  bool ret = inside(point, mask);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( Token( BoolDatum( ret ) ) );
+  i->OStack.pop(2);
+  i->OStack.push(Token(BoolDatum(ret)));
   i->EStack.pop();
 }
 
-void
-TopologyModule::And_M_MFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::And_M_MFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  MaskDatum mask1 = getValue< MaskDatum >( i->OStack.pick( 1 ) );
-  MaskDatum mask2 = getValue< MaskDatum >( i->OStack.pick( 0 ) );
+  MaskDatum mask1 = getValue<MaskDatum>(i->OStack.pick(1));
+  MaskDatum mask2 = getValue<MaskDatum>(i->OStack.pick(0));
 
-  MaskDatum newmask = intersect_mask( mask1, mask2 );
+  MaskDatum newmask = intersect_mask(mask1, mask2);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( newmask );
+  i->OStack.pop(2);
+  i->OStack.push(newmask);
   i->EStack.pop();
 }
 
-void
-TopologyModule::Or_M_MFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::Or_M_MFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  MaskDatum mask1 = getValue< MaskDatum >( i->OStack.pick( 1 ) );
-  MaskDatum mask2 = getValue< MaskDatum >( i->OStack.pick( 0 ) );
+  MaskDatum mask1 = getValue<MaskDatum>(i->OStack.pick(1));
+  MaskDatum mask2 = getValue<MaskDatum>(i->OStack.pick(0));
 
-  MaskDatum newmask = union_mask( mask1, mask2 );
+  MaskDatum newmask = union_mask(mask1, mask2);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( newmask );
+  i->OStack.pop(2);
+  i->OStack.push(newmask);
   i->EStack.pop();
 }
 
-void
-TopologyModule::Sub_M_MFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::Sub_M_MFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  MaskDatum mask1 = getValue< MaskDatum >( i->OStack.pick( 1 ) );
-  MaskDatum mask2 = getValue< MaskDatum >( i->OStack.pick( 0 ) );
+  MaskDatum mask1 = getValue<MaskDatum>(i->OStack.pick(1));
+  MaskDatum mask2 = getValue<MaskDatum>(i->OStack.pick(0));
 
-  MaskDatum newmask = minus_mask( mask1, mask2 );
+  MaskDatum newmask = minus_mask(mask1, mask2);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( newmask );
+  i->OStack.pop(2);
+  i->OStack.push(newmask);
   i->EStack.pop();
 }
 
-void
-TopologyModule::Mul_P_PFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::Mul_P_PFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  ParameterDatum param1 = getValue< ParameterDatum >( i->OStack.pick( 1 ) );
-  ParameterDatum param2 = getValue< ParameterDatum >( i->OStack.pick( 0 ) );
+  ParameterDatum param1 = getValue<ParameterDatum>(i->OStack.pick(1));
+  ParameterDatum param2 = getValue<ParameterDatum>(i->OStack.pick(0));
 
-  ParameterDatum newparam = multiply_parameter( param1, param2 );
+  ParameterDatum newparam = multiply_parameter(param1, param2);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( newparam );
+  i->OStack.pop(2);
+  i->OStack.push(newparam);
   i->EStack.pop();
 }
 
-void
-TopologyModule::Div_P_PFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::Div_P_PFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  ParameterDatum param1 = getValue< ParameterDatum >( i->OStack.pick( 1 ) );
-  ParameterDatum param2 = getValue< ParameterDatum >( i->OStack.pick( 0 ) );
+  ParameterDatum param1 = getValue<ParameterDatum>(i->OStack.pick(1));
+  ParameterDatum param2 = getValue<ParameterDatum>(i->OStack.pick(0));
 
-  ParameterDatum newparam = divide_parameter( param1, param2 );
+  ParameterDatum newparam = divide_parameter(param1, param2);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( newparam );
+  i->OStack.pop(2);
+  i->OStack.push(newparam);
   i->EStack.pop();
 }
 
-void
-TopologyModule::Add_P_PFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::Add_P_PFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  ParameterDatum param1 = getValue< ParameterDatum >( i->OStack.pick( 1 ) );
-  ParameterDatum param2 = getValue< ParameterDatum >( i->OStack.pick( 0 ) );
+  ParameterDatum param1 = getValue<ParameterDatum>(i->OStack.pick(1));
+  ParameterDatum param2 = getValue<ParameterDatum>(i->OStack.pick(0));
 
-  ParameterDatum newparam = add_parameter( param1, param2 );
+  ParameterDatum newparam = add_parameter(param1, param2);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( newparam );
+  i->OStack.pop(2);
+  i->OStack.push(newparam);
   i->EStack.pop();
 }
 
-void
-TopologyModule::Sub_P_PFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::Sub_P_PFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  ParameterDatum param1 = getValue< ParameterDatum >( i->OStack.pick( 1 ) );
-  ParameterDatum param2 = getValue< ParameterDatum >( i->OStack.pick( 0 ) );
+  ParameterDatum param1 = getValue<ParameterDatum>(i->OStack.pick(1));
+  ParameterDatum param2 = getValue<ParameterDatum>(i->OStack.pick(0));
 
-  ParameterDatum newparam = subtract_parameter( param1, param2 );
+  ParameterDatum newparam = subtract_parameter(param1, param2);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( newparam );
+  i->OStack.pop(2);
+  i->OStack.push(newparam);
   i->EStack.pop();
 }
 
+void TopologyModule::GetGlobalChildren_i_M_aFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(3);
 
-void
-TopologyModule::GetGlobalChildren_i_M_aFunction::execute(
-  SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
+  index gid = getValue<long>(i->OStack.pick(2));
+  MaskDatum maskd = getValue<MaskDatum>(i->OStack.pick(1));
+  std::vector<double> anchor = getValue<std::vector<double>>(i->OStack.pick(0));
 
-  index gid = getValue< long >( i->OStack.pick( 2 ) );
-  MaskDatum maskd = getValue< MaskDatum >( i->OStack.pick( 1 ) );
-  std::vector< double > anchor =
-    getValue< std::vector< double > >( i->OStack.pick( 0 ) );
+  ArrayDatum result = get_global_children(gid, maskd, anchor);
 
-  ArrayDatum result = get_global_children( gid, maskd, anchor );
-
-  i->OStack.pop( 3 );
-  i->OStack.push( result );
+  i->OStack.pop(3);
+  i->OStack.push(result);
   i->EStack.pop();
 }
 
@@ -970,22 +874,20 @@ TopologyModule::GetGlobalChildren_i_M_aFunction::execute(
 
   SeeAlso: topology::CreateLayer
 */
-void
-TopologyModule::ConnectLayers_i_i_DFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
+void TopologyModule::ConnectLayers_i_i_DFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(3);
 
-  index source_gid = getValue< long >( i->OStack.pick( 2 ) );
-  index target_gid = getValue< long >( i->OStack.pick( 1 ) );
+  index source_gid = getValue<long>(i->OStack.pick(2));
+  index target_gid = getValue<long>(i->OStack.pick(1));
   const DictionaryDatum connection_dict =
-    getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+      getValue<DictionaryDatum>(i->OStack.pick(0));
 
-  connect_layers( source_gid, target_gid, connection_dict );
+  connect_layers(source_gid, target_gid, connection_dict);
 
-  i->OStack.pop( 3 );
+  i->OStack.pop(3);
   i->EStack.pop();
 }
-
 
 /** @BeginDocumentation
   Name: topology::CreateParameter - create a spatial function
@@ -1006,20 +908,18 @@ TopologyModule::ConnectLayers_i_i_DFunction::execute( SLIInterpreter* i ) const
 
   Author: Håkon Enger
 */
-void
-TopologyModule::CreateParameter_DFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void TopologyModule::CreateParameter_DFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(1);
   const DictionaryDatum param_dict =
-    getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+      getValue<DictionaryDatum>(i->OStack.pick(0));
 
-  ParameterDatum datum = nest::create_parameter( param_dict );
+  ParameterDatum datum = nest::create_parameter(param_dict);
 
-  i->OStack.pop( 1 );
-  i->OStack.push( datum );
+  i->OStack.pop(1);
+  i->OStack.push(datum);
   i->EStack.pop();
 }
-
 
 /** @BeginDocumentation
   Name: topology::GetValue - compute value of parameter at a point
@@ -1036,19 +936,16 @@ TopologyModule::CreateParameter_DFunction::execute( SLIInterpreter* i ) const
 
   Author: Håkon Enger
 */
-void
-TopologyModule::GetValue_a_PFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::GetValue_a_PFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  std::vector< double > point =
-    getValue< std::vector< double > >( i->OStack.pick( 1 ) );
-  ParameterDatum param = getValue< ParameterDatum >( i->OStack.pick( 0 ) );
+  std::vector<double> point = getValue<std::vector<double>>(i->OStack.pick(1));
+  ParameterDatum param = getValue<ParameterDatum>(i->OStack.pick(0));
 
-  double value = get_value( point, param );
+  double value = get_value(point, param);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( value );
+  i->OStack.pop(2);
+  i->OStack.push(value);
   i->EStack.pop();
 }
 
@@ -1090,17 +987,16 @@ TopologyModule::GetValue_a_PFunction::execute( SLIInterpreter* i ) const
 
   SeeAlso: topology::DumpLayerConnections, setprecision, modeldict
 */
-void
-TopologyModule::DumpLayerNodes_os_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::DumpLayerNodes_os_iFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  const index layer_gid = getValue< long >( i->OStack.pick( 0 ) );
-  OstreamDatum out = getValue< OstreamDatum >( i->OStack.pick( 1 ) );
+  const index layer_gid = getValue<long>(i->OStack.pick(0));
+  OstreamDatum out = getValue<OstreamDatum>(i->OStack.pick(1));
 
-  dump_layer_nodes( layer_gid, out );
+  dump_layer_nodes(layer_gid, out);
 
-  i->OStack.pop( 1 ); // leave ostream on stack
+  i->OStack.pop(1); // leave ostream on stack
   i->EStack.pop();
 }
 
@@ -1144,21 +1040,19 @@ TopologyModule::DumpLayerNodes_os_iFunction::execute( SLIInterpreter* i ) const
   SeeAlso: topology::DumpLayerNodes
 */
 
-void
-TopologyModule::DumpLayerConnections_os_i_lFunction::execute(
-  SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
+void TopologyModule::DumpLayerConnections_os_i_lFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(3);
 
-  OstreamDatum out_file = getValue< OstreamDatum >( i->OStack.pick( 2 ) );
+  OstreamDatum out_file = getValue<OstreamDatum>(i->OStack.pick(2));
 
-  const index layer_gid = getValue< long >( i->OStack.pick( 1 ) );
+  const index layer_gid = getValue<long>(i->OStack.pick(1));
 
-  const Token syn_model = i->OStack.pick( 0 );
+  const Token syn_model = i->OStack.pick(0);
 
-  dump_layer_connections( syn_model, layer_gid, out_file );
+  dump_layer_connections(syn_model, layer_gid, out_file);
 
-  i->OStack.pop( 2 ); // leave ostream on stack
+  i->OStack.pop(2); // leave ostream on stack
   i->EStack.pop();
 }
 
@@ -1193,109 +1087,82 @@ TopologyModule::DumpLayerConnections_os_i_lFunction::execute(
 
   Author: Kittel Austvoll, Håkon Enger
 */
-void
-TopologyModule::GetElement_i_iaFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void TopologyModule::GetElement_i_iaFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  const index layer_gid = getValue< long >( i->OStack.pick( 1 ) );
-  TokenArray array = getValue< TokenArray >( i->OStack.pick( 0 ) );
+  const index layer_gid = getValue<long>(i->OStack.pick(1));
+  TokenArray array = getValue<TokenArray>(i->OStack.pick(0));
 
-  std::vector< index > node_gids = get_element( layer_gid, array );
+  std::vector<index> node_gids = get_element(layer_gid, array);
 
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
 
   // For compatibility reasons, return either single node or array
-  if ( node_gids.size() == 1 )
-  {
-    i->OStack.push( node_gids[ 0 ] );
-  }
-  else
-  {
-    i->OStack.push( node_gids );
+  if (node_gids.size() == 1) {
+    i->OStack.push(node_gids[0]);
+  } else {
+    i->OStack.push(node_gids);
   }
 
   i->EStack.pop();
 }
 
-void
-TopologyModule::Cvdict_MFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void TopologyModule::Cvdict_MFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  MaskDatum mask = getValue< MaskDatum >( i->OStack.pick( 0 ) );
+  MaskDatum mask = getValue<MaskDatum>(i->OStack.pick(0));
   DictionaryDatum dict = mask->get_dict();
 
   i->OStack.pop();
-  i->OStack.push( dict );
+  i->OStack.push(dict);
   i->EStack.pop();
 }
 
+void TopologyModule::SelectNodesByMask_L_a_MFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(3);
 
-void
-TopologyModule::SelectNodesByMask_L_a_MFunction::execute(
-  SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
+  const index &layer_gid = getValue<long>(i->OStack.pick(2));
+  std::vector<double> anchor = getValue<std::vector<double>>(i->OStack.pick(1));
+  MaskDatum mask = getValue<MaskDatum>(i->OStack.pick(0));
 
-  const index& layer_gid = getValue< long >( i->OStack.pick( 2 ) );
-  std::vector< double > anchor =
-    getValue< std::vector< double > >( i->OStack.pick( 1 ) );
-  MaskDatum mask = getValue< MaskDatum >( i->OStack.pick( 0 ) );
-
-  std::vector< index > mask_gids;
+  std::vector<index> mask_gids;
 
   const int dim = anchor.size();
 
-  if ( dim != 2 and dim != 3 )
-  {
-    throw BadProperty( "Center must be 2- or 3-dimensional." );
+  if (dim != 2 and dim != 3) {
+    throw BadProperty("Center must be 2- or 3-dimensional.");
   }
 
-  if ( dim == 2 )
-  {
-    Layer< 2 >* layer = dynamic_cast< Layer< 2 >* >(
-      kernel().node_manager.get_node( layer_gid ) );
+  if (dim == 2) {
+    Layer<2> *layer =
+        dynamic_cast<Layer<2> *>(kernel().node_manager.get_node(layer_gid));
 
-    MaskedLayer< 2 > ml =
-      MaskedLayer< 2 >( *layer, Selector(), mask, true, false );
+    MaskedLayer<2> ml = MaskedLayer<2>(*layer, Selector(), mask, true, false);
 
-    for ( Ntree< 2, index >::masked_iterator it =
-            ml.begin( Position< 2 >( anchor[ 0 ], anchor[ 1 ] ) );
-          it != ml.end();
-          ++it )
-    {
-      mask_gids.push_back( it->second );
+    for (Ntree<2, index>::masked_iterator it =
+             ml.begin(Position<2>(anchor[0], anchor[1]));
+         it != ml.end(); ++it) {
+      mask_gids.push_back(it->second);
     }
-  }
-  else
-  {
-    Layer< 3 >* layer = dynamic_cast< Layer< 3 >* >(
-      kernel().node_manager.get_node( layer_gid ) );
+  } else {
+    Layer<3> *layer =
+        dynamic_cast<Layer<3> *>(kernel().node_manager.get_node(layer_gid));
 
-    MaskedLayer< 3 > ml =
-      MaskedLayer< 3 >( *layer, Selector(), mask, true, false );
+    MaskedLayer<3> ml = MaskedLayer<3>(*layer, Selector(), mask, true, false);
 
-    for ( Ntree< 3, index >::masked_iterator it =
-            ml.begin( Position< 3 >( anchor[ 0 ], anchor[ 1 ], anchor[ 2 ] ) );
-          it != ml.end();
-          ++it )
-    {
-      mask_gids.push_back( it->second );
+    for (Ntree<3, index>::masked_iterator it =
+             ml.begin(Position<3>(anchor[0], anchor[1], anchor[2]));
+         it != ml.end(); ++it) {
+      mask_gids.push_back(it->second);
     }
   }
 
-  i->OStack.pop( 3 );
-  i->OStack.push( mask_gids );
+  i->OStack.pop(3);
+  i->OStack.push(mask_gids);
   i->EStack.pop();
 }
 
-
-std::string
-LayerExpected::message() const
-{
-  return std::string();
-}
-
+std::string LayerExpected::message() const { return std::string(); }
 
 } // namespace nest

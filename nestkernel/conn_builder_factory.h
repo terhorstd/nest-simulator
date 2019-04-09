@@ -34,8 +34,7 @@
 #include "lockptrdatum.h"
 #include "name.h"
 
-namespace nest
-{
+namespace nest {
 /**
  * Generic factory class for ConnBuilder objects.
  *
@@ -43,35 +42,28 @@ namespace nest
  * of ConnBuilder subclasses and object creation.
  *
  */
-class GenericConnBuilderFactory
-{
+class GenericConnBuilderFactory {
 public:
-  virtual ~GenericConnBuilderFactory()
-  {
-  }
-  virtual ConnBuilder* create( const GIDCollection&,
-    const GIDCollection&,
-    const DictionaryDatum&,
-    const DictionaryDatum& ) const = 0;
+  virtual ~GenericConnBuilderFactory() {}
+  virtual ConnBuilder *create(const GIDCollection &, const GIDCollection &,
+                              const DictionaryDatum &,
+                              const DictionaryDatum &) const = 0;
 };
 
 /**
  * Factory class for generating objects of type ConnBuilder
  */
 
-template < typename ConnBuilderType >
-class ConnBuilderFactory : public GenericConnBuilderFactory
-{
+template <typename ConnBuilderType>
+class ConnBuilderFactory : public GenericConnBuilderFactory {
 
 public:
   //! create conn builder
-  ConnBuilder*
-  create( const GIDCollection& sources,
-    const GIDCollection& targets,
-    const DictionaryDatum& conn_spec,
-    const DictionaryDatum& syn_spec ) const
-  {
-    return new ConnBuilderType( sources, targets, conn_spec, syn_spec );
+  ConnBuilder *create(const GIDCollection &sources,
+                      const GIDCollection &targets,
+                      const DictionaryDatum &conn_spec,
+                      const DictionaryDatum &syn_spec) const {
+    return new ConnBuilderType(sources, targets, conn_spec, syn_spec);
   }
 };
 

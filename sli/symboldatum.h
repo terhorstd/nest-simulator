@@ -44,30 +44,18 @@
    to use a compiler-switch.
 */
 #ifndef HAVE_STATIC_TEMPLATE_DECLARATION_FAILS
-template <>
-sli::pool AggregateDatum< Name, &SLIInterpreter::Symboltype >::memory;
+template <> sli::pool AggregateDatum<Name, &SLIInterpreter::Symboltype>::memory;
 #endif
 
-class SymbolDatum : public AggregateDatum< Name, &SLIInterpreter::Symboltype >
-{
-  Datum*
-  clone( void ) const
-  {
-    return new SymbolDatum( *this );
-  }
+class SymbolDatum : public AggregateDatum<Name, &SLIInterpreter::Symboltype> {
+  Datum *clone(void) const { return new SymbolDatum(*this); }
 
 public:
-  SymbolDatum( const Name& n )
-    : AggregateDatum< Name, &SLIInterpreter::Symboltype >( n )
-  {
-  }
-  SymbolDatum( const SymbolDatum& n )
-    : AggregateDatum< Name, &SLIInterpreter::Symboltype >( n )
-  {
-  }
-  ~SymbolDatum()
-  {
-  }
+  SymbolDatum(const Name &n)
+      : AggregateDatum<Name, &SLIInterpreter::Symboltype>(n) {}
+  SymbolDatum(const SymbolDatum &n)
+      : AggregateDatum<Name, &SLIInterpreter::Symboltype>(n) {}
+  ~SymbolDatum() {}
 };
 
 #endif

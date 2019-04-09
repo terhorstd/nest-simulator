@@ -27,30 +27,21 @@
 #include "arraydatum.h"
 #include "dictutils.h"
 
-namespace nest
-{
+namespace nest {
 
-class ConnectionID
-{
+class ConnectionID {
 public:
-  ConnectionID()
-  {
-  }
-  ConnectionID( long source_gid,
-    long target_gid,
-    long target_thread,
-    long synapse_modelid,
-    long port );
-  ConnectionID( long source_gid,
-    long target_thread,
-    long synapse_modelid,
-    long port );
-  ConnectionID( const ConnectionID& );
+  ConnectionID() {}
+  ConnectionID(long source_gid, long target_gid, long target_thread,
+               long synapse_modelid, long port);
+  ConnectionID(long source_gid, long target_thread, long synapse_modelid,
+               long port);
+  ConnectionID(const ConnectionID &);
 
   DictionaryDatum get_dict() const;
   ArrayDatum to_ArrayDatum() const;
-  bool operator==( const ConnectionID& c ) const;
-  void print_me( std::ostream& out ) const;
+  bool operator==(const ConnectionID &c) const;
+  void print_me(std::ostream &out) const;
   long get_source_gid() const;
   long get_target_gid() const;
   long get_target_thread() const;
@@ -65,45 +56,23 @@ protected:
   long port_;
 };
 
-inline ConnectionID::ConnectionID( const ConnectionID& cid )
-  : source_gid_( cid.source_gid_ )
-  , target_gid_( cid.target_gid_ )
-  , target_thread_( cid.target_thread_ )
-  , synapse_modelid_( cid.synapse_modelid_ )
-  , port_( cid.port_ )
-{
-}
+inline ConnectionID::ConnectionID(const ConnectionID &cid)
+    : source_gid_(cid.source_gid_), target_gid_(cid.target_gid_),
+      target_thread_(cid.target_thread_),
+      synapse_modelid_(cid.synapse_modelid_), port_(cid.port_) {}
 
-inline long
-ConnectionID::get_source_gid() const
-{
-  return source_gid_;
-}
+inline long ConnectionID::get_source_gid() const { return source_gid_; }
 
-inline long
-ConnectionID::get_target_gid() const
-{
-  return target_gid_;
-}
+inline long ConnectionID::get_target_gid() const { return target_gid_; }
 
-inline long
-ConnectionID::get_target_thread() const
-{
-  return target_thread_;
-}
+inline long ConnectionID::get_target_thread() const { return target_thread_; }
 
-inline long
-ConnectionID::get_synapse_model_id() const
-{
+inline long ConnectionID::get_synapse_model_id() const {
   return synapse_modelid_;
 }
 
-inline long
-ConnectionID::get_port() const
-{
-  return port_;
-}
+inline long ConnectionID::get_port() const { return port_; }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef CONNECTION_ID_H */

@@ -26,65 +26,43 @@
 #include "name.h"
 #include "token.h"
 
-sli::pool BoolDatum::memory( sizeof( BoolDatum ), 1024, 1 );
+sli::pool BoolDatum::memory(sizeof(BoolDatum), 1024, 1);
 
-const char* BoolDatum::true_string = "true";
-const char* BoolDatum::false_string = "false";
+const char *BoolDatum::true_string = "true";
+const char *BoolDatum::false_string = "false";
 
-BoolDatum::BoolDatum( const Name& val )
-{
-  d = ( val == Name( true_string ) );
+BoolDatum::BoolDatum(const Name &val) { d = (val == Name(true_string)); }
+
+BoolDatum::operator Name() const {
+  return (d ? Name(true_string) : Name(false_string));
 }
 
-BoolDatum::operator Name() const
-{
-  return ( d ? Name( true_string ) : Name( false_string ) );
+BoolDatum::operator std::string() const {
+  return (d ? std::string(true_string) : std::string(false_string));
 }
 
-BoolDatum::operator std::string() const
-{
-  return ( d ? std::string( true_string ) : std::string( false_string ) );
+void BoolDatum::input_form(std::ostream &out) const { print(out); }
+
+void BoolDatum::pprint(std::ostream &out) const { print(out); }
+
+void BoolDatum::print(std::ostream &out) const {
+  out << (d ? true_string : false_string);
 }
 
-void
-BoolDatum::input_form( std::ostream& out ) const
-{
-  print( out );
-}
-
-void
-BoolDatum::pprint( std::ostream& out ) const
-{
-  print( out );
-}
-
-void
-BoolDatum::print( std::ostream& out ) const
-{
-  out << ( d ? true_string : false_string );
-}
-
-void*
-BoolDatum::operator new( size_t size )
-{
-  if ( size != memory.size_of() )
-  {
-    return ::operator new( size );
+void *BoolDatum::operator new(size_t size) {
+  if (size != memory.size_of()) {
+    return ::operator new(size);
   }
   return memory.alloc();
 }
 
-void
-BoolDatum::operator delete( void* p, size_t size )
-{
-  if ( p == NULL )
-  {
+void BoolDatum::operator delete(void *p, size_t size) {
+  if (p == NULL) {
     return;
   }
-  if ( size != memory.size_of() )
-  {
-    ::operator delete( p );
+  if (size != memory.size_of()) {
+    ::operator delete(p);
     return;
   }
-  memory.free( p );
+  memory.free(p);
 }

@@ -35,32 +35,27 @@
 #include "slifunction.h"
 #include "slimodule.h"
 
-class Regex
-{
+class Regex {
   regex_t r;
 
 public:
   Regex();
   ~Regex();
-  regex_t* get( void );
+  regex_t *get(void);
 };
 
-class RegexpModule : public SLIModule
-{
-  class RegcompFunction : public SLIFunction
-  {
+class RegexpModule : public SLIModule {
+  class RegcompFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
-  class RegexecFunction : public SLIFunction
-  {
+  class RegexecFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
-  class RegerrorFunction : public SLIFunction
-  {
+  class RegerrorFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
 public:
@@ -91,34 +86,23 @@ public:
 
   static SLIType RegexType;
 
-  RegexpModule( void )
-    : regexdict_name( "regexdict" )
-    , REG_NOTBOL_name( "REG_NOTBOL" )
-    , REG_NOTEOL_name( "REG_NOTEOL" )
-    , REG_ESPACE_name( "REG_ESPACE" )
-    , REG_BADPAT_name( "REG_BADPAT" )
-    , REG_EXTENDED_name( "REG_EXTENDED" )
-    , REG_ICASE_name( "REG_ICASE" )
-    , REG_NOSUB_name( "REG_NOSUB" )
-    , REG_NEWLINE_name( "REG_NEWLINE" )
-    , REG_ECOLLATE_name( "REG_ECOLLATE" )
-    , REG_ECTYPE_name( "REG_ECTYPE" )
-    , REG_EESCAPE_name( "REG_EESCAPE" )
-    , REG_ESUBREG_name( "REG_ESUBREG" )
-    , REG_EBRACK_name( "REG_EBRACK" )
-    , REG_EPAREN_name( "REG_EPAREN" )
-    , REG_EBRACE_name( "REG_EBRACE" )
-    , REG_BADBR_name( "REG_BADBR" )
-    , REG_ERANGE_name( "REG_ERANGE" )
-    , REG_BADRPT_name( "REG_BADRPT" )
-  {
-  }
+  RegexpModule(void)
+      : regexdict_name("regexdict"), REG_NOTBOL_name("REG_NOTBOL"),
+        REG_NOTEOL_name("REG_NOTEOL"), REG_ESPACE_name("REG_ESPACE"),
+        REG_BADPAT_name("REG_BADPAT"), REG_EXTENDED_name("REG_EXTENDED"),
+        REG_ICASE_name("REG_ICASE"), REG_NOSUB_name("REG_NOSUB"),
+        REG_NEWLINE_name("REG_NEWLINE"), REG_ECOLLATE_name("REG_ECOLLATE"),
+        REG_ECTYPE_name("REG_ECTYPE"), REG_EESCAPE_name("REG_EESCAPE"),
+        REG_ESUBREG_name("REG_ESUBREG"), REG_EBRACK_name("REG_EBRACK"),
+        REG_EPAREN_name("REG_EPAREN"), REG_EBRACE_name("REG_EBRACE"),
+        REG_BADBR_name("REG_BADBR"), REG_ERANGE_name("REG_ERANGE"),
+        REG_BADRPT_name("REG_BADRPT") {}
 
   ~RegexpModule();
 
-  void init( SLIInterpreter* );
-  const std::string name( void ) const;
-  const std::string commandstring( void ) const;
+  void init(SLIInterpreter *);
+  const std::string name(void) const;
+  const std::string commandstring(void) const;
 };
 
 #endif

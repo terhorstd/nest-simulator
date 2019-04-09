@@ -26,47 +26,34 @@
 // Includes from nestkernel:
 #include "node.h"
 
-namespace nest
-{
+namespace nest {
 
 /**
  * Base class for device objects.
  */
-class DeviceNode : public Node
-{
+class DeviceNode : public Node {
 
 public:
-  DeviceNode()
-    : Node()
-    , local_device_id_( invalid_index )
-  {
-  }
+  DeviceNode() : Node(), local_device_id_(invalid_index) {}
 
-  DeviceNode( DeviceNode const& dn )
-    : Node( dn )
-    , local_device_id_( invalid_index )
-  {
-  }
+  DeviceNode(DeviceNode const &dn)
+      : Node(dn), local_device_id_(invalid_index) {}
 
-  void set_local_device_id( const index ldid );
+  void set_local_device_id(const index ldid);
   index get_local_device_id() const;
 
 protected:
   index local_device_id_;
 };
 
-inline void
-DeviceNode::set_local_device_id( const index ldid )
-{
+inline void DeviceNode::set_local_device_id(const index ldid) {
   local_device_id_ = ldid;
 }
 
-inline index
-DeviceNode::get_local_device_id() const
-{
+inline index DeviceNode::get_local_device_id() const {
   return local_device_id_;
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef DEVICE_NODE_H */

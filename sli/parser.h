@@ -35,17 +35,14 @@
 #include "token.h"
 #include "tokenstack.h"
 
-
-class Parser
-{
-  Scanner* s;
+class Parser {
+  Scanner *s;
 
   Token arraytoken;
   Token proctoken;
   TokenStack ParseStack;
 
-  enum ParseResult
-  {
+  enum ParseResult {
     tokencontinue,
     scancontinue,
     tokencompleted,
@@ -56,46 +53,34 @@ class Parser
     unexpectedeof
   };
 
-  void init( std::istream& );
+  void init(std::istream &);
 
 public:
-  Parser( void );
-  Parser( std::istream& );
+  Parser(void);
+  Parser(std::istream &);
 
-  bool operator()( Token& );
-  bool
-  readToken( std::istream& is, Token& t )
-  {
-    s->source( &is );
-    return operator()( t );
+  bool operator()(Token &);
+  bool readToken(std::istream &is, Token &t) {
+    s->source(&is);
+    return operator()(t);
   }
 
-  bool
-  readSymbol( std::istream& is, Token& t )
-  {
-    s->source( &is );
-    return s->operator()( t );
+  bool readSymbol(std::istream &is, Token &t) {
+    s->source(&is);
+    return s->operator()(t);
   }
 
-  Scanner const*
-  scan( void ) const
-  {
-    return s;
-  }
+  Scanner const *scan(void) const { return s; }
 
-  void
-  clear_context()
-  {
-    if ( s != NULL )
-    {
+  void clear_context() {
+    if (s != NULL) {
       s->clear_context();
     }
   }
 };
 
-bool operator==( Parser const&, Parser const& );
+bool operator==(Parser const &, Parser const &);
 
-std::ostream& operator<<( std::ostream&, const Parser& );
-
+std::ostream &operator<<(std::ostream &, const Parser &);
 
 #endif

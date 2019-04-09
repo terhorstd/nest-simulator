@@ -22,38 +22,30 @@
 
 #include "ginzburg_neuron.h"
 
-namespace nest
-{
+namespace nest {
 
-void
-gainfunction_ginzburg::get( DictionaryDatum& d ) const
-{
-  def< double >( d, names::theta, theta_ );
-  def< double >( d, names::c_1, c1_ );
-  def< double >( d, names::c_2, c2_ );
-  def< double >( d, names::c_3, c3_ );
+void gainfunction_ginzburg::get(DictionaryDatum &d) const {
+  def<double>(d, names::theta, theta_);
+  def<double>(d, names::c_1, c1_);
+  def<double>(d, names::c_2, c2_);
+  def<double>(d, names::c_3, c3_);
 }
 
-void
-gainfunction_ginzburg::set( const DictionaryDatum& d )
-{
-  updateValue< double >( d, names::theta, theta_ );
-  updateValue< double >( d, names::c_1, c1_ );
-  updateValue< double >( d, names::c_2, c2_ );
-  updateValue< double >( d, names::c_3, c3_ );
+void gainfunction_ginzburg::set(const DictionaryDatum &d) {
+  updateValue<double>(d, names::theta, theta_);
+  updateValue<double>(d, names::c_1, c1_);
+  updateValue<double>(d, names::c_2, c2_);
+  updateValue<double>(d, names::c_3, c3_);
 }
 
 /*
  * Override the create() method with one call to RecordablesMap::insert_()
  * for each quantity to be recorded.
  */
-template <>
-void
-RecordablesMap< nest::ginzburg_neuron >::create()
-{
+template <> void RecordablesMap<nest::ginzburg_neuron>::create() {
   // use standard names whereever you can for consistency!
-  insert_( names::S, &nest::ginzburg_neuron::get_output_state__ );
-  insert_( names::h, &nest::ginzburg_neuron::get_input__ );
+  insert_(names::S, &nest::ginzburg_neuron::get_output_state__);
+  insert_(names::h, &nest::ginzburg_neuron::get_input__);
 }
 
 } // namespace nest

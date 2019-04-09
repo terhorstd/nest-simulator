@@ -32,8 +32,7 @@
 // Includes from precise:
 #include "slice_ring_buffer.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: parrot_neuron_ps - Neuron that repeats incoming spikes handling
@@ -74,8 +73,7 @@ Receives: SpikeEvent
 
 Author: adapted from parrot_neuron by Kunkel
 */
-class parrot_neuron_ps : public Archiving_Node
-{
+class parrot_neuron_ps : public Archiving_Node {
 public:
   parrot_neuron_ps();
 
@@ -87,71 +85,52 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  void handle( SpikeEvent& );
-  port send_test_event( Node&, rport, synindex, bool );
-  port handles_test_event( SpikeEvent&, rport );
+  void handle(SpikeEvent &);
+  port send_test_event(Node &, rport, synindex, bool);
+  port handles_test_event(SpikeEvent &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
   // uses off_grid events
-  bool
-  is_off_grid() const
-  {
-    return true;
-  }
+  bool is_off_grid() const { return true; }
 
 private:
-  void
-  init_state_( Node const& )
-  {
-  } // no state
+  void init_state_(Node const &) {} // no state
 
   void init_buffers_();
 
-  void
-  calibrate()
-  {
-  } // no variables
+  void calibrate() {} // no variables
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   /** Queue for incoming events. */
-  struct Buffers_
-  {
+  struct Buffers_ {
     SliceRingBuffer events_;
   };
 
   Buffers_ B_;
 };
 
-inline port
-parrot_neuron_ps::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port parrot_neuron_ps::send_test_event(Node &target, rport receptor_type,
+                                              synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-parrot_neuron_ps::handles_test_event( SpikeEvent&, rport receptor_type )
-{
+inline port parrot_neuron_ps::handles_test_event(SpikeEvent &,
+                                                 rport receptor_type) {
   // Allow connections to port 0 (spikes to be repeated)
   // and port 1 (spikes to be ignored).
-  if ( receptor_type == 0 or receptor_type == 1 )
-  {
+  if (receptor_type == 0 or receptor_type == 1) {
     return receptor_type;
-  }
-  else
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+  } else {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
 }
 
-} // namespace
+} // namespace nest
 
 #endif // PARROT_NEURON_PS_H

@@ -56,20 +56,18 @@
 #define EXITCODE_SKIPPED_NO_GSL 204
 #define EXITCODE_SKIPPED_NO_MUSIC 205
 
-
-class SLIStartup : public SLIModule
-{
+class SLIStartup : public SLIModule {
   const std::string startupfilename;
   const std::string slilibpath;
   std::string slihomepath;
   std::string slidocdir;
   std::string sliprefix;
 
-  std::string locateSLIInstallationPath( void );
-  bool checkpath( std::string const&, std::string& ) const;
-  std::string getenv( const std::string& ) const;
-  std::string
-  checkenvpath( std::string const&, SLIInterpreter*, std::string ) const;
+  std::string locateSLIInstallationPath(void);
+  bool checkpath(std::string const &, std::string &) const;
+  std::string getenv(const std::string &) const;
+  std::string checkenvpath(std::string const &, SLIInterpreter *,
+                           std::string) const;
 
   Token targs;
   int verbosity_;
@@ -132,26 +130,19 @@ public:
 
   Name environment_name;
 
-  class GetenvFunction : public SLIFunction
-  {
+  class GetenvFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
   GetenvFunction getenvfunction;
 
-  SLIStartup( int, char** );
-  ~SLIStartup()
-  {
-  }
+  SLIStartup(int, char **);
+  ~SLIStartup() {}
 
-  void init( SLIInterpreter* );
+  void init(SLIInterpreter *);
 
-  const std::string
-  name( void ) const
-  {
-    return "SLIStartup";
-  }
+  const std::string name(void) const { return "SLIStartup"; }
 };
 
 #endif

@@ -29,55 +29,39 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 
 /**
  * Contains rules for selecting nodes from a layer when connecting. Users
  * may select by model or by depth.
  */
-struct Selector
-{
+struct Selector {
   /**
    * The default constructor creates a Selector with no specific rules,
    * so all nodes are selected.
    */
-  Selector()
-    : model( -1 )
-    , depth( -1 )
-  {
-  }
+  Selector() : model(-1), depth(-1) {}
   /**
    * The dictionary used to initialize the Selector may contain
    * parameters 'model', which is the name of a model to select by,
    * and/or 'lid', which is the depth to select by (an integer >= 1).
    * @param d Dictionary containing parameters for the Selector.
    */
-  Selector( const DictionaryDatum& d );
+  Selector(const DictionaryDatum &d);
   /**
    * @returns true if this Selector selects by model
    */
-  bool
-  select_model() const
-  {
-    return model >= 0;
-  }
+  bool select_model() const { return model >= 0; }
   /**
    * @returns true if this Selector selects by depth
    */
-  bool
-  select_depth() const
-  {
-    return depth >= 0;
-  }
+  bool select_depth() const { return depth >= 0; }
   /**
    * Test if two selectors are equal, i.e. contain the same rules.
    * @returns true if both selectors are equal.
    */
-  bool
-  operator==( const Selector& other )
-  {
-    return ( other.model == model ) and ( other.depth == depth );
+  bool operator==(const Selector &other) {
+    return (other.model == model) and (other.depth == depth);
   }
   /**
    * The model to select, or -1 if all models are allowed.

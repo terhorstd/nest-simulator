@@ -36,140 +36,109 @@
 
 const Token Dictionary::VoidToken;
 
-Dictionary::~Dictionary()
-{
+Dictionary::~Dictionary() {}
+
+const Token &Dictionary::operator[](const char *n) const {
+  return operator[](Name(n));
 }
 
-const Token& Dictionary::operator[]( const char* n ) const
-{
-  return operator[]( Name( n ) );
-}
+Token &Dictionary::operator[](const char *n) { return operator[](Name(n)); }
 
-Token& Dictionary::operator[]( const char* n )
-{
-  return operator[]( Name( n ) );
-}
-
-void
-Dictionary::clear()
-{
-  TokenMap cp( *this );
+void Dictionary::clear() {
+  TokenMap cp(*this);
   TokenMap::clear();
 
-  for ( TokenMap::iterator i = cp.begin(); i != cp.end(); ++i )
-  {
-    Token* tok = &i->second;
-    Datum* datum = tok->datum();
-    DictionaryDatum* d = dynamic_cast< DictionaryDatum* >( datum );
-    if ( not d )
-    {
+  for (TokenMap::iterator i = cp.begin(); i != cp.end(); ++i) {
+    Token *tok = &i->second;
+    Datum *datum = tok->datum();
+    DictionaryDatum *d = dynamic_cast<DictionaryDatum *>(datum);
+    if (not d) {
       continue;
     }
 
-    Dictionary* dt = d->get();
+    Dictionary *dt = d->get();
     d->unlock();
     dt->clear();
   }
 }
 
-void
-Dictionary::info( std::ostream& out ) const
-{
-  out.setf( std::ios::left );
-  if ( size() > 0 )
-  {
+void Dictionary::info(std::ostream &out) const {
+  out.setf(std::ios::left);
+  if (size() > 0) {
     // copy to vector and sort
-    typedef std::vector< std::pair< Name, Token > > DataVec;
+    typedef std::vector<std::pair<Name, Token>> DataVec;
     DataVec data;
-    std::copy( begin(), end(), std::inserter( data, data.begin() ) );
-    std::sort( data.begin(), data.end(), DictItemLexicalOrder() );
+    std::copy(begin(), end(), std::inserter(data, data.begin()));
+    std::sort(data.begin(), data.end(), DictItemLexicalOrder());
 
     out << "--------------------------------------------------" << std::endl;
-    out << std::setw( 25 ) << "Name" << std::setw( 20 ) << "Type"
+    out << std::setw(25) << "Name" << std::setw(20) << "Type"
         << "Value" << std::endl;
     out << "--------------------------------------------------" << std::endl;
 
-    for ( DataVec::const_iterator where = data.begin(); where != data.end();
-          ++where )
-    {
-      out << std::setw( 25 ) << where->first << std::setw( 20 )
+    for (DataVec::const_iterator where = data.begin(); where != data.end();
+         ++where) {
+      out << std::setw(25) << where->first << std::setw(20)
           << where->second->gettypename() << where->second << std::endl;
     }
     out << "--------------------------------------------------" << std::endl;
   }
   out << "Total number of entries: " << size() << std::endl;
 
-  out.unsetf( std::ios::left );
+  out.unsetf(std::ios::left);
 }
 
-void
-Dictionary::add_dict( const std::string& target, SLIInterpreter& i )
-{
+void Dictionary::add_dict(const std::string &target, SLIInterpreter &i) {
   DictionaryDatum targetdict;
 
   // retrieve targetdict from interpreter
-  Token d = i.baselookup( Name( target ) );
-  targetdict = getValue< DictionaryDatum >( d );
+  Token d = i.baselookup(Name(target));
+  targetdict = getValue<DictionaryDatum>(d);
 
-  for ( TokenMap::const_iterator it = TokenMap::begin(); it != TokenMap::end();
-        ++it )
-  {
-    if ( not targetdict->known( it->first ) )
-    {
-      targetdict->insert( it->first, it->second );
-    }
-    else
-    {
-      throw UndefinedName( ( it->first ).toString() );
+  for (TokenMap::const_iterator it = TokenMap::begin(); it != TokenMap::end();
+       ++it) {
+    if (not targetdict->known(it->first)) {
+      targetdict->insert(it->first, it->second);
+    } else {
+      throw UndefinedName((it->first).toString());
       //      throw DictError();
     }
   }
 }
 
-void
-Dictionary::remove( const Name& n )
-{
-  TokenMap::iterator it = find( n );
-  if ( it != end() )
-  {
-    erase( it );
+void Dictionary::remove(const Name &n) {
+  TokenMap::iterator it = find(n);
+  if (it != end()) {
+    erase(it);
   }
 }
 
-void
-Dictionary::remove_dict( const std::string& target, SLIInterpreter& i )
-{
+void Dictionary::remove_dict(const std::string &target, SLIInterpreter &i) {
   DictionaryDatum targetdict;
 
   // retrieve targetdict from interpreter
-  Token d = i.baselookup( Name( target ) );
-  targetdict = getValue< DictionaryDatum >( d );
+  Token d = i.baselookup(Name(target));
+  targetdict = getValue<DictionaryDatum>(d);
 
-  for ( TokenMap::const_iterator it = TokenMap::begin(); it != TokenMap::end();
-        ++it )
-  {
-    TokenMap::iterator tgt_it = targetdict->find( it->first );
-    if ( tgt_it != targetdict->end() )
-    {
-      targetdict->erase( tgt_it );
+  for (TokenMap::const_iterator it = TokenMap::begin(); it != TokenMap::end();
+       ++it) {
+    TokenMap::iterator tgt_it = targetdict->find(it->first);
+    if (tgt_it != targetdict->end()) {
+      targetdict->erase(tgt_it);
     }
   }
 }
 
-void
-Dictionary::clear_access_flags()
-{
-  for ( TokenMap::iterator it = TokenMap::begin(); it != TokenMap::end(); ++it )
-  {
+void Dictionary::clear_access_flags() {
+  for (TokenMap::iterator it = TokenMap::begin(); it != TokenMap::end(); ++it) {
     /*
        Clear flags in nested dictionaries recursively.
        We first test whether the token is a DictionaryDatum
        and then call getValue(). This entails two dynamic casts,
        but is likely more efficient than a try-catch construction.
     */
-    if ( it->second.is_a< DictionaryDatum >() )
-    {
-      DictionaryDatum subdict = getValue< DictionaryDatum >( it->second );
+    if (it->second.is_a<DictionaryDatum>()) {
+      DictionaryDatum subdict = getValue<DictionaryDatum>(it->second);
       subdict->clear_access_flags();
     }
 
@@ -179,51 +148,40 @@ Dictionary::clear_access_flags()
   }
 }
 
-bool
-Dictionary::all_accessed_( std::string& missed, std::string prefix ) const
-{
+bool Dictionary::all_accessed_(std::string &missed, std::string prefix) const {
   missed = "";
 
   // build list of all non-accessed Token names
-  for ( TokenMap::const_iterator it = TokenMap::begin(); it != TokenMap::end();
-        ++it )
-  {
-    if ( not it->second.accessed() )
-    {
+  for (TokenMap::const_iterator it = TokenMap::begin(); it != TokenMap::end();
+       ++it) {
+    if (not it->second.accessed()) {
       missed = missed + " " + prefix + it->first.toString();
-    }
-    else if ( it->second.is_a< DictionaryDatum >() )
-    {
+    } else if (it->second.is_a<DictionaryDatum>()) {
       // recursively check if nested dictionary content was accessed
       // see also comments in clear_access_flags()
 
       // this sets access flag on it->second, but that does not matter,
       // since it is anyways set, otherwise we would not be recursing
-      DictionaryDatum subdict = getValue< DictionaryDatum >( it->second );
+      DictionaryDatum subdict = getValue<DictionaryDatum>(it->second);
 
-      subdict->all_accessed_( missed, prefix + it->first.toString() + "::" );
+      subdict->all_accessed_(missed, prefix + it->first.toString() + "::");
     }
   }
 
   return missed.empty();
 }
 
-std::ostream&
-operator<<( std::ostream& out, const Dictionary& d )
-{
+std::ostream &operator<<(std::ostream &out, const Dictionary &d) {
   out << "<<";
 
-  for ( TokenMap::const_iterator where = d.begin(); where != d.end(); ++where )
-  {
-    out << ( *where ).first << ' ' << ( *where ).second << ',';
+  for (TokenMap::const_iterator where = d.begin(); where != d.end(); ++where) {
+    out << (*where).first << ' ' << (*where).second << ',';
   }
   out << ">>";
 
   return out;
 }
 
-bool
-Dictionary::DictItemLexicalOrder::nocase_compare( char c1, char c2 )
-{
-  return std::toupper( c1 ) < std::toupper( c2 );
+bool Dictionary::DictItemLexicalOrder::nocase_compare(char c1, char c2) {
+  return std::toupper(c1) < std::toupper(c2);
 }

@@ -37,8 +37,7 @@
 #include "nest_types.h"
 #include "stimulating_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: ppd_sup_generator - simulate the superimposed spike train of a population
@@ -80,23 +79,14 @@ Authors:
 SeeAlso: gamma_sup_generator, poisson_generator_ps, spike_generator, Device,
 StimulatingDevice
 */
-class ppd_sup_generator : public DeviceNode
-{
+class ppd_sup_generator : public DeviceNode {
 
 public:
   ppd_sup_generator();
-  ppd_sup_generator( const ppd_sup_generator& );
+  ppd_sup_generator(const ppd_sup_generator &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  is_off_grid() const
-  {
-    return false;
-  } // does not use off_grid events
+  bool has_proxies() const { return false; }
+  bool is_off_grid() const { return false; } // does not use off_grid events
 
   /**
    * Import sets of overloaded virtual functions.
@@ -105,13 +95,13 @@ public:
    */
   using Node::event_hook;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
@@ -124,22 +114,21 @@ private:
    * information.
    * @see event_hook, DSSpikeEvent
    */
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   /**
    * Send out spikes.
    * Called once per target to dispatch actual output spikes.
    * @param contains target information.
    */
-  void event_hook( DSSpikeEvent& );
+  void event_hook(DSSpikeEvent &);
 
   // ------------------------------------------------------------
 
   /**
    * Store independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double rate_;          //!< process rate [Hz]
     double dead_time_;     //!< dead time [ms]
     unsigned long n_proc_; //!< number of component processes
@@ -156,49 +145,43 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
   // ------------------------------------------------------------
 
-
-  class Age_distribution_
-  {
+  class Age_distribution_ {
 
     librandom::BinomialRandomDev bino_dev_;   //!< random deviate generator
     librandom::PoissonRandomDev poisson_dev_; //!< random deviate generator
     //! occupation numbers of ages below dead time
-    std::vector< unsigned long > occ_refractory_;
+    std::vector<unsigned long> occ_refractory_;
     unsigned long
-      occ_active_;    //!< summed occupation number of ages above dead time
+        occ_active_;  //!< summed occupation number of ages above dead time
     size_t activate_; //!< rotating pointer
 
   public:
     //! initialize age dist
-    Age_distribution_( size_t num_age_bins,
-      unsigned long ini_occ_ref,
-      unsigned long ini_occ_act );
+    Age_distribution_(size_t num_age_bins, unsigned long ini_occ_ref,
+                      unsigned long ini_occ_act);
 
     //! update age dist and generate spikes
-    unsigned long update( double hazard_rate, librandom::RngPtr rng );
+    unsigned long update(double hazard_rate, librandom::RngPtr rng);
   };
 
-
-  struct Buffers_
-  {
+  struct Buffers_ {
     /**
      * Age distribution of component Poisson processes with dead time of the
      * superposition.
      */
 
-    std::vector< Age_distribution_ > age_distributions_;
+    std::vector<Age_distribution_> age_distributions_;
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     double hazard_step_;   //!< base hazard rate in units of time step
     double hazard_step_t_; //!< hazard rate at time t in units of time step
     double omega_;         //!< angular velocity of rate modulation [rad/ms]
@@ -220,61 +203,51 @@ private:
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< CurrentEvent > device_;
+  StimulatingDevice<CurrentEvent> device_;
   Parameters_ P_;
   Variables_ V_;
   Buffers_ B_;
 };
 
-inline port
-ppd_sup_generator::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool dummy_target )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port ppd_sup_generator::send_test_event(Node &target,
+                                               rport receptor_type,
+                                               synindex syn_id,
+                                               bool dummy_target) {
+  device_.enforce_single_syn_type(syn_id);
 
-  if ( dummy_target )
-  {
+  if (dummy_target) {
     DSSpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
-  }
-  else
-  {
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
+  } else {
     SpikeEvent e;
-    e.set_sender( *this );
-    const port p = target.handles_test_event( e, receptor_type );
-    if ( p != invalid_port_ and not is_model_prototype() )
-    {
+    e.set_sender(*this);
+    const port p = target.handles_test_event(e, receptor_type);
+    if (p != invalid_port_ and not is_model_prototype()) {
       ++P_.num_targets_; // count number of targets
     }
     return p;
   }
 }
 
-inline void
-ppd_sup_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  device_.get_status( d );
+inline void ppd_sup_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  device_.get_status(d);
 }
 
-inline void
-ppd_sup_generator::set_status( const DictionaryDatum& d )
-{
+inline void ppd_sup_generator::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
 
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // PPD_SUP_GENERATOR_H

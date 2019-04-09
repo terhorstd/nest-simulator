@@ -26,16 +26,14 @@
 // Includes from nestkernel:
 #include "conn_builder.h"
 
-namespace mynest
-{
+namespace mynest {
 
-class StepPatternBuilder : public nest::ConnBuilder
-{
+class StepPatternBuilder : public nest::ConnBuilder {
 public:
-  StepPatternBuilder( const nest::GIDCollection& sources,
-    const nest::GIDCollection& targets,
-    const DictionaryDatum& conn_spec,
-    const DictionaryDatum& syn_spec );
+  StepPatternBuilder(const nest::GIDCollection &sources,
+                     const nest::GIDCollection &targets,
+                     const DictionaryDatum &conn_spec,
+                     const DictionaryDatum &syn_spec);
 
 protected:
   void connect_();
@@ -51,10 +49,9 @@ private:
    * @param Number of positions to advance
    * @return Iterator after advance
    */
-  static nest::GIDCollection::const_iterator& advance_(
-    nest::GIDCollection::const_iterator&,
-    const nest::GIDCollection::const_iterator&,
-    size_t );
+  static nest::GIDCollection::const_iterator &
+  advance_(nest::GIDCollection::const_iterator &,
+           const nest::GIDCollection::const_iterator &, size_t);
 
   size_t source_step_;
   size_t target_step_;

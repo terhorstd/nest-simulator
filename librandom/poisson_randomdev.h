@@ -82,8 +82,7 @@
 
 /************************************************************/
 
-namespace librandom
-{
+namespace librandom {
 
 /** @BeginDocumentation
 Name: rdevdict::poisson - poisson random deviate generator
@@ -107,24 +106,23 @@ Author: Hans Ekkehard Plesser
  * @ingroup RandomDeviateGenerators
  */
 
-class PoissonRandomDev : public RandomDev
-{
+class PoissonRandomDev : public RandomDev {
   RngPtr r; // pointer to underlying uniform RNG
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  PoissonRandomDev( RngPtr, double lambda = 0.0 );
-  PoissonRandomDev( double lambda = 0.0 ); // for threaded environments
+  PoissonRandomDev(RngPtr, double lambda = 0.0);
+  PoissonRandomDev(double lambda = 0.0); // for threaded environments
 
-  void set_lambda( double );
+  void set_lambda(double);
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
   /**
    * Import sets of overloaded virtual functions.
@@ -137,14 +135,10 @@ public:
   using RandomDev::operator();
   using RandomDev::ldev;
 
-  long ldev( RngPtr ) const; //!< draw integer, threaded
-  bool
-  has_ldev() const
-  {
-    return true;
-  }
+  long ldev(RngPtr) const; //!< draw integer, threaded
+  bool has_ldev() const { return true; }
 
-  double operator()( RngPtr ) const; //!< return as double, threaded
+  double operator()(RngPtr) const; //!< return as double, threaded
 
 private:
   void init_(); //!< re-compute internal parameters
@@ -167,7 +161,7 @@ private:
   double c3_;
 
   static const unsigned n_tab_; //!< tabulate P_0 ... P_{n_tab_-1}
-  std::vector< double > P_;     //!< PoissonCDF
+  std::vector<double> P_;       //!< PoissonCDF
 
   static const unsigned fact_[]; //!< array of factorials 0! .. 10!
 
@@ -175,18 +169,13 @@ private:
   static const unsigned n_a_; //!< length of array
 
   //! Procedure F from Ahrens & Dieter
-  void proc_f_( const unsigned k,
-    double& px,
-    double& py,
-    double& fx,
-    double& fy ) const;
+  void proc_f_(const unsigned k, double &px, double &py, double &fx,
+               double &fy) const;
 };
-}
+} // namespace librandom
 
-inline double
-librandom::PoissonRandomDev::operator()( RngPtr rthrd ) const
-{
-  return static_cast< double >( ldev( rthrd ) );
+inline double librandom::PoissonRandomDev::operator()(RngPtr rthrd) const {
+  return static_cast<double>(ldev(rthrd));
 }
 
 #endif

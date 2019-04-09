@@ -32,112 +32,46 @@
 // Includes from nestkernel:
 #include "node.h"
 
-namespace nest
-{
+namespace nest {
 Event::Event()
-  : sender_gid_( 0 ) // initializing to 0 as this is an unsigned type
+    : sender_gid_(0) // initializing to 0 as this is an unsigned type
                      // gid 0 is network, can never send an event, so
                      // this is safe
-  , sender_( NULL )
-  , receiver_( NULL )
-  , p_( -1 )
-  , rp_( 0 )
-  , d_( 1 )
-  , stamp_( Time::step( 0 ) )
-  , stamp_steps_( 0 )
-  , offset_( 0.0 )
-  , w_( 0.0 )
-{
+      ,
+      sender_(NULL), receiver_(NULL), p_(-1), rp_(0), d_(1),
+      stamp_(Time::step(0)), stamp_steps_(0), offset_(0.0), w_(0.0) {}
+
+void SpikeEvent::operator()() { receiver_->handle(*this); }
+
+void WeightRecorderEvent::operator()() { receiver_->handle(*this); }
+
+void DSSpikeEvent::operator()() { sender_->event_hook(*this); }
+
+void RateEvent::operator()() { receiver_->handle(*this); }
+
+void CurrentEvent::operator()() { receiver_->handle(*this); }
+
+void DSCurrentEvent::operator()() { sender_->event_hook(*this); }
+
+void ConductanceEvent::operator()() { receiver_->handle(*this); }
+
+void DoubleDataEvent::operator()() { receiver_->handle(*this); }
+
+void DataLoggingRequest::operator()() { receiver_->handle(*this); }
+
+void DataLoggingReply::operator()() { receiver_->handle(*this); }
+
+void GapJunctionEvent::operator()() { receiver_->handle(*this); }
+
+void InstantaneousRateConnectionEvent::operator()() {
+  receiver_->handle(*this);
 }
 
+void DelayedRateConnectionEvent::operator()() { receiver_->handle(*this); }
 
-void
-SpikeEvent::operator()()
-{
-  receiver_->handle( *this );
-}
+void DiffusionConnectionEvent::operator()() { receiver_->handle(*this); }
+} // namespace nest
 
-void
-WeightRecorderEvent::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-DSSpikeEvent::operator()()
-{
-  sender_->event_hook( *this );
-}
-
-void
-RateEvent::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-CurrentEvent::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-DSCurrentEvent::operator()()
-{
-  sender_->event_hook( *this );
-}
-
-void
-ConductanceEvent::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-DoubleDataEvent::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-DataLoggingRequest::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-DataLoggingReply::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-GapJunctionEvent::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-InstantaneousRateConnectionEvent::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-DelayedRateConnectionEvent::operator()()
-{
-  receiver_->handle( *this );
-}
-
-void
-DiffusionConnectionEvent::operator()()
-{
-  receiver_->handle( *this );
-}
-}
-
-nest::index
-nest::Event::get_receiver_gid( void ) const
-{
+nest::index nest::Event::get_receiver_gid(void) const {
   return receiver_->get_gid();
 }

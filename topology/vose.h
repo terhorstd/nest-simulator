@@ -32,8 +32,7 @@
 // Includes from nestkernel:
 #include "nest_types.h"
 
-namespace nest
-{
+namespace nest {
 
 /**
  * Vose's alias method for selecting a random number using a discrete
@@ -42,24 +41,17 @@ namespace nest
  * IEEE trans. softw. eng. 17(9):972.
  * See also http://www.keithschwarz.com/darts-dice-coins/
  */
-class Vose
-{
+class Vose {
   /**
    * An object containing two possible outcomes and a probability to
    * choose between the two.
    */
-  struct BiasedCoin
-  {
+  struct BiasedCoin {
     index heads, tails;
     double probability; ///< Probability for heads
-    BiasedCoin()
-      : heads( 0 )
-      , tails( 0 )
-      , probability( 0 ){};
-    BiasedCoin( index h, index t, double p )
-      : heads( h )
-      , tails( t )
-      , probability( p ){};
+    BiasedCoin() : heads(0), tails(0), probability(0){};
+    BiasedCoin(index h, index t, double p)
+        : heads(h), tails(t), probability(p){};
   };
 
 public:
@@ -67,17 +59,16 @@ public:
    * Constructor taking a probability distribution.
    * @param dist - probability distribution.
    */
-  Vose( std::vector< double > dist );
+  Vose(std::vector<double> dist);
 
   /**
    * @returns a randomly selected index with the given distribution
    */
-  index get_random_id( librandom::RngPtr rng ) const;
+  index get_random_id(librandom::RngPtr rng) const;
 
 private:
-  std::vector< BiasedCoin > dist_;
+  std::vector<BiasedCoin> dist_;
 };
-
 
 } // namespace nest
 

@@ -28,54 +28,40 @@
 // Explicit definition required to ensure visibility when compiling with
 // clang under OSX. This must be outside namespace NEST, since the template
 // is defined in the global namespace.
-template class lockPTRDatum< nest::TopologyParameter,
-  &nest::TopologyModule::ParameterType >;
+template class lockPTRDatum<nest::TopologyParameter,
+                            &nest::TopologyModule::ParameterType>;
 
-namespace nest
-{
+namespace nest {
 
-double
-TopologyParameter::value( const std::vector< double >& pt,
-  librandom::RngPtr& rng ) const
-{
-  switch ( pt.size() )
-  {
+double TopologyParameter::value(const std::vector<double> &pt,
+                                librandom::RngPtr &rng) const {
+  switch (pt.size()) {
   case 2:
-    return value( Position< 2 >( pt ), rng );
+    return value(Position<2>(pt), rng);
   case 3:
-    return value( Position< 3 >( pt ), rng );
+    return value(Position<3>(pt), rng);
   default:
-    throw BadProperty( "Position must be 2- or 3-dimensional." );
+    throw BadProperty("Position must be 2- or 3-dimensional.");
   }
 }
 
-Gaussian2DParameter::Gaussian2DParameter( const DictionaryDatum& d )
-  : c_( 0.0 )
-  , p_center_( 1.0 )
-  , mean_x_( 0.0 )
-  , sigma_x_( 1.0 )
-  , mean_y_( 0.0 )
-  , sigma_y_( 1.0 )
-  , rho_( 0.0 )
-{
-  updateValue< double >( d, names::c, c_ );
-  updateValue< double >( d, names::p_center, p_center_ );
-  updateValue< double >( d, names::mean_x, mean_x_ );
-  updateValue< double >( d, names::sigma_x, sigma_x_ );
-  updateValue< double >( d, names::mean_y, mean_y_ );
-  updateValue< double >( d, names::sigma_y, sigma_y_ );
-  updateValue< double >( d, names::rho, rho_ );
-  if ( rho_ >= 1 || rho_ <= -1 )
-  {
-    throw BadProperty(
-      "topology::Gaussian2DParameter: "
-      "-1 < rho < 1 required." );
+Gaussian2DParameter::Gaussian2DParameter(const DictionaryDatum &d)
+    : c_(0.0), p_center_(1.0), mean_x_(0.0), sigma_x_(1.0), mean_y_(0.0),
+      sigma_y_(1.0), rho_(0.0) {
+  updateValue<double>(d, names::c, c_);
+  updateValue<double>(d, names::p_center, p_center_);
+  updateValue<double>(d, names::mean_x, mean_x_);
+  updateValue<double>(d, names::sigma_x, sigma_x_);
+  updateValue<double>(d, names::mean_y, mean_y_);
+  updateValue<double>(d, names::sigma_y, sigma_y_);
+  updateValue<double>(d, names::rho, rho_);
+  if (rho_ >= 1 || rho_ <= -1) {
+    throw BadProperty("topology::Gaussian2DParameter: "
+                      "-1 < rho < 1 required.");
   }
-  if ( sigma_x_ <= 0 || sigma_y_ <= 0 )
-  {
-    throw BadProperty(
-      "topology::Gaussian2DParameter: "
-      "sigma_x > 0 and sigma_y > 0 required." );
+  if (sigma_x_ <= 0 || sigma_y_ <= 0) {
+    throw BadProperty("topology::Gaussian2DParameter: "
+                      "sigma_x > 0 and sigma_y > 0 required.");
   }
 }
 

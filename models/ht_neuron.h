@@ -47,8 +47,7 @@
 // Includes from sli:
 #include "stringdatum.h"
 
-namespace nest
-{
+namespace nest {
 /**
  * Function computing right-hand side of ODE for GSL solver.
  * @note Must be declared here so we can befriend it in class.
@@ -59,7 +58,7 @@ namespace nest
  *       through a function pointer.
  * @param void* Pointer to model neuron instance.
  */
-extern "C" int ht_neuron_dynamics( double, const double*, double*, void* );
+extern "C" int ht_neuron_dynamics(double, const double *, double *, void *);
 
 /** @BeginDocumentation
 Name: ht_neuron - Neuron model after Hill & Tononi (2005).
@@ -134,11 +133,10 @@ References:
 
 SeeAlso: ht_synapse
 */
-class ht_neuron : public Archiving_Node
-{
+class ht_neuron : public Archiving_Node {
 public:
   ht_neuron();
-  ht_neuron( const ht_neuron& );
+  ht_neuron(const ht_neuron &);
   ~ht_neuron();
 
   /**
@@ -149,18 +147,18 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void handle( SpikeEvent& e );
-  void handle( CurrentEvent& e );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &e);
+  void handle(CurrentEvent &e);
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
   /**
@@ -168,8 +166,7 @@ private:
    * @note Excluded upper and lower bounds are defined as INF_, SUP_.
    *       Excluding port 0 avoids accidental connections.
    */
-  enum SynapseTypes
-  {
+  enum SynapseTypes {
     INF_SPIKE_RECEPTOR = 0,
     AMPA,
     NMDA,
@@ -178,32 +175,31 @@ private:
     SUP_SPIKE_RECEPTOR
   };
 
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
-  double get_synapse_constant( double, double, double );
+  double get_synapse_constant(double, double, double);
 
   // END Boilerplate function declarations ----------------------------
 
   // Friends --------------------------------------------------------
 
   // make dynamics function quasi-member
-  friend int ht_neuron_dynamics( double, const double*, double*, void* );
+  friend int ht_neuron_dynamics(double, const double *, double *, void *);
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     Parameters_();
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
 
     // Note: Conductances are unitless
     // Leaks
@@ -270,12 +266,10 @@ private:
    * State variables of the model.
    */
 public:
-  struct State_
-  {
+  struct State_ {
 
     // y_ = [V, theta, Synapses]
-    enum StateVecElems_
-    {
+    enum StateVecElems_ {
       V_M = 0,
       THETA,
       DG_AMPA,
@@ -297,7 +291,7 @@ public:
     };
 
     //! neuron state, must be C-array for GSL solver
-    double y_[ STATE_VEC_SIZE ];
+    double y_[STATE_VEC_SIZE];
 
     /** Timer (counter) for spike-activated repolarizing potassium current.
      * Neuron is absolutely refractory during this period.
@@ -309,42 +303,40 @@ public:
     double I_T_;   //!< Low-thresh Ca current; member only to allow recording
     double I_h_;   //!< Pacemaker current; member only to allow recording
 
-    State_( const ht_neuron&, const Parameters_& p );
-    State_( const State_& s );
+    State_(const ht_neuron &, const Parameters_ &p);
+    State_(const State_ &s);
     ~State_();
 
-    State_& operator=( const State_& s );
+    State_ &operator=(const State_ &s);
 
-    void get( DictionaryDatum& ) const;
-    void set( const DictionaryDatum&, const ht_neuron& );
+    void get(DictionaryDatum &) const;
+    void set(const DictionaryDatum &, const ht_neuron &);
   };
 
 private:
   // These friend declarations must be precisely here.
-  friend class RecordablesMap< ht_neuron >;
-  friend class UniversalDataLogger< ht_neuron >;
-
+  friend class RecordablesMap<ht_neuron>;
+  friend class UniversalDataLogger<ht_neuron>;
 
   // ----------------------------------------------------------------
 
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( ht_neuron& );
-    Buffers_( const Buffers_&, ht_neuron& );
+  struct Buffers_ {
+    Buffers_(ht_neuron &);
+    Buffers_(const Buffers_ &, ht_neuron &);
 
-    UniversalDataLogger< ht_neuron > logger_;
+    UniversalDataLogger<ht_neuron> logger_;
 
     /** buffers and sums up incoming spikes/currents */
-    std::vector< RingBuffer > spike_inputs_;
+    std::vector<RingBuffer> spike_inputs_;
     RingBuffer currents_;
 
     /** GSL ODE stuff */
-    gsl_odeiv_step* s_;    //!< stepping function
-    gsl_odeiv_control* c_; //!< adaptive stepsize control function
-    gsl_odeiv_evolve* e_;  //!< evolution function
+    gsl_odeiv_step *s_;    //!< stepping function
+    gsl_odeiv_control *c_; //!< adaptive stepsize control function
+    gsl_odeiv_evolve *e_;  //!< evolution function
     gsl_odeiv_system sys_; //!< struct describing system
 
     // IntergrationStep_ should be reset with the neuron on ResetNetwork,
@@ -369,10 +361,9 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
     //! size of conductance steps for arriving spikes
-    std::vector< double > cond_steps_;
+    std::vector<double> cond_steps_;
 
     //! Duration of potassium current.
     int PotassiumRefractoryCounts_;
@@ -381,34 +372,14 @@ private:
     double V_clamp_;
   };
 
-
   // readout functions, can use template for vector elements
-  template < State_::StateVecElems_ elem >
-  double
-  get_y_elem_() const
-  {
-    return S_.y_[ elem ];
+  template <State_::StateVecElems_ elem> double get_y_elem_() const {
+    return S_.y_[elem];
   }
-  double
-  get_I_NaP_() const
-  {
-    return S_.I_NaP_;
-  }
-  double
-  get_I_KNa_() const
-  {
-    return S_.I_KNa_;
-  }
-  double
-  get_I_T_() const
-  {
-    return S_.I_T_;
-  }
-  double
-  get_I_h_() const
-  {
-    return S_.I_h_;
-  }
+  double get_I_NaP_() const { return S_.I_NaP_; }
+  double get_I_KNa_() const { return S_.I_KNa_; }
+  double get_I_T_() const { return S_.I_T_; }
+  double get_I_h_() const { return S_.I_h_; }
 
   double get_g_NMDA_() const;
 
@@ -417,7 +388,7 @@ private:
    * Needs to take parameter values explicitly since it is called from
    * _dynamics.
    */
-  double m_NMDA_( double V, double m_eq, double m_fast, double m_slow ) const;
+  double m_NMDA_(double V, double m_eq, double m_fast, double m_slow) const;
 
   /**
    * Return equilibrium value of I_h activation
@@ -425,7 +396,7 @@ private:
    * @param V Membrane potential for which to evaluate
    *        (may differ from y_[V_M] when clamping)
    */
-  double m_eq_h_( double V ) const;
+  double m_eq_h_(double V) const;
 
   /**
    * Return equilibrium value of I_T activation
@@ -433,7 +404,7 @@ private:
    * @param V Membrane potential for which to evaluate
    *        (may differ from y_[V_M] when clamping)
    */
-  double m_eq_T_( double V ) const;
+  double m_eq_T_(double V) const;
 
   /**
    * Return equilibrium value of I_T inactivation
@@ -441,7 +412,7 @@ private:
    * @param V Membrane potential for which to evaluate
    *        (may differ from y_[V_M] when clamping)
    */
-  double h_eq_T_( double V ) const;
+  double h_eq_T_(double V) const;
 
   /**
    * Return steady-state magnesium unblock ratio.
@@ -449,14 +420,14 @@ private:
    * Receives V_m as argument since it is called from ht_neuron_dyamics
    * with temporary state values.
    */
-  double m_eq_NMDA_( double V ) const;
+  double m_eq_NMDA_(double V) const;
 
   /**
    * Steady-state "D" value for given voltage.
    */
-  double D_eq_KNa_( double V ) const;
+  double D_eq_KNa_(double V) const;
 
-  static RecordablesMap< ht_neuron > recordablesMap_;
+  static RecordablesMap<ht_neuron> recordablesMap_;
 
   Parameters_ P_;
   State_ S_;
@@ -464,33 +435,24 @@ private:
   Buffers_ B_;
 };
 
-
-inline port
-ht_neuron::send_test_event( Node& target, rport receptor_type, synindex, bool )
-{
+inline port ht_neuron::send_test_event(Node &target, rport receptor_type,
+                                       synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
+inline port ht_neuron::handles_test_event(SpikeEvent &, rport receptor_type) {
+  assert(B_.spike_inputs_.size() == 4);
 
-inline port
-ht_neuron::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  assert( B_.spike_inputs_.size() == 4 );
-
-  if ( not( INF_SPIKE_RECEPTOR < receptor_type
-         && receptor_type < SUP_SPIKE_RECEPTOR ) )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+  if (not(INF_SPIKE_RECEPTOR < receptor_type &&
+          receptor_type < SUP_SPIKE_RECEPTOR)) {
+    throw UnknownReceptorType(receptor_type, get_name());
     return 0;
-  }
-  else
-  {
+  } else {
     return receptor_type - 1;
   }
-
 
   /*
 if (receptor_type != 0)
@@ -500,26 +462,21 @@ if (receptor_type != 0)
 return 0;*/
 }
 
-inline port
-ht_neuron::handles_test_event( CurrentEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port ht_neuron::handles_test_event(CurrentEvent &, rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-ht_neuron::handles_test_event( DataLoggingRequest& dlr, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port ht_neuron::handles_test_event(DataLoggingRequest &dlr,
+                                          rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
-}
+} // namespace nest
 
 #endif // HAVE_GSL
 #endif // HT_NEURON_H

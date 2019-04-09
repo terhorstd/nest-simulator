@@ -20,22 +20,19 @@
  *
  */
 
-
 #include "librandom_names.h"
 
-namespace librandom
-{
-namespace names
-{
-const Name high( "high" );
-const Name is_discrete( "is_discrete" );
-const Name lambda( "lambda" );
-const Name low( "low" );
-const Name mu( "mu" );
-const Name n( "n" );
-const Name order( "order" );
-const Name p( "p" );
-const Name scale( "scale" );
-const Name sigma( "sigma" );
-}
-}
+namespace librandom {
+namespace names {
+const Name high("high");
+const Name is_discrete("is_discrete");
+const Name lambda("lambda");
+const Name low("low");
+const Name mu("mu");
+const Name n("n");
+const Name order("order");
+const Name p("p");
+const Name scale("scale");
+const Name sigma("sigma");
+} // namespace names
+} // namespace librandom

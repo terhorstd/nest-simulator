@@ -30,6 +30,6 @@
 #include "token.h"
 #include "tokenarray.h"
 
-bool array2vector( std::vector< long >&, const TokenArray& );
+bool array2vector(std::vector<long> &, const TokenArray &);
 
 #endif

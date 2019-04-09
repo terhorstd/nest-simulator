@@ -31,8 +31,7 @@
 #include "nest_types.h"
 #include "static_assert.h"
 
-namespace nest
-{
+namespace nest {
 // clang-format off
 /**
  * This class implements a 64-bit target neuron identifier type. It uniquely identifies
@@ -54,27 +53,17 @@ namespace nest
 // constexpr-functions for convenient compile-time generation of the bit-masks
 // and bit-constants. An ill-defined length or size will cause a compile-time
 // error, e.g., num_bits to be shifted exceeds the sizeof(<datatype>) * 8.
-constexpr uint64_t
-generate_bit_mask( uint8_t num_bits, uint8_t bit_position )
-{
-  return (
-    ( ( static_cast< uint64_t >( 1 ) << num_bits ) - 1 ) << bit_position );
+constexpr uint64_t generate_bit_mask(uint8_t num_bits, uint8_t bit_position) {
+  return (((static_cast<uint64_t>(1) << num_bits) - 1) << bit_position);
 }
 
-constexpr int
-generate_max_value( uint8_t num_bits )
-{
-  return ( ( static_cast< int >( 1 ) << num_bits ) - 1 );
+constexpr int generate_max_value(uint8_t num_bits) {
+  return ((static_cast<int>(1) << num_bits) - 1);
 }
 
-enum enum_status_target_id
-{
-  TARGET_ID_PROCESSED,
-  TARGET_ID_UNPROCESSED
-};
+enum enum_status_target_id { TARGET_ID_PROCESSED, TARGET_ID_UNPROCESSED };
 
-class Target
-{
+class Target {
 private:
   uint64_t remote_target_id_;
 
@@ -90,39 +79,37 @@ private:
   static constexpr uint8_t BITPOS_TID = BITPOS_RANK + NUM_BITS_RANK;
   static constexpr uint8_t BITPOS_SYN_ID = BITPOS_TID + NUM_BITS_TID;
   static constexpr uint8_t BITPOS_PROCESSED_FLAG =
-    BITPOS_SYN_ID + NUM_BITS_SYN_ID;
-  typedef StaticAssert< BITPOS_PROCESSED_FLAG == 63U >::success
-    position_of_processed_flag;
+      BITPOS_SYN_ID + NUM_BITS_SYN_ID;
+  typedef StaticAssert<BITPOS_PROCESSED_FLAG == 63U>::success
+      position_of_processed_flag;
 
   // generate bit-masks used in bit-operations
   static constexpr uint64_t MASK_LCID =
-    generate_bit_mask( NUM_BITS_LCID, BITPOS_LCID );
+      generate_bit_mask(NUM_BITS_LCID, BITPOS_LCID);
   static constexpr uint64_t MASK_RANK =
-    generate_bit_mask( NUM_BITS_RANK, BITPOS_RANK );
+      generate_bit_mask(NUM_BITS_RANK, BITPOS_RANK);
   static constexpr uint64_t MASK_TID =
-    generate_bit_mask( NUM_BITS_TID, BITPOS_TID );
+      generate_bit_mask(NUM_BITS_TID, BITPOS_TID);
   static constexpr uint64_t MASK_SYN_ID =
-    generate_bit_mask( NUM_BITS_SYN_ID, BITPOS_SYN_ID );
+      generate_bit_mask(NUM_BITS_SYN_ID, BITPOS_SYN_ID);
   static constexpr uint64_t MASK_PROCESSED_FLAG =
-    generate_bit_mask( NUM_BITS_PROCESSED_FLAG, BITPOS_PROCESSED_FLAG );
+      generate_bit_mask(NUM_BITS_PROCESSED_FLAG, BITPOS_PROCESSED_FLAG);
 
 public:
   Target();
-  Target( const Target& target );
-  Target( const thread tid,
-    const thread rank,
-    const synindex syn_id,
-    const index lcid );
+  Target(const Target &target);
+  Target(const thread tid, const thread rank, const synindex syn_id,
+         const index lcid);
 
-  static constexpr int MAX_LCID = generate_max_value( NUM_BITS_LCID );
-  static constexpr int MAX_RANK = generate_max_value( NUM_BITS_RANK );
-  static constexpr int MAX_TID = generate_max_value( NUM_BITS_TID );
-  static constexpr int MAX_SYN_ID = generate_max_value( NUM_BITS_SYN_ID );
+  static constexpr int MAX_LCID = generate_max_value(NUM_BITS_LCID);
+  static constexpr int MAX_RANK = generate_max_value(NUM_BITS_RANK);
+  static constexpr int MAX_TID = generate_max_value(NUM_BITS_TID);
+  static constexpr int MAX_SYN_ID = generate_max_value(NUM_BITS_SYN_ID);
 
   /**
    * Set local connection id.
    */
-  void set_lcid( const index lcid );
+  void set_lcid(const index lcid);
 
   /**
    * Return local connection id.
@@ -132,7 +119,7 @@ public:
   /**
    * Set rank.
    */
-  void set_rank( const thread rank );
+  void set_rank(const thread rank);
 
   /**
    * Return rank.
@@ -142,7 +129,7 @@ public:
   /**
    * Set thread id.
    */
-  void set_tid( const thread tid );
+  void set_tid(const thread tid);
 
   /**
    * Return thread id.
@@ -152,7 +139,7 @@ public:
   /**
    * Set the synapse-type id.
    */
-  void set_syn_id( const synindex syn_id );
+  void set_syn_id(const synindex syn_id);
 
   /**
    * Return synapse-type id.
@@ -162,7 +149,7 @@ public:
   /**
    * Set the status of the target identifier: processed or unprocessed.
    */
-  void set_status( enum_status_target_id status );
+  void set_status(enum_status_target_id status);
 
   /**
    * Get the status of the target identifier: processed or unprocessed.
@@ -180,160 +167,114 @@ public:
   double get_offset() const;
 };
 
-inline Target::Target()
-  : remote_target_id_( 0 )
-{
+inline Target::Target() : remote_target_id_(0) {}
+
+inline Target::Target(const Target &target)
+    : remote_target_id_(target.remote_target_id_) {
+  set_status(TARGET_ID_UNPROCESSED); // initialize
 }
 
-inline Target::Target( const Target& target )
-  : remote_target_id_( target.remote_target_id_ )
-{
-  set_status( TARGET_ID_UNPROCESSED ); // initialize
+inline Target::Target(const thread tid, const thread rank,
+                      const synindex syn_id, const index lcid)
+    : remote_target_id_(0) {
+  assert(tid <= MAX_TID);
+  assert(rank <= MAX_RANK);
+  assert(syn_id <= MAX_SYN_ID);
+  assert(lcid <= MAX_LCID);
+
+  set_lcid(lcid);
+  set_rank(rank);
+  set_tid(tid);
+  set_syn_id(syn_id);
+  set_status(TARGET_ID_UNPROCESSED); // initialize
 }
 
-inline Target::Target( const thread tid,
-  const thread rank,
-  const synindex syn_id,
-  const index lcid )
-  : remote_target_id_( 0 )
-{
-  assert( tid <= MAX_TID );
-  assert( rank <= MAX_RANK );
-  assert( syn_id <= MAX_SYN_ID );
-  assert( lcid <= MAX_LCID );
-
-  set_lcid( lcid );
-  set_rank( rank );
-  set_tid( tid );
-  set_syn_id( syn_id );
-  set_status( TARGET_ID_UNPROCESSED ); // initialize
+inline void Target::set_lcid(const index lcid) {
+  assert(lcid <= MAX_LCID);
+  remote_target_id_ = (remote_target_id_ & (~MASK_LCID)) |
+                      (static_cast<uint64_t>(lcid) << BITPOS_LCID);
 }
 
-inline void
-Target::set_lcid( const index lcid )
-{
-  assert( lcid <= MAX_LCID );
-  remote_target_id_ = ( remote_target_id_ & ( ~MASK_LCID ) )
-    | ( static_cast< uint64_t >( lcid ) << BITPOS_LCID );
+inline index Target::get_lcid() const {
+  return ((remote_target_id_ & MASK_LCID) >> BITPOS_LCID);
 }
 
-inline index
-Target::get_lcid() const
-{
-  return ( ( remote_target_id_ & MASK_LCID ) >> BITPOS_LCID );
+inline void Target::set_rank(const thread rank) {
+  assert(rank <= MAX_RANK);
+  remote_target_id_ = (remote_target_id_ & (~MASK_RANK)) |
+                      (static_cast<uint64_t>(rank) << BITPOS_RANK);
 }
 
-inline void
-Target::set_rank( const thread rank )
-{
-  assert( rank <= MAX_RANK );
-  remote_target_id_ = ( remote_target_id_ & ( ~MASK_RANK ) )
-    | ( static_cast< uint64_t >( rank ) << BITPOS_RANK );
+inline thread Target::get_rank() const {
+  return ((remote_target_id_ & MASK_RANK) >> BITPOS_RANK);
 }
 
-inline thread
-Target::get_rank() const
-{
-  return ( ( remote_target_id_ & MASK_RANK ) >> BITPOS_RANK );
+inline void Target::set_tid(const thread tid) {
+  assert(tid <= MAX_TID);
+  remote_target_id_ = (remote_target_id_ & (~MASK_TID)) |
+                      (static_cast<uint64_t>(tid) << BITPOS_TID);
 }
 
-inline void
-Target::set_tid( const thread tid )
-{
-  assert( tid <= MAX_TID );
-  remote_target_id_ = ( remote_target_id_ & ( ~MASK_TID ) )
-    | ( static_cast< uint64_t >( tid ) << BITPOS_TID );
+inline thread Target::get_tid() const {
+  return ((remote_target_id_ & MASK_TID) >> BITPOS_TID);
 }
 
-inline thread
-Target::get_tid() const
-{
-  return ( ( remote_target_id_ & MASK_TID ) >> BITPOS_TID );
+inline void Target::set_syn_id(const synindex syn_id) {
+  assert(syn_id <= MAX_SYN_ID);
+  remote_target_id_ = (remote_target_id_ & (~MASK_SYN_ID)) |
+                      (static_cast<uint64_t>(syn_id) << BITPOS_SYN_ID);
 }
 
-inline void
-Target::set_syn_id( const synindex syn_id )
-{
-  assert( syn_id <= MAX_SYN_ID );
-  remote_target_id_ = ( remote_target_id_ & ( ~MASK_SYN_ID ) )
-    | ( static_cast< uint64_t >( syn_id ) << BITPOS_SYN_ID );
+inline synindex Target::get_syn_id() const {
+  return ((remote_target_id_ & MASK_SYN_ID) >> BITPOS_SYN_ID);
 }
 
-inline synindex
-Target::get_syn_id() const
-{
-  return ( ( remote_target_id_ & MASK_SYN_ID ) >> BITPOS_SYN_ID );
-}
-
-inline void
-Target::set_status( enum_status_target_id set_status_to )
-{
-  switch ( set_status_to )
-  {
+inline void Target::set_status(enum_status_target_id set_status_to) {
+  switch (set_status_to) {
   case TARGET_ID_PROCESSED:
     remote_target_id_ =
-      remote_target_id_ | MASK_PROCESSED_FLAG; // set single bit
+        remote_target_id_ | MASK_PROCESSED_FLAG; // set single bit
     break;
   case TARGET_ID_UNPROCESSED:
     remote_target_id_ =
-      remote_target_id_ & ~MASK_PROCESSED_FLAG; // clear single bit
+        remote_target_id_ & ~MASK_PROCESSED_FLAG; // clear single bit
     break;
   default:
-    throw InternalError( "Invalid remote target id status." );
+    throw InternalError("Invalid remote target id status.");
   }
 }
 
-inline enum_status_target_id
-Target::get_status() const
-{
-  if ( ( remote_target_id_ & MASK_PROCESSED_FLAG )
-    >> BITPOS_PROCESSED_FLAG ) // test single bit
+inline enum_status_target_id Target::get_status() const {
+  if ((remote_target_id_ & MASK_PROCESSED_FLAG) >>
+      BITPOS_PROCESSED_FLAG) // test single bit
   {
-    return ( TARGET_ID_PROCESSED );
+    return (TARGET_ID_PROCESSED);
   }
-  return ( TARGET_ID_UNPROCESSED );
+  return (TARGET_ID_UNPROCESSED);
 }
 
-inline bool
-Target::is_processed() const
-{
-  return ( Target::get_status() == TARGET_ID_PROCESSED );
+inline bool Target::is_processed() const {
+  return (Target::get_status() == TARGET_ID_PROCESSED);
 }
 
-inline double
-Target::get_offset() const
-{
-  return 0;
-}
+inline double Target::get_offset() const { return 0; }
 
-class OffGridTarget : public Target
-{
+class OffGridTarget : public Target {
 private:
   double offset_;
 
 public:
   OffGridTarget();
-  OffGridTarget( const Target& target, const double offset );
+  OffGridTarget(const Target &target, const double offset);
   double get_offset() const;
 };
 
-inline OffGridTarget::OffGridTarget()
-  : Target()
-  , offset_( 0 )
-{
-}
+inline OffGridTarget::OffGridTarget() : Target(), offset_(0) {}
 
-inline OffGridTarget::OffGridTarget( const Target& target, const double offset )
-  : Target( target )
-  , offset_( offset )
-{
-}
+inline OffGridTarget::OffGridTarget(const Target &target, const double offset)
+    : Target(target), offset_(offset) {}
 
-inline double
-OffGridTarget::get_offset() const
-{
-  return offset_;
-}
+inline double OffGridTarget::get_offset() const { return offset_; }
 
 } // namespace nest
 

@@ -47,8 +47,7 @@
 #include "dict.h"
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 class Node;
 
 class SPBuilder;
@@ -59,8 +58,7 @@ class SPBuilder;
  * Otherwise it behaves as the normal ConnectionManager.
  * @param
  */
-class SPManager : public ManagerInterface
-{
+class SPManager : public ManagerInterface {
 
 public:
   SPManager();
@@ -69,23 +67,23 @@ public:
   virtual void initialize();
   virtual void finalize();
 
-  virtual void get_status( DictionaryDatum& );
-  virtual void set_status( const DictionaryDatum& );
+  virtual void get_status(DictionaryDatum &);
+  virtual void set_status(const DictionaryDatum &);
 
-  DictionaryDatum& get_growthcurvedict();
+  DictionaryDatum &get_growthcurvedict();
 
   /**
    * Create a new Growth Curve object using the GrowthCurve Factory
    * @param name which defines the type of GC to be created
    * @return a new Growth Curve object of the type indicated by name
    */
-  GrowthCurve* new_growth_curve( Name name );
+  GrowthCurve *new_growth_curve(Name name);
 
   /**
    * Add a growth curve for MSP
    */
-  template < typename GrowthCurve >
-  void register_growth_curve( const std::string& name );
+  template <typename GrowthCurve>
+  void register_growth_curve(const std::string &name);
 
   /**
    * Disconnect two nodes. The source node is defined by its global ID.
@@ -99,10 +97,8 @@ public:
    * \param target_thread Thread that hosts the target node.
    * \param syn The synapse model to use.
    */
-  void disconnect_single( index s,
-    Node* target,
-    thread target_thread,
-    DictionaryDatum& syn );
+  void disconnect_single(index s, Node *target, thread target_thread,
+                         DictionaryDatum &syn);
 
   /**
    * Disconnect two collections of nodes.  The connection is
@@ -113,10 +109,8 @@ public:
    * \param connectivityParams connectivity Dictionary
    * \param synapseParams synapse parameters Dictionary
    */
-  void disconnect( GIDCollection&,
-    GIDCollection&,
-    DictionaryDatum&,
-    DictionaryDatum& );
+  void disconnect(GIDCollection &, GIDCollection &, DictionaryDatum &,
+                  DictionaryDatum &);
 
   /**
    * Disconnect two nodes.
@@ -129,13 +123,11 @@ public:
    * \param target_thread Thread that hosts the target node.
    * \param syn_id The synapse model to use.
    */
-  void disconnect( const index sgid,
-    Node* target,
-    thread target_thread,
-    const index syn_id );
+  void disconnect(const index sgid, Node *target, thread target_thread,
+                  const index syn_id);
 
   void update_structural_plasticity();
-  void update_structural_plasticity( SPBuilder* );
+  void update_structural_plasticity(SPBuilder *);
 
   /**
    * Enable structural plasticity
@@ -170,41 +162,36 @@ public:
   delay builder_max_delay() const;
 
   // Creation of synapses
-  void create_synapses( std::vector< index >& pre_vacant_id,
-    std::vector< int >& pre_vacant_n,
-    std::vector< index >& post_vacant_id,
-    std::vector< int >& post_vacant_n,
-    SPBuilder* sp_conn_builder );
+  void create_synapses(std::vector<index> &pre_vacant_id,
+                       std::vector<int> &pre_vacant_n,
+                       std::vector<index> &post_vacant_id,
+                       std::vector<int> &post_vacant_n,
+                       SPBuilder *sp_conn_builder);
   // Deletion of synapses on the pre synaptic side
-  void delete_synapses_from_pre( const std::vector< index >& pre_deleted_id,
-    std::vector< int >& pre_deleted_n,
-    const index synapse_model,
-    const std::string& se_pre_name,
-    const std::string& se_post_name );
+  void delete_synapses_from_pre(const std::vector<index> &pre_deleted_id,
+                                std::vector<int> &pre_deleted_n,
+                                const index synapse_model,
+                                const std::string &se_pre_name,
+                                const std::string &se_post_name);
   // Deletion of synapses on the post synaptic side
-  void delete_synapses_from_post( std::vector< index >& post_deleted_id,
-    std::vector< int >& post_deleted_n,
-    index synapse_model,
-    std::string se_pre_name,
-    std::string se_post_name );
+  void delete_synapses_from_post(std::vector<index> &post_deleted_id,
+                                 std::vector<int> &post_deleted_n,
+                                 index synapse_model, std::string se_pre_name,
+                                 std::string se_post_name);
   // Deletion of synapses
-  void delete_synapse( index source,
-    index target,
-    long syn_id,
-    std::string se_pre_name,
-    std::string se_post_name );
+  void delete_synapse(index source, index target, long syn_id,
+                      std::string se_pre_name, std::string se_post_name);
 
-  void get_synaptic_elements( std::string se_name,
-    std::vector< index >& se_vacant_id,
-    std::vector< int >& se_vacant_n,
-    std::vector< index >& se_deleted_id,
-    std::vector< int >& se_deleted_n );
+  void get_synaptic_elements(std::string se_name,
+                             std::vector<index> &se_vacant_id,
+                             std::vector<int> &se_vacant_n,
+                             std::vector<index> &se_deleted_id,
+                             std::vector<int> &se_deleted_n);
 
-  void serialize_id( std::vector< index >& id,
-    std::vector< int >& n,
-    std::vector< index >& res );
-  void global_shuffle( std::vector< index >& v );
-  void global_shuffle( std::vector< index >& v, size_t n );
+  void serialize_id(std::vector<index> &id, std::vector<int> &n,
+                    std::vector<index> &res);
+  void global_shuffle(std::vector<index> &v);
+  void global_shuffle(std::vector<index> &v, size_t n);
 
 private:
   /**
@@ -218,7 +205,7 @@ private:
    * Off (False).
    */
   bool structural_plasticity_enabled_;
-  std::vector< SPBuilder* > sp_conn_builders_;
+  std::vector<SPBuilder *> sp_conn_builders_;
 
   /** @BeginDocumentation
 
@@ -232,32 +219,24 @@ private:
   /**
    * GrowthCurve factories, indexed by growthcurvedict_ elements.
    */
-  std::vector< GenericGrowthCurveFactory* > growthcurve_factories_;
+  std::vector<GenericGrowthCurveFactory *> growthcurve_factories_;
 };
 
-inline DictionaryDatum&
-SPManager::get_growthcurvedict()
-{
+inline DictionaryDatum &SPManager::get_growthcurvedict() {
   return growthcurvedict_;
 }
 
-inline GrowthCurve*
-SPManager::new_growth_curve( Name name )
-{
-  const long gc_id = ( *growthcurvedict_ )[ name ];
-  return growthcurve_factories_.at( gc_id )->create();
+inline GrowthCurve *SPManager::new_growth_curve(Name name) {
+  const long gc_id = (*growthcurvedict_)[name];
+  return growthcurve_factories_.at(gc_id)->create();
 }
 
-inline bool
-SPManager::is_structural_plasticity_enabled() const
-{
+inline bool SPManager::is_structural_plasticity_enabled() const {
   return structural_plasticity_enabled_;
 }
 
-inline long
-SPManager::get_structural_plasticity_update_interval() const
-{
+inline long SPManager::get_structural_plasticity_update_interval() const {
   return structural_plasticity_update_interval_;
 }
-}
+} // namespace nest
 #endif /* SP_MANAGER_H */

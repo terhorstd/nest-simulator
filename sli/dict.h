@@ -33,20 +33,16 @@
 #include "sliexceptions.h"
 #include "token.h"
 
+typedef std::map<Name, Token, std::less<Name>> TokenMap;
 
-typedef std::map< Name, Token, std::less< Name > > TokenMap;
-
-inline bool
-operator==( const TokenMap& x, const TokenMap& y )
-{
-  return ( x.size() == y.size() ) && equal( x.begin(), x.end(), y.begin() );
+inline bool operator==(const TokenMap &x, const TokenMap &y) {
+  return (x.size() == y.size()) && equal(x.begin(), x.end(), y.begin());
 }
 
 /** A class that associates names and tokens.
  *  @ingroup TokenHandling
  */
-class Dictionary : private TokenMap
-{
+class Dictionary : private TokenMap {
   /**
    * Helper class for lexicographical sorting of dictionary entries.
    * Provides comparison operator for ascending, case-insensitive
@@ -55,34 +51,24 @@ class Dictionary : private TokenMap
    * N.M.Josuttis, The C++ Standard Library, Addison Wesley, 1999,
    * ch. 6.6.6.
    */
-  class DictItemLexicalOrder
-  {
+  class DictItemLexicalOrder {
   private:
-    static bool nocase_compare( char c1, char c2 );
+    static bool nocase_compare(char c1, char c2);
 
   public:
-    bool
-    operator()( const std::pair< Name, Token >& lhs,
-      const std::pair< Name, Token >& rhs ) const
-    {
-      const std::string& ls = lhs.first.toString();
-      const std::string& rs = rhs.first.toString();
+    bool operator()(const std::pair<Name, Token> &lhs,
+                    const std::pair<Name, Token> &rhs) const {
+      const std::string &ls = lhs.first.toString();
+      const std::string &rs = rhs.first.toString();
 
-      return std::lexicographical_compare(
-        ls.begin(), ls.end(), rs.begin(), rs.end(), nocase_compare );
+      return std::lexicographical_compare(ls.begin(), ls.end(), rs.begin(),
+                                          rs.end(), nocase_compare);
     }
   };
 
 public:
-  Dictionary()
-    : refs_on_dictstack_( 0 )
-  {
-  }
-  Dictionary( const Dictionary& d )
-    : TokenMap( d )
-    , refs_on_dictstack_( 0 )
-  {
-  }
+  Dictionary() : refs_on_dictstack_(0) {}
+  Dictionary(const Dictionary &d) : TokenMap(d), refs_on_dictstack_(0) {}
   ~Dictionary();
 
   using TokenMap::begin;
@@ -105,7 +91,7 @@ public:
    *       not its copy.
    */
 
-  const Token& lookup( const Name& n ) const;
+  const Token &lookup(const Name &n) const;
 
   /**
    * lookup a name in the dictionary. If the name is not found an UndefinedName
@@ -116,36 +102,28 @@ public:
    *       dictionary read-out is set on the Token in the dictionary,
    *       not its copy.
    */
-  const Token& lookup2( const Name& n ) const; // throws UndefinedName
-  bool known( const Name& ) const;
+  const Token &lookup2(const Name &n) const; // throws UndefinedName
+  bool known(const Name &) const;
 
   //! Returns true if name is known but token has not been accessed
-  bool known_but_not_accessed( const Name& ) const;
+  bool known_but_not_accessed(const Name &) const;
 
-  Token& insert( const Name& n, const Token& t );
-  Token& insert_move( const Name&, Token& );
+  Token &insert(const Name &n, const Token &t);
+  Token &insert_move(const Name &, Token &);
 
   //! Remove entry from dictionary
-  void remove( const Name& n );
+  void remove(const Name &n);
 
-  const Token& operator[]( const Name& ) const;
-  Token& operator[]( const Name& );
-  const Token& operator[]( const char* ) const;
-  Token& operator[]( const char* );
+  const Token &operator[](const Name &) const;
+  Token &operator[](const Name &);
+  const Token &operator[](const char *) const;
+  Token &operator[](const char *);
 
-  bool
-  empty( void ) const
-  {
-    return TokenMap::empty();
-  }
+  bool empty(void) const { return TokenMap::empty(); }
 
-  void info( std::ostream& ) const;
+  void info(std::ostream &) const;
 
-  bool
-  operator==( const Dictionary& d ) const
-  {
-    return ::operator==( *this, d );
-  }
+  bool operator==(const Dictionary &d) const { return ::operator==(*this, d); }
 
   /**
    * Add the contents of this dictionary to another.
@@ -155,13 +133,13 @@ public:
    * via functor, and add traits to allow duplicates.
    * @see remove_dict
    */
-  void add_dict( const std::string&, SLIInterpreter& );
+  void add_dict(const std::string &, SLIInterpreter &);
 
   /**
    * Remove entries found in another dictionary from this.
    * @see add_dict
    */
-  void remove_dict( const std::string&, SLIInterpreter& );
+  void remove_dict(const std::string &, SLIInterpreter &);
 
   /**
    * Clear access flags on all dictionary elements.
@@ -179,13 +157,9 @@ public:
    * recursion
    * @see clear_access_flags(), all_accessed_()
    */
-  bool
-  all_accessed( std::string& missed ) const
-  {
-    return all_accessed_( missed );
-  }
+  bool all_accessed(std::string &missed) const { return all_accessed_(missed); }
 
-  friend std::ostream& operator<<( std::ostream&, const Dictionary& );
+  friend std::ostream &operator<<(std::ostream &, const Dictionary &);
 
   /**
    * Constant iterator for dictionary.
@@ -214,7 +188,7 @@ public:
   /**
    *
    */
-  void initialize_property_array( Name propname );
+  void initialize_property_array(Name propname);
 
   /**
    * This function is called when a dictionary is pushed to the dictionary
@@ -223,31 +197,18 @@ public:
    * dictionary stack, the cache of the dictionary stack must
    * be adjusted. This is e.g. the case for the systemdict or the errordict.
    */
-  void
-  add_dictstack_reference()
-  {
-    ++refs_on_dictstack_;
-  }
+  void add_dictstack_reference() { ++refs_on_dictstack_; }
 
   /**
    * This function is called when the dictionary is popped from the dictionary
    * stack.
    */
-  void
-  remove_dictstack_reference()
-  {
-    --refs_on_dictstack_;
-  }
+  void remove_dictstack_reference() { --refs_on_dictstack_; }
 
   /**
    * Returns true, if the dictionary has references on the dictionary stack.
    */
-  bool
-  is_on_dictstack() const
-  {
-    return refs_on_dictstack_ > 0;
-  }
-
+  bool is_on_dictstack() const { return refs_on_dictstack_ > 0; }
 
 private:
   /**
@@ -262,99 +223,67 @@ private:
    */
 
   int refs_on_dictstack_;
-  bool all_accessed_( std::string&, std::string prefix = std::string() ) const;
+  bool all_accessed_(std::string &, std::string prefix = std::string()) const;
   static const Token VoidToken;
 };
 
-inline const Token&
-Dictionary::lookup( const Name& n ) const
-{
-  TokenMap::const_iterator where = find( n );
-  if ( where != end() )
-  {
-    return ( *where ).second;
-  }
-  else
-  {
+inline const Token &Dictionary::lookup(const Name &n) const {
+  TokenMap::const_iterator where = find(n);
+  if (where != end()) {
+    return (*where).second;
+  } else {
     return Dictionary::VoidToken;
   }
 }
 
-inline const Token&
-Dictionary::lookup2( const Name& n ) const
-{
-  TokenMap::const_iterator where = find( n );
-  if ( where != end() )
-  {
-    return ( *where ).second;
-  }
-  else
-  {
-    throw UndefinedName( n.toString() );
+inline const Token &Dictionary::lookup2(const Name &n) const {
+  TokenMap::const_iterator where = find(n);
+  if (where != end()) {
+    return (*where).second;
+  } else {
+    throw UndefinedName(n.toString());
   }
 }
 
-inline bool
-Dictionary::known( const Name& n ) const
-{
-  TokenMap::const_iterator where = find( n );
-  if ( where != end() )
-  {
+inline bool Dictionary::known(const Name &n) const {
+  TokenMap::const_iterator where = find(n);
+  if (where != end()) {
     return true;
-  }
-  else
-  {
+  } else {
     return false;
   }
 }
 
-inline bool
-Dictionary::known_but_not_accessed( const Name& n ) const
-{
-  TokenMap::const_iterator where = find( n );
-  if ( where != end() )
-  {
+inline bool Dictionary::known_but_not_accessed(const Name &n) const {
+  TokenMap::const_iterator where = find(n);
+  if (where != end()) {
     return not where->second.accessed();
-  }
-  else
-  {
+  } else {
     return false;
   }
 }
 
-inline Token&
-Dictionary::insert( const Name& n, const Token& t )
-{
-  return TokenMap::operator[]( n ) = t;
+inline Token &Dictionary::insert(const Name &n, const Token &t) {
+  return TokenMap::operator[](n) = t;
 }
 
-
-inline const Token& Dictionary::operator[]( const Name& n ) const
-{
-  TokenMap::const_iterator where = find( n );
-  if ( where != end() )
-  {
-    return ( *where ).second;
-  }
-  else
-  {
-    throw UndefinedName( n.toString() );
+inline const Token &Dictionary::operator[](const Name &n) const {
+  TokenMap::const_iterator where = find(n);
+  if (where != end()) {
+    return (*where).second;
+  } else {
+    throw UndefinedName(n.toString());
   }
 }
 
-
-inline Token& Dictionary::operator[]( const Name& n )
-{
-  return TokenMap::operator[]( n );
+inline Token &Dictionary::operator[](const Name &n) {
+  return TokenMap::operator[](n);
 }
 
-inline Token&
-Dictionary::insert_move( const Name& n, Token& t )
-{
-  Token& result = TokenMap::operator[]( n );
-  result.move( t );
+inline Token &Dictionary::insert_move(const Name &n, Token &t) {
+  Token &result = TokenMap::operator[](n);
+  result.move(t);
   return result;
 }
-
 
 #endif

@@ -34,8 +34,7 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 
 /**
  * A thread-safe array to coordinate progress across threads during
@@ -44,14 +43,13 @@ namespace nest
  * assignments.
  */
 
-class CompletedChecker
-{
+class CompletedChecker {
 private:
   /**
    * Array holding status values for all threads. Must be of type
    * bool; 'bitwise and' is used below instead of 'logical and'.
    */
-  bool* a_;
+  bool *a_;
 
   /**
    * Size of a_, should always be identical to number of threads.
@@ -82,43 +80,38 @@ public:
    * Updates element for thread tid by computing its 'logical and'
    * with given value v.
    */
-  void logical_and( const thread tid, const bool v );
+  void logical_and(const thread tid, const bool v);
 
   /**
    * Resizes array to given size.
    */
-  void resize( const size_t new_size, const bool v );
+  void resize(const size_t new_size, const bool v);
 
   /**
    * Sets element for thread tid to given value v.
    */
-  void set( const thread tid, const bool v );
+  void set(const thread tid, const bool v);
 
   /**
    * Returns const reference to element at position tid.
    */
-  bool operator[]( const thread tid ) const;
+  bool operator[](const thread tid) const;
 };
 
-inline void
-CompletedChecker::logical_and( const thread tid, const bool v )
-{
+inline void CompletedChecker::logical_and(const thread tid, const bool v) {
 // Use 'bitwise and', since 'logical and' is not supported by 'omp
 // atomic update'; yields same result for bool.
 #pragma omp atomic update
-  a_[ tid ] &= v;
+  a_[tid] &= v;
 }
 
-inline void
-CompletedChecker::set( const thread tid, const bool v )
-{
+inline void CompletedChecker::set(const thread tid, const bool v) {
 #pragma omp atomic write
-  a_[ tid ] = v;
+  a_[tid] = v;
 }
 
-inline bool CompletedChecker::operator[]( const thread tid ) const
-{
-  return a_[ tid ];
+inline bool CompletedChecker::operator[](const thread tid) const {
+  return a_[tid];
 }
 
 } // namespace nest

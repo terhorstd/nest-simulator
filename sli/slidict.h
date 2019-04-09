@@ -37,51 +37,36 @@
   defined in this module
   *************************************/
 
-void init_slidict( SLIInterpreter* );
+void init_slidict(SLIInterpreter *);
 
-class DictFunction : public SLIFunction
-{
+class DictFunction : public SLIFunction {
 public:
-  DictFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DictFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DictputFunction : public SLIFunction
-{
+class DictputFunction : public SLIFunction {
 public:
-  DictputFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DictputFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DictgetFunction : public SLIFunction
-{
+class DictgetFunction : public SLIFunction {
 public:
-  DictgetFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DictgetFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DictbeginFunction : public SLIFunction
-{
+class DictbeginFunction : public SLIFunction {
 public:
-  DictbeginFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DictbeginFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DictendFunction : public SLIFunction
-{
+class DictendFunction : public SLIFunction {
 public:
-  DictendFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DictendFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
 // MH fx 2010-09-28
@@ -95,166 +80,112 @@ public:
 //    void execute(SLIInterpreter *) const;
 //};
 
-class DictinfoFunction : public SLIFunction
-{
+class DictinfoFunction : public SLIFunction {
 public:
-  DictinfoFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DictinfoFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DicttopinfoFunction : public SLIFunction
-{
+class DicttopinfoFunction : public SLIFunction {
 public:
-  DicttopinfoFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DicttopinfoFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class WhoFunction : public SLIFunction
-{
+class WhoFunction : public SLIFunction {
 public:
-  WhoFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  WhoFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DictconstructFunction : public SLIFunction
-{
+class DictconstructFunction : public SLIFunction {
 public:
-  DictconstructFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DictconstructFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DictstackFunction : public SLIFunction
-{
+class DictstackFunction : public SLIFunction {
 public:
-  DictstackFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DictstackFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CurrentdictFunction : public SLIFunction
-{
+class CurrentdictFunction : public SLIFunction {
 public:
-  CurrentdictFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CurrentdictFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CountdictstackFunction : public SLIFunction
-{
+class CountdictstackFunction : public SLIFunction {
 public:
-  CountdictstackFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CountdictstackFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CleardictstackFunction : public SLIFunction
-{
+class CleardictstackFunction : public SLIFunction {
 public:
-  CleardictstackFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CleardictstackFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Length_dFunction : public SLIFunction
-{
+class Length_dFunction : public SLIFunction {
 public:
-  Length_dFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Length_dFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Empty_DFunction : public SLIFunction
-{
+class Empty_DFunction : public SLIFunction {
 public:
-  Empty_DFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Empty_DFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CleardictFunction : public SLIFunction
-{
+class CleardictFunction : public SLIFunction {
 public:
-  CleardictFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CleardictFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ClonedictFunction : public SLIFunction
-{
+class ClonedictFunction : public SLIFunction {
 public:
-  ClonedictFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ClonedictFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class UndefFunction : public SLIFunction
-{
+class UndefFunction : public SLIFunction {
 public:
-  UndefFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  UndefFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class KnownFunction : public SLIFunction
-{
+class KnownFunction : public SLIFunction {
 public:
-  KnownFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  KnownFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Cva_dFunction : public SLIFunction
-{
+class Cva_dFunction : public SLIFunction {
 public:
-  Cva_dFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Cva_dFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class KeysFunction : public SLIFunction
-{
+class KeysFunction : public SLIFunction {
 public:
-  KeysFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  KeysFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ValuesFunction : public SLIFunction
-{
+class ValuesFunction : public SLIFunction {
 public:
-  ValuesFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ValuesFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class RestoredstackFunction : public SLIFunction
-{
+class RestoredstackFunction : public SLIFunction {
 public:
-  RestoredstackFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  RestoredstackFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
 #endif

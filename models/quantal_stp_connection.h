@@ -29,8 +29,7 @@
 // Includes from nestkernel:
 #include "connection.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: quantal_stp_synapse - Probabilistic synapse model with short term
@@ -85,12 +84,11 @@ Author: Marc-Oliver Gewaltig, based on tsodyks2_synapse
 
 SeeAlso: tsodyks2_synapse, synapsedict, stdp_synapse, static_synapse
 */
-template < typename targetidentifierT >
-class Quantal_StpConnection : public Connection< targetidentifierT >
-{
+template <typename targetidentifierT>
+class Quantal_StpConnection : public Connection<targetidentifierT> {
 public:
   typedef CommonSynapseProperties CommonPropertiesType;
-  typedef Connection< targetidentifierT > ConnectionBase;
+  typedef Connection<targetidentifierT> ConnectionBase;
 
   /**
    * Default Constructor.
@@ -100,7 +98,7 @@ public:
   /**
    * Copy constructor to propagate common properties.
    */
-  Quantal_StpConnection( const Quantal_StpConnection& );
+  Quantal_StpConnection(const Quantal_StpConnection &);
 
   // Explicitly declare all methods inherited from the dependent base
   // ConnectionBase. This avoids explicit name prefixes in all places these
@@ -114,54 +112,41 @@ public:
   /**
    * Get all properties of this connection and put them into a dictionary.
    */
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
   /**
    * Set default properties of this connection from the values given in
    * dictionary.
    */
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
   /**
    * Throws exception if n or a are given in syn_spec.
    */
-  void check_synapse_params( const DictionaryDatum& d ) const;
+  void check_synapse_params(const DictionaryDatum &d) const;
 
   /**
    * Send an event to the receiver of this connection.
    * \param e The event to send
    * \param cp Common properties to all synapses (empty).
    */
-  void send( Event& e, thread t, const CommonSynapseProperties& cp );
+  void send(Event &e, thread t, const CommonSynapseProperties &cp);
 
-  class ConnTestDummyNode : public ConnTestDummyNodeBase
-  {
+  class ConnTestDummyNode : public ConnTestDummyNodeBase {
   public:
     // Ensure proper overriding of overloaded virtual functions.
     // Return values from functions are ignored.
     using ConnTestDummyNodeBase::handles_test_event;
-    port
-    handles_test_event( SpikeEvent&, rport )
-    {
-      return invalid_port_;
-    }
+    port handles_test_event(SpikeEvent &, rport) { return invalid_port_; }
   };
 
-  void
-  check_connection( Node& s,
-    Node& t,
-    rport receptor_type,
-    const CommonPropertiesType& )
-  {
+  void check_connection(Node &s, Node &t, rport receptor_type,
+                        const CommonPropertiesType &) {
     ConnTestDummyNode dummy_target;
-    ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
+    ConnectionBase::check_connection_(dummy_target, s, t, receptor_type);
   }
 
-  void
-  set_weight( double w )
-  {
-    weight_ = w;
-  }
+  void set_weight(double w) { weight_ = w; }
 
 private:
   double weight_;      //!< synaptic weight
@@ -174,55 +159,45 @@ private:
   double t_lastspike_; //!< Time point of last spike emitted
 };
 
-
 /**
  * Send an event to the receiver of this connection.
  * \param e The event to send
  * \param t The thread on which this connection is stored.
  * \param cp Common properties object, containing the quantal_stp parameters.
  */
-template < typename targetidentifierT >
-inline void
-Quantal_StpConnection< targetidentifierT >::send( Event& e,
-  thread t,
-  const CommonSynapseProperties& )
-{
+template <typename targetidentifierT>
+inline void Quantal_StpConnection<targetidentifierT>::send(
+    Event &e, thread t, const CommonSynapseProperties &) {
   const double t_spike = e.get_stamp().get_ms();
   const double h = t_spike - t_lastspike_;
 
   // Compute the decay factors, based on the time since the last spike.
-  const double p_decay = std::exp( -h / tau_rec_ );
-  const double u_decay =
-    ( tau_fac_ < 1.0e-10 ) ? 0.0 : std::exp( -h / tau_fac_ );
+  const double p_decay = std::exp(-h / tau_rec_);
+  const double u_decay = (tau_fac_ < 1.0e-10) ? 0.0 : std::exp(-h / tau_fac_);
 
   // Compute release probability
-  u_ = U_ + u_ * ( 1. - U_ ) * u_decay; // Eq. 4 from [2]
+  u_ = U_ + u_ * (1. - U_) * u_decay; // Eq. 4 from [2]
 
   // Compute number of sites that recovered during the interval.
-  for ( int depleted = n_ - a_; depleted > 0; --depleted )
-  {
-    if ( kernel().rng_manager.get_rng( t )->drand() < ( 1.0 - p_decay ) )
-    {
+  for (int depleted = n_ - a_; depleted > 0; --depleted) {
+    if (kernel().rng_manager.get_rng(t)->drand() < (1.0 - p_decay)) {
       ++a_;
     }
   }
 
   // Compute number of released sites
   int n_release = 0;
-  for ( int i = a_; i > 0; --i )
-  {
-    if ( kernel().rng_manager.get_rng( t )->drand() < u_ )
-    {
+  for (int i = a_; i > 0; --i) {
+    if (kernel().rng_manager.get_rng(t)->drand() < u_) {
       ++n_release;
     }
   }
 
-  if ( n_release > 0 )
-  {
-    e.set_receiver( *get_target( t ) );
-    e.set_weight( n_release * weight_ );
-    e.set_delay_steps( get_delay_steps() );
-    e.set_rport( get_rport() );
+  if (n_release > 0) {
+    e.set_receiver(*get_target(t));
+    e.set_weight(n_release * weight_);
+    e.set_delay_steps(get_delay_steps());
+    e.set_rport(get_rport());
     e();
     a_ -= n_release;
   }
@@ -230,6 +205,6 @@ Quantal_StpConnection< targetidentifierT >::send( Event& e,
   t_lastspike_ = t_spike;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // QUANTAL_STP_CONNECTION_H

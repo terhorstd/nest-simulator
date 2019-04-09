@@ -111,8 +111,7 @@
  *
  */
 
-namespace librandom
-{
+namespace librandom {
 
 class RandomDev;
 
@@ -122,8 +121,7 @@ class RandomDev;
  * A safe pointer that should be used instead of RandomDev*
  * in user code to manage random number generators.
  */
-typedef lockPTR< RandomDev > RdvPtr;
-
+typedef lockPTR<RandomDev> RdvPtr;
 
 /**
  * Abstract base class for access to non-uniform random deviate
@@ -133,18 +131,14 @@ typedef lockPTR< RandomDev > RdvPtr;
  * HEP 2002-07-09, 2004-06-28
  */
 
-class RandomDev
-{
+class RandomDev {
 
 public:
   /**
    * Construct with (single-threaded) or without (multithreaded)
    * RNG.
    */
-  RandomDev( RngPtr rng = RngPtr( 0 ) )
-    : rng_( rng )
-  {
-  }
+  RandomDev(RngPtr rng = RngPtr(0)) : rng_(rng) {}
 
   //! ensure proper clean-up
   virtual ~RandomDev(){};
@@ -160,30 +154,22 @@ public:
    * of the argument to force all derived classes to implement
    * both varieties.
    */
-  virtual double operator()( void );             //!< single-threaded
-  virtual double operator()( RngPtr ) const = 0; //!< multi-threaded
+  virtual double operator()(void);             //!< single-threaded
+  virtual double operator()(RngPtr) const = 0; //!< multi-threaded
 
   /**
    * integer valued functions for discrete distributions
    */
-  virtual long ldev( void );
-  virtual long ldev( RngPtr ) const;
+  virtual long ldev(void);
+  virtual long ldev(RngPtr) const;
 
   /**
    * true if RDG implements ldev function
    */
-  virtual bool
-  has_ldev() const
-  {
-    return false;
-  }
+  virtual bool has_ldev() const { return false; }
 
   //! set RNG
-  void
-  set_rng( RngPtr rng )
-  {
-    rng_ = rng;
-  }
+  void set_rng(RngPtr rng) { rng_ = rng; }
 
   /**
    * set distribution parameters from SLI interface
@@ -194,7 +180,7 @@ public:
    * of a SLI dictionary.  This function is meant only to
    * provide access from the SLI interface.
    */
-  virtual void set_status( const DictionaryDatum& ) = 0;
+  virtual void set_status(const DictionaryDatum &) = 0;
 
   /**
    * get distribution parameters from SLI interface
@@ -205,63 +191,46 @@ public:
    * of a SLI dictionary.  This function is meant only to
    * provide access from the SLI interface.
    */
-  virtual void get_status( DictionaryDatum& ) const;
+  virtual void get_status(DictionaryDatum &) const;
 
 protected:
   RngPtr rng_; //!< store underlying RNG
 };
 
-inline double
-RandomDev::operator()( void )
-{
-  assert( rng_.valid() );
-  return ( *this )( rng_ );
+inline double RandomDev::operator()(void) {
+  assert(rng_.valid());
+  return (*this)(rng_);
 }
 
-inline long
-RandomDev::ldev( void )
-{
-  assert( rng_.valid() );
-  return this->ldev( rng_ );
+inline long RandomDev::ldev(void) {
+  assert(rng_.valid());
+  return this->ldev(rng_);
 }
-
 
 /**
  * Generic factory class for RandomDev.
  */
-class GenericRandomDevFactory
-{
+class GenericRandomDevFactory {
 public:
-  virtual ~GenericRandomDevFactory()
-  {
-  }
+  virtual ~GenericRandomDevFactory() {}
   virtual RdvPtr create() const = 0;
-  virtual RdvPtr create( RngPtr rng ) const = 0;
+  virtual RdvPtr create(RngPtr rng) const = 0;
 };
 
 /**
  * Factory class for generating objects of type RandomDev
  */
 
-template < typename DevType >
-class RandomDevFactory : public GenericRandomDevFactory
-{
+template <typename DevType>
+class RandomDevFactory : public GenericRandomDevFactory {
 
 public:
   //! create unbound deviate generator
-  RdvPtr
-  create() const
-  {
-    return RdvPtr( new DevType() );
-  }
+  RdvPtr create() const { return RdvPtr(new DevType()); }
 
   //! create deviate generator given uniform number generator
-  RdvPtr
-  create( RngPtr rng ) const
-  {
-    return RdvPtr( new DevType( rng ) );
-  }
+  RdvPtr create(RngPtr rng) const { return RdvPtr(new DevType(rng)); }
 };
-}
+} // namespace librandom
 
 #endif

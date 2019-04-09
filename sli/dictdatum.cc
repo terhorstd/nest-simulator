@@ -29,4 +29,4 @@
 // because otherwise methods defined in
 // numericdatum_impl.h will not be instantiated
 // Moritz, 2007-04-16
-template class lockPTRDatum< Dictionary, &SLIInterpreter::Dictionarytype >;
+template class lockPTRDatum<Dictionary, &SLIInterpreter::Dictionarytype>;

@@ -35,8 +35,7 @@
 #include "slifunction.h"
 #include "typechk.h"
 
-class TrieDatum : public TypedDatum< &SLIInterpreter::Trietype >
-{
+class TrieDatum : public TypedDatum<&SLIInterpreter::Trietype> {
 protected:
   static sli::pool memory;
 
@@ -44,120 +43,65 @@ private:
   Name name;
   TypeTrie tree;
 
-  Datum*
-  clone( void ) const
-  {
-    return new TrieDatum( *this );
-  }
+  Datum *clone(void) const { return new TrieDatum(*this); }
 
-  Datum*
-  get_ptr()
-  {
+  Datum *get_ptr() {
     Datum::addReference();
     return this;
   }
 
 public:
-  TrieDatum( TrieDatum const& fd )
-    : TypedDatum< &SLIInterpreter::Trietype >( fd )
-    , name( fd.name )
-    , tree( fd.tree )
-  {
+  TrieDatum(TrieDatum const &fd)
+      : TypedDatum<&SLIInterpreter::Trietype>(fd), name(fd.name),
+        tree(fd.tree) {
     set_executable();
   }
 
-  TrieDatum( Name const& n )
-    : name( n )
-    , tree()
-  {
+  TrieDatum(Name const &n) : name(n), tree() { set_executable(); }
+
+  TrieDatum(Name const &n, const TokenArray &ta) : name(n), tree(ta) {
     set_executable();
   }
 
-  TrieDatum( Name const& n, const TokenArray& ta )
-    : name( n )
-    , tree( ta )
-  {
-    set_executable();
-  }
+  void print(std::ostream &o) const { o << '+' << name << '+'; }
 
+  void pprint(std::ostream &o) const { print(o); }
 
-  void
-  print( std::ostream& o ) const
-  {
-    o << '+' << name << '+';
-  }
-
-  void
-  pprint( std::ostream& o ) const
-  {
-    print( o );
-  }
-
-  void
-  info( std::ostream& out ) const
-  {
-    pprint( out );
+  void info(std::ostream &out) const {
+    pprint(out);
     out << "\nVariants are:" << std::endl;
-    tree.info( out );
+    tree.info(out);
   }
 
-  bool equals( Datum const* ) const;
+  bool equals(Datum const *) const;
 
-  const Name&
-  getname( void ) const
-  {
-    return name;
-  }
+  const Name &getname(void) const { return name; }
 
-  void
-  insert( const TypeArray& a, const Token& t )
-  {
-    tree.insert( a, t );
-  }
+  void insert(const TypeArray &a, const Token &t) { tree.insert(a, t); }
 
-  void
-  insert_move( const TypeArray& a, Token& t )
-  {
-    tree.insert_move( a, t );
-  }
+  void insert_move(const TypeArray &a, Token &t) { tree.insert_move(a, t); }
 
-  const Token&
-  lookup( const TokenStack& s ) const
-  {
-    return tree.lookup( s );
-  }
+  const Token &lookup(const TokenStack &s) const { return tree.lookup(s); }
 
-  TypeTrie&
-  get( void )
-  {
-    return tree;
-  }
+  TypeTrie &get(void) { return tree; }
 
-  static void*
-  operator new( size_t size )
-  {
-    if ( size != memory.size_of() )
-    {
-      return ::operator new( size );
+  static void *operator new(size_t size) {
+    if (size != memory.size_of()) {
+      return ::operator new(size);
     }
     return memory.alloc();
   }
 
-  static void
-  operator delete( void* p, size_t size )
-  {
-    if ( p == NULL )
-    {
+  static void operator delete(void *p, size_t size) {
+    if (p == NULL) {
       return;
     }
-    if ( size != memory.size_of() )
-    {
-      ::operator delete( p );
+    if (size != memory.size_of()) {
+      ::operator delete(p);
       return;
     }
-    memory.free( p );
+    memory.free(p);
   }
 };
-
 
 #endif

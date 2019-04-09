@@ -37,8 +37,7 @@
 #include "nest_types.h"
 #include "stimulating_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: gamma_sup_generator - simulate the superimposed spike train of a
@@ -72,33 +71,24 @@ Author:
 SeeAlso: ppd_sup_generator, poisson_generator_ps, spike_generator, Device,
 StimulatingDevice
 */
-class gamma_sup_generator : public DeviceNode
-{
+class gamma_sup_generator : public DeviceNode {
 
 public:
   gamma_sup_generator();
-  gamma_sup_generator( const gamma_sup_generator& );
+  gamma_sup_generator(const gamma_sup_generator &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  is_off_grid() const
-  {
-    return false;
-  } // does not use off_grid events
+  bool has_proxies() const { return false; }
+  bool is_off_grid() const { return false; } // does not use off_grid events
 
   using Node::event_hook;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
@@ -111,22 +101,21 @@ private:
    * information.
    * @see event_hook, DSSpikeEvent
    */
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   /**
    * Send out spikes.
    * Called once per target to dispatch actual output spikes.
    * @param contains target information.
    */
-  void event_hook( DSSpikeEvent& );
+  void event_hook(DSSpikeEvent &);
 
   // ------------------------------------------------------------
 
   /**
    * Store independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double rate_;               //!< rate of component gamma process [Hz]
     unsigned long gamma_shape_; //!< gamma shape parameter [1]
     unsigned long n_proc_;      //!< number of component processes
@@ -141,42 +130,38 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
   // ------------------------------------------------------------
 
-  class Internal_states_
-  {
+  class Internal_states_ {
 
     librandom::BinomialRandomDev bino_dev_;   //!< random deviate generator
     librandom::PoissonRandomDev poisson_dev_; //!< random deviate generator
-    std::vector< unsigned long >
-      occ_; //!< occupation numbers of internal states
+    std::vector<unsigned long> occ_; //!< occupation numbers of internal states
 
   public:
-    Internal_states_( size_t num_bins,
-      unsigned long ini_occ_ref,
-      unsigned long ini_occ_act ); //!< initialize occupation numbers
-    unsigned long update( double transition_prob,
-      librandom::RngPtr rng ); //!< update age dist and generate spikes
+    Internal_states_(
+        size_t num_bins, unsigned long ini_occ_ref,
+        unsigned long ini_occ_act); //!< initialize occupation numbers
+    unsigned long
+    update(double transition_prob,
+           librandom::RngPtr rng); //!< update age dist and generate spikes
   };
 
-
-  struct Buffers_
-  {
+  struct Buffers_ {
     /**
      * Occupation numbers of the internal states of the generator
      */
 
-    std::vector< Internal_states_ > internal_states_;
+    std::vector<Internal_states_> internal_states_;
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     double transition_prob_; //!< transition probabililty to go to next
                              //!< internal state
 
@@ -197,61 +182,51 @@ private:
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< CurrentEvent > device_;
+  StimulatingDevice<CurrentEvent> device_;
   Parameters_ P_;
   Variables_ V_;
   Buffers_ B_;
 };
 
-inline port
-gamma_sup_generator::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool dummy_target )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port gamma_sup_generator::send_test_event(Node &target,
+                                                 rport receptor_type,
+                                                 synindex syn_id,
+                                                 bool dummy_target) {
+  device_.enforce_single_syn_type(syn_id);
 
-  if ( dummy_target )
-  {
+  if (dummy_target) {
     DSSpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
-  }
-  else
-  {
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
+  } else {
     SpikeEvent e;
-    e.set_sender( *this );
-    const port p = target.handles_test_event( e, receptor_type );
-    if ( p != invalid_port_ )
-    {
+    e.set_sender(*this);
+    const port p = target.handles_test_event(e, receptor_type);
+    if (p != invalid_port_) {
       ++P_.num_targets_;
     } // count number of targets
     return p;
   }
 }
 
-inline void
-gamma_sup_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  device_.get_status( d );
+inline void gamma_sup_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  device_.get_status(d);
 }
 
-inline void
-gamma_sup_generator::set_status( const DictionaryDatum& d )
-{
+inline void gamma_sup_generator::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
 
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif

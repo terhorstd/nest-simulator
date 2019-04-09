@@ -35,9 +35,7 @@
 #include "ring_buffer.h"
 #include <vector>
 
-
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: inhomogeneous_poisson_generator - provides Poisson spike trains
@@ -80,18 +78,13 @@ Authors: Renato Duarte, Barna Zajzon
 SeeAlso: sinusoidal_poisson_generator, step_current_generator, Device,
        StimulatingDevice
 */
-class inhomogeneous_poisson_generator : public DeviceNode
-{
+class inhomogeneous_poisson_generator : public DeviceNode {
 
 public:
   inhomogeneous_poisson_generator();
-  inhomogeneous_poisson_generator( const inhomogeneous_poisson_generator& );
+  inhomogeneous_poisson_generator(const inhomogeneous_poisson_generator &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -100,116 +93,102 @@ public:
    */
   using Node::event_hook;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
-
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
-  void event_hook( DSSpikeEvent& );
+  void update(Time const &, const long, const long);
+  void event_hook(DSSpikeEvent &);
 
   struct Buffers_;
 
   /*
    * Store independent parameters of the model.
    */
-  struct Parameters_
-  {
-    std::vector< Time > rate_times_;
-    std::vector< double_t > rate_values_;
+  struct Parameters_ {
+    std::vector<Time> rate_times_;
+    std::vector<double_t> rate_values_;
 
     //! Allow and round up rate times not on steps;
     bool allow_offgrid_times_;
 
     Parameters_(); //!< Sets default parameter values
-    Parameters_( const Parameters_&, Buffers_& );
+    Parameters_(const Parameters_ &, Buffers_ &);
 
     //!< Store current values in dictionary
-    void get( DictionaryDatum& ) const;
+    void get(DictionaryDatum &) const;
     //!< Set values from dictionary
-    void set( const DictionaryDatum&, Buffers_& );
+    void set(const DictionaryDatum &, Buffers_ &);
     //!< Align rate time to grid if necessary and insert it into rate_times_
-    void assert_valid_rate_time_and_insert( const double_t t );
+    void assert_valid_rate_time_and_insert(const double_t t);
   };
 
   // ------------------------------------------------------------
 
-  struct Buffers_
-  {
+  struct Buffers_ {
     size_t idx_;    //!< index of current amplitude
     double_t rate_; //!< current amplitude
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     librandom::PoissonRandomDev poisson_dev_; //!< random deviate generator
     double_t h_;                              //! time resolution (ms)
   };
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< SpikeEvent > device_;
+  StimulatingDevice<SpikeEvent> device_;
 
   Parameters_ P_;
   Buffers_ B_;
   Variables_ V_;
 };
 
-inline port
-inhomogeneous_poisson_generator::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool dummy_target )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port inhomogeneous_poisson_generator::send_test_event(
+    Node &target, rport receptor_type, synindex syn_id, bool dummy_target) {
+  device_.enforce_single_syn_type(syn_id);
 
   // to ensure correct overloading resolution, we need explicit event types
   // therefore, we need to duplicate the code here
-  if ( dummy_target )
-  {
+  if (dummy_target) {
     DSSpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
-  }
-  else
-  {
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
+  } else {
     SpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
   }
 }
 
-
 inline void
-inhomogeneous_poisson_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  device_.get_status( d );
+inhomogeneous_poisson_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  device_.get_status(d);
 }
 
 inline void
-inhomogeneous_poisson_generator::set_status( const DictionaryDatum& d )
-{
+inhomogeneous_poisson_generator::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
 
-  ptmp.set( d, B_ ); // throws if BadProperty
+  ptmp.set(d, B_); // throws if BadProperty
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // INHOMOGENEOUS_POISSON_GENERATOR_H

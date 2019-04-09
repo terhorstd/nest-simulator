@@ -37,7 +37,6 @@
 #include "tokenarray.h"
 #include "tokenutils.h"
 
-
 /***********************************************************/
 /* Definitions for Token                                       */
 /***********************************************************/
@@ -48,68 +47,31 @@
 // Thus, this constructor must only be called by the
 // (virtual) Datum members who create new Datums
 
+Token::Token(int value) { p = new IntegerDatum(value); }
 
-Token::Token( int value )
-{
-  p = new IntegerDatum( value );
-}
+Token::Token(unsigned int value) { p = new IntegerDatum(value); }
 
-Token::Token( unsigned int value )
-{
-  p = new IntegerDatum( value );
-}
+Token::Token(long value) { p = new IntegerDatum(value); }
 
-Token::Token( long value )
-{
-  p = new IntegerDatum( value );
-}
-
-Token::Token( unsigned long value )
-{
-  p = new IntegerDatum( value );
-}
+Token::Token(unsigned long value) { p = new IntegerDatum(value); }
 
 #ifdef HAVE_32BIT_ARCH
-Token::Token( uint64_t value )
-{
-  p = new IntegerDatum( value );
-}
+Token::Token(uint64_t value) { p = new IntegerDatum(value); }
 #endif
 
-Token::Token( double value )
-{
-  p = new DoubleDatum( value );
-}
+Token::Token(double value) { p = new DoubleDatum(value); }
 
-Token::Token( bool value )
-{
-  p = new BoolDatum( value );
-}
+Token::Token(bool value) { p = new BoolDatum(value); }
 
-Token::Token( const char* value )
-{
-  p = new StringDatum( value );
-}
+Token::Token(const char *value) { p = new StringDatum(value); }
 
-Token::Token( std::string value )
-{
-  p = new StringDatum( value );
-}
+Token::Token(std::string value) { p = new StringDatum(value); }
 
-Token::Token( const std::vector< long >& value )
-{
-  p = new ArrayDatum( value );
-}
+Token::Token(const std::vector<long> &value) { p = new ArrayDatum(value); }
 
-Token::Token( const std::vector< size_t >& value )
-{
-  p = new ArrayDatum( value );
-}
+Token::Token(const std::vector<size_t> &value) { p = new ArrayDatum(value); }
 
-Token::Token( const std::vector< double >& value )
-{
-  p = new ArrayDatum( value );
-}
+Token::Token(const std::vector<double> &value) { p = new ArrayDatum(value); }
 
 /*
 Token::operator Datum* () const
@@ -118,93 +80,55 @@ Token::operator Datum* () const
 }
 */
 
-Token::operator long() const
-{
-  return getValue< long >( *this );
-}
+Token::operator long() const { return getValue<long>(*this); }
 
-Token::operator size_t() const
-{
-  return getValue< long >( *this );
-}
+Token::operator size_t() const { return getValue<long>(*this); }
 
-Token::operator double() const
-{
-  return getValue< double >( *this );
-}
+Token::operator double() const { return getValue<double>(*this); }
 
-Token::operator float() const
-{
-  return getValue< float >( *this );
-}
+Token::operator float() const { return getValue<float>(*this); }
 
-Token::operator bool() const
-{
-  return getValue< bool >( *this );
-}
+Token::operator bool() const { return getValue<bool>(*this); }
 
-Token::operator std::string() const
-{
-  return getValue< std::string >( *this );
-}
+Token::operator std::string() const { return getValue<std::string>(*this); }
 
-void
-Token::info( std::ostream& out ) const
-{
+void Token::info(std::ostream &out) const {
   out << "Token::info\n";
-  if ( p )
-  {
-    p->Datum::info( out );
+  if (p) {
+    p->Datum::info(out);
 
     out << "p    = " << p << std::endl;
 
     out << "Type = " << type().name() << std::endl;
-    p->info( out );
-  }
-  else
-  {
+    p->info(out);
+  } else {
     out << "<NULL token>\n";
   }
 }
 
-void
-Token::pprint( std::ostream& out ) const
-{
-  if ( not p )
-  {
+void Token::pprint(std::ostream &out) const {
+  if (not p) {
     out << "<Null token>";
-  }
-  else
-  {
-    p->pprint( out );
+  } else {
+    p->pprint(out);
   }
 }
 
-std::ostream&
-operator<<( std::ostream& o, const Token& c )
-{
-  if ( not c )
-  {
+std::ostream &operator<<(std::ostream &o, const Token &c) {
+  if (not c) {
     o << "<Null token>";
-  }
-  else
-  {
-    c->print( o );
+  } else {
+    c->print(o);
   }
   return o;
 }
 
-bool
-Token::matches_as_string( const Token& rhs ) const
-{
-  try
-  {
-    const std::string& left = getValue< std::string >( *this );
-    const std::string& right = getValue< std::string >( rhs );
+bool Token::matches_as_string(const Token &rhs) const {
+  try {
+    const std::string &left = getValue<std::string>(*this);
+    const std::string &right = getValue<std::string>(rhs);
     return left == right;
-  }
-  catch ( TypeMismatch& )
-  {
+  } catch (TypeMismatch &) {
     return false;
   }
   return false;

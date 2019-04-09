@@ -33,74 +33,60 @@
 #include "modelrange.h"
 #include "nest_types.h"
 
-namespace nest
-{
+namespace nest {
 class Model;
 
-class ModelRangeManager : public ManagerInterface
-{
+class ModelRangeManager : public ManagerInterface {
 public:
   ModelRangeManager();
-  ~ModelRangeManager()
-  {
-  }
+  ~ModelRangeManager() {}
 
   virtual void initialize();
   virtual void finalize();
 
-  virtual void
-  set_status( const DictionaryDatum& )
-  {
-  }
-  virtual void
-  get_status( DictionaryDatum& )
-  {
-  }
+  virtual void set_status(const DictionaryDatum &) {}
+  virtual void get_status(DictionaryDatum &) {}
 
   /**
    * Assign a range of GIDs for the given model
    */
-  void add_range( index model, index first_gid, index last_gid );
+  void add_range(index model, index first_gid, index last_gid);
 
   /**
    * Check whether a GID is with the range of assigned gids
    */
-  bool is_in_range( index gid ) const;
+  bool is_in_range(index gid) const;
 
   /**
    * Get the ID of the model to which this GID is assigned
    */
-  index get_model_id( index gid ) const;
+  index get_model_id(index gid) const;
 
   /**
    * Return the Model for a given GID.
    */
-  Model* get_model_of_gid( index );
+  Model *get_model_of_gid(index);
 
   /**
    * Check whether this model ID has any gids assigned to it
    */
-  bool model_in_use( index i ) const;
+  bool model_in_use(index i) const;
 
   /**
    * Return the contiguous range of IDs of nodes assigned to the same model
    * as the node with the given GID.
    */
-  const modelrange& get_contiguous_gid_range( index gid ) const;
-
+  const modelrange &get_contiguous_gid_range(index gid) const;
 
 private:
-  std::vector< modelrange > modelranges_;
+  std::vector<modelrange> modelranges_;
   index first_gid_;
   index last_gid_;
 };
-}
+} // namespace nest
 
-inline bool
-nest::ModelRangeManager::is_in_range( index gid ) const
-{
-  return ( ( gid <= last_gid_ ) and ( gid >= first_gid_ ) );
+inline bool nest::ModelRangeManager::is_in_range(index gid) const {
+  return ((gid <= last_gid_) and (gid >= first_gid_));
 }
-
 
 #endif

@@ -37,10 +37,8 @@
 #include "symboldatum.h"
 #include "token.h"
 
-
-class Scanner
-{
-  std::istream* in;
+class Scanner {
+  std::istream *in;
 
   CharCode code; // some Chars cause the same Transition
 
@@ -48,8 +46,7 @@ class Scanner
   unsigned long col;   //!< Current column in line
   std::string context; //!< Current context.
   std::string old_context;
-  enum ScanStates
-  {
+  enum ScanStates {
     start = 0,
     intdgtst,
     intexpst,
@@ -98,8 +95,7 @@ class Scanner
     lastscanstate
   };
 
-  enum Codes
-  {
+  enum Codes {
     invalid = 0,
     whitespace,
     eof,
@@ -127,20 +123,14 @@ class Scanner
     lastcode
   };
 
-  enum ScanStates trans[ lastscanstate ][ lastcode ]; // DFA transition-function
-
+  enum ScanStates trans[lastscanstate][lastcode]; // DFA transition-function
 
   const unsigned char space;
   const unsigned char tab;
   const unsigned char endoln;
   const unsigned char cr; // carriage return (ctrl M)
   const unsigned char endof;
-  int
-  digval( unsigned char c ) const
-  {
-    return c - '0';
-  }
-
+  int digval(unsigned char c) const { return c - '0'; }
 
 public:
   SymbolDatum BeginArraySymbol;
@@ -152,53 +142,39 @@ public:
   /**
    * Initialise scanner with a stream.
    */
-  Scanner( std::istream* );
+  Scanner(std::istream *);
 
   /**
    * Set new input stream.
    */
-  void source( std::istream* );
+  void source(std::istream *);
 
   /**
    * Return input stream.
    */
-  std::istream*
-  GetSource( void )
-  {
-    return in;
-  }
+  std::istream *GetSource(void) { return in; }
 
   /**
    * Scan input until the next Token.
    */
-  bool operator()( Token& );
+  bool operator()(Token &);
 
   /**
    * Issue an error message.
    */
-  void print_error( const char* );
+  void print_error(const char *);
 
   /**
    * Return current line number in input stream.
    */
-  unsigned long
-  get_line() const
-  {
-    return line;
-  }
+  unsigned long get_line() const { return line; }
 
   /**
    * Return position in  current line in input stream.
    */
-  unsigned long
-  get_col() const
-  {
-    return col;
-  }
+  unsigned long get_col() const { return col; }
 
-  void
-  clear_context()
-  {
+  void clear_context() {
     line = 0;
     col = 0;
     context.clear();

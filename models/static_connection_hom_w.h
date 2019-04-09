@@ -27,8 +27,7 @@
 #include "common_properties_hom_w.h"
 #include "connection.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: static_synapse_hom_w - Synapse type for static connections with
@@ -63,14 +62,13 @@ Author: Susanne Kunkel, Moritz Helias
 
 SeeAlso: synapsedict, static_synapse
 */
-template < typename targetidentifierT >
-class StaticConnectionHomW : public Connection< targetidentifierT >
-{
+template <typename targetidentifierT>
+class StaticConnectionHomW : public Connection<targetidentifierT> {
 
 public:
   // this line determines which common properties to use
   typedef CommonPropertiesHomW CommonPropertiesType;
-  typedef Connection< targetidentifierT > ConnectionBase;
+  typedef Connection<targetidentifierT> ConnectionBase;
 
   // Explicitly declare all methods inherited from the dependent base
   // ConnectionBase. This avoids explicit name prefixes in all places these
@@ -80,78 +78,39 @@ public:
   using ConnectionBase::get_rport;
   using ConnectionBase::get_target;
 
-  class ConnTestDummyNode : public ConnTestDummyNodeBase
-  {
+  class ConnTestDummyNode : public ConnTestDummyNodeBase {
   public:
     // Ensure proper overriding of overloaded virtual functions.
     // Return values from functions are ignored.
     using ConnTestDummyNodeBase::handles_test_event;
-    port
-    handles_test_event( SpikeEvent&, rport )
-    {
+    port handles_test_event(SpikeEvent &, rport) { return invalid_port_; }
+    port handles_test_event(RateEvent &, rport) { return invalid_port_; }
+    port handles_test_event(DataLoggingRequest &, rport) {
       return invalid_port_;
     }
-    port
-    handles_test_event( RateEvent&, rport )
-    {
-      return invalid_port_;
-    }
-    port
-    handles_test_event( DataLoggingRequest&, rport )
-    {
-      return invalid_port_;
-    }
-    port
-    handles_test_event( CurrentEvent&, rport )
-    {
-      return invalid_port_;
-    }
-    port
-    handles_test_event( ConductanceEvent&, rport )
-    {
-      return invalid_port_;
-    }
-    port
-    handles_test_event( DoubleDataEvent&, rport )
-    {
-      return invalid_port_;
-    }
-    port
-    handles_test_event( DSSpikeEvent&, rport )
-    {
-      return invalid_port_;
-    }
-    port
-    handles_test_event( DSCurrentEvent&, rport )
-    {
-      return invalid_port_;
-    }
+    port handles_test_event(CurrentEvent &, rport) { return invalid_port_; }
+    port handles_test_event(ConductanceEvent &, rport) { return invalid_port_; }
+    port handles_test_event(DoubleDataEvent &, rport) { return invalid_port_; }
+    port handles_test_event(DSSpikeEvent &, rport) { return invalid_port_; }
+    port handles_test_event(DSCurrentEvent &, rport) { return invalid_port_; }
   };
 
+  void get_status(DictionaryDatum &d) const;
 
-  void get_status( DictionaryDatum& d ) const;
-
-  void
-  check_connection( Node& s,
-    Node& t,
-    rport receptor_type,
-    const CommonPropertiesType& )
-  {
+  void check_connection(Node &s, Node &t, rport receptor_type,
+                        const CommonPropertiesType &) {
     ConnTestDummyNode dummy_target;
-    ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
+    ConnectionBase::check_connection_(dummy_target, s, t, receptor_type);
   }
 
   /**
    * Checks to see if weight is given in syn_spec.
    */
-  void
-  check_synapse_params( const DictionaryDatum& syn_spec ) const
-  {
-    if ( syn_spec->known( names::weight ) )
-    {
+  void check_synapse_params(const DictionaryDatum &syn_spec) const {
+    if (syn_spec->known(names::weight)) {
       throw BadProperty(
-        "Weight cannot be specified since it needs to be equal "
-        "for all connections when static_synapse_hom_w is used." );
+          "Weight cannot be specified since it needs to be equal "
+          "for all connections when static_synapse_hom_w is used.");
     }
   }
 
@@ -161,36 +120,29 @@ public:
    * \param tid Thread ID of the target
    * \param cp Common properties-object of the synapse
    */
-  void
-  send( Event& e, const thread tid, const CommonPropertiesHomW& cp )
-  {
-    e.set_weight( cp.get_weight() );
-    e.set_delay_steps( get_delay_steps() );
-    e.set_receiver( *get_target( tid ) );
-    e.set_rport( get_rport() );
+  void send(Event &e, const thread tid, const CommonPropertiesHomW &cp) {
+    e.set_weight(cp.get_weight());
+    e.set_delay_steps(get_delay_steps());
+    e.set_receiver(*get_target(tid));
+    e.set_rport(get_rport());
     e();
   }
 
-  void
-  set_weight( double )
-  {
+  void set_weight(double) {
     throw BadProperty(
-      "Setting of individual weights is not possible! The common weights can "
-      "be changed via "
-      "CopyModel()." );
+        "Setting of individual weights is not possible! The common weights can "
+        "be changed via "
+        "CopyModel().");
   }
 };
 
-
-template < typename targetidentifierT >
-void
-StaticConnectionHomW< targetidentifierT >::get_status(
-  DictionaryDatum& d ) const
-{
-  ConnectionBase::get_status( d );
-  def< long >( d, names::size_of, sizeof( *this ) );
+template <typename targetidentifierT>
+void StaticConnectionHomW<targetidentifierT>::get_status(
+    DictionaryDatum &d) const {
+  ConnectionBase::get_status(d);
+  def<long>(d, names::size_of, sizeof(*this));
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef STATICCONNECTION_HOM_W_H */

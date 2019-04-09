@@ -31,24 +31,22 @@
 #include "dictdatum.h"
 #include "token.h"
 
-namespace librandom
-{
+namespace librandom {
 
-librandom::RngDatum create_rng( const long seed,
-  const RngFactoryDatum& factory );
+librandom::RngDatum create_rng(const long seed, const RngFactoryDatum &factory);
 
-librandom::RdvDatum create_rdv( const RdvFactoryDatum& factory,
-  const RngDatum& rng );
+librandom::RdvDatum create_rdv(const RdvFactoryDatum &factory,
+                               const RngDatum &rng);
 
-void set_status( const DictionaryDatum& dict, RdvDatum& rdv );
-DictionaryDatum get_status( const RdvDatum& rdv );
+void set_status(const DictionaryDatum &dict, RdvDatum &rdv);
+DictionaryDatum get_status(const RdvDatum &rdv);
 
-void seed( const long seed, RngDatum& rng );
-unsigned long irand( const long N, RngDatum& rng );
-double drand( RngDatum& rng );
+void seed(const long seed, RngDatum &rng);
+unsigned long irand(const long N, RngDatum &rng);
+double drand(RngDatum &rng);
 
-ArrayDatum random_array( RdvDatum& rdv, const size_t n );
-Token random( RdvDatum& rdv );
-}
+ArrayDatum random_array(RdvDatum &rdv, const size_t n);
+Token random(RdvDatum &rdv);
+} // namespace librandom
 
 #endif /* RANDOM_H */

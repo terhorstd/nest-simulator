@@ -23,7 +23,6 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-
 // Includes from nestkernel:
 #include "nest_time.h"
 #include "nest_types.h"
@@ -32,8 +31,7 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
    Name: Device - General properties of devices.
@@ -95,47 +93,35 @@ namespace nest
  *
  * @author HEP 2002-07-22, 2008-03-21, 2008-06-20
  */
-class Device
-{
+class Device {
 public:
   Device();
-  Device( const Device& n );
-  virtual ~Device()
-  {
-  }
+  Device(const Device &n);
+  virtual ~Device() {}
 
   /** Reset parameters to those of model; also resets state. */
-  virtual void init_parameters( const Device& );
+  virtual void init_parameters(const Device &);
 
   /** Reset dynamic state to that of model. */
-  virtual void
-  init_state( const Device& )
-  {
-  }
+  virtual void init_state(const Device &) {}
 
   /** Reset buffers. */
-  virtual void
-  init_buffers()
-  {
-  }
+  virtual void init_buffers() {}
 
   /** Set internal variables, including opening files. */
   virtual void calibrate();
 
   /** Housekeeping at end of simulation, eg close files. */
-  virtual void
-  finalize()
-  {
-  }
+  virtual void finalize() {}
 
-  virtual void get_status( DictionaryDatum& ) const;
-  virtual void set_status( const DictionaryDatum& );
+  virtual void get_status(DictionaryDatum &) const;
+  virtual void set_status(const DictionaryDatum &);
 
   /**
    *  Returns true if the device is active at the given time stamp.
    *  Semantics are implemented by subclasses.
    */
-  virtual bool is_active( Time const& T ) const = 0;
+  virtual bool is_active(Time const &T) const = 0;
 
   /**
    * Return lower limit in steps.
@@ -151,9 +137,9 @@ public:
    */
   long get_t_max_() const;
 
-  Time const& get_origin() const;
-  Time const& get_start() const;
-  Time const& get_stop() const;
+  Time const &get_origin() const;
+  Time const &get_start() const;
+  Time const &get_stop() const;
 
 private:
   // ----------------------------------------------------------------
@@ -161,8 +147,7 @@ private:
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     //! Origin of device time axis, relative to network time. Defaults to 0.
     Time origin_;
 
@@ -175,24 +160,22 @@ private:
     Parameters_(); //!< Sets default parameter values
 
     //! Copy and recalibrate parameter set
-    Parameters_( const Parameters_& );
+    Parameters_(const Parameters_ &);
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dictionary
 
   private:
     //! Update given Time parameter including error checking
-    static void update_( const DictionaryDatum&, const Name&, Time& );
+    static void update_(const DictionaryDatum &, const Name &, Time &);
   };
-
 
   // ----------------------------------------------------------------
 
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
 
     /**
      * Time step of device activation.
@@ -219,52 +202,26 @@ private:
   Variables_ V_;
 };
 
-} // namespace
+} // namespace nest
 
-inline void
-nest::Device::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-}
+inline void nest::Device::get_status(DictionaryDatum &d) const { P_.get(d); }
 
-inline void
-nest::Device::set_status( const DictionaryDatum& d )
-{
+inline void nest::Device::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
 }
 
-inline nest::Time const&
-nest::Device::get_origin() const
-{
-  return P_.origin_;
-}
+inline nest::Time const &nest::Device::get_origin() const { return P_.origin_; }
 
-inline nest::Time const&
-nest::Device::get_start() const
-{
-  return P_.start_;
-}
+inline nest::Time const &nest::Device::get_start() const { return P_.start_; }
 
-inline nest::Time const&
-nest::Device::get_stop() const
-{
-  return P_.stop_;
-}
+inline nest::Time const &nest::Device::get_stop() const { return P_.stop_; }
 
-inline long
-nest::Device::get_t_min_() const
-{
-  return V_.t_min_;
-}
+inline long nest::Device::get_t_min_() const { return V_.t_min_; }
 
-inline long
-nest::Device::get_t_max_() const
-{
-  return V_.t_max_;
-}
+inline long nest::Device::get_t_max_() const { return V_.t_max_; }
 
 #endif // DEVICE_H

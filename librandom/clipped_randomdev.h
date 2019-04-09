@@ -38,8 +38,7 @@
 #include "dictutils.h"
 #include "sliexceptions.h"
 
-namespace librandom
-{
+namespace librandom {
 
 /** @BeginDocumentation
 Name: rdevdict::*_clipped - clipped random deviate generators.
@@ -90,105 +89,91 @@ Author: Hans Ekkehard Plesser
  * @ingroup RandomDeviateGenerators
  * @see ClippedRedrawDiscreteRandomDev
  */
-template < typename BaseRDV >
-class ClippedRedrawContinuousRandomDev : public BaseRDV
-{
+template <typename BaseRDV>
+class ClippedRedrawContinuousRandomDev : public BaseRDV {
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  ClippedRedrawContinuousRandomDev( RngPtr );
+  ClippedRedrawContinuousRandomDev(RngPtr);
   ClippedRedrawContinuousRandomDev(); // threaded
 
-#if not defined( HAVE_XLC_ICE_ON_USING ) and not defined( IS_K )
+#if not defined(HAVE_XLC_ICE_ON_USING) and not defined(IS_K)
   using RandomDev::operator();
 #endif
 
-  double operator()( void );
-  double operator()( RngPtr ) const; // threaded
+  double operator()(void);
+  double operator()(RngPtr) const; // threaded
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
 private:
   double min_; //!< lower bound
   double max_; //!< upper bound
 };
 
-template < typename BaseRDV >
-ClippedRedrawContinuousRandomDev< BaseRDV >::ClippedRedrawContinuousRandomDev(
-  RngPtr r )
-  : BaseRDV( r )
-  , min_( -std::numeric_limits< double >::infinity() )
-  , max_( std::numeric_limits< double >::infinity() )
-{
+template <typename BaseRDV>
+ClippedRedrawContinuousRandomDev<BaseRDV>::ClippedRedrawContinuousRandomDev(
+    RngPtr r)
+    : BaseRDV(r), min_(-std::numeric_limits<double>::infinity()),
+      max_(std::numeric_limits<double>::infinity()) {
   assert(
-    not BaseRDV::has_ldev() ); // ensure underlying distribution is continuous
+      not BaseRDV::has_ldev()); // ensure underlying distribution is continuous
 }
 
-template < typename BaseRDV >
-ClippedRedrawContinuousRandomDev< BaseRDV >::ClippedRedrawContinuousRandomDev()
-  : BaseRDV()
-  , min_( -std::numeric_limits< double >::infinity() )
-  , max_( std::numeric_limits< double >::infinity() )
-{
+template <typename BaseRDV>
+ClippedRedrawContinuousRandomDev<BaseRDV>::ClippedRedrawContinuousRandomDev()
+    : BaseRDV(), min_(-std::numeric_limits<double>::infinity()),
+      max_(std::numeric_limits<double>::infinity()) {
   assert(
-    not BaseRDV::has_ldev() ); // ensure underlying distribution is continuous
+      not BaseRDV::has_ldev()); // ensure underlying distribution is continuous
 }
 
-template < typename BaseRDV >
-void
-ClippedRedrawContinuousRandomDev< BaseRDV >::set_status(
-  const DictionaryDatum& d )
-{
-  BaseRDV::set_status( d );
+template <typename BaseRDV>
+void ClippedRedrawContinuousRandomDev<BaseRDV>::set_status(
+    const DictionaryDatum &d) {
+  BaseRDV::set_status(d);
 
   double new_min = min_;
   double new_max = max_;
 
-  updateValue< double >( d, names::low, new_min );
-  updateValue< double >( d, names::high, new_max );
-  if ( new_min >= new_max )
-  {
-    throw BadParameterValue( "Clipped RDVs require low < high." );
+  updateValue<double>(d, names::low, new_min);
+  updateValue<double>(d, names::high, new_max);
+  if (new_min >= new_max) {
+    throw BadParameterValue("Clipped RDVs require low < high.");
   }
 
   min_ = new_min;
   max_ = new_max;
 }
 
-template < typename BaseRDV >
-void
-ClippedRedrawContinuousRandomDev< BaseRDV >::get_status(
-  DictionaryDatum& d ) const
-{
-  BaseRDV::get_status( d );
+template <typename BaseRDV>
+void ClippedRedrawContinuousRandomDev<BaseRDV>::get_status(
+    DictionaryDatum &d) const {
+  BaseRDV::get_status(d);
 
-  def< double >( d, names::low, min_ );
-  def< double >( d, names::high, max_ );
+  def<double>(d, names::low, min_);
+  def<double>(d, names::high, max_);
 }
 
-template < typename BaseRDV >
-inline double
-ClippedRedrawContinuousRandomDev< BaseRDV >::operator()( void )
-{
-  return ( *this )( this->rng_ );
+template <typename BaseRDV>
+inline double ClippedRedrawContinuousRandomDev<BaseRDV>::operator()(void) {
+  return (*this)(this->rng_);
 }
 
-template < typename BaseRDV >
-inline double
-ClippedRedrawContinuousRandomDev< BaseRDV >::operator()( RngPtr r ) const
-{
+template <typename BaseRDV>
+inline double ClippedRedrawContinuousRandomDev<BaseRDV>::
+operator()(RngPtr r) const {
   double value;
 
-  do
-  {
-    value = BaseRDV::operator()( r );
-  } while ( value <= min_ || max_ <= value );
+  do {
+    value = BaseRDV::operator()(r);
+  } while (value <= min_ || max_ <= value);
 
   return value;
 }
@@ -201,133 +186,113 @@ ClippedRedrawContinuousRandomDev< BaseRDV >::operator()( RngPtr r ) const
  * @ingroup RandomDeviateGenerators
  * @see ClippedRedrawContinuousRandomDev
  */
-template < typename BaseRDV >
-class ClippedRedrawDiscreteRandomDev : public BaseRDV
-{
+template <typename BaseRDV>
+class ClippedRedrawDiscreteRandomDev : public BaseRDV {
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  ClippedRedrawDiscreteRandomDev( RngPtr );
+  ClippedRedrawDiscreteRandomDev(RngPtr);
   ClippedRedrawDiscreteRandomDev(); // threaded
 
   // Forwarding operators are explicitly defined here,
   // to ensure that they forward to the clipped generator.
   // Null-pointer checking is done in the underlying generator.
 
-#if not defined( HAVE_XLC_ICE_ON_USING ) and not defined( IS_K )
+#if not defined(HAVE_XLC_ICE_ON_USING) and not defined(IS_K)
   using RandomDev::operator();
   using RandomDev::ldev;
 #endif
 
-  double operator()( void );
-  double operator()( RngPtr ) const; // threaded
+  double operator()(void);
+  double operator()(RngPtr) const; // threaded
 
-  long ldev( void );
-  long ldev( RngPtr ) const;
-
+  long ldev(void);
+  long ldev(RngPtr) const;
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
 private:
   long min_; //!< smallest value
   long max_; //!< largest value
 };
 
-template < typename BaseRDV >
-ClippedRedrawDiscreteRandomDev< BaseRDV >::ClippedRedrawDiscreteRandomDev(
-  RngPtr r )
-  : BaseRDV( r )
-  , min_( std::numeric_limits< long >::min() )
-  , max_( std::numeric_limits< long >::max() )
-{
-  assert( BaseRDV::has_ldev() ); // ensure underlying distribution is discrete
+template <typename BaseRDV>
+ClippedRedrawDiscreteRandomDev<BaseRDV>::ClippedRedrawDiscreteRandomDev(
+    RngPtr r)
+    : BaseRDV(r), min_(std::numeric_limits<long>::min()),
+      max_(std::numeric_limits<long>::max()) {
+  assert(BaseRDV::has_ldev()); // ensure underlying distribution is discrete
 }
 
-template < typename BaseRDV >
-ClippedRedrawDiscreteRandomDev< BaseRDV >::ClippedRedrawDiscreteRandomDev()
-  : BaseRDV()
-  , min_( std::numeric_limits< long >::min() )
-  , max_( std::numeric_limits< long >::max() )
-{
-  assert( BaseRDV::has_ldev() ); // ensure underlying distribution is discrete
+template <typename BaseRDV>
+ClippedRedrawDiscreteRandomDev<BaseRDV>::ClippedRedrawDiscreteRandomDev()
+    : BaseRDV(), min_(std::numeric_limits<long>::min()),
+      max_(std::numeric_limits<long>::max()) {
+  assert(BaseRDV::has_ldev()); // ensure underlying distribution is discrete
 }
 
-template < typename BaseRDV >
-void
-ClippedRedrawDiscreteRandomDev< BaseRDV >::set_status(
-  const DictionaryDatum& d )
-{
-  BaseRDV::set_status( d );
+template <typename BaseRDV>
+void ClippedRedrawDiscreteRandomDev<BaseRDV>::set_status(
+    const DictionaryDatum &d) {
+  BaseRDV::set_status(d);
 
   long new_min = min_;
   long new_max = max_;
 
-  updateValue< long >( d, names::low, new_min );
-  updateValue< long >( d, names::high, new_max );
-  if ( new_min >= new_max )
-  {
-    throw BadParameterValue( "Clipped RDVs require low < high." );
+  updateValue<long>(d, names::low, new_min);
+  updateValue<long>(d, names::high, new_max);
+  if (new_min >= new_max) {
+    throw BadParameterValue("Clipped RDVs require low < high.");
   }
 
   min_ = new_min;
   max_ = new_max;
 }
 
-template < typename BaseRDV >
-void
-ClippedRedrawDiscreteRandomDev< BaseRDV >::get_status(
-  DictionaryDatum& d ) const
-{
-  BaseRDV::get_status( d );
+template <typename BaseRDV>
+void ClippedRedrawDiscreteRandomDev<BaseRDV>::get_status(
+    DictionaryDatum &d) const {
+  BaseRDV::get_status(d);
 
-  def< long >( d, names::low, min_ );
-  def< long >( d, names::high, max_ );
+  def<long>(d, names::low, min_);
+  def<long>(d, names::high, max_);
 }
 
-template < typename BaseRDV >
-inline double
-ClippedRedrawDiscreteRandomDev< BaseRDV >::operator()( void )
-{
-  return ( *this )( this->rng_ );
+template <typename BaseRDV>
+inline double ClippedRedrawDiscreteRandomDev<BaseRDV>::operator()(void) {
+  return (*this)(this->rng_);
 }
 
-template < typename BaseRDV >
-inline double
-ClippedRedrawDiscreteRandomDev< BaseRDV >::operator()( RngPtr r ) const
-{
+template <typename BaseRDV>
+inline double ClippedRedrawDiscreteRandomDev<BaseRDV>::
+operator()(RngPtr r) const {
   double value;
 
-  do
-  {
-    value = BaseRDV::operator()( r );
-  } while ( value < min_ || max_ < value );
+  do {
+    value = BaseRDV::operator()(r);
+  } while (value < min_ || max_ < value);
 
   return value;
 }
 
-template < typename BaseRDV >
-inline long
-ClippedRedrawDiscreteRandomDev< BaseRDV >::ldev( void )
-{
-  return ClippedRedrawDiscreteRandomDev< BaseRDV >::ldev( this->rng_ );
+template <typename BaseRDV>
+inline long ClippedRedrawDiscreteRandomDev<BaseRDV>::ldev(void) {
+  return ClippedRedrawDiscreteRandomDev<BaseRDV>::ldev(this->rng_);
 }
 
-template < typename BaseRDV >
-inline long
-ClippedRedrawDiscreteRandomDev< BaseRDV >::ldev( RngPtr r ) const
-{
+template <typename BaseRDV>
+inline long ClippedRedrawDiscreteRandomDev<BaseRDV>::ldev(RngPtr r) const {
   long value;
 
-  do
-  {
-    value = BaseRDV::ldev( r );
-  } while ( value < min_ || max_ < value );
+  do {
+    value = BaseRDV::ldev(r);
+  } while (value < min_ || max_ < value);
 
   return value;
 }
@@ -344,107 +309,92 @@ ClippedRedrawDiscreteRandomDev< BaseRDV >::ldev( RngPtr r ) const
  * @ingroup RandomDeviateGenerators
  * @see ClippedToBoundaryDiscreteRandomDev
  */
-template < typename BaseRDV >
-class ClippedToBoundaryContinuousRandomDev : public BaseRDV
-{
+template <typename BaseRDV>
+class ClippedToBoundaryContinuousRandomDev : public BaseRDV {
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  ClippedToBoundaryContinuousRandomDev( RngPtr );
+  ClippedToBoundaryContinuousRandomDev(RngPtr);
   ClippedToBoundaryContinuousRandomDev(); // threaded
 
-#if not defined( HAVE_XLC_ICE_ON_USING ) and not defined( IS_K )
+#if not defined(HAVE_XLC_ICE_ON_USING) and not defined(IS_K)
   using RandomDev::operator();
 #endif
 
-  double operator()( void );
-  double operator()( RngPtr ) const; // threaded
+  double operator()(void);
+  double operator()(RngPtr) const; // threaded
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
 private:
   double min_; //!< lower bound
   double max_; //!< upper bound
 };
 
-template < typename BaseRDV >
+template <typename BaseRDV>
 ClippedToBoundaryContinuousRandomDev<
-  BaseRDV >::ClippedToBoundaryContinuousRandomDev( RngPtr r )
-  : BaseRDV( r )
-  , min_( -std::numeric_limits< double >::infinity() )
-  , max_( std::numeric_limits< double >::infinity() )
-{
+    BaseRDV>::ClippedToBoundaryContinuousRandomDev(RngPtr r)
+    : BaseRDV(r), min_(-std::numeric_limits<double>::infinity()),
+      max_(std::numeric_limits<double>::infinity()) {
   assert(
-    not BaseRDV::has_ldev() ); // ensure underlying distribution is continuous
+      not BaseRDV::has_ldev()); // ensure underlying distribution is continuous
 }
 
-template < typename BaseRDV >
+template <typename BaseRDV>
 ClippedToBoundaryContinuousRandomDev<
-  BaseRDV >::ClippedToBoundaryContinuousRandomDev()
-  : BaseRDV()
-  , min_( -std::numeric_limits< double >::infinity() )
-  , max_( std::numeric_limits< double >::infinity() )
-{
+    BaseRDV>::ClippedToBoundaryContinuousRandomDev()
+    : BaseRDV(), min_(-std::numeric_limits<double>::infinity()),
+      max_(std::numeric_limits<double>::infinity()) {
   assert(
-    not BaseRDV::has_ldev() ); // ensure underlying distribution is continuous
+      not BaseRDV::has_ldev()); // ensure underlying distribution is continuous
 }
 
-template < typename BaseRDV >
-void
-ClippedToBoundaryContinuousRandomDev< BaseRDV >::set_status(
-  const DictionaryDatum& d )
-{
-  BaseRDV::set_status( d );
+template <typename BaseRDV>
+void ClippedToBoundaryContinuousRandomDev<BaseRDV>::set_status(
+    const DictionaryDatum &d) {
+  BaseRDV::set_status(d);
 
   double new_min = min_;
   double new_max = max_;
 
-  updateValue< double >( d, names::low, new_min );
-  updateValue< double >( d, names::high, new_max );
-  if ( new_min >= new_max )
-  {
-    throw BadParameterValue( "Clipped RDVs require low < high." );
+  updateValue<double>(d, names::low, new_min);
+  updateValue<double>(d, names::high, new_max);
+  if (new_min >= new_max) {
+    throw BadParameterValue("Clipped RDVs require low < high.");
   }
 
   min_ = new_min;
   max_ = new_max;
 }
 
-template < typename BaseRDV >
-void
-ClippedToBoundaryContinuousRandomDev< BaseRDV >::get_status(
-  DictionaryDatum& d ) const
-{
-  BaseRDV::get_status( d );
+template <typename BaseRDV>
+void ClippedToBoundaryContinuousRandomDev<BaseRDV>::get_status(
+    DictionaryDatum &d) const {
+  BaseRDV::get_status(d);
 
-  def< double >( d, names::low, min_ );
-  def< double >( d, names::high, max_ );
+  def<double>(d, names::low, min_);
+  def<double>(d, names::high, max_);
 }
 
-template < typename BaseRDV >
-inline double
-ClippedToBoundaryContinuousRandomDev< BaseRDV >::operator()( void )
-{
-  return ( *this )( this->rng_ );
+template <typename BaseRDV>
+inline double ClippedToBoundaryContinuousRandomDev<BaseRDV>::operator()(void) {
+  return (*this)(this->rng_);
 }
 
-template < typename BaseRDV >
-inline double
-ClippedToBoundaryContinuousRandomDev< BaseRDV >::operator()( RngPtr r ) const
-{
-  const double value = BaseRDV::operator()( r );
-  if ( value < min_ )
-  {
+template <typename BaseRDV>
+inline double ClippedToBoundaryContinuousRandomDev<BaseRDV>::
+operator()(RngPtr r) const {
+  const double value = BaseRDV::operator()(r);
+  if (value < min_) {
     return min_;
   }
-  if ( value > max_ )
-  {
+  if (value > max_) {
     return max_;
   }
   return value;
@@ -462,137 +412,115 @@ ClippedToBoundaryContinuousRandomDev< BaseRDV >::operator()( RngPtr r ) const
  * @ingroup RandomDeviateGenerators
  * @see ClippedToBoundaryContinuousRandomDev
  */
-template < typename BaseRDV >
-class ClippedToBoundaryDiscreteRandomDev : public BaseRDV
-{
+template <typename BaseRDV>
+class ClippedToBoundaryDiscreteRandomDev : public BaseRDV {
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  ClippedToBoundaryDiscreteRandomDev( RngPtr );
+  ClippedToBoundaryDiscreteRandomDev(RngPtr);
   ClippedToBoundaryDiscreteRandomDev(); // threaded
 
   // Forwarding operators are explicitly defined here,
   // to ensure that they forward to the clipped generator.
   // Null-pointer checking is done in the underlying generator.
 
-#if not defined( HAVE_XLC_ICE_ON_USING ) and not defined( IS_K )
+#if not defined(HAVE_XLC_ICE_ON_USING) and not defined(IS_K)
   using RandomDev::operator();
   using RandomDev::ldev;
 #endif
 
-  double operator()( void );
-  double operator()( RngPtr ) const; // threaded
+  double operator()(void);
+  double operator()(RngPtr) const; // threaded
 
-  long ldev( void );
-  long ldev( RngPtr ) const;
-
+  long ldev(void);
+  long ldev(RngPtr) const;
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
 private:
   long min_; //!< smallest value
   long max_; //!< largest value
 };
 
-template < typename BaseRDV >
-ClippedToBoundaryDiscreteRandomDev<
-  BaseRDV >::ClippedToBoundaryDiscreteRandomDev( RngPtr r )
-  : BaseRDV( r )
-  , min_( std::numeric_limits< long >::min() )
-  , max_( std::numeric_limits< long >::max() )
-{
-  assert( BaseRDV::has_ldev() ); // ensure underlying distribution is discrete
+template <typename BaseRDV>
+ClippedToBoundaryDiscreteRandomDev<BaseRDV>::ClippedToBoundaryDiscreteRandomDev(
+    RngPtr r)
+    : BaseRDV(r), min_(std::numeric_limits<long>::min()),
+      max_(std::numeric_limits<long>::max()) {
+  assert(BaseRDV::has_ldev()); // ensure underlying distribution is discrete
 }
 
-template < typename BaseRDV >
+template <typename BaseRDV>
 ClippedToBoundaryDiscreteRandomDev<
-  BaseRDV >::ClippedToBoundaryDiscreteRandomDev()
-  : BaseRDV()
-  , min_( std::numeric_limits< long >::min() )
-  , max_( std::numeric_limits< long >::max() )
-{
-  assert( BaseRDV::has_ldev() ); // ensure underlying distribution is discrete
+    BaseRDV>::ClippedToBoundaryDiscreteRandomDev()
+    : BaseRDV(), min_(std::numeric_limits<long>::min()),
+      max_(std::numeric_limits<long>::max()) {
+  assert(BaseRDV::has_ldev()); // ensure underlying distribution is discrete
 }
 
-template < typename BaseRDV >
-void
-ClippedToBoundaryDiscreteRandomDev< BaseRDV >::set_status(
-  const DictionaryDatum& d )
-{
-  BaseRDV::set_status( d );
+template <typename BaseRDV>
+void ClippedToBoundaryDiscreteRandomDev<BaseRDV>::set_status(
+    const DictionaryDatum &d) {
+  BaseRDV::set_status(d);
 
   long new_min = min_;
   long new_max = max_;
 
-  updateValue< long >( d, names::low, new_min );
-  updateValue< long >( d, names::high, new_max );
-  if ( new_min >= new_max )
-  {
-    throw BadParameterValue( "Clipped RDVs require low < high." );
+  updateValue<long>(d, names::low, new_min);
+  updateValue<long>(d, names::high, new_max);
+  if (new_min >= new_max) {
+    throw BadParameterValue("Clipped RDVs require low < high.");
   }
 
   min_ = new_min;
   max_ = new_max;
 }
 
-template < typename BaseRDV >
-void
-ClippedToBoundaryDiscreteRandomDev< BaseRDV >::get_status(
-  DictionaryDatum& d ) const
-{
-  BaseRDV::get_status( d );
+template <typename BaseRDV>
+void ClippedToBoundaryDiscreteRandomDev<BaseRDV>::get_status(
+    DictionaryDatum &d) const {
+  BaseRDV::get_status(d);
 
-  def< long >( d, names::low, min_ );
-  def< long >( d, names::high, max_ );
+  def<long>(d, names::low, min_);
+  def<long>(d, names::high, max_);
 }
 
-template < typename BaseRDV >
-inline double
-ClippedToBoundaryDiscreteRandomDev< BaseRDV >::operator()( void )
-{
-  return ( *this )( this->rng_ );
+template <typename BaseRDV>
+inline double ClippedToBoundaryDiscreteRandomDev<BaseRDV>::operator()(void) {
+  return (*this)(this->rng_);
 }
 
-template < typename BaseRDV >
-inline double
-ClippedToBoundaryDiscreteRandomDev< BaseRDV >::operator()( RngPtr r ) const
-{
-  const double value = BaseRDV::operator()( r );
-  if ( value < min_ )
-  {
+template <typename BaseRDV>
+inline double ClippedToBoundaryDiscreteRandomDev<BaseRDV>::
+operator()(RngPtr r) const {
+  const double value = BaseRDV::operator()(r);
+  if (value < min_) {
     return min_;
   }
-  if ( value > max_ )
-  {
+  if (value > max_) {
     return max_;
   }
   return value;
 }
 
-template < typename BaseRDV >
-inline long
-ClippedToBoundaryDiscreteRandomDev< BaseRDV >::ldev( void )
-{
-  return ClippedToBoundaryDiscreteRandomDev< BaseRDV >::ldev( this->rng_ );
+template <typename BaseRDV>
+inline long ClippedToBoundaryDiscreteRandomDev<BaseRDV>::ldev(void) {
+  return ClippedToBoundaryDiscreteRandomDev<BaseRDV>::ldev(this->rng_);
 }
 
-template < typename BaseRDV >
-inline long
-ClippedToBoundaryDiscreteRandomDev< BaseRDV >::ldev( RngPtr r ) const
-{
-  const long value = BaseRDV::ldev( r );
-  if ( value < min_ )
-  {
+template <typename BaseRDV>
+inline long ClippedToBoundaryDiscreteRandomDev<BaseRDV>::ldev(RngPtr r) const {
+  const long value = BaseRDV::ldev(r);
+  if (value < min_) {
     return min_;
   }
-  if ( value > max_ )
-  {
+  if (value > max_) {
     return max_;
   }
   return value;

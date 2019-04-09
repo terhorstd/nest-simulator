@@ -34,8 +34,7 @@
 #include "rate_transformer_node.h"
 #include "rate_transformer_node_impl.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: threshold_lin_rate - rate model with threshold-linear gain function
@@ -95,8 +94,7 @@ Author: David Dahmen, Jan Hahne, Jannis Schuecker
 SeeAlso: rate_connection_instantaneous, rate_connection_delayed
 */
 
-class nonlinearities_threshold_lin_rate
-{
+class nonlinearities_threshold_lin_rate {
 private:
   /** gain factor of gain function */
   double g_;
@@ -110,53 +108,39 @@ private:
 public:
   /** sets default parameters */
   nonlinearities_threshold_lin_rate()
-    : g_( 1.0 )
-    , theta_( 0.0 )
-    , alpha_( std::numeric_limits< double >::infinity() )
-  {
-  }
+      : g_(1.0), theta_(0.0), alpha_(std::numeric_limits<double>::infinity()) {}
 
-  void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-  void set( const DictionaryDatum& ); //!< Set values from dicitonary
+  void get(DictionaryDatum &) const; //!< Store current values in dictionary
+  void set(const DictionaryDatum &); //!< Set values from dicitonary
 
-  double input( double h );               // non-linearity on input
-  double mult_coupling_ex( double rate ); // factor of multiplicative coupling
-  double mult_coupling_in( double rate ); // factor of multiplicative coupling
+  double input(double h);               // non-linearity on input
+  double mult_coupling_ex(double rate); // factor of multiplicative coupling
+  double mult_coupling_in(double rate); // factor of multiplicative coupling
 };
 
-inline double
-nonlinearities_threshold_lin_rate::input( double h )
-{
-  return std::min( std::max( g_ * ( h - theta_ ), 0. ), alpha_ );
+inline double nonlinearities_threshold_lin_rate::input(double h) {
+  return std::min(std::max(g_ * (h - theta_), 0.), alpha_);
 }
 
-inline double
-nonlinearities_threshold_lin_rate::mult_coupling_ex( double rate )
-{
+inline double nonlinearities_threshold_lin_rate::mult_coupling_ex(double rate) {
   return 1.;
 }
 
-inline double
-nonlinearities_threshold_lin_rate::mult_coupling_in( double rate )
-{
+inline double nonlinearities_threshold_lin_rate::mult_coupling_in(double rate) {
   return 1.;
 }
 
-typedef rate_neuron_ipn< nest::nonlinearities_threshold_lin_rate >
-  threshold_lin_rate_ipn;
-typedef rate_neuron_opn< nest::nonlinearities_threshold_lin_rate >
-  threshold_lin_rate_opn;
-typedef rate_transformer_node< nest::nonlinearities_threshold_lin_rate >
-  rate_transformer_threshold_lin;
+typedef rate_neuron_ipn<nest::nonlinearities_threshold_lin_rate>
+    threshold_lin_rate_ipn;
+typedef rate_neuron_opn<nest::nonlinearities_threshold_lin_rate>
+    threshold_lin_rate_opn;
+typedef rate_transformer_node<nest::nonlinearities_threshold_lin_rate>
+    rate_transformer_threshold_lin;
 
-template <>
-void RecordablesMap< threshold_lin_rate_ipn >::create();
-template <>
-void RecordablesMap< threshold_lin_rate_opn >::create();
-template <>
-void RecordablesMap< rate_transformer_threshold_lin >::create();
+template <> void RecordablesMap<threshold_lin_rate_ipn>::create();
+template <> void RecordablesMap<threshold_lin_rate_opn>::create();
+template <> void RecordablesMap<rate_transformer_threshold_lin>::create();
 
 } // namespace nest
-
 
 #endif /* #ifndef THRESHOLD_LIN_RATE_H */

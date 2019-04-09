@@ -31,49 +31,37 @@
 #include "dictstack.h"
 #include "namedatum.h"
 
-void
-OOSupportModule::init( SLIInterpreter* i )
-{
-  i->createcommand( "call", &callmemberfunction );
+void OOSupportModule::init(SLIInterpreter *i) {
+  i->createcommand("call", &callmemberfunction);
 }
 
-const std::string
-OOSupportModule::commandstring( void ) const
-{
-  return std::string( "(oosupport.sli) run" );
+const std::string OOSupportModule::commandstring(void) const {
+  return std::string("(oosupport.sli) run");
 }
 
-const std::string
-OOSupportModule::name( void ) const
-{
-  return std::string( "OOSupport" );
+const std::string OOSupportModule::name(void) const {
+  return std::string("OOSupport");
 }
 
-void
-OOSupportModule::CallMemberFunction::execute( SLIInterpreter* i ) const
-{
+void OOSupportModule::CallMemberFunction::execute(SLIInterpreter *i) const {
   //  call: dict key call -> unknown
 
-  DictionaryDatum* dict =
-    dynamic_cast< DictionaryDatum* >( i->OStack.pick( 1 ).datum() );
-  assert( dict != NULL );
-  LiteralDatum* key =
-    dynamic_cast< LiteralDatum* >( i->OStack.pick( 0 ).datum() );
-  assert( key != NULL );
+  DictionaryDatum *dict =
+      dynamic_cast<DictionaryDatum *>(i->OStack.pick(1).datum());
+  assert(dict != NULL);
+  LiteralDatum *key = dynamic_cast<LiteralDatum *>(i->OStack.pick(0).datum());
+  assert(key != NULL);
 
-  Token value = ( *dict )->lookup( *key );
+  Token value = (*dict)->lookup(*key);
 
-  if ( value.datum() != NULL )
-  {
-    Token nt( new NameDatum( *key ) );
-    i->DStack->push( *dict );
+  if (value.datum() != NULL) {
+    Token nt(new NameDatum(*key));
+    i->DStack->push(*dict);
     i->EStack.pop(); // never forget me
-    i->EStack.push( i->baselookup( i->end_name ) );
-    i->EStack.push_move( nt );
-    i->OStack.pop( 2 );
-  }
-  else
-  {
-    i->raiseerror( "UnknownMember" );
+    i->EStack.push(i->baselookup(i->end_name));
+    i->EStack.push_move(nt);
+    i->OStack.pop(2);
+  } else {
+    i->raiseerror("UnknownMember");
   }
 }

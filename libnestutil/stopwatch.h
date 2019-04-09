@@ -30,8 +30,7 @@
 #include <cassert>
 #include <iostream>
 
-namespace nest
-{
+namespace nest {
 
 /***********************************************************************
  * Stopwatch                                                           *
@@ -63,15 +62,13 @@ namespace nest
  *     // > Time needed 1,8593 min. (on cerr)                          *
  *     // other units and output streams possible                      *
  ***********************************************************************/
-class Stopwatch
-{
+class Stopwatch {
 public:
   typedef size_t timestamp_t;
   typedef size_t timeunit_t;
 
-  enum
-  {
-    MICROSEC = ( timeunit_t ) 1,
+  enum {
+    MICROSEC = (timeunit_t)1,
     MILLISEC = MICROSEC * 1000,
     SECONDS = MILLISEC * 1000,
     MINUTES = SECONDS * 60,
@@ -79,15 +76,12 @@ public:
     DAYS = HOURS * 24
   };
 
-  static bool correct_timeunit( timeunit_t t );
+  static bool correct_timeunit(timeunit_t t);
 
   /**
    * Creates a stopwatch that is not running.
    */
-  Stopwatch()
-  {
-    reset();
-  }
+  Stopwatch() { reset(); }
 
   /**
    * Starts or resumes the stopwatch, if it is not running already.
@@ -112,7 +106,7 @@ public:
    * have to reset the timer, before stating the measurment.
    * Does not change the running state.
    */
-  double elapsed( timeunit_t timeunit = SECONDS ) const;
+  double elapsed(timeunit_t timeunit = SECONDS) const;
 
   /**
    * Returns the time elapsed between the start and stop of the
@@ -134,16 +128,14 @@ public:
   /**
    * This method prints out the currently elapsed time.
    */
-  void print( const char* msg = "",
-    timeunit_t timeunit = SECONDS,
-    std::ostream& os = std::cout ) const;
+  void print(const char *msg = "", timeunit_t timeunit = SECONDS,
+             std::ostream &os = std::cout) const;
 
   /**
    * Convenient method for writing time in seconds
    * to some ostream.
    */
-  friend std::ostream& operator<<( std::ostream& os,
-    const Stopwatch& stopwatch );
+  friend std::ostream &operator<<(std::ostream &os, const Stopwatch &stopwatch);
 
 private:
 #ifndef DISABLE_TIMING
@@ -158,19 +150,14 @@ private:
   static timestamp_t get_timestamp();
 };
 
-inline bool
-Stopwatch::correct_timeunit( timeunit_t t )
-{
-  return t == MICROSEC || t == MILLISEC || t == SECONDS || t == MINUTES
-    || t == HOURS || t == DAYS;
+inline bool Stopwatch::correct_timeunit(timeunit_t t) {
+  return t == MICROSEC || t == MILLISEC || t == SECONDS || t == MINUTES ||
+         t == HOURS || t == DAYS;
 }
 
-inline void
-nest::Stopwatch::start()
-{
+inline void nest::Stopwatch::start() {
 #ifndef DISABLE_TIMING
-  if ( not isRunning() )
-  {
+  if (not isRunning()) {
     _prev_elapsed += _end - _beg;  // store prev. time, if we resume
     _end = _beg = get_timestamp(); // invariant: _end >= _beg
     _running = true;               // we start running
@@ -178,21 +165,16 @@ nest::Stopwatch::start()
 #endif
 }
 
-inline void
-nest::Stopwatch::stop()
-{
+inline void nest::Stopwatch::stop() {
 #ifndef DISABLE_TIMING
-  if ( isRunning() )
-  {
+  if (isRunning()) {
     _end = get_timestamp(); // invariant: _end >= _beg
     _running = false;       // we stopped running
   }
 #endif
 }
 
-inline bool
-nest::Stopwatch::isRunning() const
-{
+inline bool nest::Stopwatch::isRunning() const {
 #ifndef DISABLE_TIMING
   return _running;
 #else
@@ -200,39 +182,30 @@ nest::Stopwatch::isRunning() const
 #endif
 }
 
-inline double
-nest::Stopwatch::elapsed( timeunit_t timeunit ) const
-{
+inline double nest::Stopwatch::elapsed(timeunit_t timeunit) const {
 #ifndef DISABLE_TIMING
-  assert( correct_timeunit( timeunit ) );
+  assert(correct_timeunit(timeunit));
   return 1.0 * elapsed_timestamp() / timeunit;
 #else
   return 0.0;
 #endif
 }
 
-inline nest::Stopwatch::timestamp_t
-nest::Stopwatch::elapsed_timestamp() const
-{
+inline nest::Stopwatch::timestamp_t nest::Stopwatch::elapsed_timestamp() const {
 #ifndef DISABLE_TIMING
-  if ( isRunning() )
-  {
+  if (isRunning()) {
     // get intermediate elapsed time; do not change _end, to be const
     return get_timestamp() - _beg + _prev_elapsed;
-  }
-  else
-  {
+  } else {
     // stopped before, get time of current measurment + last measurments
     return _end - _beg + _prev_elapsed;
   }
 #else
-  return ( timestamp_t ) 0;
+  return (timestamp_t)0;
 #endif
 }
 
-inline void
-nest::Stopwatch::reset()
-{
+inline void nest::Stopwatch::reset() {
 #ifndef DISABLE_TIMING
   _beg = 0; // invariant: _end >= _beg
   _end = 0;
@@ -241,17 +214,13 @@ nest::Stopwatch::reset()
 #endif
 }
 
-inline void
-nest::Stopwatch::print( const char* msg,
-  timeunit_t timeunit,
-  std::ostream& os ) const
-{
+inline void nest::Stopwatch::print(const char *msg, timeunit_t timeunit,
+                                   std::ostream &os) const {
 #ifndef DISABLE_TIMING
-  assert( correct_timeunit( timeunit ) );
-  double e = elapsed( timeunit );
+  assert(correct_timeunit(timeunit));
+  double e = elapsed(timeunit);
   os << msg << e;
-  switch ( timeunit )
-  {
+  switch (timeunit) {
   case MICROSEC:
     os << " microsec.";
     break;
@@ -272,26 +241,24 @@ nest::Stopwatch::print( const char* msg,
     break;
   }
 #ifdef DEBUG
-  os << " (running: " << ( _running ? "true" : "false" ) << ", begin: " << _beg
-     << ", end: " << _end << ", diff: " << ( _end - _beg )
+  os << " (running: " << (_running ? "true" : "false") << ", begin: " << _beg
+     << ", end: " << _end << ", diff: " << (_end - _beg)
      << ", prev: " << _prev_elapsed << ")";
 #endif
   os << std::endl;
 #endif
 }
 
-inline nest::Stopwatch::timestamp_t
-nest::Stopwatch::get_timestamp()
-{
+inline nest::Stopwatch::timestamp_t nest::Stopwatch::get_timestamp() {
   // works with:
   // * hambach (Linux 2.6.32 x86_64)
   // * JuQueen (BG/Q)
   // * MacOS 10.9
   struct timeval now;
-  gettimeofday( &now, ( struct timezone* ) 0 );
-  return ( nest::Stopwatch::timestamp_t ) now.tv_usec
-    + ( nest::Stopwatch::timestamp_t ) now.tv_sec * nest::Stopwatch::SECONDS;
+  gettimeofday(&now, (struct timezone *)0);
+  return (nest::Stopwatch::timestamp_t)now.tv_usec +
+         (nest::Stopwatch::timestamp_t)now.tv_sec * nest::Stopwatch::SECONDS;
 }
 
-} /* namespace timer */
+} // namespace nest
 #endif /* STOPWATCH_H */

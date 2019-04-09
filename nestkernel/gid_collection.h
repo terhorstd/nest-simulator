@@ -36,46 +36,38 @@
 #include "arraydatum.h"
 #include "tokenarray.h"
 
-namespace nest
-{
+namespace nest {
 
-class GIDCollection
-{
+class GIDCollection {
 
-  std::vector< index > gid_array_;
-  std::pair< index, index > gid_range_;
+  std::vector<index> gid_array_;
+  std::pair<index, index> gid_range_;
   bool is_range_;
 
 public:
-  class const_iterator
-  {
+  class const_iterator {
     friend class GIDCollection;
-    const_iterator( const GIDCollection* gc, size_t offset )
-      : gc_( gc )
-      , offset_( offset )
-    {
-    }
-    const GIDCollection* gc_;
+    const_iterator(const GIDCollection *gc, size_t offset)
+        : gc_(gc), offset_(offset) {}
+    const GIDCollection *gc_;
     size_t offset_;
 
   public:
     index operator*() const;
-    const const_iterator& operator++();
-    bool operator!=( const const_iterator& rhs ) const;
+    const const_iterator &operator++();
+    bool operator!=(const const_iterator &rhs) const;
   };
 
-  GIDCollection()
-  {
-  }
-  GIDCollection( index first, index last );
-  GIDCollection( IntVectorDatum gids );
-  GIDCollection( TokenArray gids );
+  GIDCollection() {}
+  GIDCollection(index first, index last);
+  GIDCollection(IntVectorDatum gids);
+  GIDCollection(TokenArray gids);
 
-  void print_me( std::ostream& out ) const;
+  void print_me(std::ostream &out) const;
 
-  index operator[]( const size_t pos ) const;
-  bool operator==( const GIDCollection& rhs ) const;
-  int find( const index ) const;
+  index operator[](const size_t pos) const;
+  bool operator==(const GIDCollection &rhs) const;
+  int find(const index) const;
   bool is_range() const;
 
   const_iterator begin() const;
@@ -84,26 +76,16 @@ public:
   size_t size() const;
 };
 
-inline int
-GIDCollection::find( const index neuron_id ) const
-{
-  if ( is_range_ )
-  {
-    if ( neuron_id > gid_range_.second )
-    {
+inline int GIDCollection::find(const index neuron_id) const {
+  if (is_range_) {
+    if (neuron_id > gid_range_.second) {
       return -1;
-    }
-    else
-    {
+    } else {
       return neuron_id - gid_range_.first;
     }
-  }
-  else
-  {
-    for ( size_t i = 0; i < gid_array_.size(); ++i )
-    {
-      if ( neuron_id == gid_array_[ i ] )
-      {
+  } else {
+    for (size_t i = 0; i < gid_array_.size(); ++i) {
+      if (neuron_id == gid_array_[i]) {
         return i;
       }
     }
@@ -111,82 +93,55 @@ GIDCollection::find( const index neuron_id ) const
   }
 }
 
-inline bool
-GIDCollection::is_range() const
-{
-  return is_range_;
+inline bool GIDCollection::is_range() const { return is_range_; }
+
+inline index GIDCollection::const_iterator::operator*() const {
+  return (*gc_)[offset_];
 }
 
-inline index GIDCollection::const_iterator::operator*() const
-{
-  return ( *gc_ )[ offset_ ];
-}
-
-inline const GIDCollection::const_iterator& GIDCollection::const_iterator::
-operator++()
-{
+inline const GIDCollection::const_iterator &GIDCollection::const_iterator::
+operator++() {
   ++offset_;
   return *this;
 }
 
-inline bool
-GIDCollection::const_iterator::operator!=(
-  const GIDCollection::const_iterator& rhs ) const
-{
+inline bool GIDCollection::const_iterator::
+operator!=(const GIDCollection::const_iterator &rhs) const {
   return offset_ != rhs.offset_;
 }
 
-inline index GIDCollection::operator[]( const size_t pos ) const
-{
-  if ( ( is_range_ and pos + gid_range_.first > gid_range_.second )
-    or ( not is_range_ and pos >= gid_array_.size() ) )
-  {
-    throw std::out_of_range( "pos points outside of the GIDCollection" );
+inline index GIDCollection::operator[](const size_t pos) const {
+  if ((is_range_ and pos + gid_range_.first > gid_range_.second) or
+      (not is_range_ and pos >= gid_array_.size())) {
+    throw std::out_of_range("pos points outside of the GIDCollection");
   }
-  if ( is_range_ )
-  {
+  if (is_range_) {
     return gid_range_.first + pos;
-  }
-  else
-  {
-    return gid_array_[ pos ];
+  } else {
+    return gid_array_[pos];
   }
 }
 
-inline bool
-GIDCollection::operator==( const GIDCollection& rhs ) const
-{
-  if ( is_range_ )
-  {
+inline bool GIDCollection::operator==(const GIDCollection &rhs) const {
+  if (is_range_) {
     return gid_range_ == rhs.gid_range_;
-  }
-  else
-  {
+  } else {
     return gid_array_ == rhs.gid_array_;
   }
 }
 
-inline GIDCollection::const_iterator
-GIDCollection::begin() const
-{
-  return const_iterator( this, 0 );
+inline GIDCollection::const_iterator GIDCollection::begin() const {
+  return const_iterator(this, 0);
 }
 
-inline GIDCollection::const_iterator
-GIDCollection::end() const
-{
-  return const_iterator( this, size() );
+inline GIDCollection::const_iterator GIDCollection::end() const {
+  return const_iterator(this, size());
 }
 
-inline size_t
-GIDCollection::size() const
-{
-  if ( is_range_ )
-  {
+inline size_t GIDCollection::size() const {
+  if (is_range_) {
     return gid_range_.second - gid_range_.first + 1;
-  }
-  else
-  {
+  } else {
     return gid_array_.size();
   }
 }

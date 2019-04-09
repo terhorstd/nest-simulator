@@ -32,9 +32,7 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-
-namespace nest
-{
+namespace nest {
 
 // forward declarations
 class ConnectorModel;
@@ -48,8 +46,7 @@ class TimeConverter;
  * If the synapse type does not have any common properties, this class may be
  * used as a placeholder.
  */
-class CommonSynapseProperties
-{
+class CommonSynapseProperties {
 public:
   /**
    * Standard constructor. Sets all common properties to default values.
@@ -64,24 +61,23 @@ public:
   /**
    * Get all properties and put them into a dictionary.
    */
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
   /**
    * Set properties from the values given in dictionary.
    */
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
-
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
   /**
    * Calibrate all time objects, which might be contained in this object.
    */
 
-  void calibrate( const TimeConverter& );
+  void calibrate(const TimeConverter &);
 
   /**
    * get reference to registering node
    */
-  Node* get_node();
+  Node *get_node();
 
   /**
    * get gid of volume transmitter
@@ -91,29 +87,22 @@ public:
   /**
    * get weight_recorder
    */
-  const SiblingContainer* get_weight_recorder() const;
-
+  const SiblingContainer *get_weight_recorder() const;
 
 private:
   /**
    * weight recorder
    */
-  const SiblingContainer* weight_recorder_;
+  const SiblingContainer *weight_recorder_;
 };
 
-inline long
-CommonSynapseProperties::get_vt_gid() const
-{
-  return -1;
-}
+inline long CommonSynapseProperties::get_vt_gid() const { return -1; }
 
-inline const SiblingContainer*
-CommonSynapseProperties::get_weight_recorder() const
-{
+inline const SiblingContainer *
+CommonSynapseProperties::get_weight_recorder() const {
   return weight_recorder_;
 }
 
-
-} // of namespace nest
+} // namespace nest
 
 #endif

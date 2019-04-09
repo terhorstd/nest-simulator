@@ -26,32 +26,22 @@
 #include <cassert>
 #include <ctime>
 
-nest::LoggingEvent::LoggingEvent( const nest::severity_t s,
-  const std::string& fctn,
-  const std::string& msg,
-  const std::string& file,
-  const size_t line )
-  : message( msg )
-  , function( fctn )
-  , severity( s )
-  , time_stamp( 0 )
-  , file_name( file )
-  , line_number( line )
-{
-  assert( severity > M_ALL );
-  assert( severity < M_QUIET );
-  time( const_cast< time_t* >( &time_stamp ) );
+nest::LoggingEvent::LoggingEvent(const nest::severity_t s,
+                                 const std::string &fctn,
+                                 const std::string &msg,
+                                 const std::string &file, const size_t line)
+    : message(msg), function(fctn), severity(s), time_stamp(0), file_name(file),
+      line_number(line) {
+  assert(severity > M_ALL);
+  assert(severity < M_QUIET);
+  time(const_cast<time_t *>(&time_stamp));
 }
 
-namespace nest
-{
+namespace nest {
 
-std::ostream&
-operator<<( std::ostream& out, const LoggingEvent& e )
-{
-  struct tm* ptm = localtime( &e.time_stamp );
-  switch ( e.severity )
-  {
+std::ostream &operator<<(std::ostream &out, const LoggingEvent &e) {
+  struct tm *ptm = localtime(&e.time_stamp);
+  switch (e.severity) {
   case M_ALL:
     out << "[ALL] ";
     break;
@@ -93,4 +83,4 @@ operator<<( std::ostream& out, const LoggingEvent& e )
 
   return out;
 }
-}
+} // namespace nest

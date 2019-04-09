@@ -32,78 +32,67 @@
 // Includes from libnestutil:
 #include "sort.h"
 
-namespace nest
-{
+namespace nest {
 
-void
-nest_quicksort( BlockVector< size_t >& bv0, BlockVector< size_t >& bv1 )
-{
-  nest::quicksort3way( bv0, bv1, 0, bv0.size() - 1 );
+void nest_quicksort(BlockVector<size_t> &bv0, BlockVector<size_t> &bv1) {
+  nest::quicksort3way(bv0, bv1, 0, bv0.size() - 1);
 }
 
-const bool
-is_sorted( BlockVector< size_t >::const_iterator begin,
-  BlockVector< size_t >::const_iterator end )
-{
-  for ( BlockVector< size_t >::const_iterator it = begin; it < --end; )
-  {
-    if ( *it > *( ++it ) )
-    {
+const bool is_sorted(BlockVector<size_t>::const_iterator begin,
+                     BlockVector<size_t>::const_iterator end) {
+  for (BlockVector<size_t>::const_iterator it = begin; it < --end;) {
+    if (*it > *(++it)) {
       return false;
     }
   }
   return true;
 }
 
-BOOST_AUTO_TEST_SUITE( test_sort )
+BOOST_AUTO_TEST_SUITE(test_sort)
 
 /**
  * Tests whether two arrays with randomly generated numbers are sorted
  * correctly by a single call to sort.
  */
-BOOST_AUTO_TEST_CASE( test_random )
-{
+BOOST_AUTO_TEST_CASE(test_random) {
   const size_t N = 20000;
-  BlockVector< size_t > bv0( N );
-  BlockVector< size_t > bv1( N );
+  BlockVector<size_t> bv0(N);
+  BlockVector<size_t> bv1(N);
 
-  for ( size_t i = 0; i < N; ++i )
-  {
+  for (size_t i = 0; i < N; ++i) {
     const size_t k = std::rand() % N;
-    bv0[ i ] = k;
-    bv1[ i ] = k;
+    bv0[i] = k;
+    bv1[i] = k;
   }
 
-  nest_quicksort( bv0, bv1 );
+  nest_quicksort(bv0, bv1);
 
-  BOOST_REQUIRE( is_sorted( bv0.begin(), bv0.end() ) );
-  BOOST_REQUIRE( is_sorted( bv1.begin(), bv1.end() ) );
+  BOOST_REQUIRE(is_sorted(bv0.begin(), bv0.end()));
+  BOOST_REQUIRE(is_sorted(bv1.begin(), bv1.end()));
 }
 
 /**
  * Tests whether two arrays with linearly increasing numbers are sorted
  * correctly by a single call to sort.
  */
-BOOST_AUTO_TEST_CASE( test_linear )
-{
+BOOST_AUTO_TEST_CASE(test_linear) {
   const size_t N = 20000;
-  BlockVector< size_t > bv0( N );
-  BlockVector< size_t > bv1( N );
+  BlockVector<size_t> bv0(N);
+  BlockVector<size_t> bv1(N);
 
-  for ( size_t i = 0; i < N; ++i )
-  {
-    bv0[ i ] = N - i - 1;
-    bv1[ i ] = N - i - 1;
+  for (size_t i = 0; i < N; ++i) {
+    bv0[i] = N - i - 1;
+    bv1[i] = N - i - 1;
   }
 
-  nest_quicksort( bv0, bv1 );
+  nest_quicksort(bv0, bv1);
 
-  BOOST_REQUIRE( is_sorted( bv0.begin(), bv0.end() ) );
-  BOOST_REQUIRE( is_sorted( bv1.begin(), bv1.end() ) );
+  BOOST_REQUIRE(is_sorted(bv0.begin(), bv0.end()));
+  BOOST_REQUIRE(is_sorted(bv1.begin(), bv1.end()));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-} // of namespace nest
+} // namespace nest
 
 #endif /* TEST_SORT_H */

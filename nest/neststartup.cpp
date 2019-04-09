@@ -60,41 +60,33 @@
 #include "slistartup.h"
 #include "specialfunctionsmodule.h"
 
-#if defined( _BUILD_NEST_CLI ) && defined( HAVE_READLINE )
+#if defined(_BUILD_NEST_CLI) && defined(HAVE_READLINE)
 #include <gnureadline.h>
 #endif
 
-SLIInterpreter* sli_engine;
+SLIInterpreter *sli_engine;
 
-SLIInterpreter&
-get_engine()
-{
-  assert( sli_engine );
+SLIInterpreter &get_engine() {
+  assert(sli_engine);
   return *sli_engine;
 }
 
-void
-sli_logging( const nest::LoggingEvent& e )
-{
-  sli_engine->message(
-    static_cast< int >( e.severity ), e.function.c_str(), e.message.c_str() );
+void sli_logging(const nest::LoggingEvent &e) {
+  sli_engine->message(static_cast<int>(e.severity), e.function.c_str(),
+                      e.message.c_str());
 }
 
 #ifndef _IS_PYNEST
-int
-neststartup( int* argc, char*** argv, SLIInterpreter& engine )
+int neststartup(int *argc, char ***argv, SLIInterpreter &engine)
 #else
-int
-neststartup( int* argc,
-  char*** argv,
-  SLIInterpreter& engine,
-  std::string modulepath )
+int neststartup(int *argc, char ***argv, SLIInterpreter &engine,
+                std::string modulepath)
 #endif
 {
-  nest::init_nest( argc, argv );
+  nest::init_nest(argc, argv);
 
   sli_engine = &engine;
-  register_logger_client( sli_logging );
+  register_logger_client(sli_logging);
 
 // We disable synchronization between stdio and istd::ostreams
 // this has to be done before any in- or output has been done.
@@ -103,49 +95,49 @@ neststartup( int* argc,
  *       in all cases. Can it be removed (or simplified, if I'm wrong ;-)
  */
 #ifdef __GNUC__
-#if __GNUC__ < 3 || ( __GNUC__ == 3 && __GNUC_MINOR__ < 1 )
+#if __GNUC__ < 3 || (__GNUC__ == 3 && __GNUC_MINOR__ < 1)
   // Broken with GCC 3.1 and higher.
   // cin.get() never returns, or leaves cin in a broken state.
-  std::ios::sync_with_stdio( false );
+  std::ios::sync_with_stdio(false);
 #endif
 #else
   // This is for all other compilers
-  std::ios::sync_with_stdio( false );
+  std::ios::sync_with_stdio(false);
 #endif
 
-  addmodule< OOSupportModule >( engine );
-  addmodule< RandomNumbers >( engine );
+  addmodule<OOSupportModule>(engine);
+  addmodule<RandomNumbers>(engine);
 
-#if defined( _BUILD_NEST_CLI ) && defined( HAVE_READLINE )
-  addmodule< GNUReadline >( engine );
+#if defined(_BUILD_NEST_CLI) && defined(HAVE_READLINE)
+  addmodule<GNUReadline>(engine);
 #endif
 
-  addmodule< SLIArrayModule >( engine );
-  addmodule< SpecialFunctionsModule >( engine ); // safe without GSL
-  addmodule< SLIgraphics >( engine );
-  engine.addmodule( new SLIStartup( *argc, *argv ) );
-  addmodule< Processes >( engine );
-  addmodule< RegexpModule >( engine );
-  addmodule< FilesystemModule >( engine );
+  addmodule<SLIArrayModule>(engine);
+  addmodule<SpecialFunctionsModule>(engine); // safe without GSL
+  addmodule<SLIgraphics>(engine);
+  engine.addmodule(new SLIStartup(*argc, *argv));
+  addmodule<Processes>(engine);
+  addmodule<RegexpModule>(engine);
+  addmodule<FilesystemModule>(engine);
 
   // register NestModule class
-  addmodule< nest::NestModule >( engine );
+  addmodule<nest::NestModule>(engine);
 
   // this can make problems with reference counting, if
   // the intepreter decides cleans up memory before NEST is ready
-  engine.def( "modeldict", nest::kernel().model_manager.get_modeldict() );
-  engine.def( "synapsedict", nest::kernel().model_manager.get_synapsedict() );
-  engine.def(
-    "connruledict", nest::kernel().connection_manager.get_connruledict() );
-  engine.def(
-    "growthcurvedict", nest::kernel().sp_manager.get_growthcurvedict() );
+  engine.def("modeldict", nest::kernel().model_manager.get_modeldict());
+  engine.def("synapsedict", nest::kernel().model_manager.get_synapsedict());
+  engine.def("connruledict",
+             nest::kernel().connection_manager.get_connruledict());
+  engine.def("growthcurvedict",
+             nest::kernel().sp_manager.get_growthcurvedict());
 
   // register sli_neuron
-  nest::kernel().model_manager.register_node_model< nest::sli_neuron >(
-    "sli_neuron" );
+  nest::kernel().model_manager.register_node_model<nest::sli_neuron>(
+      "sli_neuron");
 
   // now add static modules providing models
-  add_static_modules( engine );
+  add_static_modules(engine);
 
 /*
  * The following section concerns shared user modules and is thus only
@@ -161,50 +153,43 @@ neststartup( int* argc,
 #ifdef HAVE_LIBLTDL
   // dynamic loader module for managing linked and dynamically loaded extension
   // modules
-  nest::DynamicLoaderModule* pDynLoader =
-    new nest::DynamicLoaderModule( engine );
+  nest::DynamicLoaderModule *pDynLoader = new nest::DynamicLoaderModule(engine);
 
 // initialize all modules that were linked into at compile time
 // these modules have registered via calling DynamicLoader::registerLinkedModule
 // from their constructor
 #ifndef IS_BLUEGENE
-  pDynLoader->initLinkedModules( engine );
+  pDynLoader->initLinkedModules(engine);
 
   // interpreter will delete module on destruction
-  engine.addmodule( pDynLoader );
+  engine.addmodule(pDynLoader);
 #endif
 #endif
 
 #ifdef _IS_PYNEST
   // add the init-script to the list of module initializers
-  ArrayDatum* ad = dynamic_cast< ArrayDatum* >(
-    engine.baselookup( engine.commandstring_name ).datum() );
-  assert( ad != NULL );
-  ad->push_back(
-    new StringDatum( "(" + modulepath + "/pynest-init.sli) run" ) );
+  ArrayDatum *ad = dynamic_cast<ArrayDatum *>(
+      engine.baselookup(engine.commandstring_name).datum());
+  assert(ad != NULL);
+  ad->push_back(new StringDatum("(" + modulepath + "/pynest-init.sli) run"));
 #endif
 
   return engine.startup();
 }
 
-void
-nestshutdown( int exitcode )
-{
-  nest::kernel().mpi_manager.mpi_finalize( exitcode );
+void nestshutdown(int exitcode) {
+  nest::kernel().mpi_manager.mpi_finalize(exitcode);
   nest::KernelManager::destroy_kernel_manager();
 }
 
-#if defined( HAVE_LIBNEUROSIM ) && defined( _IS_PYNEST )
-Datum*
-CYTHON_unpackConnectionGeneratorDatum( PyObject* obj )
-{
-  Datum* ret = NULL;
-  ConnectionGenerator* cg = NULL;
+#if defined(HAVE_LIBNEUROSIM) && defined(_IS_PYNEST)
+Datum *CYTHON_unpackConnectionGeneratorDatum(PyObject *obj) {
+  Datum *ret = NULL;
+  ConnectionGenerator *cg = NULL;
 
-  cg = PNS::unpackConnectionGenerator( obj );
-  if ( cg != NULL )
-  {
-    ret = static_cast< Datum* >( new nest::ConnectionGeneratorDatum( cg ) );
+  cg = PNS::unpackConnectionGenerator(obj);
+  if (cg != NULL) {
+    ret = static_cast<Datum *>(new nest::ConnectionGeneratorDatum(cg));
   }
 
   return ret;

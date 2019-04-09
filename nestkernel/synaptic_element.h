@@ -93,8 +93,7 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 
 /**
  * \class SynapticElement
@@ -107,8 +106,7 @@ namespace nest
  * node). The probability of two neurons creating a new synapse between them,
  * depends on the number of available synaptic elements of each neuron.
  */
-class SynapticElement
-{
+class SynapticElement {
 
 public:
   /**
@@ -122,38 +120,34 @@ public:
    * Copy Constructor.
    * @param se SynapticElement
    */
-  SynapticElement( const SynapticElement& se );
+  SynapticElement(const SynapticElement &se);
 
   /**
    * \fn SynapticElement(const SynapticElement& se)
    * copy assignment operator.
    * @param other SynapticElement
    */
-  SynapticElement& operator=( const SynapticElement& other );
+  SynapticElement &operator=(const SynapticElement &other);
 
   /**
    * \fn SynapticElement()
    * Destructor.
    */
-  ~SynapticElement()
-  {
-    delete growth_curve_;
-  }
+  ~SynapticElement() { delete growth_curve_; }
 
   /**
    * \fn void get(DictionaryDatum&) const
    * Store current values in a dictionary.
    * @param d to write data
    */
-  void get( DictionaryDatum& d ) const;
+  void get(DictionaryDatum &d) const;
 
   /**
    * \fn void set(const DictionaryDatum&)
    * Set values from a dictionary.
    * @param d to take data from
    */
-  void set( const DictionaryDatum& d );
-
+  void set(const DictionaryDatum &d);
 
   /*
    * Updates the number of available synaptic elements according to the mean
@@ -163,7 +157,7 @@ public:
    * @param Ca_minus Calcium concentration at time t_minus
    * @param tau_Ca change in the calcium concentration on each spike
    */
-  void update( double t, double t_minus, double Ca_minus, double tau_Ca );
+  void update(double t, double t_minus, double Ca_minus, double tau_Ca);
 
   /**
    * \fn double get_z_value(Archiving_Node const *a, double t) const
@@ -173,49 +167,31 @@ public:
    * @param a node of this synaptic_element
    * @param t Current time (in ms)
    */
-  int
-  get_z_vacant() const
-  {
-    return std::floor( z_ ) - z_connected_;
-  }
+  int get_z_vacant() const { return std::floor(z_) - z_connected_; }
   /*
    * Retrieves the current number of synaptic elements bound to a synapse
    */
-  int
-  get_z_connected() const
-  {
-    return z_connected_;
-  }
+  int get_z_connected() const { return z_connected_; }
   /*
    * Retrieves the value of tau_vacant
    */
-  double
-  get_tau_vacant() const
-  {
-    return tau_vacant_;
-  }
+  double get_tau_vacant() const { return tau_vacant_; }
   /*
    * Changes the number of bound synaptic elements by n.
    * @param n number of new connections. Can be negative.
    */
-  void
-  connect( int n )
-  {
+  void connect(int n) {
     z_connected_ += n;
-    if ( z_connected_ > floor( z_ ) )
-    {
-      z_ = z_connected_ + ( z_ - floor( z_ ) );
+    if (z_connected_ > floor(z_)) {
+      z_ = z_connected_ + (z_ - floor(z_));
     }
   }
 
   /*
    * Used to define the dynamics of the synaptic elements using a Growth Curve
    */
-  void
-  set_growth_curve( GrowthCurve& g )
-  {
-    if ( growth_curve_ != &g )
-    {
+  void set_growth_curve(GrowthCurve &g) {
+    if (growth_curve_ != &g) {
       delete growth_curve_;
       growth_curve_ = &g;
     }
@@ -224,40 +200,21 @@ public:
   /*
    * Retrieves the current value of the growth rate
    */
-  double
-  get_growth_rate() const
-  {
-    return growth_rate_;
-  }
+  double get_growth_rate() const { return growth_rate_; }
 
-  void
-  set_z( const double z_new )
-  {
-    z_ = z_new;
-  }
-  double
-  get_z() const
-  {
-    return z_;
-  }
+  void set_z(const double z_new) { z_ = z_new; }
+  double get_z() const { return z_; }
   /**
    * Reduce the amount of vacant synaptic elements by a factor
    * of tau_vacant_
    */
-  void
-  decay_z_vacant()
-  {
-    if ( get_z_vacant() > 0 )
-    {
+  void decay_z_vacant() {
+    if (get_z_vacant() > 0) {
       z_ -= get_z_vacant() * tau_vacant_;
     }
   }
 
-  bool
-  continuous() const
-  {
-    return continuous_;
-  }
+  bool continuous() const { return continuous_; }
 
 private:
   // The current number of synaptic elements at t = z_t_
@@ -275,9 +232,9 @@ private:
   // Rate at which vacant synaptic elements will decay
   double tau_vacant_;
   // Growth curve which defines the dynamics of this synaptic element.
-  GrowthCurve* growth_curve_;
+  GrowthCurve *growth_curve_;
 };
 
-} // of namespace
+} // namespace nest
 
 #endif

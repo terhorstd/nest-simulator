@@ -32,8 +32,7 @@
 
 #include "nest.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: gif_psc_exp_multisynapse - Current-based generalized
@@ -145,12 +144,11 @@ Author: March 2016, Setareh
 
 SeeAlso: pp_psc_delta, gif_psc_exp, gif_cond_exp, gif_cond_exp_multisynapse
 */
-class gif_psc_exp_multisynapse : public Archiving_Node
-{
+class gif_psc_exp_multisynapse : public Archiving_Node {
 
 public:
   gif_psc_exp_multisynapse();
-  gif_psc_exp_multisynapse( const gif_psc_exp_multisynapse& );
+  gif_psc_exp_multisynapse(const gif_psc_exp_multisynapse &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -160,44 +158,42 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< gif_psc_exp_multisynapse >;
-  friend class UniversalDataLogger< gif_psc_exp_multisynapse >;
+  friend class RecordablesMap<gif_psc_exp_multisynapse>;
+  friend class UniversalDataLogger<gif_psc_exp_multisynapse>;
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double g_L_;
     double E_L_;
     double V_reset_;
     double Delta_V_;
     double V_T_star_;
     double lambda_0_; /** 1/ms */
-
 
     /** Refractory period in ms. */
     double t_ref_;
@@ -209,19 +205,19 @@ private:
     (mentioned in the references). */
 
     /** List of spike triggered current time constant in ms. */
-    std::vector< double > tau_stc_;
+    std::vector<double> tau_stc_;
 
     /** List of spike triggered current jumps in nA. */
-    std::vector< double > q_stc_;
+    std::vector<double> q_stc_;
 
     /** List of adaptive threshold time constant in ms. */
-    std::vector< double > tau_sfa_;
+    std::vector<double> tau_sfa_;
 
     /** List of adaptive threshold jumps in mV. */
-    std::vector< double > q_sfa_;
+    std::vector<double> q_sfa_;
 
     /** Time constants of synaptic currents in ms */
-    std::vector< double > tau_syn_;
+    std::vector<double> tau_syn_;
 
     /** boolean flag which indicates whether the neuron has connections */
     bool has_connections_;
@@ -231,15 +227,11 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dictionary
 
     //! Return the number of receptor ports
-    inline size_t
-    n_receptors_() const
-    {
-      return tau_syn_.size();
-    }
+    inline size_t n_receptors_() const { return tau_syn_.size(); }
   };
 
   // ----------------------------------------------------------------
@@ -247,26 +239,25 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
     double I_stim_; //!< This is piecewise constant external current
     double V_;      //!< This is the membrane potential
     double sfa_; //!< This is the change of the 'threshold' due to adaptation.
     double stc_; //!< Spike triggered current.
 
-    std::vector< double > sfa_elems_; //!< Vector of adaptation parameters.
-    std::vector< double > stc_elems_; //!< Vector of spike triggered parameters.
+    std::vector<double> sfa_elems_; //!< Vector of adaptation parameters.
+    std::vector<double> stc_elems_; //!< Vector of spike triggered parameters.
 
-    std::vector< double >
-      i_syn_; //!< instantaneous currents of different synapses.
+    std::vector<double>
+        i_syn_; //!< instantaneous currents of different synapses.
 
     //!< absolute refractory counter (no membrane potential propagation)
     unsigned int r_ref_;
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum&, const Parameters_& ) const;
-    void set( const DictionaryDatum&, const Parameters_& );
+    void get(DictionaryDatum &, const Parameters_ &) const;
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ----------------------------------------------------------------
@@ -274,17 +265,16 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( gif_psc_exp_multisynapse& );
-    Buffers_( const Buffers_&, gif_psc_exp_multisynapse& );
+  struct Buffers_ {
+    Buffers_(gif_psc_exp_multisynapse &);
+    Buffers_(const Buffers_ &, gif_psc_exp_multisynapse &);
 
     /** buffers and sums up incoming spikes/currents */
-    std::vector< RingBuffer > spikes_;
+    std::vector<RingBuffer> spikes_;
     RingBuffer currents_;
 
     //! Logger for all analog data
-    UniversalDataLogger< gif_psc_exp_multisynapse > logger_;
+    UniversalDataLogger<gif_psc_exp_multisynapse> logger_;
   };
 
   // ----------------------------------------------------------------
@@ -292,19 +282,18 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
     double P30_; // coefficient for solving membrane potential equation
     double P33_; // decay term of membrane potential
     double P31_; // coefficient for solving membrane potential equation
 
-    std::vector< double >
-      P_sfa_; // decay terms of spike-triggered current elements
-    std::vector< double > P_stc_; // decay terms of adaptive threshold elements
+    std::vector<double>
+        P_sfa_; // decay terms of spike-triggered current elements
+    std::vector<double> P_stc_; // decay terms of adaptive threshold elements
 
-    std::vector< double > P11_syn_; // decay terms of synaptic currents
-    std::vector< double >
-      P21_syn_; // coefficients for solving membrane potential equation
+    std::vector<double> P11_syn_; // decay terms of synaptic currents
+    std::vector<double>
+        P21_syn_; // coefficients for solving membrane potential equation
 
     librandom::RngPtr rng_; // random number generator of my own thread
 
@@ -314,25 +303,13 @@ private:
   // Access functions for UniversalDataLogger -----------------------
 
   //! Read out the real membrane potential
-  double
-  get_V_m_() const
-  {
-    return S_.V_;
-  }
+  double get_V_m_() const { return S_.V_; }
 
   //! Read out the adaptive threshold potential
-  double
-  get_E_sfa_() const
-  {
-    return S_.sfa_;
-  }
+  double get_E_sfa_() const { return S_.sfa_; }
 
   //! Read out the spike triggered current
-  double
-  get_I_stc_() const
-  {
-    return S_.stc_;
-  }
+  double get_I_stc_() const { return S_.stc_; }
 
   // ----------------------------------------------------------------
 
@@ -350,84 +327,70 @@ private:
   /** @} */
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< gif_psc_exp_multisynapse > recordablesMap_;
+  static RecordablesMap<gif_psc_exp_multisynapse> recordablesMap_;
 };
 
-inline port
-gif_psc_exp_multisynapse::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port gif_psc_exp_multisynapse::send_test_event(Node &target,
+                                                      rport receptor_type,
+                                                      synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-gif_psc_exp_multisynapse::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type <= 0
-    || receptor_type > static_cast< port >( P_.n_receptors_() ) )
-  {
-    throw IncompatibleReceptorType( receptor_type, get_name(), "SpikeEvent" );
+inline port gif_psc_exp_multisynapse::handles_test_event(SpikeEvent &,
+                                                         rport receptor_type) {
+  if (receptor_type <= 0 ||
+      receptor_type > static_cast<port>(P_.n_receptors_())) {
+    throw IncompatibleReceptorType(receptor_type, get_name(), "SpikeEvent");
   }
 
   P_.has_connections_ = true;
   return receptor_type;
 }
 
-inline port
-gif_psc_exp_multisynapse::handles_test_event( CurrentEvent&,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port gif_psc_exp_multisynapse::handles_test_event(CurrentEvent &,
+                                                         rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
 inline port
-gif_psc_exp_multisynapse::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+gif_psc_exp_multisynapse::handles_test_event(DataLoggingRequest &dlr,
+                                             rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-gif_psc_exp_multisynapse::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d, P_ );
-  Archiving_Node::get_status( d );
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+inline void gif_psc_exp_multisynapse::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d, P_);
+  Archiving_Node::get_status(d);
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-gif_psc_exp_multisynapse::set_status( const DictionaryDatum& d )
-{
+inline void gif_psc_exp_multisynapse::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
   State_ stmp = S_;      // temporary copy in case of errors
-  stmp.set( d, ptmp );   // throws if BadProperty
+  stmp.set(d, ptmp);     // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef GIF_PSC_EXP_MULTISYNAPSE_H */

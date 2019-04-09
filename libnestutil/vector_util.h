@@ -26,25 +26,20 @@
 #include <cstddef>
 #include <vector>
 
-namespace vector_util
-{
+namespace vector_util {
 
-template < typename T >
-inline void
-grow( std::vector< T >& v )
-{
+template <typename T> inline void grow(std::vector<T> &v) {
   // set maximal growth of vector to 256MiB; this allows for fast
   // growth while the vector is small, but limits capacity wasted
   // while growing large vectors; value determined by experimenting
   // with different max block sizes
   const size_t max_block_size_MiB = 256;
-  const size_t max_block_size = static_cast< size_t >(
-    max_block_size_MiB * ( 2 << 20 ) / static_cast< double >( sizeof( T ) ) );
+  const size_t max_block_size = static_cast<size_t>(
+      max_block_size_MiB * (2 << 20) / static_cast<double>(sizeof(T)));
 
-  if ( v.size() == v.capacity() )
-  {
-    v.reserve( v.size() < max_block_size ? 2 * v.size()
-                                         : ( v.size() + max_block_size ) );
+  if (v.size() == v.capacity()) {
+    v.reserve(v.size() < max_block_size ? 2 * v.size()
+                                        : (v.size() + max_block_size));
   }
 }
 

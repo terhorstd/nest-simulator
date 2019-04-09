@@ -34,8 +34,7 @@
 #include "ring_buffer.h"
 #include "universal_data_logger.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: pp_pop_psc_delta - Population of point process neurons with leaky
@@ -148,12 +147,11 @@ Author: May 2014, Setareh, Deger
 SeeAlso: gif_pop_psc_exp, pp_psc_delta, ppd_sup_generator,
 gamma_sup_generator
 */
-class pp_pop_psc_delta : public Node
-{
+class pp_pop_psc_delta : public Node {
 
 public:
   pp_pop_psc_delta();
-  pp_pop_psc_delta( const pp_pop_psc_delta& );
+  pp_pop_psc_delta(const pp_pop_psc_delta &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -163,37 +161,36 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< pp_pop_psc_delta >;
-  friend class UniversalDataLogger< pp_pop_psc_delta >;
+  friend class RecordablesMap<pp_pop_psc_delta>;
+  friend class UniversalDataLogger<pp_pop_psc_delta>;
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
 
     /** Number of neurons in the population. */
     int N_; // by Hesam
@@ -217,14 +214,14 @@ private:
     double I_e_;
 
     /** Array of time constants */
-    std::vector< double > tau_eta_;
+    std::vector<double> tau_eta_;
 
     /** -------------- */
-    std::vector< double > val_eta_;
+    std::vector<double> val_eta_;
 
-    Parameters_();                      //!< Sets default parameter values
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dictionary
+    Parameters_();                     //!< Sets default parameter values
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dictionary
   };
 
   // ----------------------------------------------------------------
@@ -232,17 +229,16 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
 
     double y0_;
     double h_;
 
-    std::vector< int > age_occupations_;
-    std::vector< double > thetas_ages_;
-    std::vector< int > n_spikes_past_;
-    std::vector< int > n_spikes_ages_;
-    std::vector< double > rhos_ages_;
+    std::vector<int> age_occupations_;
+    std::vector<double> thetas_ages_;
+    std::vector<int> n_spikes_past_;
+    std::vector<int> n_spikes_ages_;
+    std::vector<double> rhos_ages_;
 
     // ring array pointers
     int p_age_occupations_;
@@ -252,8 +248,8 @@ private:
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum&, const Parameters_& ) const;
-    void set( const DictionaryDatum&, const Parameters_& );
+    void get(DictionaryDatum &, const Parameters_ &) const;
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ----------------------------------------------------------------
@@ -261,17 +257,16 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( pp_pop_psc_delta& );
-    Buffers_( const Buffers_&, pp_pop_psc_delta& );
+  struct Buffers_ {
+    Buffers_(pp_pop_psc_delta &);
+    Buffers_(const Buffers_ &, pp_pop_psc_delta &);
 
     /** buffers and sums up incoming spikes/currents */
     RingBuffer spikes_;
     RingBuffer currents_;
 
     //! Logger for all analog data
-    UniversalDataLogger< pp_pop_psc_delta > logger_;
+    UniversalDataLogger<pp_pop_psc_delta> logger_;
   };
 
   // ----------------------------------------------------------------
@@ -279,25 +274,21 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
-
+  struct Variables_ {
 
     double P30_;
     double P33_;
 
     int len_eta_;
-    std::vector< double > theta_kernel_;
-    std::vector< double > eta_kernel_;
+    std::vector<double> theta_kernel_;
+    std::vector<double> eta_kernel_;
 
     double h_; //!< simulation time step in ms
     double min_double_;
 
-
     librandom::RngPtr rng_; // random number generator of my own thread
 
     librandom::BinomialRandomDev binom_dev_; // binomial random generator
-
 
     int DeadTimeCounts_;
   };
@@ -305,17 +296,11 @@ private:
   // Access functions for UniversalDataLogger -----------------------
 
   //! Read out the real membrane potential
-  double
-  get_V_m_() const
-  {
-    return S_.h_;
-  } // filtered input
+  double get_V_m_() const { return S_.h_; } // filtered input
 
   //! Read out the adaptive threshold potential
-  double
-  get_n_events_() const
-  {
-    return S_.n_spikes_past_[ S_.p_n_spikes_past_ ];
+  double get_n_events_() const {
+    return S_.n_spikes_past_[S_.p_n_spikes_past_];
   } // number of generated spikes
 
   // ----------------------------------------------------------------
@@ -334,73 +319,58 @@ private:
   /** @} */
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< pp_pop_psc_delta > recordablesMap_;
+  static RecordablesMap<pp_pop_psc_delta> recordablesMap_;
 };
 
-inline port
-pp_pop_psc_delta::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port pp_pop_psc_delta::send_test_event(Node &target, rport receptor_type,
+                                              synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-pp_pop_psc_delta::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port pp_pop_psc_delta::handles_test_event(SpikeEvent &,
+                                                 rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-pp_pop_psc_delta::handles_test_event( CurrentEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port pp_pop_psc_delta::handles_test_event(CurrentEvent &,
+                                                 rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-pp_pop_psc_delta::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port pp_pop_psc_delta::handles_test_event(DataLoggingRequest &dlr,
+                                                 rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-pp_pop_psc_delta::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d, P_ );
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+inline void pp_pop_psc_delta::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d, P_);
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-pp_pop_psc_delta::set_status( const DictionaryDatum& d )
-{
+inline void pp_pop_psc_delta::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
   State_ stmp = S_;      // temporary copy in case of errors
-  stmp.set( d, ptmp );   // throws if BadProperty
+  stmp.set(d, ptmp);     // throws if BadProperty
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef PP_POP_PSC_DELTA_H */

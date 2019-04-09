@@ -20,7 +20,6 @@
  *
  */
 
-
 #ifndef IAF_TUM_2000_H
 #define IAF_TUM_2000_H
 
@@ -32,8 +31,7 @@
 #include "ring_buffer.h"
 #include "universal_data_logger.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: iaf_tum_2000 - Leaky integrate-and-fire neuron model with exponential
@@ -127,12 +125,11 @@ FirstVersion: March 2006
 
 Author: Moritz Helias
 */
-class iaf_tum_2000 : public Archiving_Node
-{
+class iaf_tum_2000 : public Archiving_Node {
 
 public:
   iaf_tum_2000();
-  iaf_tum_2000( const iaf_tum_2000& );
+  iaf_tum_2000(const iaf_tum_2000 &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -142,37 +139,36 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< iaf_tum_2000 >;
-  friend class UniversalDataLogger< iaf_tum_2000 >;
+  friend class RecordablesMap<iaf_tum_2000>;
+  friend class UniversalDataLogger<iaf_tum_2000>;
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
 
     /** Membrane time constant in ms. */
     double Tau_;
@@ -205,12 +201,12 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
     /** Set values from dictionary.
      * @returns Change in reversal potential E_L, to be passed to State_::set()
      */
-    double set( const DictionaryDatum& );
+    double set(const DictionaryDatum &);
   };
 
   // ----------------------------------------------------------------
@@ -218,8 +214,7 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
     // state variables
     double i_0_;      //!< synaptic dc input current, variable 0
     double i_syn_ex_; //!< postsynaptic current for exc. inputs, variable 1
@@ -232,14 +227,14 @@ private:
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum&, const Parameters_& ) const;
+    void get(DictionaryDatum &, const Parameters_ &) const;
 
     /** Set values from dictionary.
      * @param dictionary to take data from
      * @param current parameters
      * @param Change in reversal potential E_L specified by this dict
      */
-    void set( const DictionaryDatum&, const Parameters_&, double delta_EL );
+    void set(const DictionaryDatum &, const Parameters_ &, double delta_EL);
   };
 
   // ----------------------------------------------------------------
@@ -247,10 +242,9 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( iaf_tum_2000& );
-    Buffers_( const Buffers_&, iaf_tum_2000& );
+  struct Buffers_ {
+    Buffers_(iaf_tum_2000 &);
+    Buffers_(const Buffers_ &, iaf_tum_2000 &);
 
     /** buffers and sums up incoming spikes/currents */
     RingBuffer spikes_ex_;
@@ -258,7 +252,7 @@ private:
     RingBuffer currents_;
 
     //! Logger for all analog data
-    UniversalDataLogger< iaf_tum_2000 > logger_;
+    UniversalDataLogger<iaf_tum_2000> logger_;
   };
 
   // ----------------------------------------------------------------
@@ -266,8 +260,7 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
     /** Amplitude of the synaptic current.
         This value is chosen such that a post-synaptic potential with
         weight one has an amplitude of 1 mV.
@@ -290,21 +283,9 @@ private:
   // Access functions for UniversalDataLogger -------------------------------
 
   //! Read out the real membrane potential
-  double
-  get_V_m_() const
-  {
-    return S_.V_m_;
-  }
-  double
-  get_I_syn_ex_() const
-  {
-    return S_.i_syn_ex_;
-  }
-  double
-  get_I_syn_in_() const
-  {
-    return S_.i_syn_in_;
-  }
+  double get_V_m_() const { return S_.V_m_; }
+  double get_I_syn_ex_() const { return S_.i_syn_ex_; }
+  double get_I_syn_in_() const { return S_.i_syn_in_; }
 
   // ----------------------------------------------------------------
 
@@ -322,80 +303,64 @@ private:
   /** @} */
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< iaf_tum_2000 > recordablesMap_;
+  static RecordablesMap<iaf_tum_2000> recordablesMap_;
 };
 
-
-inline port
-iaf_tum_2000::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port iaf_tum_2000::send_test_event(Node &target, rport receptor_type,
+                                          synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
-  return target.handles_test_event( e, receptor_type );
+  e.set_sender(*this);
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-iaf_tum_2000::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port iaf_tum_2000::handles_test_event(SpikeEvent &,
+                                             rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-iaf_tum_2000::handles_test_event( CurrentEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port iaf_tum_2000::handles_test_event(CurrentEvent &,
+                                             rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-iaf_tum_2000::handles_test_event( DataLoggingRequest& dlr, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port iaf_tum_2000::handles_test_event(DataLoggingRequest &dlr,
+                                             rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-
-inline void
-iaf_tum_2000::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d, P_ );
-  Archiving_Node::get_status( d );
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+inline void iaf_tum_2000::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d, P_);
+  Archiving_Node::get_status(d);
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-iaf_tum_2000::set_status( const DictionaryDatum& d )
-{
-  Parameters_ ptmp = P_;                 // temporary copy in case of errors
-  const double delta_EL = ptmp.set( d ); // throws if BadProperty
-  State_ stmp = S_;                      // temporary copy in case of errors
-  stmp.set( d, ptmp, delta_EL );         // throws if BadProperty
+inline void iaf_tum_2000::set_status(const DictionaryDatum &d) {
+  Parameters_ ptmp = P_;               // temporary copy in case of errors
+  const double delta_EL = ptmp.set(d); // throws if BadProperty
+  State_ stmp = S_;                    // temporary copy in case of errors
+  stmp.set(d, ptmp, delta_EL);         // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // IAF_TUM_2000_H

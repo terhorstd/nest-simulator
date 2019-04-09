@@ -55,129 +55,83 @@
  for base class Datum.
 *************************************************/
 
-template < class C, SLIType* slt >
-class AggregateDatum : public TypedDatum< slt >, public C
-{
+template <class C, SLIType *slt>
+class AggregateDatum : public TypedDatum<slt>, public C {
 protected:
   static sli::pool memory;
 
 private:
-  virtual Datum*
-  clone( void ) const
-  {
-    return new AggregateDatum< C, slt >( *this );
-  }
+  virtual Datum *clone(void) const { return new AggregateDatum<C, slt>(*this); }
 
 public:
-  AggregateDatum()
-  {
-    TypedDatum< slt >::unset_executable();
-  }
-  AggregateDatum( const AggregateDatum< C, slt >& d )
-    : TypedDatum< slt >( d )
-    , C( d )
-  {
-  }
-  AggregateDatum( const C& c )
-    : TypedDatum< slt >()
-    , C( c )
-  {
-  }
+  AggregateDatum() { TypedDatum<slt>::unset_executable(); }
+  AggregateDatum(const AggregateDatum<C, slt> &d) : TypedDatum<slt>(d), C(d) {}
+  AggregateDatum(const C &c) : TypedDatum<slt>(), C(c) {}
 
-  virtual ~AggregateDatum()
-  {
-  }
+  virtual ~AggregateDatum() {}
 
-  bool
-  equals( const Datum* dat ) const
-  {
+  bool equals(const Datum *dat) const {
     // The following construct works around the problem, that
     // a direct dynamic_cast<const GenericDatum<D> * > does not seem
     // to work.
 
-    const AggregateDatum< C, slt >* ddc =
-      dynamic_cast< AggregateDatum< C, slt >* >( const_cast< Datum* >( dat ) );
-    if ( ddc == NULL )
-    {
+    const AggregateDatum<C, slt> *ddc =
+        dynamic_cast<AggregateDatum<C, slt> *>(const_cast<Datum *>(dat));
+    if (ddc == NULL) {
       return false;
     }
 
-    return static_cast< C >( *ddc ) == static_cast< C >( *this );
+    return static_cast<C>(*ddc) == static_cast<C>(*this);
   }
 
-  static void*
-  operator new( size_t size )
-  {
-    if ( size != memory.size_of() )
-    {
-      return ::operator new( size );
+  static void *operator new(size_t size) {
+    if (size != memory.size_of()) {
+      return ::operator new(size);
     }
     return memory.alloc();
   }
 
-  static void
-  operator delete( void* p, size_t size )
-  {
-    if ( p == NULL )
-    {
+  static void operator delete(void *p, size_t size) {
+    if (p == NULL) {
       return;
     }
-    if ( size != memory.size_of() )
-    {
-      ::operator delete( p );
+    if (size != memory.size_of()) {
+      ::operator delete(p);
       return;
     }
-    memory.free( p );
+    memory.free(p);
   }
 
-  virtual void print( std::ostream& out ) const;
-  virtual void pprint( std::ostream& out ) const;
-  virtual void list( std::ostream& out, std::string prefix, int length ) const;
+  virtual void print(std::ostream &out) const;
+  virtual void pprint(std::ostream &out) const;
+  virtual void list(std::ostream &out, std::string prefix, int length) const;
 
-  virtual void
-  input_form( std::ostream& out ) const
-  {
-    print( out );
-  }
+  virtual void input_form(std::ostream &out) const { print(out); }
 
-  virtual void
-  info( std::ostream& out ) const
-  {
-    print( out );
-  }
+  virtual void info(std::ostream &out) const { print(out); }
 };
 
-template < class C, SLIType* slt >
-void
-AggregateDatum< C, slt >::print( std::ostream& out ) const
-{
-  out << *dynamic_cast< C* >( const_cast< AggregateDatum< C, slt >* >( this ) );
+template <class C, SLIType *slt>
+void AggregateDatum<C, slt>::print(std::ostream &out) const {
+  out << *dynamic_cast<C *>(const_cast<AggregateDatum<C, slt> *>(this));
 }
 
-template < class C, SLIType* slt >
-void
-AggregateDatum< C, slt >::pprint( std::ostream& out ) const
-{
-  print( out );
+template <class C, SLIType *slt>
+void AggregateDatum<C, slt>::pprint(std::ostream &out) const {
+  print(out);
 }
 
-template < class C, SLIType* slt >
-void
-AggregateDatum< C, slt >::list( std::ostream& out,
-  std::string prefix,
-  int length ) const
-{
-  if ( length == 0 )
-  {
+template <class C, SLIType *slt>
+void AggregateDatum<C, slt>::list(std::ostream &out, std::string prefix,
+                                  int length) const {
+  if (length == 0) {
     prefix = "-->" + prefix;
-  }
-  else
-  {
+  } else {
     prefix = "   " + prefix;
   }
 
   out << prefix;
-  print( out );
+  print(out);
 }
 
 #endif

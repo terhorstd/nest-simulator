@@ -57,16 +57,12 @@ const unsigned long Ngen = 1000000UL;
 const unsigned long Ndev = 1000000UL;
 const unsigned long seed = 1234567890UL;
 
-void
-printres( double mean, double sdev, double dt )
-{
-  std::cout << std::setprecision( 4 ) << std::fixed;
-  std::cout << "<X> = " << std::setw( 6 ) << std::showpos << mean
-            << std::noshowpos << std::setw( 4 ) << " +- " << std::setw( 6 )
-            << sdev;
-  if ( dt >= 0 )
-  {
-    std::cout << ", dt = " << std::setw( 4 ) << std::setprecision( 0 ) << dt
+void printres(double mean, double sdev, double dt) {
+  std::cout << std::setprecision(4) << std::fixed;
+  std::cout << "<X> = " << std::setw(6) << std::showpos << mean
+            << std::noshowpos << std::setw(4) << " +- " << std::setw(6) << sdev;
+  if (dt >= 0) {
+    std::cout << ", dt = " << std::setw(4) << std::setprecision(0) << dt
               << " ms";
   }
 
@@ -74,77 +70,66 @@ printres( double mean, double sdev, double dt )
 }
 
 // routine running RNG
-void
-rungen( librandom::RngPtr rng, const unsigned long N )
-{
+void rungen(librandom::RngPtr rng, const unsigned long N) {
   double sum = 0;
   double sum2 = 0;
   double x;
   std::clock_t t1, t2;
 
   t1 = std::clock();
-  for ( unsigned long k = 0; k < N; k++ )
-  {
-    x = ( *rng )();
+  for (unsigned long k = 0; k < N; k++) {
+    x = (*rng)();
     sum += x;
-    sum2 += std::pow( x, 2 );
+    sum2 += std::pow(x, 2);
   }
   t2 = std::clock();
-  double dt = double( t2 - t1 ) / CLOCKS_PER_SEC * 1000; // ms
+  double dt = double(t2 - t1) / CLOCKS_PER_SEC * 1000; // ms
 
   double mean = sum / N;
-  double sdev = std::sqrt( sum2 / N - std::pow( mean, 2 ) );
-  printres( mean, sdev, dt );
+  double sdev = std::sqrt(sum2 / N - std::pow(mean, 2));
+  printres(mean, sdev, dt);
 }
 
 // routine running RND
-void
-rundev( librandom::RandomDev* rnd, const unsigned long N )
-{
+void rundev(librandom::RandomDev *rnd, const unsigned long N) {
   double sum = 0;
   double sum2 = 0;
   double x;
   std::clock_t t1, t2;
 
   t1 = std::clock();
-  for ( unsigned long k = 0; k < N; k++ )
-  {
-    x = ( *rnd )();
+  for (unsigned long k = 0; k < N; k++) {
+    x = (*rnd)();
     // std::cout << x << std::endl;
     sum += x;
-    sum2 += std::pow( x, 2 );
+    sum2 += std::pow(x, 2);
   }
   t2 = std::clock();
-  double dt = double( t2 - t1 ) / CLOCKS_PER_SEC * 1000; // ms
+  double dt = double(t2 - t1) / CLOCKS_PER_SEC * 1000; // ms
 
   double mean = sum / N;
-  double sdev = std::sqrt( sum2 / N - std::pow( mean, 2 ) );
-  printres( mean, sdev, dt );
+  double sdev = std::sqrt(sum2 / N - std::pow(mean, 2));
+  printres(mean, sdev, dt);
 }
 
-template < typename NumberGenerator >
-void
-register_rng( const std::string& name, DictionaryDatum& dict )
-{
+template <typename NumberGenerator>
+void register_rng(const std::string &name, DictionaryDatum &dict) {
   Token rngfactory = new librandom::RngFactoryDatum(
-    new librandom::BuiltinRNGFactory< NumberGenerator > );
-  dict->insert_move( Name( name ), rngfactory );
+      new librandom::BuiltinRNGFactory<NumberGenerator>);
+  dict->insert_move(Name(name), rngfactory);
 }
 
-
-int
-main( void )
-{
+int main(void) {
   // create random number generator type dictionary
   Dictionary rngdict;
-  DictionaryDatum rngdictd( rngdict );
+  DictionaryDatum rngdictd(rngdict);
 
   // add non-GSL rngs
-  register_rng< librandom::KnuthLFG >( "KnuthLFG", rngdictd );
-  register_rng< librandom::MT19937 >( "MT19937", rngdictd );
+  register_rng<librandom::KnuthLFG>("KnuthLFG", rngdictd);
+  register_rng<librandom::MT19937>("MT19937", rngdictd);
 
   // let GslRandomGen add all of the GSL rngs
-  librandom::GslRandomGen::add_gsl_rngs( rngdict );
+  librandom::GslRandomGen::add_gsl_rngs(rngdict);
 
   // run all available RNG
   std::cout << std::endl
@@ -156,20 +141,19 @@ main( void )
   std::cout << "-----------------------------------------------------------"
             << std::endl;
   // check all implementations
-  for ( Dictionary::const_iterator it = rngdict.begin(); it != rngdict.end();
-        ++it )
-  {
-    std::cout << std::left << std::setw( 25 ) << it->first << ": ";
+  for (Dictionary::const_iterator it = rngdict.begin(); it != rngdict.end();
+       ++it) {
+    std::cout << std::left << std::setw(25) << it->first << ": ";
 
     librandom::RngFactoryDatum fd =
-      getValue< librandom::RngFactoryDatum >( it->second );
-    librandom::RngPtr rp = fd->create( librandom::RandomGen::DefaultSeed );
-    rungen( rp, Ngen );
+        getValue<librandom::RngFactoryDatum>(it->second);
+    librandom::RngPtr rp = fd->create(librandom::RandomGen::DefaultSeed);
+    rungen(rp, Ngen);
   }
 
-  std::cout << std::left << std::setw( 25 ) << "Expected"
+  std::cout << std::left << std::setw(25) << "Expected"
             << ": ";
-  printres( 0.5, 1.0 / std::sqrt( 12.0 ), -1 );
+  printres(0.5, 1.0 / std::sqrt(12.0), -1);
   std::cout << std::endl
             << "==========================================================="
             << std::endl;
@@ -182,78 +166,77 @@ main( void )
             << std::endl
             << std::endl;
 
-
   // create default generator for deviate generation
   librandom::RngFactoryDatum rngfact =
-    getValue< librandom::RngFactoryDatum >( rngdict.begin()->second );
+      getValue<librandom::RngFactoryDatum>(rngdict.begin()->second);
 
   librandom::RngPtr lockrng =
-    rngfact->create( librandom::RandomGen::DefaultSeed );
+      rngfact->create(librandom::RandomGen::DefaultSeed);
 
-  librandom::RandomDev* rnd;
+  librandom::RandomDev *rnd;
 
   // Poisson
   {
-    std::cout << std::left << std::setw( 25 ) << "Poisson (lam=1)"
+    std::cout << std::left << std::setw(25) << "Poisson (lam=1)"
               << " : ";
-    lockrng->seed( seed );
-    rnd = new librandom::PoissonRandomDev( lockrng, 1 );
-    rundev( rnd, Ndev );
-    std::cout << std::left << std::setw( 25 ) << "Expected"
+    lockrng->seed(seed);
+    rnd = new librandom::PoissonRandomDev(lockrng, 1);
+    rundev(rnd, Ndev);
+    std::cout << std::left << std::setw(25) << "Expected"
               << " : ";
-    printres( 1.0, 1.0, -1 );
+    printres(1.0, 1.0, -1);
     std::cout << std::endl;
   }
 
   // Normal
   {
-    std::cout << std::left << std::setw( 25 ) << "Normal"
+    std::cout << std::left << std::setw(25) << "Normal"
               << " : ";
-    lockrng->seed( seed );
-    rnd = new librandom::NormalRandomDev( lockrng );
-    rundev( rnd, Ndev );
-    std::cout << std::left << std::setw( 25 ) << "Expected"
+    lockrng->seed(seed);
+    rnd = new librandom::NormalRandomDev(lockrng);
+    rundev(rnd, Ndev);
+    std::cout << std::left << std::setw(25) << "Expected"
               << " : ";
-    printres( 0.0, 1.0, -1 );
+    printres(0.0, 1.0, -1);
     std::cout << std::endl;
   }
 
   // Exponential
   {
-    std::cout << std::left << std::setw( 25 ) << "Exponential"
+    std::cout << std::left << std::setw(25) << "Exponential"
               << " : ";
-    lockrng->seed( seed );
-    rnd = new librandom::ExpRandomDev( lockrng );
-    rundev( rnd, Ndev );
-    std::cout << std::left << std::setw( 25 ) << "Expected"
+    lockrng->seed(seed);
+    rnd = new librandom::ExpRandomDev(lockrng);
+    rundev(rnd, Ndev);
+    std::cout << std::left << std::setw(25) << "Expected"
               << " : ";
-    printres( 1.0, 1.0, -1 );
+    printres(1.0, 1.0, -1);
     std::cout << std::endl;
   }
 
   // Gamma
   {
-    std::cout << std::left << std::setw( 25 ) << "Gamma (Order 4)"
+    std::cout << std::left << std::setw(25) << "Gamma (Order 4)"
               << " : ";
-    lockrng->seed( seed );
-    rnd = new librandom::GammaRandomDev( lockrng, 4 );
-    rundev( rnd, Ndev );
-    std::cout << std::left << std::setw( 25 ) << "Expected"
+    lockrng->seed(seed);
+    rnd = new librandom::GammaRandomDev(lockrng, 4);
+    rundev(rnd, Ndev);
+    std::cout << std::left << std::setw(25) << "Expected"
               << " : ";
-    printres( 4.0, 2.0, -1 );
+    printres(4.0, 2.0, -1);
     std::cout << std::endl;
   }
 
   // Binomial
   {
-    std::cout << std::left << std::setw( 25 ) << "Binom (0.25, 8)"
+    std::cout << std::left << std::setw(25) << "Binom (0.25, 8)"
               << " : ";
-    lockrng->seed( seed );
-    rnd = new librandom::BinomialRandomDev( lockrng, 0.25, 8 );
-    rundev( rnd, Ndev );
-    std::cout << std::left << std::setw( 25 ) << "Expected"
+    lockrng->seed(seed);
+    rnd = new librandom::BinomialRandomDev(lockrng, 0.25, 8);
+    rundev(rnd, Ndev);
+    std::cout << std::left << std::setw(25) << "Expected"
               << " : ";
-    printres( 2.0, 1.2247, -1 );
+    printres(2.0, 1.2247, -1);
     std::cout << std::endl;
   }
 

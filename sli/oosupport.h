@@ -30,25 +30,20 @@
 #include "slifunction.h"
 #include "slimodule.h"
 
-class OOSupportModule : public SLIModule
-{
-  class CallMemberFunction : public SLIFunction
-  {
+class OOSupportModule : public SLIModule {
+  class CallMemberFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
   CallMemberFunction callmemberfunction;
 
 public:
-  OOSupportModule( void )
-  {
-  }
+  OOSupportModule(void) {}
 
-  void init( SLIInterpreter* );
-  const std::string commandstring( void ) const;
-  const std::string name( void ) const;
+  void init(SLIInterpreter *);
+  const std::string commandstring(void) const;
+  const std::string name(void) const;
 };
-
 
 #endif

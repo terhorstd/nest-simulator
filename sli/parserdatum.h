@@ -28,23 +28,14 @@
 #include "interpret.h"
 #include "parser.h"
 
-class ParserDatum : public AggregateDatum< Parser, &SLIInterpreter::Parsertype >
-{
-  Datum*
-  clone( void ) const
-  {
-    return new ParserDatum( *this );
-  }
+class ParserDatum : public AggregateDatum<Parser, &SLIInterpreter::Parsertype> {
+  Datum *clone(void) const { return new ParserDatum(*this); }
 
-  ParserDatum( void )
-  {
-    set_executable();
-  }
+  ParserDatum(void) { set_executable(); }
 
 public:
-  ParserDatum( Scanner* s )
-    : AggregateDatum< Parser, &SLIInterpreter::Parsertype >( Parser( s ) )
-  {
+  ParserDatum(Scanner *s)
+      : AggregateDatum<Parser, &SLIInterpreter::Parsertype>(Parser(s)) {
     set_executable();
   }
 };

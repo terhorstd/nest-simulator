@@ -25,18 +25,14 @@
 
 #include "numericdatum.h"
 
-template < class D, SLIType* slt >
-void
-NumericDatum< D, slt >::input_form( std::ostream& o ) const
-{
-  pprint( o );
+template <class D, SLIType *slt>
+void NumericDatum<D, slt>::input_form(std::ostream &o) const {
+  pprint(o);
 }
 
-template < class D, SLIType* slt >
-void
-NumericDatum< D, slt >::pprint( std::ostream& o ) const
-{
-  this->print( o );
+template <class D, SLIType *slt>
+void NumericDatum<D, slt>::pprint(std::ostream &o) const {
+  this->print(o);
 }
 
 #endif

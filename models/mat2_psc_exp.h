@@ -20,7 +20,6 @@
  *
  */
 
-
 #ifndef MAT2_PSC_EXP_H
 #define MAT2_PSC_EXP_H
 
@@ -33,8 +32,7 @@
 #include "ring_buffer.h"
 #include "universal_data_logger.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: mat2_psc_exp - Non-resetting leaky integrate-and-fire neuron model with
@@ -128,12 +126,11 @@ FirstVersion: Mai 2009
 Author: Thomas Pfeil (modified iaf_psc_exp model of Moritz Helias)
 
 */
-class mat2_psc_exp : public Archiving_Node
-{
+class mat2_psc_exp : public Archiving_Node {
 
 public:
   mat2_psc_exp();
-  mat2_psc_exp( const mat2_psc_exp& );
+  mat2_psc_exp(const mat2_psc_exp &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -143,36 +140,35 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
+  void handle(DataLoggingRequest &);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   // The next two classes need to be friends to access private members
-  friend class RecordablesMap< mat2_psc_exp >;
-  friend class UniversalDataLogger< mat2_psc_exp >;
+  friend class RecordablesMap<mat2_psc_exp>;
+  friend class UniversalDataLogger<mat2_psc_exp>;
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
 
     /** Membrane time constant in ms. */
     double Tau_;
@@ -211,12 +207,12 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
     /** Set values from dictionary.
      * @returns Change in reversal potential E_L, to be passed to State_::set()
      */
-    double set( const DictionaryDatum& ); //!< Set values from dicitonary
+    double set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
   // ----------------------------------------------------------------
@@ -224,8 +220,7 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
     // state variables
     double i_0_;      //!< synaptic dc input current, variable 0
     double i_syn_ex_; //!< postsynaptic current for exc. inputs, variable 1
@@ -240,14 +235,14 @@ private:
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum&, const Parameters_& ) const;
+    void get(DictionaryDatum &, const Parameters_ &) const;
 
     /** Set values from dictionary.
      * @param dictionary to take data from
      * @param current parameters
      * @param Change in reversal potential E_L specified by this dict
      */
-    void set( const DictionaryDatum&, const Parameters_&, double );
+    void set(const DictionaryDatum &, const Parameters_ &, double);
   };
 
   // ----------------------------------------------------------------
@@ -255,10 +250,9 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( mat2_psc_exp& );                  //!< Sets buffer pointers to 0
-    Buffers_( const Buffers_&, mat2_psc_exp& ); //!< Sets buffer pointers to 0
+  struct Buffers_ {
+    Buffers_(mat2_psc_exp &);                   //!< Sets buffer pointers to 0
+    Buffers_(const Buffers_ &, mat2_psc_exp &); //!< Sets buffer pointers to 0
 
     /** buffers and sums up incoming spikes/currents */
     RingBuffer spikes_ex_;
@@ -266,7 +260,7 @@ private:
     RingBuffer currents_;
 
     //! Logger for all analog data
-    UniversalDataLogger< mat2_psc_exp > logger_;
+    UniversalDataLogger<mat2_psc_exp> logger_;
   };
 
   // ----------------------------------------------------------------
@@ -274,8 +268,7 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
 
     /** Amplitude of the synaptic current.
     This value is chosen such that a post-synaptic potential with
@@ -303,14 +296,8 @@ private:
   // ----------------------------------------------------------------
 
   //! Read out state variables, used by UniversalDataLogger
-  double
-  get_V_m_() const
-  {
-    return S_.V_m_ + P_.E_L_;
-  }
-  double
-  get_V_th_() const
-  {
+  double get_V_m_() const { return S_.V_m_ + P_.E_L_; }
+  double get_V_th_() const {
     return P_.E_L_ + P_.omega_ + S_.V_th_1_ + S_.V_th_2_;
   }
 
@@ -330,82 +317,66 @@ private:
   /** @} */
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< mat2_psc_exp > recordablesMap_;
+  static RecordablesMap<mat2_psc_exp> recordablesMap_;
 };
 
-
-inline port
-mat2_psc_exp::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port mat2_psc_exp::send_test_event(Node &target, rport receptor_type,
+                                          synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-
-inline port
-mat2_psc_exp::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port mat2_psc_exp::handles_test_event(SpikeEvent &,
+                                             rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-mat2_psc_exp::handles_test_event( CurrentEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port mat2_psc_exp::handles_test_event(CurrentEvent &,
+                                             rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-mat2_psc_exp::handles_test_event( DataLoggingRequest& dlr, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port mat2_psc_exp::handles_test_event(DataLoggingRequest &dlr,
+                                             rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-mat2_psc_exp::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d, P_ );
-  Archiving_Node::get_status( d );
+inline void mat2_psc_exp::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d, P_);
+  Archiving_Node::get_status(d);
 
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-mat2_psc_exp::set_status( const DictionaryDatum& d )
-{
-  Parameters_ ptmp = P_;                 // temporary copy in case of errors
-  const double delta_EL = ptmp.set( d ); // throws if BadProperty
-  State_ stmp = S_;                      // temporary copy in case of errors
-  stmp.set( d, ptmp, delta_EL );         // throws if BadProperty
+inline void mat2_psc_exp::set_status(const DictionaryDatum &d) {
+  Parameters_ ptmp = P_;               // temporary copy in case of errors
+  const double delta_EL = ptmp.set(d); // throws if BadProperty
+  State_ stmp = S_;                    // temporary copy in case of errors
+  stmp.set(d, ptmp, delta_EL);         // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // MAT2_PSC_EXP_H

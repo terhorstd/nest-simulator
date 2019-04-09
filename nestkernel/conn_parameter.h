@@ -49,20 +49,14 @@
  *   - an array of scalars: values are returned in order
  */
 
-namespace nest
-{
+namespace nest {
 
-class ConnParameter
-{
+class ConnParameter {
 
 public:
-  ConnParameter()
-  {
-  }
+  ConnParameter() {}
 
-  virtual ~ConnParameter()
-  {
-  }
+  virtual ~ConnParameter() {}
 
   /**
    * Return parameter value.
@@ -75,25 +69,16 @@ public:
    * @param rng   random number generator pointer
    * will be ignored except for random parameters.
    */
-  virtual double value_double( thread, librandom::RngPtr& ) const = 0;
-  virtual long value_int( thread, librandom::RngPtr& ) const = 0;
-  virtual void
-  skip( thread, size_t n_skip ) const
-  {
-  }
+  virtual double value_double(thread, librandom::RngPtr &) const = 0;
+  virtual long value_int(thread, librandom::RngPtr &) const = 0;
+  virtual void skip(thread, size_t n_skip) const {}
   virtual bool is_array() const = 0;
 
-  virtual bool
-  is_scalar() const
-  {
-    return false;
-  }
+  virtual bool is_scalar() const { return false; }
 
-  virtual void
-  reset() const
-  {
+  virtual void reset() const {
     throw NotImplemented(
-      "Symmetric connections require parameters that can be reset." );
+        "Symmetric connections require parameters that can be reset.");
   }
 
   /**
@@ -101,11 +86,7 @@ public:
    *
    * 0 indicates scalar/unlimited supply.
    */
-  virtual size_t
-  number_of_values() const
-  {
-    return 0;
-  }
+  virtual size_t number_of_values() const { return 0; }
 
   /**
    * @param t parameter
@@ -113,53 +94,30 @@ public:
    * @param nthread number of threads
    * required to fix number pointers to the iterator (one for each thread)
    */
-  static ConnParameter* create( const Token&, const size_t );
+  static ConnParameter *create(const Token &, const size_t);
 };
-
 
 /**
  * Single double value.
  *
  * On each request, it returns the same value.
  */
-class ScalarDoubleParameter : public ConnParameter
-{
+class ScalarDoubleParameter : public ConnParameter {
 public:
-  ScalarDoubleParameter( double value, const size_t )
-    : value_( value )
-  {
-  }
+  ScalarDoubleParameter(double value, const size_t) : value_(value) {}
 
-  double
-  value_double( thread, librandom::RngPtr& ) const
-  {
-    return value_;
-  }
+  double value_double(thread, librandom::RngPtr &) const { return value_; }
 
-  long
-  value_int( thread, librandom::RngPtr& ) const
-  {
+  long value_int(thread, librandom::RngPtr &) const {
     throw KernelException(
-      "ConnParameter calls value function with false return type." );
+        "ConnParameter calls value function with false return type.");
   }
 
-  inline bool
-  is_array() const
-  {
-    return false;
-  }
+  inline bool is_array() const { return false; }
 
-  void
-  reset() const
-  {
-  }
+  void reset() const {}
 
-  bool
-  is_scalar() const
-  {
-    return true;
-  }
-
+  bool is_scalar() const { return true; }
 
 private:
   double value_;
@@ -170,47 +128,25 @@ private:
  *
  * On each request, it returns the same value.
  */
-class ScalarIntegerParameter : public ConnParameter
-{
+class ScalarIntegerParameter : public ConnParameter {
 public:
-  ScalarIntegerParameter( long value, const size_t )
-    : value_( value )
-  {
+  ScalarIntegerParameter(long value, const size_t) : value_(value) {}
+
+  double value_double(thread, librandom::RngPtr &) const {
+    return static_cast<double>(value_);
   }
 
-  double
-  value_double( thread, librandom::RngPtr& ) const
-  {
-    return static_cast< double >( value_ );
-  }
+  long value_int(thread, librandom::RngPtr &) const { return value_; }
 
-  long
-  value_int( thread, librandom::RngPtr& ) const
-  {
-    return value_;
-  }
+  inline bool is_array() const { return false; }
 
-  inline bool
-  is_array() const
-  {
-    return false;
-  }
+  void reset() const {}
 
-  void
-  reset() const
-  {
-  }
-
-  bool
-  is_scalar() const
-  {
-    return true;
-  }
+  bool is_scalar() const { return true; }
 
 private:
   long value_;
 };
-
 
 /**
  * Array parameter classes, returning double values in order.
@@ -227,76 +163,47 @@ private:
  *   throws an error.
  */
 
-class ArrayDoubleParameter : public ConnParameter
-{
+class ArrayDoubleParameter : public ConnParameter {
 public:
-  ArrayDoubleParameter( const std::vector< double >& values,
-    const size_t nthreads )
-    : values_( &values )
-    , next_( nthreads, values_->begin() )
-  {
-  }
+  ArrayDoubleParameter(const std::vector<double> &values, const size_t nthreads)
+      : values_(&values), next_(nthreads, values_->begin()) {}
 
-  void
-  skip( thread tid, size_t n_skip ) const
-  {
-    if ( next_[ tid ] < values_->end() )
-    {
-      next_[ tid ] += n_skip;
-    }
-    else
-    {
-      throw KernelException( "Parameter values exhausted." );
+  void skip(thread tid, size_t n_skip) const {
+    if (next_[tid] < values_->end()) {
+      next_[tid] += n_skip;
+    } else {
+      throw KernelException("Parameter values exhausted.");
     }
   }
 
-  size_t
-  number_of_values() const
-  {
-    return values_->size();
-  }
+  size_t number_of_values() const { return values_->size(); }
 
-  double
-  value_double( thread tid, librandom::RngPtr& ) const
-  {
-    if ( next_[ tid ] != values_->end() )
-    {
-      return *next_[ tid ]++;
-    }
-    else
-    {
-      throw KernelException( "Parameter values exhausted." );
+  double value_double(thread tid, librandom::RngPtr &) const {
+    if (next_[tid] != values_->end()) {
+      return *next_[tid]++;
+    } else {
+      throw KernelException("Parameter values exhausted.");
     }
   }
 
-  long
-  value_int( thread, librandom::RngPtr& ) const
-  {
+  long value_int(thread, librandom::RngPtr &) const {
     throw KernelException(
-      "ConnParameter calls value function with false return type." );
+        "ConnParameter calls value function with false return type.");
   }
 
-  inline bool
-  is_array() const
-  {
-    return true;
-  }
+  inline bool is_array() const { return true; }
 
-  void
-  reset() const
-  {
-    for ( std::vector< std::vector< double >::const_iterator >::iterator it =
-            next_.begin();
-          it != next_.end();
-          ++it )
-    {
+  void reset() const {
+    for (std::vector<std::vector<double>::const_iterator>::iterator it =
+             next_.begin();
+         it != next_.end(); ++it) {
       *it = values_->begin();
     }
   }
 
 private:
-  const std::vector< double >* values_;
-  mutable std::vector< std::vector< double >::const_iterator > next_;
+  const std::vector<double> *values_;
+  mutable std::vector<std::vector<double>::const_iterator> next_;
 };
 
 /**
@@ -314,82 +221,50 @@ private:
  *   throws an error.
  */
 
-class ArrayIntegerParameter : public ConnParameter
-{
+class ArrayIntegerParameter : public ConnParameter {
 public:
-  ArrayIntegerParameter( const std::vector< long >& values,
-    const size_t nthreads )
-    : values_( &values )
-    , next_( nthreads, values_->begin() )
-  {
-  }
+  ArrayIntegerParameter(const std::vector<long> &values, const size_t nthreads)
+      : values_(&values), next_(nthreads, values_->begin()) {}
 
-  void
-  skip( thread tid, size_t n_skip ) const
-  {
-    if ( next_[ tid ] < values_->end() )
-    {
-      next_[ tid ] += n_skip;
-    }
-    else
-    {
-      throw KernelException( "Parameter values exhausted." );
+  void skip(thread tid, size_t n_skip) const {
+    if (next_[tid] < values_->end()) {
+      next_[tid] += n_skip;
+    } else {
+      throw KernelException("Parameter values exhausted.");
     }
   }
 
-  size_t
-  number_of_values() const
-  {
-    return values_->size();
-  }
+  size_t number_of_values() const { return values_->size(); }
 
-  long
-  value_int( thread tid, librandom::RngPtr& ) const
-  {
-    if ( next_[ tid ] != values_->end() )
-    {
-      return *next_[ tid ]++;
-    }
-    else
-    {
-      throw KernelException( "Parameter values exhausted." );
+  long value_int(thread tid, librandom::RngPtr &) const {
+    if (next_[tid] != values_->end()) {
+      return *next_[tid]++;
+    } else {
+      throw KernelException("Parameter values exhausted.");
     }
   }
 
-  double
-  value_double( thread tid, librandom::RngPtr& ) const
-  {
-    if ( next_[ tid ] != values_->end() )
-    {
-      return static_cast< double >( *next_[ tid ]++ );
-    }
-    else
-    {
-      throw KernelException( "Parameter values exhausted." );
+  double value_double(thread tid, librandom::RngPtr &) const {
+    if (next_[tid] != values_->end()) {
+      return static_cast<double>(*next_[tid]++);
+    } else {
+      throw KernelException("Parameter values exhausted.");
     }
   }
 
-  inline bool
-  is_array() const
-  {
-    return true;
-  }
+  inline bool is_array() const { return true; }
 
-  void
-  reset() const
-  {
-    for ( std::vector< std::vector< long >::const_iterator >::iterator it =
-            next_.begin();
-          it != next_.end();
-          ++it )
-    {
+  void reset() const {
+    for (std::vector<std::vector<long>::const_iterator>::iterator it =
+             next_.begin();
+         it != next_.end(); ++it) {
       *it = values_->begin();
     }
   }
 
 private:
-  const std::vector< long >* values_;
-  mutable std::vector< std::vector< long >::const_iterator > next_;
+  const std::vector<long> *values_;
+  mutable std::vector<std::vector<long>::const_iterator> next_;
 };
 
 /**
@@ -397,28 +272,17 @@ private:
  *
  * On each request, it returns a new value drawn from the given deviate.
  */
-class RandomParameter : public ConnParameter
-{
+class RandomParameter : public ConnParameter {
 public:
-  RandomParameter( const DictionaryDatum&, const size_t );
+  RandomParameter(const DictionaryDatum &, const size_t);
 
-  double
-  value_double( thread, librandom::RngPtr& rng ) const
-  {
-    return ( *rdv_ )( rng );
+  double value_double(thread, librandom::RngPtr &rng) const {
+    return (*rdv_)(rng);
   }
 
-  long
-  value_int( thread, librandom::RngPtr& rng ) const
-  {
-    return ( *rdv_ )( rng );
-  }
+  long value_int(thread, librandom::RngPtr &rng) const { return (*rdv_)(rng); }
 
-  inline bool
-  is_array() const
-  {
-    return false;
-  }
+  inline bool is_array() const { return false; }
 
 private:
   librandom::RdvPtr rdv_;

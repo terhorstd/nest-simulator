@@ -147,13 +147,9 @@
     match the Token's contents, or a template specialization for this
     type is missing.
 **/
-template < typename FT >
-FT
-getValue( const Token& t )
-{
-  FT* value = dynamic_cast< FT* >( t.datum() );
-  if ( value == NULL )
-  {
+template <typename FT> FT getValue(const Token &t) {
+  FT *value = dynamic_cast<FT *>(t.datum());
+  if (value == NULL) {
     throw TypeMismatch();
   }
   return *value;
@@ -172,13 +168,9 @@ getValue( const Token& t )
     match the Token's contents, or a template specialization for this
     type is missing.
 **/
-template < typename FT >
-void
-setValue( const Token& t, FT const& value )
-{
-  FT* old = dynamic_cast< FT* >( t.datum() );
-  if ( old == NULL )
-  {
+template <typename FT> void setValue(const Token &t, FT const &value) {
+  FT *old = dynamic_cast<FT *>(t.datum());
+  if (old == NULL) {
     throw TypeMismatch();
   }
 
@@ -189,100 +181,69 @@ setValue( const Token& t, FT const& value )
     Specify the desired Datum type as the second template parameter!
     @ingroup TokenUtils
 **/
-template < typename FT, class D >
-Token
-newToken2( FT const& value )
-{
-  Token t( new D( value ) );
+template <typename FT, class D> Token newToken2(FT const &value) {
+  Token t(new D(value));
 
   // this is for typechecking reasons:
-  getValue< FT >( t );
+  getValue<FT>(t);
 
   return t;
 }
-
 
 /** Create a new Token from a fundamental data type.
     This template is specialized for the most fundamental types. If it
     does not work, use newToken2() and specify the Datum type explicitely.
     @ingroup TokenUtils
 **/
-template < typename FT >
-Token
-newToken( FT const& value )
-{
-  return newToken2< FT, NameDatum >( value );
+template <typename FT> Token newToken(FT const &value) {
+  return newToken2<FT, NameDatum>(value);
 }
 
 // specializations below this line: -----------------------
-template <>
-long getValue< long >( const Token& );
-template <>
-void setValue< long >( const Token&, long const& value );
+template <> long getValue<long>(const Token &);
+template <> void setValue<long>(const Token &, long const &value);
 
-template <>
-Token newToken< long >( long const& value );
+template <> Token newToken<long>(long const &value);
 
-template <>
-double getValue< double >( const Token& );
+template <> double getValue<double>(const Token &);
 
-template <>
-void setValue< double >( const Token&, double const& value );
+template <> void setValue<double>(const Token &, double const &value);
 
-template <>
-float getValue< float >( const Token& );
+template <> float getValue<float>(const Token &);
 
-template <>
-void setValue< float >( const Token&, float const& value );
+template <> void setValue<float>(const Token &, float const &value);
 
+template <> Token newToken<double>(double const &value);
 
-template <>
-Token newToken< double >( double const& value );
+template <> bool getValue<bool>(const Token &);
+template <> void setValue<bool>(const Token &, bool const &value);
 
-template <>
-bool getValue< bool >( const Token& );
-template <>
-void setValue< bool >( const Token&, bool const& value );
-
-template <>
-Token newToken< bool >( bool const& value );
-
+template <> Token newToken<bool>(bool const &value);
 
 // These will handle StringDatum, NameDatum,
 // LiteralDatum and SymbolDatum tokens:
-template <>
-std::string getValue< std::string >( const Token& );
-template <>
-void setValue< std::string >( const Token&, std::string const& value );
+template <> std::string getValue<std::string>(const Token &);
+template <> void setValue<std::string>(const Token &, std::string const &value);
 
-
-template <>
-Token newToken< std::string >( std::string const& value );
-
+template <> Token newToken<std::string>(std::string const &value);
 
 // To get NameDatum, LiteralDatum or SymbolDatum tokens from a string,
 // use newToken2<FT,D> instead (e.g. newToken2<string,LiteralDatum>);
 
-
 // These will convert homogeneous int arrays to vectors:
+template <> std::vector<long> getValue<std::vector<long>>(const Token &);
 template <>
-std::vector< long > getValue< std::vector< long > >( const Token& );
-template <>
-void setValue< std::vector< long > >( const Token&,
-  std::vector< long > const& value );
+void setValue<std::vector<long>>(const Token &, std::vector<long> const &value);
 
-template <>
-Token newToken< std::vector< long > >( std::vector< long > const& value );
-
+template <> Token newToken<std::vector<long>>(std::vector<long> const &value);
 
 // These will convert homogeneous double arrays to vectors:
+template <> std::vector<double> getValue<std::vector<double>>(const Token &);
 template <>
-std::vector< double > getValue< std::vector< double > >( const Token& );
-template <>
-void setValue< std::vector< double > >( const Token&,
-  std::vector< double > const& value );
+void setValue<std::vector<double>>(const Token &,
+                                   std::vector<double> const &value);
 
 template <>
-Token newToken< std::vector< double > >( std::vector< double > const& value );
+Token newToken<std::vector<double>>(std::vector<double> const &value);
 
 #endif

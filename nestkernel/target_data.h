@@ -31,10 +31,8 @@
 #include "static_assert.h"
 #include "target.h"
 
-namespace nest
-{
-class TargetDataFields
-{
+namespace nest {
+class TargetDataFields {
 private:
   unsigned int lcid_ : 27;
   unsigned int tid_ : 10;
@@ -46,7 +44,7 @@ public:
   /**
    * Sets the local connection ID.
    */
-  void set_lcid( const index lcid );
+  void set_lcid(const index lcid);
 
   /**
    * Returns the local connection ID.
@@ -56,7 +54,7 @@ public:
   /**
    * Sets the target ID.
    */
-  void set_tid( const thread tid );
+  void set_tid(const thread tid);
 
   /**
    * Returns the target ID.
@@ -66,7 +64,7 @@ public:
   /**
    * Sets the synapse-type ID.
    */
-  void set_syn_id( const synindex syn_id );
+  void set_syn_id(const synindex syn_id);
 
   /**
    * Returns the synapse-type ID.
@@ -74,79 +72,48 @@ public:
   synindex get_syn_id() const;
 };
 
-inline void
-TargetDataFields::set_lcid( const index lcid )
-{
-  lcid_ = lcid;
-}
+inline void TargetDataFields::set_lcid(const index lcid) { lcid_ = lcid; }
 
-inline index
-TargetDataFields::get_lcid() const
-{
-  return lcid_;
-}
+inline index TargetDataFields::get_lcid() const { return lcid_; }
 
-inline void
-TargetDataFields::set_tid( const thread tid )
-{
-  tid_ = tid;
-}
+inline void TargetDataFields::set_tid(const thread tid) { tid_ = tid; }
 
-inline thread
-TargetDataFields::get_tid() const
-{
-  return tid_;
-}
+inline thread TargetDataFields::get_tid() const { return tid_; }
 
-inline void
-TargetDataFields::set_syn_id( const synindex syn_id )
-{
+inline void TargetDataFields::set_syn_id(const synindex syn_id) {
   syn_id_ = syn_id;
 }
 
-inline synindex
-TargetDataFields::get_syn_id() const
-{
-  return syn_id_;
-}
+inline synindex TargetDataFields::get_syn_id() const { return syn_id_; }
 
-class SecondaryTargetDataFields
-{
+class SecondaryTargetDataFields {
 private:
   unsigned int send_buffer_pos_;
   unsigned char syn_id_;
 
 public:
   // Members must be set explicitly -- no defaults
-  void set_send_buffer_pos( const size_t pos );
+  void set_send_buffer_pos(const size_t pos);
   size_t get_send_buffer_pos() const;
-  void set_syn_id( const synindex syn_id );
+  void set_syn_id(const synindex syn_id);
   synindex get_syn_id() const;
 };
 
-inline void
-SecondaryTargetDataFields::set_send_buffer_pos( const size_t pos )
-{
-  assert( pos < std::numeric_limits< unsigned int >::max() );
+inline void SecondaryTargetDataFields::set_send_buffer_pos(const size_t pos) {
+  assert(pos < std::numeric_limits<unsigned int>::max());
   send_buffer_pos_ = pos;
 }
 
-inline size_t
-SecondaryTargetDataFields::get_send_buffer_pos() const
-{
+inline size_t SecondaryTargetDataFields::get_send_buffer_pos() const {
   return send_buffer_pos_;
 }
 
-inline void
-SecondaryTargetDataFields::set_syn_id( const synindex syn_id )
-{
-  assert( syn_id < std::numeric_limits< unsigned char >::max() );
+inline void SecondaryTargetDataFields::set_syn_id(const synindex syn_id) {
+  assert(syn_id < std::numeric_limits<unsigned char>::max());
   syn_id_ = syn_id;
 }
 
-inline synindex
-SecondaryTargetDataFields::get_syn_id() const
-{
+inline synindex SecondaryTargetDataFields::get_syn_id() const {
   return syn_id_;
 }
 
@@ -156,8 +123,7 @@ SecondaryTargetDataFields::get_syn_id() const
  * buffers.
  * SeeAlso: SpikeData
  */
-class TargetData
-{
+class TargetData {
   // Members must be set explicitly -- no defaults
   // Done this way to create large vector without preconstruction
   // and to handle variant fields
@@ -188,97 +154,55 @@ public:
   bool is_complete_marker() const;
   bool is_end_marker() const;
   bool is_invalid_marker() const;
-  void set_source_lid( const index source_lid );
-  void set_source_tid( const thread source_tid );
+  void set_source_lid(const index source_lid);
+  void set_source_tid(const thread source_tid);
   index get_source_lid() const;
   thread get_source_tid() const;
-  void set_is_primary( const bool is_primary );
+  void set_is_primary(const bool is_primary);
   bool is_primary() const;
 };
 
 //!< check legal size
-typedef StaticAssert< sizeof( TargetData ) == 12 >::success
-  success_target_data_size;
+typedef StaticAssert<sizeof(TargetData) == 12>::success
+    success_target_data_size;
 
-inline void
-TargetData::reset_marker()
-{
-  marker_ = default_marker_;
-}
+inline void TargetData::reset_marker() { marker_ = default_marker_; }
 
-inline void
-TargetData::set_complete_marker()
-{
-  marker_ = complete_marker_;
-}
+inline void TargetData::set_complete_marker() { marker_ = complete_marker_; }
 
-inline void
-TargetData::set_end_marker()
-{
-  marker_ = end_marker_;
-}
+inline void TargetData::set_end_marker() { marker_ = end_marker_; }
 
-inline void
-TargetData::set_invalid_marker()
-{
-  marker_ = invalid_marker_;
-}
+inline void TargetData::set_invalid_marker() { marker_ = invalid_marker_; }
 
-inline bool
-TargetData::is_complete_marker() const
-{
+inline bool TargetData::is_complete_marker() const {
   return marker_ == complete_marker_;
 }
 
-inline bool
-TargetData::is_end_marker() const
-{
-  return marker_ == end_marker_;
-}
+inline bool TargetData::is_end_marker() const { return marker_ == end_marker_; }
 
-inline bool
-TargetData::is_invalid_marker() const
-{
+inline bool TargetData::is_invalid_marker() const {
   return marker_ == invalid_marker_;
 }
 
-inline void
-TargetData::set_source_lid( const index source_lid )
-{
-  assert( source_lid < 1048576 );
+inline void TargetData::set_source_lid(const index source_lid) {
+  assert(source_lid < 1048576);
   source_lid_ = source_lid;
 }
 
-inline void
-TargetData::set_source_tid( const thread source_tid )
-{
-  assert( source_tid < 1024 );
+inline void TargetData::set_source_tid(const thread source_tid) {
+  assert(source_tid < 1024);
   source_tid_ = source_tid;
 }
 
-inline index
-TargetData::get_source_lid() const
-{
-  return source_lid_;
-}
+inline index TargetData::get_source_lid() const { return source_lid_; }
 
-inline thread
-TargetData::get_source_tid() const
-{
-  return source_tid_;
-}
+inline thread TargetData::get_source_tid() const { return source_tid_; }
 
-inline void
-TargetData::set_is_primary( const bool is_primary )
-{
+inline void TargetData::set_is_primary(const bool is_primary) {
   is_primary_ = is_primary;
 }
 
-inline bool
-TargetData::is_primary() const
-{
-  return is_primary_;
-}
+inline bool TargetData::is_primary() const { return is_primary_; }
 } // namespace nest
 
 #endif // TARGET_DATA_H

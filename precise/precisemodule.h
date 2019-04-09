@@ -26,13 +26,11 @@
 // Includes from sli:
 #include "slimodule.h"
 
-namespace nest
-{
+namespace nest {
 /**
  * Module supplying models support precise spike timing.
  */
-class PreciseModule : public SLIModule
-{
+class PreciseModule : public SLIModule {
 public:
   PreciseModule();
   ~PreciseModule();
@@ -41,12 +39,12 @@ public:
    * Initialize module by registering models with the network.
    * @param SLIInterpreter* SLI interpreterm, must know modeldict
    */
-  void init( SLIInterpreter* );
+  void init(SLIInterpreter *);
 
-  const std::string name( void ) const;
-  const std::string commandstring( void ) const;
+  const std::string name(void) const;
+  const std::string commandstring(void) const;
 };
 
-} // namespace
+} // namespace nest
 
 #endif

@@ -23,7 +23,6 @@
 #ifndef CORRELOSPINMATRIX_DETECTOR_H
 #define CORRELOSPINMATRIX_DETECTOR_H
 
-
 // C++ includes:
 #include <deque>
 #include <vector>
@@ -34,9 +33,7 @@
 #include "node.h"
 #include "pseudo_recording_device.h"
 
-
-namespace nest
-{
+namespace nest {
 /** @BeginDocumentation
 Name: correlospinmatrix_detector - Device for measuring the covariance matrix
                                   from several inputs
@@ -137,22 +134,17 @@ SeeAlso: correlation_detector, correlomatrix_detector, spike_detector,
 
 Availability: NEST
 */
-class correlospinmatrix_detector : public Node
-{
+class correlospinmatrix_detector : public Node {
 
 public:
   correlospinmatrix_detector();
-  correlospinmatrix_detector( const correlospinmatrix_detector& );
+  correlospinmatrix_detector(const correlospinmatrix_detector &);
 
   /**
    * This device has proxies, so that it will receive
    * spikes also from sources which live on other threads.
    */
-  bool
-  has_proxies() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return true; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -163,21 +155,21 @@ public:
   using Node::handles_test_event;
   using Node::receives_signal;
 
-  void handle( SpikeEvent& );
+  void handle(SpikeEvent &);
 
-  port handles_test_event( SpikeEvent&, rport );
+  port handles_test_event(SpikeEvent &, rport);
 
   SignalType receives_signal() const;
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   // ------------------------------------------------------------
 
@@ -185,37 +177,29 @@ private:
    * Structure to store in the deque of recently
    * received events marked by beginning and end of the binary on pulse
    */
-  struct BinaryPulse_
-  {
+  struct BinaryPulse_ {
     long t_on_;
     long t_off_;
     long receptor_channel_;
 
-    BinaryPulse_( long timeon, long timeoff, long receptorchannel )
-      : t_on_( timeon )
-      , t_off_( timeoff )
-      , receptor_channel_( receptorchannel )
-    {
-    }
+    BinaryPulse_(long timeon, long timeoff, long receptorchannel)
+        : t_on_(timeon), t_off_(timeoff), receptor_channel_(receptorchannel) {}
 
     /**
      * Greater operator needed for insertion sort.
      */
-    inline bool
-    operator>( const BinaryPulse_& second ) const
-    {
+    inline bool operator>(const BinaryPulse_ &second) const {
       return t_off_ > second.t_off_;
     }
   };
 
-  typedef std::deque< BinaryPulse_ > BinaryPulselistType;
+  typedef std::deque<BinaryPulse_> BinaryPulselistType;
 
   // ------------------------------------------------------------
 
   struct State_;
 
-  struct Parameters_
-  {
+  struct Parameters_ {
 
     Time delta_tau_;  //!< width of correlation histogram bins
     Time tau_max_;    //!< maximum time difference of events to detect
@@ -223,17 +207,17 @@ private:
     Time Tstop_;      //!< end of recording
     long N_channels_; //!< number of channels
 
-    Parameters_();                     //!< Sets default parameter values
-    Parameters_( const Parameters_& ); //!< Recalibrate all times
+    Parameters_();                    //!< Sets default parameter values
+    Parameters_(const Parameters_ &); //!< Recalibrate all times
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
     /**
      * Set values from dicitonary.
      * @returns true if the state needs to be reset after a change of
      *          binwidth or tau_max.
      */
-    bool set( const DictionaryDatum&, const correlospinmatrix_detector& );
+    bool set(const DictionaryDatum &, const correlospinmatrix_detector &);
   };
 
   // ------------------------------------------------------------
@@ -247,8 +231,7 @@ private:
    * @note State_ only contains read-out values, so we copy-construct
    *       using the default c'tor.
    */
-  struct State_
-  {
+  struct State_ {
     BinaryPulselistType incoming_; //!< incoming binary pulses, sorted
                                    /**
                                     * rport of last event coming in
@@ -263,26 +246,25 @@ private:
     //! potentially a down transition (single spike received)
     bool tentative_down_;
 
-    std::vector< bool > curr_state_; //!< current state of neuron i
+    std::vector<bool> curr_state_; //!< current state of neuron i
 
     //! last time pointof change of neuron i
-    std::vector< long > last_change_;
+    std::vector<long> last_change_;
 
     /** Unweighted covariance matrix.
      */
-    std::vector< std::vector< std::vector< long > > > count_covariance_;
-
+    std::vector<std::vector<std::vector<long>>> count_covariance_;
 
     State_(); //!< initialize default state
 
-    void get( DictionaryDatum& ) const;
+    void get(DictionaryDatum &) const;
 
     /**
      * @param bool if true, force state reset
      */
-    void set( const DictionaryDatum&, const Parameters_&, bool );
+    void set(const DictionaryDatum &, const Parameters_ &, bool);
 
-    void reset( const Parameters_& );
+    void reset(const Parameters_ &);
   };
 
   // ------------------------------------------------------------
@@ -293,47 +275,39 @@ private:
 };
 
 inline port
-correlospinmatrix_detector::handles_test_event( SpikeEvent&,
-  rport receptor_type )
-{
-  if ( receptor_type < 0 || receptor_type > P_.N_channels_ - 1 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+correlospinmatrix_detector::handles_test_event(SpikeEvent &,
+                                               rport receptor_type) {
+  if (receptor_type < 0 || receptor_type > P_.N_channels_ - 1) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return receptor_type;
 }
 
 inline void
-nest::correlospinmatrix_detector::get_status( DictionaryDatum& d ) const
-{
-  device_.get_status( d );
-  P_.get( d );
-  S_.get( d );
+nest::correlospinmatrix_detector::get_status(DictionaryDatum &d) const {
+  device_.get_status(d);
+  P_.get(d);
+  S_.get(d);
 
-  ( *d )[ names::element_type ] = LiteralDatum( names::recorder );
+  (*d)[names::element_type] = LiteralDatum(names::recorder);
 }
 
 inline void
-nest::correlospinmatrix_detector::set_status( const DictionaryDatum& d )
-{
+nest::correlospinmatrix_detector::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_;
-  const bool reset_required = ptmp.set( d, *this );
+  const bool reset_required = ptmp.set(d, *this);
 
-  device_.set_status( d );
+  device_.set_status(d);
   P_ = ptmp;
-  if ( reset_required == true )
-  {
-    S_.reset( P_ );
+  if (reset_required == true) {
+    S_.reset(P_);
   }
 }
 
-
-inline SignalType
-nest::correlospinmatrix_detector::receives_signal() const
-{
+inline SignalType nest::correlospinmatrix_detector::receives_signal() const {
   return BINARY;
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef CORRELOSPINMATRIX_DETECTOR_H */

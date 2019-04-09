@@ -30,7 +30,6 @@
 #include "interpret.h"
 #include "numericdatum.h"
 
-
 /* These are declarations to specialize the static memory pool BEFORE
    we instantiate the AggregateDatum. Note, that this is only a declaration,
    because we do not provide an initializer (see ISO14882 Sec.  14.7.3.15.)
@@ -44,10 +43,9 @@
    so I removed it. 15.2.2002 Diesmann
 */
 #ifndef HAVE_STATIC_TEMPLATE_DECLARATION_FAILS
-template <>
-sli::pool NumericDatum< long, &SLIInterpreter::Integertype >::memory;
+template <> sli::pool NumericDatum<long, &SLIInterpreter::Integertype>::memory;
 #endif
 
-typedef NumericDatum< long, &SLIInterpreter::Integertype > IntegerDatum;
+typedef NumericDatum<long, &SLIInterpreter::Integertype> IntegerDatum;
 
 #endif

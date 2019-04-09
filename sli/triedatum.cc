@@ -25,17 +25,14 @@
 // Includes from sli:
 #include "interpret.h"
 
-sli::pool TrieDatum::memory( sizeof( TrieDatum ), 1024, 1 );
+sli::pool TrieDatum::memory(sizeof(TrieDatum), 1024, 1);
 
-bool
-TrieDatum::equals( Datum const* dat ) const
-{
+bool TrieDatum::equals(Datum const *dat) const {
   // The following construct works around the problem, that
   // a direct dynamic_cast<const GenericDatum<D,slt> * > does not seem
   // to work.
 
-  const TrieDatum* fd =
-    dynamic_cast< TrieDatum* >( const_cast< Datum* >( dat ) );
+  const TrieDatum *fd = dynamic_cast<TrieDatum *>(const_cast<Datum *>(dat));
 
-  return ( fd == NULL ) ? false : ( tree == fd->tree );
+  return (fd == NULL) ? false : (tree == fd->tree);
 }

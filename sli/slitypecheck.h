@@ -29,61 +29,42 @@
 // Includes from sli:
 #include "slifunction.h"
 
-class TrieFunction : public SLIFunction
-{
+class TrieFunction : public SLIFunction {
 public:
-  TrieFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  TrieFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class TrieInfoFunction : public SLIFunction
-{
+class TrieInfoFunction : public SLIFunction {
 public:
-  TrieInfoFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  TrieInfoFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class AddtotrieFunction : public SLIFunction
-{
+class AddtotrieFunction : public SLIFunction {
 public:
-  AddtotrieFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  AddtotrieFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Cva_tFunction : public SLIFunction
-{
+class Cva_tFunction : public SLIFunction {
 public:
-  Cva_tFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Cva_tFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Cvt_aFunction : public SLIFunction
-{
+class Cvt_aFunction : public SLIFunction {
 public:
-  Cvt_aFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Cvt_aFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class TypeFunction : public SLIFunction
-{
+class TypeFunction : public SLIFunction {
 public:
-  TypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  TypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-
-void init_slitypecheck( SLIInterpreter* );
+void init_slitypecheck(SLIInterpreter *);
 
 #endif

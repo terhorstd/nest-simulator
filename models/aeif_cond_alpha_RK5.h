@@ -31,8 +31,7 @@
 #include "ring_buffer.h"
 #include "universal_data_logger.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: aeif_cond_alpha_RK5 - Conductance based exponential integrate-and-fire
@@ -112,13 +111,12 @@ References: Brette R and Gerstner W (2005) Adaptive Exponential
 
 SeeAlso: iaf_cond_alpha, aeif_cond_exp, aeif_cond_alpha
 */
-class aeif_cond_alpha_RK5 : public Archiving_Node
-{
+class aeif_cond_alpha_RK5 : public Archiving_Node {
 
 public:
-  typedef void ( aeif_cond_alpha_RK5::*func_ptr )( const double*, double* );
+  typedef void (aeif_cond_alpha_RK5::*func_ptr)(const double *, double *);
   aeif_cond_alpha_RK5();
-  aeif_cond_alpha_RK5( const aeif_cond_alpha_RK5& );
+  aeif_cond_alpha_RK5(const aeif_cond_alpha_RK5 &);
   ~aeif_cond_alpha_RK5();
 
   /**
@@ -129,44 +127,42 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
-  inline void aeif_cond_alpha_RK5_dynamics( const double*, double* );
-  inline void aeif_cond_alpha_RK5_dynamics_DT0( const double*, double* );
+  inline void aeif_cond_alpha_RK5_dynamics(const double *, double *);
+  inline void aeif_cond_alpha_RK5_dynamics_DT0(const double *, double *);
 
   // END Boilerplate function declarations ----------------------------
 
   // Friends --------------------------------------------------------
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< aeif_cond_alpha_RK5 >;
-  friend class UniversalDataLogger< aeif_cond_alpha_RK5 >;
-
+  friend class RecordablesMap<aeif_cond_alpha_RK5>;
+  friend class UniversalDataLogger<aeif_cond_alpha_RK5>;
 
 private:
   // ----------------------------------------------------------------
 
   //! Independent parameters
-  struct Parameters_
-  {
+  struct Parameters_ {
     double V_peak_;  //!< Spike detection threshold in mV
     double V_reset_; //!< Reset Potential in mV
     double t_ref_;   //!< Refractory period in ms
@@ -189,8 +185,8 @@ private:
     double HMIN;       //!< Smallest permissible stepsize in ms.
     Parameters_();     //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
 public:
@@ -201,16 +197,14 @@ public:
    * @note Copy constructor and assignment operator required because
    *       of C-style array.
    */
-  struct State_
-  {
+  struct State_ {
     /**
      * Enumeration identifying elements in state array State_::y_.
      * The state vector is passed as a C array. This enum
      * identifies the elements of the vector. It must be public to be
      * accessible from the iteration function.
      */
-    enum StateVecElems
-    {
+    enum StateVecElems {
       V_M = 0,
       DG_EXC, // 1
       G_EXC,  // 2
@@ -220,25 +214,25 @@ public:
       STATE_VEC_SIZE
     };
 
-    double y_[ STATE_VEC_SIZE ];   //!< neuron state
-    double k1[ STATE_VEC_SIZE ];   //!< Runge-Kutta variable
-    double k2[ STATE_VEC_SIZE ];   //!< Runge-Kutta variable
-    double k3[ STATE_VEC_SIZE ];   //!< Runge-Kutta variable
-    double k4[ STATE_VEC_SIZE ];   //!< Runge-Kutta variable
-    double k5[ STATE_VEC_SIZE ];   //!< Runge-Kutta variable
-    double k6[ STATE_VEC_SIZE ];   //!< Runge-Kutta variable
-    double k7[ STATE_VEC_SIZE ];   //!< Runge-Kutta variable
-    double yin[ STATE_VEC_SIZE ];  //!< Runge-Kutta variable
-    double ynew[ STATE_VEC_SIZE ]; //!< 5th order update
-    double yref[ STATE_VEC_SIZE ]; //!< 4th order update
-    unsigned int r_;               //!< number of refractory steps remaining
+    double y_[STATE_VEC_SIZE];   //!< neuron state
+    double k1[STATE_VEC_SIZE];   //!< Runge-Kutta variable
+    double k2[STATE_VEC_SIZE];   //!< Runge-Kutta variable
+    double k3[STATE_VEC_SIZE];   //!< Runge-Kutta variable
+    double k4[STATE_VEC_SIZE];   //!< Runge-Kutta variable
+    double k5[STATE_VEC_SIZE];   //!< Runge-Kutta variable
+    double k6[STATE_VEC_SIZE];   //!< Runge-Kutta variable
+    double k7[STATE_VEC_SIZE];   //!< Runge-Kutta variable
+    double yin[STATE_VEC_SIZE];  //!< Runge-Kutta variable
+    double ynew[STATE_VEC_SIZE]; //!< 5th order update
+    double yref[STATE_VEC_SIZE]; //!< 4th order update
+    unsigned int r_;             //!< number of refractory steps remaining
 
-    State_( const Parameters_& ); //!< Default initialization
-    State_( const State_& );
-    State_& operator=( const State_& );
+    State_(const Parameters_ &); //!< Default initialization
+    State_(const State_ &);
+    State_ &operator=(const State_ &);
 
-    void get( DictionaryDatum& ) const;
-    void set( const DictionaryDatum&, const Parameters_& );
+    void get(DictionaryDatum &) const;
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ----------------------------------------------------------------
@@ -246,14 +240,13 @@ public:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( aeif_cond_alpha_RK5& ); //!< Sets buffer pointers to 0
-    Buffers_( const Buffers_&,
-      aeif_cond_alpha_RK5& ); //!< Sets buffer pointers to 0
+  struct Buffers_ {
+    Buffers_(aeif_cond_alpha_RK5 &); //!< Sets buffer pointers to 0
+    Buffers_(const Buffers_ &,
+             aeif_cond_alpha_RK5 &); //!< Sets buffer pointers to 0
 
     //! Logger for all analog data
-    UniversalDataLogger< aeif_cond_alpha_RK5 > logger_;
+    UniversalDataLogger<aeif_cond_alpha_RK5> logger_;
 
     /** buffers and sums up incoming spikes/currents */
     RingBuffer spike_exc_;
@@ -266,7 +259,7 @@ public:
     // it is safe to place both here.
     double step_; //!< simulation step size in ms
     double
-      IntegrationStep_; //!< current integration time step, updated by solver
+        IntegrationStep_; //!< current integration time step, updated by solver
 
     /**
      * Input current injected by CurrentEvent.
@@ -283,8 +276,7 @@ public:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
     /** initial value to normalise excitatory synaptic conductance */
     double g0_ex_;
 
@@ -306,11 +298,8 @@ public:
   // Access functions for UniversalDataLogger -------------------------------
 
   //! Read out state vector elements, used by UniversalDataLogger
-  template < State_::StateVecElems elem >
-  double
-  get_y_elem_() const
-  {
-    return S_.y_[ elem ];
+  template <State_::StateVecElems elem> double get_y_elem_() const {
+    return S_.y_[elem];
   }
 
   // ----------------------------------------------------------------
@@ -321,75 +310,61 @@ public:
   Buffers_ B_;
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< aeif_cond_alpha_RK5 > recordablesMap_;
+  static RecordablesMap<aeif_cond_alpha_RK5> recordablesMap_;
 };
 
-inline port
-aeif_cond_alpha_RK5::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port aeif_cond_alpha_RK5::send_test_event(Node &target,
+                                                 rport receptor_type, synindex,
+                                                 bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-aeif_cond_alpha_RK5::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port aeif_cond_alpha_RK5::handles_test_event(SpikeEvent &,
+                                                    rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-aeif_cond_alpha_RK5::handles_test_event( CurrentEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port aeif_cond_alpha_RK5::handles_test_event(CurrentEvent &,
+                                                    rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-aeif_cond_alpha_RK5::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port aeif_cond_alpha_RK5::handles_test_event(DataLoggingRequest &dlr,
+                                                    rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-aeif_cond_alpha_RK5::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d );
-  Archiving_Node::get_status( d );
+inline void aeif_cond_alpha_RK5::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d);
+  Archiving_Node::get_status(d);
 
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-aeif_cond_alpha_RK5::set_status( const DictionaryDatum& d )
-{
+inline void aeif_cond_alpha_RK5::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
   State_ stmp = S_;      // temporary copy in case of errors
-  stmp.set( d, ptmp );   // throws if BadProperty
+  stmp.set(d, ptmp);     // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
@@ -401,10 +376,8 @@ aeif_cond_alpha_RK5::set_status( const DictionaryDatum& d )
  * @param y State vector (input).
  * @param f Derivatives (output).
  */
-inline void
-aeif_cond_alpha_RK5::aeif_cond_alpha_RK5_dynamics( const double y[],
-  double f[] )
-{
+inline void aeif_cond_alpha_RK5::aeif_cond_alpha_RK5_dynamics(const double y[],
+                                                              double f[]) {
   // a shorthand
   typedef aeif_cond_alpha_RK5::State_ S;
 
@@ -415,34 +388,34 @@ aeif_cond_alpha_RK5::aeif_cond_alpha_RK5_dynamics( const double y[],
   // good compiler will optimize the verbosity away ...
 
   // shorthand for state variables
-  const double& V = std::min( y[ S::V_M ], P_.V_peak_ );
-  const double& dg_ex = y[ S::DG_EXC ];
-  const double& g_ex = y[ S::G_EXC ];
-  const double& dg_in = y[ S::DG_INH ];
-  const double& g_in = y[ S::G_INH ];
-  const double& w = y[ S::W ];
+  const double &V = std::min(y[S::V_M], P_.V_peak_);
+  const double &dg_ex = y[S::DG_EXC];
+  const double &g_ex = y[S::G_EXC];
+  const double &dg_in = y[S::DG_INH];
+  const double &g_in = y[S::G_INH];
+  const double &w = y[S::W];
 
-  const double I_syn_exc = g_ex * ( V - P_.E_ex );
-  const double I_syn_inh = g_in * ( V - P_.E_in );
+  const double I_syn_exc = g_ex * (V - P_.E_ex);
+  const double I_syn_inh = g_in * (V - P_.E_in);
 
   // for this function the exponential must still be bounded
   // otherwise issue77.sli fails because of numerical instability or
   // the value of w undergoes jumps because of V's divergence.
-  const double exp_arg = std::min( ( V - P_.V_th ) / P_.Delta_T, 10. );
-  const double I_spike = P_.Delta_T * std::exp( exp_arg );
+  const double exp_arg = std::min((V - P_.V_th) / P_.Delta_T, 10.);
+  const double I_spike = P_.Delta_T * std::exp(exp_arg);
 
   // dv/dt
-  f[ S::V_M ] = ( -P_.g_L * ( ( V - P_.E_L ) - I_spike ) - I_syn_exc - I_syn_inh
-                  - w + P_.I_e + B_.I_stim_ )
-    / P_.C_m;
-  f[ S::DG_EXC ] = -dg_ex / P_.tau_syn_ex;
-  f[ S::G_EXC ] = dg_ex - g_ex / P_.tau_syn_ex; // Synaptic Conductance (nS)
+  f[S::V_M] = (-P_.g_L * ((V - P_.E_L) - I_spike) - I_syn_exc - I_syn_inh - w +
+               P_.I_e + B_.I_stim_) /
+              P_.C_m;
+  f[S::DG_EXC] = -dg_ex / P_.tau_syn_ex;
+  f[S::G_EXC] = dg_ex - g_ex / P_.tau_syn_ex; // Synaptic Conductance (nS)
 
-  f[ S::DG_INH ] = -dg_in / P_.tau_syn_in;
-  f[ S::G_INH ] = dg_in - g_in / P_.tau_syn_in; // Synaptic Conductance (nS)
+  f[S::DG_INH] = -dg_in / P_.tau_syn_in;
+  f[S::G_INH] = dg_in - g_in / P_.tau_syn_in; // Synaptic Conductance (nS)
 
   // Adaptation current w.
-  f[ S::W ] = ( P_.a * ( V - P_.E_L ) - w ) / P_.tau_w;
+  f[S::W] = (P_.a * (V - P_.E_L) - w) / P_.tau_w;
 }
 
 /**
@@ -451,9 +424,8 @@ aeif_cond_alpha_RK5::aeif_cond_alpha_RK5_dynamics( const double y[],
  * @param f Derivatives (output).
  */
 inline void
-aeif_cond_alpha_RK5::aeif_cond_alpha_RK5_dynamics_DT0( const double y[],
-  double f[] )
-{
+aeif_cond_alpha_RK5::aeif_cond_alpha_RK5_dynamics_DT0(const double y[],
+                                                      double f[]) {
   // a shorthand
   typedef aeif_cond_alpha_RK5::State_ S;
 
@@ -464,31 +436,30 @@ aeif_cond_alpha_RK5::aeif_cond_alpha_RK5_dynamics_DT0( const double y[],
   // good compiler will optimize the verbosity away ...
 
   // shorthand for state variables
-  const double& V = y[ S::V_M ];
-  const double& dg_ex = y[ S::DG_EXC ];
-  const double& g_ex = y[ S::G_EXC ];
-  const double& dg_in = y[ S::DG_INH ];
-  const double& g_in = y[ S::G_INH ];
-  const double& w = y[ S::W ];
+  const double &V = y[S::V_M];
+  const double &dg_ex = y[S::DG_EXC];
+  const double &g_ex = y[S::G_EXC];
+  const double &dg_in = y[S::DG_INH];
+  const double &g_in = y[S::G_INH];
+  const double &w = y[S::W];
 
-  const double I_syn_exc = g_ex * ( V - P_.E_ex );
-  const double I_syn_inh = g_in * ( V - P_.E_in );
+  const double I_syn_exc = g_ex * (V - P_.E_ex);
+  const double I_syn_inh = g_in * (V - P_.E_in);
 
   // dv/dt
-  f[ S::V_M ] = ( -P_.g_L * ( V - P_.E_L ) - I_syn_exc - I_syn_inh - w + P_.I_e
-                  + B_.I_stim_ )
-    / P_.C_m;
-  f[ S::DG_EXC ] = -dg_ex / P_.tau_syn_ex;
-  f[ S::G_EXC ] = dg_ex - g_ex / P_.tau_syn_ex; // Synaptic Conductance (nS)
+  f[S::V_M] = (-P_.g_L * (V - P_.E_L) - I_syn_exc - I_syn_inh - w + P_.I_e +
+               B_.I_stim_) /
+              P_.C_m;
+  f[S::DG_EXC] = -dg_ex / P_.tau_syn_ex;
+  f[S::G_EXC] = dg_ex - g_ex / P_.tau_syn_ex; // Synaptic Conductance (nS)
 
-  f[ S::DG_INH ] = -dg_in / P_.tau_syn_in;
-  f[ S::G_INH ] = dg_in - g_in / P_.tau_syn_in; // Synaptic Conductance (nS)
+  f[S::DG_INH] = -dg_in / P_.tau_syn_in;
+  f[S::G_INH] = dg_in - g_in / P_.tau_syn_in; // Synaptic Conductance (nS)
 
   // Adaptation current w.
-  f[ S::W ] = ( P_.a * ( V - P_.E_L ) - w ) / P_.tau_w;
+  f[S::W] = (P_.a * (V - P_.E_L) - w) / P_.tau_w;
 }
 
-
-} // namespace
+} // namespace nest
 
 #endif // AEIF_COND_ALPHA_RK5_H

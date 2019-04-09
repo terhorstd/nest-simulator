@@ -28,36 +28,31 @@
 #ifndef CONNECTOR_BASE_IMPL_H
 #define CONNECTOR_BASE_IMPL_H
 
-namespace nest
-{
+namespace nest {
 
-template < typename ConnectionT >
-void
-Connector< ConnectionT >::send_weight_event( const thread tid,
-  const unsigned int lcid,
-  Event& e,
-  const CommonSynapseProperties& cp )
-{
-  if ( cp.get_weight_recorder() )
-  {
+template <typename ConnectionT>
+void Connector<ConnectionT>::send_weight_event(
+    const thread tid, const unsigned int lcid, Event &e,
+    const CommonSynapseProperties &cp) {
+  if (cp.get_weight_recorder()) {
     // Create new event to record the weight and copy relevant content.
     WeightRecorderEvent wr_e;
-    wr_e.set_port( e.get_port() );
-    wr_e.set_rport( e.get_rport() );
-    wr_e.set_stamp( e.get_stamp() );
-    wr_e.set_sender( e.get_sender() );
+    wr_e.set_port(e.get_port());
+    wr_e.set_rport(e.get_rport());
+    wr_e.set_stamp(e.get_stamp());
+    wr_e.set_sender(e.get_sender());
     wr_e.set_sender_gid(
-      kernel().connection_manager.get_source_gid( tid, syn_id_, lcid ) );
-    wr_e.set_weight( e.get_weight() );
-    wr_e.set_delay_steps( e.get_delay_steps() );
+        kernel().connection_manager.get_source_gid(tid, syn_id_, lcid));
+    wr_e.set_weight(e.get_weight());
+    wr_e.set_delay_steps(e.get_delay_steps());
     // Set weight_recorder as receiver
-    wr_e.set_receiver( *cp.get_weight_recorder()->get_thread_sibling( tid ) );
+    wr_e.set_receiver(*cp.get_weight_recorder()->get_thread_sibling(tid));
     // Put the gid of the postsynaptic node as receiver gid
-    wr_e.set_receiver_gid( e.get_receiver().get_gid() );
+    wr_e.set_receiver_gid(e.get_receiver().get_gid());
     wr_e();
   }
 }
 
-} // of namespace nest
+} // namespace nest
 
 #endif

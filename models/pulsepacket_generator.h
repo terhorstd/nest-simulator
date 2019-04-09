@@ -37,8 +37,7 @@
 #include "node.h"
 #include "stimulating_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: pulsepacket_generator - Generate sequence of Gaussian pulse packets.
@@ -70,70 +69,62 @@ Sends: SpikeEvent
 
 SeeAlso: spike_generator, StimulatingDevice
 */
-class pulsepacket_generator : public Node
-{
+class pulsepacket_generator : public Node {
 
 public:
   pulsepacket_generator();
-  pulsepacket_generator( pulsepacket_generator const& );
+  pulsepacket_generator(pulsepacket_generator const &);
 
   // behaves like normal node, since it must provide identical
   // output to all targets
-  bool
-  has_proxies() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return true; }
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
   void create_pulse();
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   struct Buffers_;
 
   // ------------------------------------------------------------
 
-  struct Parameters_
-  {
+  struct Parameters_ {
 
-    std::vector< double > pulse_times_; //!< times of pulses
-    long a_;                            //!< number of pulses in a packet
-    double sdev_;                       //!< standard deviation of the packet
+    std::vector<double> pulse_times_; //!< times of pulses
+    long a_;                          //!< number of pulses in a packet
+    double sdev_;                     //!< standard deviation of the packet
 
     double sdev_tolerance_;
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
     /**
      * Set values from dicitonary.
      * @note Buffer is passed so that the position etc can be reset
      *       parameters have been changed.
      */
-    void set( const DictionaryDatum&, pulsepacket_generator& );
+    void set(const DictionaryDatum &, pulsepacket_generator &);
   };
 
   // ------------------------------------------------------------
 
-  struct Buffers_
-  {
-    std::deque< long > spiketimes_;
+  struct Buffers_ {
+    std::deque<long> spiketimes_;
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
 
     librandom::NormalRandomDev norm_dev_; //!< random deviate generator
 
@@ -154,44 +145,37 @@ private:
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< SpikeEvent > device_;
+  StimulatingDevice<SpikeEvent> device_;
 
   Parameters_ P_;
   Buffers_ B_;
   Variables_ V_;
 };
 
-inline port
-pulsepacket_generator::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port pulsepacket_generator::send_test_event(Node &target,
+                                                   rport receptor_type,
+                                                   synindex syn_id, bool) {
+  device_.enforce_single_syn_type(syn_id);
 
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline void
-pulsepacket_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  device_.get_status( d );
+inline void pulsepacket_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  device_.get_status(d);
 }
 
-inline void
-pulsepacket_generator::set_status( const DictionaryDatum& d )
-{
+inline void pulsepacket_generator::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d, *this );  // throws if BadProperty
+  ptmp.set(d, *this);    // throws if BadProperty
 
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

@@ -23,7 +23,6 @@
 #ifndef SPIKE_GENERATOR_H
 #define SPIKE_GENERATOR_H
 
-
 // C++ includes:
 #include <vector>
 
@@ -35,8 +34,7 @@
 #include "nest_types.h"
 #include "stimulating_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: spike_generator - A device which generates spikes from an array with
@@ -179,22 +177,17 @@ Author: Gewaltig, Diesmann, Eppler
 
 SeeAlso: Device, StimulatingDevice, testsuite::test_spike_generator
 */
-class spike_generator : public DeviceNode
-{
+class spike_generator : public DeviceNode {
 
 public:
   spike_generator();
-  spike_generator( const spike_generator& );
+  spike_generator(const spike_generator &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
 
-  port send_test_event( Node&, rport, synindex, bool );
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  port send_test_event(Node &, rport, synindex, bool);
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -204,25 +197,20 @@ public:
   using Node::event_hook;
   using Node::sends_signal;
 
-  void event_hook( DSSpikeEvent& );
+  void event_hook(DSSpikeEvent &);
 
-  SignalType
-  sends_signal() const
-  {
-    return ALL;
-  }
+  SignalType sends_signal() const { return ALL; }
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   // ------------------------------------------------------------
 
-  struct State_
-  {
+  struct State_ {
     size_t position_; //!< index of next spike to deliver
 
     State_(); //!< Sets default state value
@@ -230,17 +218,16 @@ private:
 
   // ------------------------------------------------------------
 
-  struct Parameters_
-  {
+  struct Parameters_ {
     //! Spike time stamp as Time, rel to origin_
-    std::vector< Time > spike_stamps_;
+    std::vector<Time> spike_stamps_;
 
     //! Spike time offset, if using precise_times_
-    std::vector< double > spike_offsets_;
+    std::vector<double> spike_offsets_;
 
-    std::vector< double > spike_weights_; //!< Spike weights as double
+    std::vector<double> spike_weights_; //!< Spike weights as double
 
-    std::vector< long > spike_multiplicities_; //!< Spike multiplicity
+    std::vector<long> spike_multiplicities_; //!< Spike multiplicity
 
     //! Interpret spike times as precise, i.e. send as step and offset
     bool precise_times_;
@@ -253,10 +240,10 @@ private:
 
     bool deprecation_warning_issued_;
 
-    Parameters_();                     //!< Sets default parameter values
-    Parameters_( const Parameters_& ); //!< Recalibrate all times
+    Parameters_();                    //!< Sets default parameter values
+    Parameters_(const Parameters_ &); //!< Recalibrate all times
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
     /**
      * Set values from dictionary.
@@ -264,7 +251,7 @@ private:
      *       spike_times_ or spike_weights_ vector has been filled with
      *       new data, or if the origin was reset.
      */
-    void set( const DictionaryDatum&, State_&, const Time&, const Time& );
+    void set(const DictionaryDatum &, State_ &, const Time &, const Time &);
 
     /**
      * Insert spike time to arrays, throw BadProperty for invalid spike times.
@@ -273,47 +260,39 @@ private:
      * @param origin
      * @param current simulation time
      */
-    void
-    assert_valid_spike_time_and_insert_( double, const Time&, const Time& );
+    void assert_valid_spike_time_and_insert_(double, const Time &,
+                                             const Time &);
   };
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< SpikeEvent > device_;
+  StimulatingDevice<SpikeEvent> device_;
 
   Parameters_ P_;
   State_ S_;
 };
 
-inline port
-spike_generator::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool dummy_target )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port spike_generator::send_test_event(Node &target, rport receptor_type,
+                                             synindex syn_id,
+                                             bool dummy_target) {
+  device_.enforce_single_syn_type(syn_id);
 
-  if ( dummy_target )
-  {
+  if (dummy_target) {
     DSSpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
-  }
-  else
-  {
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
+  } else {
     SpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
   }
 }
 
-inline void
-spike_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  device_.get_status( d );
+inline void spike_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  device_.get_status(d);
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef SPIKE_GENERATOR_H */

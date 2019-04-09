@@ -35,332 +35,222 @@
   defined in this module
   *************************************/
 
-void init_slicontrol( SLIInterpreter* );
+void init_slicontrol(SLIInterpreter *);
 
-class Backtrace_onFunction : public SLIFunction
-{
+class Backtrace_onFunction : public SLIFunction {
 public:
-  Backtrace_onFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Backtrace_onFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Backtrace_offFunction : public SLIFunction
-{
+class Backtrace_offFunction : public SLIFunction {
 public:
-  Backtrace_offFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Backtrace_offFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class OStackdumpFunction : public SLIFunction
-{
+class OStackdumpFunction : public SLIFunction {
 public:
-  OStackdumpFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  OStackdumpFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class EStackdumpFunction : public SLIFunction
-{
+class EStackdumpFunction : public SLIFunction {
 public:
-  EStackdumpFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  EStackdumpFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class LoopFunction : public SLIFunction
-{
+class LoopFunction : public SLIFunction {
 public:
-  LoopFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  LoopFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ExitFunction : public SLIFunction
-{
+class ExitFunction : public SLIFunction {
 public:
-  ExitFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ExitFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class QuitFunction : public SLIFunction
-{
+class QuitFunction : public SLIFunction {
 public:
-  QuitFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  QuitFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IfFunction : public SLIFunction
-{
+class IfFunction : public SLIFunction {
 public:
-  IfFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IfFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IfelseFunction : public SLIFunction
-{
+class IfelseFunction : public SLIFunction {
 public:
-  IfelseFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IfelseFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class RepeatFunction : public SLIFunction
-{
+class RepeatFunction : public SLIFunction {
 public:
-  RepeatFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  RepeatFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CloseinputFunction : public SLIFunction
-{
+class CloseinputFunction : public SLIFunction {
 public:
-  CloseinputFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CloseinputFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class StoppedFunction : public SLIFunction
-{
+class StoppedFunction : public SLIFunction {
 public:
-  StoppedFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  StoppedFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class StopFunction : public SLIFunction
-{
+class StopFunction : public SLIFunction {
 public:
-  StopFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  StopFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CurrentnameFunction : public SLIFunction
-{
+class CurrentnameFunction : public SLIFunction {
 public:
-  CurrentnameFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CurrentnameFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IparsestdinFunction : public SLIFunction
-{
+class IparsestdinFunction : public SLIFunction {
 public:
-  IparsestdinFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IparsestdinFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class StartFunction : public SLIFunction
-{
+class StartFunction : public SLIFunction {
 public:
-  StartFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  StartFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ParsestdinFunction : public SLIFunction
-{
+class ParsestdinFunction : public SLIFunction {
 public:
-  ParsestdinFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ParsestdinFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IparseFunction : public SLIFunction
-{
+class IparseFunction : public SLIFunction {
 public:
-  IparseFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IparseFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DefFunction : public SLIFunction
-{
+class DefFunction : public SLIFunction {
 public:
-  DefFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DefFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class SetFunction : public SLIFunction
-{
+class SetFunction : public SLIFunction {
 public:
-  SetFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  SetFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class LoadFunction : public SLIFunction
-{
+class LoadFunction : public SLIFunction {
 public:
-  LoadFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  LoadFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class LookupFunction : public SLIFunction
-{
+class LookupFunction : public SLIFunction {
 public:
-  LookupFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  LookupFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ForFunction : public SLIFunction
-{
+class ForFunction : public SLIFunction {
 public:
-  ForFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ForFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Forall_aFunction : public SLIFunction
-{
+class Forall_aFunction : public SLIFunction {
 public:
-  Forall_aFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Forall_aFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Forall_iterFunction : public SLIFunction
-{
+class Forall_iterFunction : public SLIFunction {
 public:
-  Forall_iterFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Forall_iterFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-
-class Forallindexed_aFunction : public SLIFunction
-{
+class Forallindexed_aFunction : public SLIFunction {
 public:
-  Forallindexed_aFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Forallindexed_aFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Forallindexed_sFunction : public SLIFunction
-{
+class Forallindexed_sFunction : public SLIFunction {
 public:
-  Forallindexed_sFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Forallindexed_sFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Forall_sFunction : public SLIFunction
-{
+class Forall_sFunction : public SLIFunction {
 public:
-  Forall_sFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Forall_sFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class RaiseerrorFunction : public SLIFunction
-{
+class RaiseerrorFunction : public SLIFunction {
 public:
-  RaiseerrorFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  RaiseerrorFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class PrinterrorFunction : public SLIFunction
-{
+class PrinterrorFunction : public SLIFunction {
 public:
-  PrinterrorFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  PrinterrorFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class RaiseagainFunction : public SLIFunction
-{
+class RaiseagainFunction : public SLIFunction {
 public:
-  RaiseagainFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  RaiseagainFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CyclesFunction : public SLIFunction
-{
+class CyclesFunction : public SLIFunction {
 public:
-  CyclesFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CyclesFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CodeAccessedFunction : public SLIFunction
-{
+class CodeAccessedFunction : public SLIFunction {
 public:
-  CodeAccessedFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CodeAccessedFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CodeExecutedFunction : public SLIFunction
-{
+class CodeExecutedFunction : public SLIFunction {
 public:
-  CodeExecutedFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CodeExecutedFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ExecFunction : public SLIFunction
-{
+class ExecFunction : public SLIFunction {
 public:
-  ExecFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ExecFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-
-class TypeinfoFunction : public SLIFunction
-{
+class TypeinfoFunction : public SLIFunction {
 public:
-  TypeinfoFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  TypeinfoFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
 /** @BeginDocumentation
@@ -393,14 +283,10 @@ public:
  SeeAlso: case, switchdefault, exit, mark
 */
 
-
-class SwitchFunction : public SLIFunction
-{
+class SwitchFunction : public SLIFunction {
 public:
-  SwitchFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  SwitchFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
 /** @BeginDocumentation
@@ -446,13 +332,10 @@ public:
  SeeAlso: case, switch, exit, mark
 */
 
-class SwitchdefaultFunction : public SLIFunction
-{
+class SwitchdefaultFunction : public SLIFunction {
 public:
-  SwitchdefaultFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  SwitchdefaultFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
 /** @BeginDocumentation
@@ -489,180 +372,121 @@ public:
  SeeAlso: switch, switchdefault, exit, mark, if
 */
 
-class CaseFunction : public SLIFunction
-{
+class CaseFunction : public SLIFunction {
 public:
-  CaseFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CaseFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CounttomarkFunction : public SLIFunction
-{
+class CounttomarkFunction : public SLIFunction {
 public:
-  CounttomarkFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CounttomarkFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class PclocksFunction : public SLIFunction
-{
+class PclocksFunction : public SLIFunction {
 public:
-  PclocksFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  PclocksFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class PclockspersecFunction : public SLIFunction
-{
+class PclockspersecFunction : public SLIFunction {
 public:
-  PclockspersecFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  PclockspersecFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class PgetrusageFunction : public SLIFunction
-{
+class PgetrusageFunction : public SLIFunction {
 public:
-  PgetrusageFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  PgetrusageFunction() {}
+  void execute(SLIInterpreter *) const;
 
 private:
-  bool getinfo_( int, DictionaryDatum& ) const;
+  bool getinfo_(int, DictionaryDatum &) const;
 };
 
-class TimeFunction : public SLIFunction
-{
+class TimeFunction : public SLIFunction {
 public:
-  TimeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  TimeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Sleep_dFunction : public SLIFunction
-{
+class Sleep_dFunction : public SLIFunction {
 public:
-  Sleep_dFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Sleep_dFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Token_sFunction : public SLIFunction
-{
+class Token_sFunction : public SLIFunction {
 public:
-  Token_sFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Token_sFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Token_isFunction : public SLIFunction
-{
+class Token_isFunction : public SLIFunction {
 public:
-  Token_isFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Token_isFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Symbol_sFunction : public SLIFunction
-{
+class Symbol_sFunction : public SLIFunction {
 public:
-  Symbol_sFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Symbol_sFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class SetGuardFunction : public SLIFunction
-{
+class SetGuardFunction : public SLIFunction {
 public:
-  SetGuardFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  SetGuardFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class RemoveGuardFunction : public SLIFunction
-{
+class RemoveGuardFunction : public SLIFunction {
 public:
-  RemoveGuardFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  RemoveGuardFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class MessageFunction : public SLIFunction
-{
+class MessageFunction : public SLIFunction {
 public:
-  MessageFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  MessageFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class SetVerbosityFunction : public SLIFunction
-{
+class SetVerbosityFunction : public SLIFunction {
 public:
-  SetVerbosityFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  SetVerbosityFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class VerbosityFunction : public SLIFunction
-{
+class VerbosityFunction : public SLIFunction {
 public:
-  VerbosityFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  VerbosityFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-
-class NoopFunction : public SLIFunction
-{
+class NoopFunction : public SLIFunction {
 public:
-  NoopFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  NoopFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DebugOnFunction : public SLIFunction
-{
+class DebugOnFunction : public SLIFunction {
 public:
-  DebugOnFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DebugOnFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DebugOffFunction : public SLIFunction
-{
+class DebugOffFunction : public SLIFunction {
 public:
-  DebugOffFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DebugOffFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class DebugFunction : public SLIFunction
-{
+class DebugFunction : public SLIFunction {
 public:
-  DebugFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DebugFunction() {}
+  void execute(SLIInterpreter *) const;
 };
-
 
 #endif

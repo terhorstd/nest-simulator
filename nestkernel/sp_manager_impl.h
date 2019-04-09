@@ -32,19 +32,16 @@
 #include "growth_curve.h"
 #include "growth_curve_factory.h"
 
-namespace nest
-{
+namespace nest {
 
-template < typename GrowthCurve >
-void
-SPManager::register_growth_curve( const std::string& name )
-{
-  assert( not growthcurvedict_->known( name ) );
-  GenericGrowthCurveFactory* gc = new GrowthCurveFactory< GrowthCurve >();
-  assert( gc != 0 );
+template <typename GrowthCurve>
+void SPManager::register_growth_curve(const std::string &name) {
+  assert(not growthcurvedict_->known(name));
+  GenericGrowthCurveFactory *gc = new GrowthCurveFactory<GrowthCurve>();
+  assert(gc != 0);
   const int id = growthcurve_factories_.size();
-  growthcurve_factories_.push_back( gc );
-  growthcurvedict_->insert( name, id );
+  growthcurve_factories_.push_back(gc);
+  growthcurvedict_->insert(name, id);
 }
 
 } // namespace nest

@@ -40,56 +40,41 @@
 // Includes from sli:
 #include "arraydatum.h"
 
+nest::RNGManager::RNGManager() : rng_() {}
 
-nest::RNGManager::RNGManager()
-  : rng_()
-{
-}
-
-void
-nest::RNGManager::initialize()
-{
+void nest::RNGManager::initialize() {
   create_rngs_();
   create_grng_();
 }
 
-void
-nest::RNGManager::finalize()
-{
-}
+void nest::RNGManager::finalize() {}
 
-void
-nest::RNGManager::set_status( const DictionaryDatum& d )
-{
+void nest::RNGManager::set_status(const DictionaryDatum &d) {
   // have those two for later asking, whether threads have changed:
   long n_threads;
   bool n_threads_updated =
-    updateValue< long >( d, names::local_num_threads, n_threads );
+      updateValue<long>(d, names::local_num_threads, n_threads);
 
   // set RNGs --- MUST come after n_threads_ is updated
-  if ( d->known( "rngs" ) )
-  {
+  if (d->known("rngs")) {
     // this array contains pre-seeded RNGs, so they can be used
     // directly, no seeding required
-    ArrayDatum* ad = dynamic_cast< ArrayDatum* >( ( *d )[ "rngs" ].datum() );
-    if ( ad == 0 )
-    {
+    ArrayDatum *ad = dynamic_cast<ArrayDatum *>((*d)["rngs"].datum());
+    if (ad == 0) {
       throw BadProperty();
     }
 
     // n_threads_ is the new value after a change of the number of
     // threads
-    if ( ad->size()
-      != ( size_t )( kernel().vp_manager.get_num_virtual_processes() ) )
-    {
-      LOG( M_ERROR,
-        "RNGManager::set_status",
-        "Number of RNGs must equal number of virtual processes "
-        "(threads*processes). RNGs "
-        "unchanged." );
+    if (ad->size() !=
+        (size_t)(kernel().vp_manager.get_num_virtual_processes())) {
+      LOG(M_ERROR, "RNGManager::set_status",
+          "Number of RNGs must equal number of virtual processes "
+          "(threads*processes). RNGs "
+          "unchanged.");
       throw DimensionMismatch(
-        ( size_t )( kernel().vp_manager.get_num_virtual_processes() ),
-        ad->size() );
+          (size_t)(kernel().vp_manager.get_num_virtual_processes()),
+          ad->size());
     }
 
     // delete old generators, insert new generators this code is
@@ -97,156 +82,122 @@ nest::RNGManager::set_status( const DictionaryDatum& d )
     // set_status, as long as it comes AFTER n_threads_ has been
     // upated
     rng_.clear();
-    for ( index i = 0; i < ad->size(); ++i )
-    {
-      if ( kernel().vp_manager.is_local_vp( i ) )
-      {
-        rng_.push_back( getValue< librandom::RngDatum >(
-          ( *ad )[ kernel().vp_manager.suggest_vp_for_gid( i ) ] ) );
+    for (index i = 0; i < ad->size(); ++i) {
+      if (kernel().vp_manager.is_local_vp(i)) {
+        rng_.push_back(getValue<librandom::RngDatum>(
+            (*ad)[kernel().vp_manager.suggest_vp_for_gid(i)]));
       }
     }
-  }
-  else if ( n_threads_updated and kernel().node_manager.size() == 0 )
-  {
-    LOG( M_WARNING,
-      "RNGManager::set_status",
-      "Equipping threads with new default RNGs" );
+  } else if (n_threads_updated and kernel().node_manager.size() == 0) {
+    LOG(M_WARNING, "RNGManager::set_status",
+        "Equipping threads with new default RNGs");
     create_rngs_();
   }
 
-  if ( d->known( "rng_seeds" ) )
-  {
-    ArrayDatum* ad =
-      dynamic_cast< ArrayDatum* >( ( *d )[ "rng_seeds" ].datum() );
-    if ( ad == 0 )
-    {
+  if (d->known("rng_seeds")) {
+    ArrayDatum *ad = dynamic_cast<ArrayDatum *>((*d)["rng_seeds"].datum());
+    if (ad == 0) {
       throw BadProperty();
     }
 
-    if ( ad->size()
-      != ( size_t )( kernel().vp_manager.get_num_virtual_processes() ) )
-    {
-      LOG( M_ERROR,
-        "RNGManager::set_status",
-        "Number of seeds must equal number of virtual processes "
-        "(threads*processes). RNGs unchanged." );
+    if (ad->size() !=
+        (size_t)(kernel().vp_manager.get_num_virtual_processes())) {
+      LOG(M_ERROR, "RNGManager::set_status",
+          "Number of seeds must equal number of virtual processes "
+          "(threads*processes). RNGs unchanged.");
       throw DimensionMismatch(
-        ( size_t )( kernel().vp_manager.get_num_virtual_processes() ),
-        ad->size() );
+          (size_t)(kernel().vp_manager.get_num_virtual_processes()),
+          ad->size());
     }
 
     // check if seeds are unique
-    std::set< unsigned long > seedset;
-    for ( index i = 0; i < ad->size(); ++i )
-    {
-      long s = ( *ad )[ i ]; // SLI has no ulong tokens
-      if ( not seedset.insert( s ).second )
-      {
-        LOG( M_WARNING,
-          "RNGManager::set_status",
-          "Seeds are not unique across threads!" );
+    std::set<unsigned long> seedset;
+    for (index i = 0; i < ad->size(); ++i) {
+      long s = (*ad)[i]; // SLI has no ulong tokens
+      if (not seedset.insert(s).second) {
+        LOG(M_WARNING, "RNGManager::set_status",
+            "Seeds are not unique across threads!");
         break;
       }
     }
 
     // now apply seeds, resets generators automatically
-    for ( index i = 0; i < ad->size(); ++i )
-    {
-      long s = ( *ad )[ i ];
+    for (index i = 0; i < ad->size(); ++i) {
+      long s = (*ad)[i];
 
-      if ( kernel().vp_manager.is_local_vp( i ) )
-      {
-        rng_[ kernel().vp_manager.vp_to_thread(
-                kernel().vp_manager.suggest_vp_for_gid( i ) ) ]
-          ->seed( s );
+      if (kernel().vp_manager.is_local_vp(i)) {
+        rng_[kernel().vp_manager.vp_to_thread(
+                 kernel().vp_manager.suggest_vp_for_gid(i))]
+            ->seed(s);
       }
 
-      rng_seeds_[ i ] = s;
+      rng_seeds_[i] = s;
     }
   } // if rng_seeds
 
   // set GRNG
-  if ( d->known( "grng" ) )
-  {
+  if (d->known("grng")) {
     // pre-seeded grng that can be used directly, no seeding required
-    updateValue< librandom::RngDatum >( d, names::grng, grng_ );
-  }
-  else if ( n_threads_updated and kernel().node_manager.size() == 0 )
-  {
-    LOG( M_WARNING,
-      "RNGManager::set_status",
-      "Equipping threads with new default GRNG" );
+    updateValue<librandom::RngDatum>(d, names::grng, grng_);
+  } else if (n_threads_updated and kernel().node_manager.size() == 0) {
+    LOG(M_WARNING, "RNGManager::set_status",
+        "Equipping threads with new default GRNG");
     create_grng_();
   }
 
-  if ( d->known( "grng_seed" ) )
-  {
-    const long gseed = getValue< long >( d, names::grng_seed );
+  if (d->known("grng_seed")) {
+    const long gseed = getValue<long>(d, names::grng_seed);
 
     // check if grng seed is unique with respect to rng seeds
     // if grng_seed and rng_seeds given in one SetStatus call
-    std::set< unsigned long > seedset;
-    seedset.insert( gseed );
-    if ( d->known( "rng_seeds" ) )
-    {
-      ArrayDatum* ad_rngseeds =
-        dynamic_cast< ArrayDatum* >( ( *d )[ "rng_seeds" ].datum() );
-      if ( ad_rngseeds == 0 )
-      {
+    std::set<unsigned long> seedset;
+    seedset.insert(gseed);
+    if (d->known("rng_seeds")) {
+      ArrayDatum *ad_rngseeds =
+          dynamic_cast<ArrayDatum *>((*d)["rng_seeds"].datum());
+      if (ad_rngseeds == 0) {
         throw BadProperty();
       }
-      for ( index i = 0; i < ad_rngseeds->size(); ++i )
-      {
-        const long vpseed = ( *ad_rngseeds )[ i ]; // SLI has no ulong tokens
-        if ( not seedset.insert( vpseed ).second )
-        {
-          LOG( M_WARNING,
-            "RNGManager::set_status",
-            "Seeds are not unique across threads!" );
+      for (index i = 0; i < ad_rngseeds->size(); ++i) {
+        const long vpseed = (*ad_rngseeds)[i]; // SLI has no ulong tokens
+        if (not seedset.insert(vpseed).second) {
+          LOG(M_WARNING, "RNGManager::set_status",
+              "Seeds are not unique across threads!");
           break;
         }
       }
     }
     // now apply seed, resets generator automatically
     grng_seed_ = gseed;
-    grng_->seed( gseed );
+    grng_->seed(gseed);
 
   } // if grng_seed
 }
 
-void
-nest::RNGManager::get_status( DictionaryDatum& d )
-{
-  ( *d )[ names::rng_seeds ] = Token( rng_seeds_ );
-  def< long >( d, names::grng_seed, grng_seed_ );
+void nest::RNGManager::get_status(DictionaryDatum &d) {
+  (*d)[names::rng_seeds] = Token(rng_seeds_);
+  def<long>(d, names::grng_seed, grng_seed_);
 }
 
-
-void
-nest::RNGManager::create_rngs_()
-{
+void nest::RNGManager::create_rngs_() {
   // if old generators exist, remove them; since rng_ contains
   // lockPTRs, we don't have to worry about deletion
-  if ( not rng_.empty() )
-  {
-    LOG( M_INFO,
-      "Network::create_rngs_",
-      "Deleting existing random number generators" );
+  if (not rng_.empty()) {
+    LOG(M_INFO, "Network::create_rngs_",
+        "Deleting existing random number generators");
 
     rng_.clear();
   }
 
-  LOG( M_INFO, "Network::create_rngs_", "Creating default RNGs" );
+  LOG(M_INFO, "Network::create_rngs_", "Creating default RNGs");
 
-  rng_seeds_.resize( kernel().vp_manager.get_num_virtual_processes() );
+  rng_seeds_.resize(kernel().vp_manager.get_num_virtual_processes());
 
-  for ( index i = 0; i < static_cast< index >(
-                           kernel().vp_manager.get_num_virtual_processes() );
-        ++i )
-  {
+  for (index i = 0;
+       i < static_cast<index>(kernel().vp_manager.get_num_virtual_processes());
+       ++i) {
     unsigned long s = i + 1;
-    if ( kernel().vp_manager.is_local_vp( i ) )
-    {
+    if (kernel().vp_manager.is_local_vp(i)) {
 /*
  We have to ensure that each thread is provided with a different
  stream of random numbers.  The seeding method for Knuth's LFG
@@ -259,43 +210,39 @@ nest::RNGManager::create_rngs_()
  */
 #ifdef HAVE_GSL
       librandom::RngPtr rng(
-        new librandom::GslRandomGen( gsl_rng_knuthran2002, s ) );
+          new librandom::GslRandomGen(gsl_rng_knuthran2002, s));
 #else
-      librandom::RngPtr rng = librandom::RandomGen::create_knuthlfg_rng( s );
+      librandom::RngPtr rng = librandom::RandomGen::create_knuthlfg_rng(s);
 #endif
 
-      if ( not rng )
-      {
-        LOG( M_ERROR, "Network::create_rngs_", "Error initializing knuthlfg" );
+      if (not rng) {
+        LOG(M_ERROR, "Network::create_rngs_", "Error initializing knuthlfg");
 
         throw KernelException();
       }
 
-      rng_.push_back( rng );
+      rng_.push_back(rng);
     }
 
-    rng_seeds_[ i ] = s;
+    rng_seeds_[i] = s;
   }
 }
 
-void
-nest::RNGManager::create_grng_()
-{
+void nest::RNGManager::create_grng_() {
   // create new grng
-  LOG( M_INFO, "Network::create_grng_", "Creating new default global RNG" );
+  LOG(M_INFO, "Network::create_grng_", "Creating new default global RNG");
 
 // create default RNG with default seed
 #ifdef HAVE_GSL
-  grng_ = librandom::RngPtr( new librandom::GslRandomGen(
-    gsl_rng_knuthran2002, librandom::RandomGen::DefaultSeed ) );
+  grng_ = librandom::RngPtr(new librandom::GslRandomGen(
+      gsl_rng_knuthran2002, librandom::RandomGen::DefaultSeed));
 #else
   grng_ = librandom::RandomGen::create_knuthlfg_rng(
-    librandom::RandomGen::DefaultSeed );
+      librandom::RandomGen::DefaultSeed);
 #endif
 
-  if ( not grng_ )
-  {
-    LOG( M_ERROR, "Network::create_grng_", "Error initializing knuthlfg" );
+  if (not grng_) {
+    LOG(M_ERROR, "Network::create_grng_", "Error initializing knuthlfg");
 
     throw KernelException();
   }
@@ -306,5 +253,5 @@ nest::RNGManager::create_grng_()
    */
   long s = 0;
   grng_seed_ = s;
-  grng_->seed( s );
+  grng_->seed(s);
 }

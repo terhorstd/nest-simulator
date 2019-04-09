@@ -38,8 +38,7 @@
 #include "dictdatum.h"
 #include "dictutils.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
   Name: PseudoRecordingDevice - Common properties of all pseudo-recording
@@ -59,7 +58,6 @@ namespace nest
   SeeAlso: Device, StimulatingDevice, RecordingDevice
 */
 
-
 /**
  * Base class for all pseudo recording devices.
  *
@@ -78,42 +76,32 @@ namespace nest
  *
  * @author HEP 2002-07-22, 2008-03-21, 2008-07-01
  */
-class PseudoRecordingDevice : public Device
-{
+class PseudoRecordingDevice : public Device {
 
 public:
   PseudoRecordingDevice();
-  PseudoRecordingDevice( const PseudoRecordingDevice& );
-  virtual ~PseudoRecordingDevice()
-  {
-  }
+  PseudoRecordingDevice(const PseudoRecordingDevice &);
+  virtual ~PseudoRecordingDevice() {}
 
   /** Indicate if recording device is active.
    *  The argument is the time stamp of the event, and the
    *  device is active if start_ < T <= stop_.
    */
-  bool is_active( Time const& T ) const;
+  bool is_active(Time const &T) const;
 };
 
-inline PseudoRecordingDevice::PseudoRecordingDevice()
-  : Device()
-{
-}
+inline PseudoRecordingDevice::PseudoRecordingDevice() : Device() {}
 
 inline PseudoRecordingDevice::PseudoRecordingDevice(
-  const PseudoRecordingDevice& prd )
-  : Device( prd )
-{
-}
+    const PseudoRecordingDevice &prd)
+    : Device(prd) {}
 
-inline bool
-PseudoRecordingDevice::is_active( Time const& T ) const
-{
+inline bool PseudoRecordingDevice::is_active(Time const &T) const {
   const long stamp = T.get_steps();
 
   return get_t_min_() < stamp and stamp <= get_t_max_();
 }
 
-} // namespace
+} // namespace nest
 
 #endif // PSEUDO_RECORDING_DEVICE_H

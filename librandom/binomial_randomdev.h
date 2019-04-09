@@ -42,7 +42,6 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-
 /** @BeginDocumentation
 Name: rdevdict::binomial - binomial random deviate generator
 
@@ -60,9 +59,7 @@ SeeAlso: CreateRDV, RandomArray, rdevdict
 Author: Hans Ekkehard Plesser, Moritz Deger
 */
 
-
-namespace librandom
-{
+namespace librandom {
 
 /**
  Class BinomialRNG
@@ -95,15 +92,13 @@ namespace librandom
  * Stable URL: http://www.jstor.org/stable/2286346 .
  * ---------------------------------------------------------------- */
 
-
-class BinomialRandomDev : public RandomDev
-{
+class BinomialRandomDev : public RandomDev {
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  BinomialRandomDev( RngPtr, double p_s = 0.5, unsigned int n_s = 1 );
-  BinomialRandomDev( double p_s = 0.5, unsigned int n_s = 1 );
+  BinomialRandomDev(RngPtr, double p_s = 0.5, unsigned int n_s = 1);
+  BinomialRandomDev(double p_s = 0.5, unsigned int n_s = 1);
 
   /**
    * set parameters for p and n
@@ -111,9 +106,9 @@ public:
    * p - success probability for single trial
    * n - number of trials
    */
-  void set_p_n( double, unsigned int );
-  void set_p( double );       //!< set p
-  void set_n( unsigned int ); //!< set n
+  void set_p_n(double, unsigned int);
+  void set_p(double);       //!< set p
+  void set_n(unsigned int); //!< set n
 
   /**
    * Import sets of overloaded virtual functions.
@@ -126,21 +121,16 @@ public:
   using RandomDev::operator();
   using RandomDev::ldev;
 
-  long ldev( RngPtr ) const; //!< draw integer, threaded
-  bool
-  has_ldev() const
-  {
-    return true;
-  }
+  long ldev(RngPtr) const; //!< draw integer, threaded
+  bool has_ldev() const { return true; }
 
-  double operator()( RngPtr ) const; //!< return as double, threaded
+  double operator()(RngPtr) const; //!< return as double, threaded
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
-
+  void get_status(DictionaryDatum &) const;
 
 private:
   PoissonRandomDev poisson_dev_; //!< source of Poisson random numbers
@@ -149,18 +139,16 @@ private:
   double phi_;
   long m_;
   unsigned int n_;          //!< parameter n in binomial distribution
-  std::vector< double > f_; //!< precomputed table of f
+  std::vector<double> f_;   //!< precomputed table of f
   unsigned int n_tablemax_; //!< current maximal n with precomputed values
 
-  void init_();                   //!< check and initialize internal parameters
-  void PrecomputeTable( size_t ); //!< compute the internal lookup table
+  void init_();                 //!< check and initialize internal parameters
+  void PrecomputeTable(size_t); //!< compute the internal lookup table
 };
 
-inline double
-BinomialRandomDev::operator()( RngPtr rthrd ) const
-{
-  return static_cast< double >( ldev( rthrd ) );
+inline double BinomialRandomDev::operator()(RngPtr rthrd) const {
+  return static_cast<double>(ldev(rthrd));
 }
-}
+} // namespace librandom
 
 #endif

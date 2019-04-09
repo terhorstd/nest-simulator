@@ -25,8 +25,7 @@
 
 #include "connection.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: gap_junction - Synapse type for gap-junction connections.
@@ -69,25 +68,20 @@ Author: Jan Hahne, Moritz Helias, Susanne Kunkel
 
 SeeAlso: synapsedict, hh_psc_alpha_gap
 */
-template < typename targetidentifierT >
-class GapJunction : public Connection< targetidentifierT >
-{
+template <typename targetidentifierT>
+class GapJunction : public Connection<targetidentifierT> {
 
 public:
   // this line determines which common properties to use
   typedef CommonSynapseProperties CommonPropertiesType;
-  typedef Connection< targetidentifierT > ConnectionBase;
+  typedef Connection<targetidentifierT> ConnectionBase;
   typedef GapJunctionEvent EventType;
 
   /**
    * Default Constructor.
    * Sets default values for all parameters. Needed by GenericConnectorModel.
    */
-  GapJunction()
-    : ConnectionBase()
-    , weight_( 1.0 )
-  {
-  }
+  GapJunction() : ConnectionBase(), weight_(1.0) {}
 
   // Explicitly declare all methods inherited from the dependent base
   // ConnectionBase. This avoids explicit name prefixes in all places these
@@ -97,19 +91,15 @@ public:
   using ConnectionBase::get_rport;
   using ConnectionBase::get_target;
 
-  void
-  check_connection( Node& s,
-    Node& t,
-    rport receptor_type,
-    const CommonPropertiesType& )
-  {
+  void check_connection(Node &s, Node &t, rport receptor_type,
+                        const CommonPropertiesType &) {
     EventType ge;
 
-    s.sends_secondary_event( ge );
-    ge.set_sender( s );
-    Connection< targetidentifierT >::target_.set_rport(
-      t.handles_test_event( ge, receptor_type ) );
-    Connection< targetidentifierT >::target_.set_target( &t );
+    s.sends_secondary_event(ge);
+    ge.set_sender(s);
+    Connection<targetidentifierT>::target_.set_rport(
+        t.handles_test_event(ge, receptor_type));
+    Connection<targetidentifierT>::target_.set_target(&t);
   }
 
   /**
@@ -117,62 +107,49 @@ public:
    * \param e The event to send
    * \param p The port under which this connection is stored in the Connector.
    */
-  void
-  send( Event& e, thread t, const CommonSynapseProperties& )
-  {
-    e.set_weight( weight_ );
-    e.set_receiver( *get_target( t ) );
-    e.set_rport( get_rport() );
+  void send(Event &e, thread t, const CommonSynapseProperties &) {
+    e.set_weight(weight_);
+    e.set_receiver(*get_target(t));
+    e.set_rport(get_rport());
     e();
   }
 
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
-  void
-  set_weight( double w )
-  {
-    weight_ = w;
-  }
+  void set_weight(double w) { weight_ = w; }
 
-  void
-  set_delay( double )
-  {
-    throw BadProperty( "gap_junction connection has no delay" );
+  void set_delay(double) {
+    throw BadProperty("gap_junction connection has no delay");
   }
 
 private:
   double weight_; //!< connection weight
 };
 
-template < typename targetidentifierT >
-void
-GapJunction< targetidentifierT >::get_status( DictionaryDatum& d ) const
-{
+template <typename targetidentifierT>
+void GapJunction<targetidentifierT>::get_status(DictionaryDatum &d) const {
   // We have to include the delay here to prevent
   // errors due to internal calls of
   // this function in SLI/pyNEST
-  ConnectionBase::get_status( d );
-  def< double >( d, names::weight, weight_ );
-  def< long >( d, names::size_of, sizeof( *this ) );
+  ConnectionBase::get_status(d);
+  def<double>(d, names::weight, weight_);
+  def<long>(d, names::size_of, sizeof(*this));
 }
 
-template < typename targetidentifierT >
-void
-GapJunction< targetidentifierT >::set_status( const DictionaryDatum& d,
-  ConnectorModel& cm )
-{
+template <typename targetidentifierT>
+void GapJunction<targetidentifierT>::set_status(const DictionaryDatum &d,
+                                                ConnectorModel &cm) {
   // If the delay is set, we throw a BadProperty
-  if ( d->known( names::delay ) )
-  {
-    throw BadProperty( "gap_junction connection has no delay" );
+  if (d->known(names::delay)) {
+    throw BadProperty("gap_junction connection has no delay");
   }
 
-  ConnectionBase::set_status( d, cm );
-  updateValue< double >( d, names::weight, weight_ );
+  ConnectionBase::set_status(d, cm);
+  updateValue<double>(d, names::weight, weight_);
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef GAP_JUNCTION_H */

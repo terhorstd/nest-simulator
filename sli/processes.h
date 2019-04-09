@@ -46,26 +46,17 @@
 #include "slimodule.h"
 
 // A new SLI-Module:
-class Processes : public SLIModule
-{
+class Processes : public SLIModule {
   // The following concernes the new module: -----------------------
 
 public:
   static const std::string systemerror(
-    SLIInterpreter* ); // This will be used to produce systemerror-messages
+      SLIInterpreter *); // This will be used to produce systemerror-messages
 
-  static int fd( std::istream* s );
-  static int fd( std::ostream* s );
-  static int
-  fd( std::ostream& s )
-  {
-    return fd( &s );
-  }
-  static int
-  fd( std::istream& s )
-  {
-    return fd( &s );
-  }
+  static int fd(std::istream *s);
+  static int fd(std::ostream *s);
+  static int fd(std::ostream &s) { return fd(&s); }
+  static int fd(std::istream &s) { return fd(&s); }
 
   static pid_t children_group; // the declaration of a static variable. It will
   // persist as long as the instantiation of the Processes module lives. Never
@@ -95,7 +86,6 @@ public:
   const Name SIGTSTP_name;
   const Name SIGTTIN_name;
   const Name SIGTTOU_name;
-
 
   const Name sys_errname; // The name of the variable in errordict, in which the
                           // name of a system error will be stored
@@ -141,197 +131,141 @@ public:
   const Name EXDEV_name;
 
   // The constructor and destructor for our module object (-if we need them-):
-  Processes( void )
-    : signaldict_name( "signaldict" )
-    , SIGABRT_name( "SIGABRT" )
-    , SIGALRM_name( "SIGALRM" )
-    , SIGFPE_name( "SIGFPE" )
-    , SIGHUP_name( "SIGHUP" )
-    , SIGILL_name( "SIGILL" )
-    , SIGINT_name( "SIGINT" )
-    , SIGKILL_name( "SIGKILL" )
-    , SIGPIPE_name( "SIGPIPE" )
-    , SIGQUIT_name( "SIGQUIT" )
-    , SIGSEGV_name( "SIGSEGV" )
-    , SIGTERM_name( "SIGTERM" )
-    , SIGUSR1_name( "SIGUSR1" )
-    , SIGUSR2_name( "SIGUSR2" )
-    , SIGCHLD_name( "SIGCHLD" )
-    , SIGCONT_name( "SIGCONT" )
-    , SIGSTOP_name( "SIGSTOP" )
-    , SIGTSTP_name( "SIGTSTP" )
-    , SIGTTIN_name( "SIGTTIN" )
-    , SIGTTOU_name( "SIGTTOU" )
-    , sys_errname( "sys_errname" ) // The name of the variable in errordict, in
+  Processes(void)
+      : signaldict_name("signaldict"), SIGABRT_name("SIGABRT"),
+        SIGALRM_name("SIGALRM"), SIGFPE_name("SIGFPE"), SIGHUP_name("SIGHUP"),
+        SIGILL_name("SIGILL"), SIGINT_name("SIGINT"), SIGKILL_name("SIGKILL"),
+        SIGPIPE_name("SIGPIPE"), SIGQUIT_name("SIGQUIT"),
+        SIGSEGV_name("SIGSEGV"), SIGTERM_name("SIGTERM"),
+        SIGUSR1_name("SIGUSR1"), SIGUSR2_name("SIGUSR2"),
+        SIGCHLD_name("SIGCHLD"), SIGCONT_name("SIGCONT"),
+        SIGSTOP_name("SIGSTOP"), SIGTSTP_name("SIGTSTP"),
+        SIGTTIN_name("SIGTTIN"), SIGTTOU_name("SIGTTOU"),
+        sys_errname("sys_errname") // The name of the variable in errordict, in
                                    // which the name of a system error will be
                                    // stored
-    , sys_errno( "sys_errno" )     // The corresponding error-number
+        ,
+        sys_errno("sys_errno") // The corresponding error-number
 
-    // The Names of the system's error-numbers contained in errordict
-    , E2BIG_name( "E2BIG" )
-    , EACCES_name( "EACCES" )
-    , EAGAIN_name( "EAGAIN" )
-    , EBADF_name( "EBADF" )
-    , EBUSY_name( "EBUSY" )
-    , ECHILD_name( "ECHILD" )
-    , EDEADLK_name( "EDEADLK" )
-    , EDOM_name( "EDOM" )
-    , EEXIST_name( "EEXIST" )
-    , EFAULT_name( "EFAULT" )
-    , EFBIG_name( "EFBIG" )
-    , EINTR_name( "EINTR" )
-    , EINVAL_name( "EINVAL" )
-    , EIO_name( "EIO" )
-    , EISDIR_name( "EISDIR" )
-    , EMFILE_name( "EMFILE" )
-    , EMLINK_name( "EMLINK" )
-    , ENAMETOOLONG_name( "ENAMETOOLONG" )
-    , ENFILE_name( "ENFILE" )
-    , ENODEV_name( "ENODEV" )
-    , ENOENT_name( "ENOENT" )
-    , ENOEXEC_name( "ENOEXEC" )
-    , ENOLCK_name( "ENOLCK" )
-    , ENOMEM_name( "ENOMEM" )
-    , ENOSPC_name( "ENOSPC" )
-    , ENOSYS_name( "ENOSYS" )
-    , ENOTDIR_name( "ENOTDIR" )
-    , ENOTEMPTY_name( "ENOTEMPTY" )
-    , ENOTTY_name( "ENOTTY" )
-    , ENXIO_name( "ENXIO" )
-    , EPERM_name( "EPERM" )
-    , EPIPE_name( "EPIPE" )
-    , ERANGE_name( "ERANGE" )
-    , EROFS_name( "EROFS" )
-    , ESPIPE_name( "ESPIPE" )
-    , ESRCH_name( "ESRCH" )
-    , EXDEV_name( "EXDEV" )
-  {
-  } // Processes constructor
+        // The Names of the system's error-numbers contained in errordict
+        ,
+        E2BIG_name("E2BIG"), EACCES_name("EACCES"), EAGAIN_name("EAGAIN"),
+        EBADF_name("EBADF"), EBUSY_name("EBUSY"), ECHILD_name("ECHILD"),
+        EDEADLK_name("EDEADLK"), EDOM_name("EDOM"), EEXIST_name("EEXIST"),
+        EFAULT_name("EFAULT"), EFBIG_name("EFBIG"), EINTR_name("EINTR"),
+        EINVAL_name("EINVAL"), EIO_name("EIO"), EISDIR_name("EISDIR"),
+        EMFILE_name("EMFILE"), EMLINK_name("EMLINK"),
+        ENAMETOOLONG_name("ENAMETOOLONG"), ENFILE_name("ENFILE"),
+        ENODEV_name("ENODEV"), ENOENT_name("ENOENT"), ENOEXEC_name("ENOEXEC"),
+        ENOLCK_name("ENOLCK"), ENOMEM_name("ENOMEM"), ENOSPC_name("ENOSPC"),
+        ENOSYS_name("ENOSYS"), ENOTDIR_name("ENOTDIR"),
+        ENOTEMPTY_name("ENOTEMPTY"), ENOTTY_name("ENOTTY"), ENXIO_name("ENXIO"),
+        EPERM_name("EPERM"), EPIPE_name("EPIPE"), ERANGE_name("ERANGE"),
+        EROFS_name("EROFS"), ESPIPE_name("ESPIPE"), ESRCH_name("ESRCH"),
+        EXDEV_name("EXDEV") {} // Processes constructor
 
-  ~Processes( void ); // clean up dynmem for static variables...
+  ~Processes(void); // clean up dynmem for static variables...
 
   // The Module is registered by a call to this Function:
-  void init( SLIInterpreter* );
+  void init(SLIInterpreter *);
 
   // This function will return the name of our module:
-  const std::string name( void ) const;
+  const std::string name(void) const;
 
   // This function -may- return a string of SLI-commands to be executed for
   // initialization
-  const std::string commandstring( void ) const;
-
+  const std::string commandstring(void) const;
 
   // ---------------------------------------------------------------
-
 
   // The following concernes the new command(s): -------------------
 
 public:
   // Module contains classes defining new SLI-functions:
-  class ForkFunction : public SLIFunction
-  {
+  class ForkFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class Sysexec_aFunction : public SLIFunction
-  {
+  class Sysexec_aFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class WaitPIDFunction : public SLIFunction
-  {
+  class WaitPIDFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class KillFunction : public SLIFunction
-  {
+  class KillFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class PipeFunction : public SLIFunction
-  {
+  class PipeFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class Dup2_is_isFunction : public SLIFunction
-  {
+  class Dup2_is_isFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class Dup2_os_osFunction : public SLIFunction
-  {
+  class Dup2_os_osFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class Dup2_is_osFunction : public SLIFunction
-  {
+  class Dup2_is_osFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class Dup2_os_isFunction : public SLIFunction
-  {
+  class Dup2_os_isFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class AvailableFunction : public SLIFunction
-  {
+  class AvailableFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class GetPIDFunction : public SLIFunction
-  {
+  class GetPIDFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class GetPPIDFunction : public SLIFunction
-  {
+  class GetPPIDFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class GetPGRPFunction : public SLIFunction
-  {
+  class GetPGRPFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class MkfifoFunction : public SLIFunction
-  {
+  class MkfifoFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
 
 #if defined IS_BLUEGENE_P || defined IS_BLUEGENE_Q
-  class MemoryThisjobBgFunction : public SLIFunction
-  {
-    void execute( SLIInterpreter* ) const;
+  class MemoryThisjobBgFunction : public SLIFunction {
+    void execute(SLIInterpreter *) const;
   };
 #endif
 
 #if defined __APPLE__ && defined HAVE_MACH_MACH_H
-  class MemoryThisjobDarwinFunction : public SLIFunction
-  {
-    void execute( SLIInterpreter* ) const;
+  class MemoryThisjobDarwinFunction : public SLIFunction {
+    void execute(SLIInterpreter *) const;
   };
 #endif
 
-  class SetNonblockFunction : public SLIFunction
-  {
+  class SetNonblockFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class CtermidFunction : public SLIFunction
-  {
+  class CtermidFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class Isatty_isFunction : public SLIFunction
-  {
+  class Isatty_isFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
-  class Isatty_osFunction : public SLIFunction
-  {
+  class Isatty_osFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const; // This is all we need.
+    void execute(SLIInterpreter *) const; // This is all we need.
   };
 
   // Module contains -one- instantiation of each new function-class:
@@ -365,7 +299,6 @@ public:
   Isatty_osFunction isatty_osfunction;
   Isatty_isFunction isatty_isfunction;
 };
-
 
 // Description of new SLI-commands:
 
@@ -960,7 +893,6 @@ FirstVersion: Oct 20 1999
 SeeAlso: available, ignore
 
 */
-
 
 /** @BeginDocumentation
 Name: ctermid - Return the path to the controlling terminal of the process.

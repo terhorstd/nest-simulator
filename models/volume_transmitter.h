@@ -33,9 +33,7 @@
 // Includes from sli:
 #include "namedatum.h"
 
-
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: volume_transmitter - Node used in combination with neuromodulated synaptic
@@ -94,23 +92,14 @@ SeeAlso: stdp_dopamine_synapse
 */
 class ConnectorBase;
 
-class volume_transmitter : public Archiving_Node
-{
+class volume_transmitter : public Archiving_Node {
 
 public:
   volume_transmitter();
-  volume_transmitter( const volume_transmitter& );
+  volume_transmitter(const volume_transmitter &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  local_receiver() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
+  bool local_receiver() const { return false; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -120,50 +109,48 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  void handle( SpikeEvent& );
+  void handle(SpikeEvent &);
 
-  port handles_test_event( SpikeEvent&, rport );
+  port handles_test_event(SpikeEvent &, rport);
 
-  void get_status( DictionaryDatum& d ) const;
-  void set_status( const DictionaryDatum& d );
+  void get_status(DictionaryDatum &d) const;
+  void set_status(const DictionaryDatum &d);
 
   /**
    * Since volume transmitters are duplicated on each thread, and are
    * hence treated just as devices during node creation, we need to
    * define the corresponding setter and getter for local_device_id.
    **/
-  void set_local_device_id( const index ldid );
+  void set_local_device_id(const index ldid);
   index get_local_device_id() const;
 
-  const std::vector< spikecounter >& deliver_spikes();
+  const std::vector<spikecounter> &deliver_spikes();
 
 private:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
 
-  void update( const Time&, const long, const long );
+  void update(const Time &, const long, const long);
 
   // --------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     Parameters_();
-    void get( DictionaryDatum& ) const;
-    void set( const DictionaryDatum& );
+    void get(DictionaryDatum &) const;
+    void set(const DictionaryDatum &);
     long deliver_interval_; //!< update interval in d_min time steps
   };
 
   //-----------------------------------------------
 
-  struct Buffers_
-  {
+  struct Buffers_ {
     RingBuffer neuromodulatory_spikes_; //!< buffer to store incoming spikes
     //! vector to store and deliver spikes
-    std::vector< spikecounter > spikecounter_;
+    std::vector<spikecounter> spikecounter_;
   };
 
   Parameters_ P_;
@@ -172,59 +159,48 @@ private:
   index local_device_id_;
 };
 
-inline port
-volume_transmitter::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port volume_transmitter::handles_test_event(SpikeEvent &,
+                                                   rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline void
-volume_transmitter::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  Archiving_Node::get_status( d );
+inline void volume_transmitter::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  Archiving_Node::get_status(d);
 
-  ( *d )[ names::element_type ] = LiteralDatum( names::other );
+  (*d)[names::element_type] = LiteralDatum(names::other);
 }
 
-inline void
-volume_transmitter::set_status( const DictionaryDatum& d )
-{
+inline void volume_transmitter::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
 }
 
-inline const std::vector< nest::spikecounter >&
-volume_transmitter::deliver_spikes()
-{
+inline const std::vector<nest::spikecounter> &
+volume_transmitter::deliver_spikes() {
   return B_.spikecounter_;
 }
 
-inline void
-volume_transmitter::set_local_device_id( const index ldid )
-{
+inline void volume_transmitter::set_local_device_id(const index ldid) {
   local_device_id_ = ldid;
 }
 
-inline index
-volume_transmitter::get_local_device_id() const
-{
+inline index volume_transmitter::get_local_device_id() const {
   return local_device_id_;
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef VOLUME_TRANSMITTER_H */

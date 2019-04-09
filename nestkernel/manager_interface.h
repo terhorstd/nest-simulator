@@ -26,8 +26,7 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 
 /**
  * Interface for kernel manager classes.
@@ -40,20 +39,15 @@ namespace nest
  *
  * @ingroup KernelManagers
  */
-class ManagerInterface
-{
+class ManagerInterface {
 private:
-  ManagerInterface( ManagerInterface const& ); // do not implement
-  void operator=( ManagerInterface const& );   // do not implement
+  ManagerInterface(ManagerInterface const &); // do not implement
+  void operator=(ManagerInterface const &);   // do not implement
 
 public:
-  ManagerInterface()
-  {
-  }
+  ManagerInterface() {}
 
-  virtual ~ManagerInterface()
-  {
-  }
+  virtual ~ManagerInterface() {}
 
   /**
    * Prepare manager for operation.
@@ -87,9 +81,9 @@ public:
    */
   virtual void finalize() = 0;
 
-  virtual void set_status( const DictionaryDatum& ) = 0;
-  virtual void get_status( DictionaryDatum& ) = 0;
+  virtual void set_status(const DictionaryDatum &) = 0;
+  virtual void get_status(DictionaryDatum &) = 0;
 };
-}
+} // namespace nest
 
 #endif /* MANAGER_INTERFACE_H */

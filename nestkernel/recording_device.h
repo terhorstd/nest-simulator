@@ -38,8 +38,7 @@
 #include "dictdatum.h"
 #include "dictutils.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
   Name: RecordingDevice - Common properties of all recording devices.
@@ -199,7 +198,6 @@ namespace nest
   SeeAlso: Device, StimulatingDevice
 */
 
-
 /**
  * Base class for all recording devices.
  *
@@ -241,20 +239,13 @@ namespace nest
  *
  * @author HEP 2002-07-22, 2008-03-21, 2011-02-11
  */
-class RecordingDevice : public Device
-{
+class RecordingDevice : public Device {
 
 public:
   /**
    * Device mode.
    */
-  enum Mode
-  {
-    SPIKE_DETECTOR,
-    MULTIMETER,
-    SPIN_DETECTOR,
-    WEIGHT_RECORDER
-  };
+  enum Mode { SPIKE_DETECTOR, MULTIMETER, SPIN_DETECTOR, WEIGHT_RECORDER };
 
   /**
    * Create recording device information.
@@ -268,31 +259,22 @@ public:
    * @param Default value for withport property
    * @param Default value for withrport property
    */
-  RecordingDevice( const Node&,
-    Mode,
-    const std::string&,
-    bool,
-    bool,
-    bool = false,
-    bool = false,
-    bool = false,
-    bool = false );
+  RecordingDevice(const Node &, Mode, const std::string &, bool, bool,
+                  bool = false, bool = false, bool = false, bool = false);
 
   /**
    * Copy from prototype member.
    * @param Node of which the device is member.
    * @param Prototype member to copy
    */
-  RecordingDevice( const Node&, const RecordingDevice& );
-  virtual ~RecordingDevice()
-  {
-  }
+  RecordingDevice(const Node &, const RecordingDevice &);
+  virtual ~RecordingDevice() {}
 
   using Device::init_parameters;
-  void init_parameters( const RecordingDevice& );
+  void init_parameters(const RecordingDevice &);
 
   using Device::init_state;
-  void init_state( const RecordingDevice& );
+  void init_state(const RecordingDevice &);
 
   /**
    * Close file stream.
@@ -327,23 +309,23 @@ public:
    * - sender ID
    * @param endrecord pass false if more data is to come on same line
    */
-  void record_event( const Event&, bool endrecord = true );
+  void record_event(const Event &, bool endrecord = true);
 
   /**
    * Print single item of type ValueT.
    *
    * @param endrecord pass false if more data is to come on same line.
    */
-  template < typename ValueT >
-  void print_value( const ValueT&, bool endrecord = true );
+  template <typename ValueT>
+  void print_value(const ValueT &, bool endrecord = true);
 
   /** Indicate if recording device is active.
    *  The argument is the time stamp of the event, and the
    *  device is active if start_ < T <= stop_.
    */
-  bool is_active( Time const& T ) const;
+  bool is_active(Time const &T) const;
 
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
   /**
    * Set properties of recording device.
@@ -358,7 +340,7 @@ public:
    * - Modifying /data_prefix in the root node will close the current stream
    *   and open a new stream on next call to Simulate (if recording to file).
    */
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   /**
    * Special version for recorders that need to have their data cleared.
@@ -370,40 +352,22 @@ public:
    * @todo This breaks encapsulation. Can be find a better solution, short of a
    *       huge mess with pointers to owners and an extended owner interface?
    */
-  template < typename DataT >
-  void set_status( const DictionaryDatum&, DataT& t );
+  template <typename DataT> void set_status(const DictionaryDatum &, DataT &t);
 
-  bool
-  to_screen() const
-  {
-    return P_.to_screen_;
-  }
-  bool
-  to_file() const
-  {
-    return P_.to_file_;
-  }
-  bool
-  to_memory() const
-  {
-    return P_.to_memory_;
-  }
-  bool
-  to_accumulator() const
-  {
-    return P_.to_accumulator_;
-  }
+  bool to_screen() const { return P_.to_screen_; }
+  bool to_file() const { return P_.to_file_; }
+  bool to_memory() const { return P_.to_memory_; }
+  bool to_accumulator() const { return P_.to_accumulator_; }
 
-  inline void set_precise_times( bool precise_times );
+  inline void set_precise_times(bool precise_times);
 
-  inline void set_precision( long precision );
+  inline void set_precision(long precision);
 
   inline bool records_precise_times() const;
 
   inline bool is_precision_user_set() const;
 
   inline bool is_precise_times_user_set() const;
-
 
 private:
   /**
@@ -415,32 +379,32 @@ private:
    *                 precise_times:  give time in ms, take into account offsets
    * none set                     :  give time in ms, ignore offsets
    */
-  void print_time_( std::ostream&, const Time&, double offset );
+  void print_time_(std::ostream &, const Time &, double offset);
 
   /**
    * Print a node's global ID and/or address, according to the recorder's flags.
    */
-  void print_id_( std::ostream&, index );
+  void print_id_(std::ostream &, index);
 
   /**
    * Print the weight of an event.
    */
-  void print_weight_( std::ostream&, double );
+  void print_weight_(std::ostream &, double);
 
   /**
    * Print the target gid of an event.
    */
-  void print_target_( std::ostream&, index );
+  void print_target_(std::ostream &, index);
 
   /**
    * Print the port of an event.
    */
-  void print_port_( std::ostream&, long );
+  void print_port_(std::ostream &, long);
 
   /**
    * Print the rport of an event.
    */
-  void print_rport_( std::ostream&, long );
+  void print_rport_(std::ostream &, long);
 
   /**
    * Store data in internal structure.
@@ -452,7 +416,7 @@ private:
    * @param store port of event
    * @param store rport of event
    */
-  void store_data_( index, const Time&, double, double, index, long, long );
+  void store_data_(index, const Time &, double, double, index, long, long);
 
   /**
    * Clear data in internal structure, and call clear_data_hook().
@@ -474,8 +438,7 @@ private:
 
   // ------------------------------------------------------------------
 
-  struct Buffers_
-  {
+  struct Buffers_ {
     std::ofstream fs_; //!< the file to write the recorded data to
 
     /**
@@ -484,7 +447,7 @@ private:
      * This pointer is zero unless the user explicitly sets fbuffer_size_
      * to a value greater than zero.
      */
-    char* fbuffer_;
+    char *fbuffer_;
     long fbuffer_size_; //!< size of fbuffer_; -1: not yet set
 
     Buffers_();
@@ -493,8 +456,7 @@ private:
 
   // ------------------------------------------------------------------
 
-  struct Parameters_
-  {
+  struct Parameters_ {
     bool to_file_;   //!< true if recorder writes its output to a file
     bool to_screen_; //!< true if recorder writes its output to stdout
     bool to_memory_; //!< true if data should be recorded in memory, default
@@ -538,10 +500,10 @@ private:
      * @param Default value for withport property
      * @param Default value for withrport property
      */
-    Parameters_( const std::string&, bool, bool, bool, bool, bool, bool );
+    Parameters_(const std::string &, bool, bool, bool, bool, bool, bool);
 
     //! Store current values in dictionary
-    void get( const RecordingDevice&, DictionaryDatum& ) const;
+    void get(const RecordingDevice &, DictionaryDatum &) const;
 
     /**
      * Set values from dictionary.
@@ -549,127 +511,102 @@ private:
      * @note `Buffers_&` cannot be `const` because `basic_ofstream::is_open()`
      * is not `const` in C++98  (cf C++ Standard §27.8.1.10).
      */
-    void set( const RecordingDevice&, Buffers_&, const DictionaryDatum& );
+    void set(const RecordingDevice &, Buffers_ &, const DictionaryDatum &);
   };
 
   // ------------------------------------------------------------------
 
-  struct State_
-  {
-    size_t events_;                         //!< Event counter
-    std::vector< long > event_senders_;     //!< List of event sender ids
-    std::vector< long > event_targets_;     //!< List of event targets ids
-    std::vector< long > event_ports_;       //!< List of event ports
-    std::vector< long > event_rports_;      //!< List of event rports
-    std::vector< double > event_times_ms_;  //!< List of event times in ms
-    std::vector< long > event_times_steps_; //!< List of event times in steps
+  struct State_ {
+    size_t events_;                       //!< Event counter
+    std::vector<long> event_senders_;     //!< List of event sender ids
+    std::vector<long> event_targets_;     //!< List of event targets ids
+    std::vector<long> event_ports_;       //!< List of event ports
+    std::vector<long> event_rports_;      //!< List of event rports
+    std::vector<double> event_times_ms_;  //!< List of event times in ms
+    std::vector<long> event_times_steps_; //!< List of event times in steps
     //! List of event time offsets
-    std::vector< double > event_times_offsets_;
-    std::vector< double > event_weights_; //!< List of event weights
+    std::vector<double> event_times_offsets_;
+    std::vector<double> event_weights_; //!< List of event weights
 
     State_(); //!< Sets default parameter values
 
     void clear_events(); //!< clear all data
     //! Store current values in dictionary
-    void get( DictionaryDatum&, const Parameters_& ) const;
-    void set( const DictionaryDatum& ); //!< Get values from dictionary
+    void get(DictionaryDatum &, const Parameters_ &) const;
+    void set(const DictionaryDatum &); //!< Get values from dictionary
   };
 
   // ------------------------------------------------------------------
 
-  const Node& node_; //!< node to which device instance belongs
+  const Node &node_; //!< node to which device instance belongs
   const Mode mode_;  //!< operating mode, depends on owning node
   Parameters_ P_;
   State_ S_;
   Buffers_ B_;
 };
 
-inline bool
-RecordingDevice::is_precision_user_set() const
-{
+inline bool RecordingDevice::is_precision_user_set() const {
   return P_.user_set_precision_;
 }
 
-inline bool
-RecordingDevice::is_precise_times_user_set() const
-{
+inline bool RecordingDevice::is_precise_times_user_set() const {
   return P_.user_set_precise_times_;
 }
 
-inline bool
-RecordingDevice::records_precise_times() const
-{
+inline bool RecordingDevice::records_precise_times() const {
   return P_.precise_times_;
 }
 
-inline bool
-RecordingDevice::is_active( Time const& T ) const
-{
+inline bool RecordingDevice::is_active(Time const &T) const {
   const long stamp = T.get_steps();
 
   return get_t_min_() < stamp and stamp <= get_t_max_();
 }
 
-inline void
-RecordingDevice::get_status( DictionaryDatum& d ) const
-{
-  P_.get( *this, d );
-  S_.get( d, P_ );
-  Device::get_status( d );
+inline void RecordingDevice::get_status(DictionaryDatum &d) const {
+  P_.get(*this, d);
+  S_.get(d, P_);
+  Device::get_status(d);
 
-  ( *d )[ names::element_type ] = LiteralDatum( names::recorder );
+  (*d)[names::element_type] = LiteralDatum(names::recorder);
 }
 
-inline void
-RecordingDevice::set_precise_times( bool use_precise )
-{
+inline void RecordingDevice::set_precise_times(bool use_precise) {
   P_.precise_times_ = use_precise;
 }
 
-inline void
-RecordingDevice::set_precision( long precision )
-{
+inline void RecordingDevice::set_precision(long precision) {
   P_.precision_ = precision;
 }
 
-
-template < typename ValueT >
-void
-RecordingDevice::print_value( const ValueT& value, bool endrecord )
-{
-  if ( P_.to_screen_ )
-  {
+template <typename ValueT>
+void RecordingDevice::print_value(const ValueT &value, bool endrecord) {
+  if (P_.to_screen_) {
     std::cout << value << '\t';
-    if ( endrecord )
-    {
+    if (endrecord) {
       std::cout << '\n';
     }
   }
 
-  if ( P_.to_file_ )
-  {
+  if (P_.to_file_) {
     B_.fs_ << value << '\t';
-    if ( endrecord )
-    {
+    if (endrecord) {
       B_.fs_ << '\n';
     }
   }
 }
 
-template < typename DataT >
-void
-RecordingDevice::set_status( const DictionaryDatum& d, DataT& data )
-{
+template <typename DataT>
+void RecordingDevice::set_status(const DictionaryDatum &d, DataT &data) {
   // plain set_status does most of the work
-  set_status( d );
+  set_status(d);
 
   // if n_events is 0, also clear event data
-  if ( S_.events_ == 0 )
-  {
+  if (S_.events_ == 0) {
     data.clear();
   }
 }
 
-} // namespace
+} // namespace nest
 
 #endif // RECORDING_DEVICE_H

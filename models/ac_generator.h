@@ -33,9 +33,7 @@
 #include "stimulating_device.h"
 #include "universal_data_logger.h"
 
-
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: ac_generator - provides AC input current
@@ -74,67 +72,55 @@ Author: Johan Hake, Spring 2003
 
 SeeAlso: Device, StimulatingDevice, dc_generator, step_current_generator
 */
-class ac_generator : public DeviceNode
-{
+class ac_generator : public DeviceNode {
 
 public:
   ac_generator();
-  ac_generator( const ac_generator& );
+  ac_generator(const ac_generator &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
   using Node::handle;
   using Node::handles_test_event;
 
-  void handle( DataLoggingRequest& );
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
   //! Allow multimeter to connect to local instances
-  bool
-  local_receiver() const
-  {
-    return true;
-  }
+  bool local_receiver() const { return true; }
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
-
+  void update(Time const &, const long, const long);
 
   // ------------------------------------------------------------
 
-  struct Parameters_
-  {
+  struct Parameters_ {
     double amp_;     //!< Amplitude of sine-current
     double offset_;  //!< Offset of sine-current
     double freq_;    //!< Standard frequency in Hz
     double phi_deg_; //!< Phase of sine current (0-360 deg)
 
     Parameters_(); //!< Sets default parameter values
-    Parameters_( const Parameters_& );
-    Parameters_& operator=( const Parameters_& p );
+    Parameters_(const Parameters_ &);
+    Parameters_ &operator=(const Parameters_ &p);
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dictionary
   };
 
   // ------------------------------------------------------------
 
-  struct State_
-  {
+  struct State_ {
     double y_0_;
     double y_1_;
     double I_; //!< Instantaneous current value; used for recording current
@@ -142,31 +128,29 @@ private:
 
     State_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
   };
 
   // ------------------------------------------------------------
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< ac_generator >;
-  friend class UniversalDataLogger< ac_generator >;
+  friend class RecordablesMap<ac_generator>;
+  friend class UniversalDataLogger<ac_generator>;
 
   // ------------------------------------------------------------
 
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( ac_generator& );
-    Buffers_( const Buffers_&, ac_generator& );
-    UniversalDataLogger< ac_generator > logger_;
+  struct Buffers_ {
+    Buffers_(ac_generator &);
+    Buffers_(const Buffers_ &, ac_generator &);
+    UniversalDataLogger<ac_generator> logger_;
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     double omega_;   //!< Angelfrequency i rad/s
     double phi_rad_; //!< Phase of sine current (0-2Pi rad)
 
@@ -177,73 +161,59 @@ private:
     double A_11_;
   };
 
-  double
-  get_I_() const
-  {
-    return S_.I_;
-  }
+  double get_I_() const { return S_.I_; }
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< CurrentEvent > device_;
-  static RecordablesMap< ac_generator > recordablesMap_;
+  StimulatingDevice<CurrentEvent> device_;
+  static RecordablesMap<ac_generator> recordablesMap_;
   Parameters_ P_;
   State_ S_;
   Variables_ V_;
   Buffers_ B_;
 };
 
-inline port
-ac_generator::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port ac_generator::send_test_event(Node &target, rport receptor_type,
+                                          synindex syn_id, bool) {
+  device_.enforce_single_syn_type(syn_id);
 
   CurrentEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-ac_generator::handles_test_event( DataLoggingRequest& dlr, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port ac_generator::handles_test_event(DataLoggingRequest &dlr,
+                                             rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-ac_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d );
-  device_.get_status( d );
+inline void ac_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d);
+  device_.get_status(d);
 
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-ac_generator::set_status( const DictionaryDatum& d )
-{
+inline void ac_generator::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
 
   // State_ is read-only
 
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // AC_GENERATOR_H

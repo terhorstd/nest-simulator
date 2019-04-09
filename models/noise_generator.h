@@ -37,8 +37,7 @@
 #include "stimulating_device.h"
 #include "universal_data_logger.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: noise_generator - Device to generate Gaussian white noise current.
@@ -110,18 +109,13 @@ SeeAlso: Device
 
 Author: Ported to NEST2 API 08/2007 by Jochen Eppler, updated 07/2008 by HEP
 */
-class noise_generator : public DeviceNode
-{
+class noise_generator : public DeviceNode {
 
 public:
   noise_generator();
-  noise_generator( const noise_generator& );
+  noise_generator(const noise_generator &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -133,26 +127,22 @@ public:
   using Node::handles_test_event;
   using Node::sends_signal;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
   SignalType sends_signal() const;
 
-  void handle( DataLoggingRequest& );
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
   //! Allow multimeter to connect to local instances
-  bool
-  local_receiver() const
-  {
-    return true;
-  }
+  bool local_receiver() const { return true; }
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
 
   /**
@@ -161,18 +151,17 @@ private:
    */
   void calibrate();
 
-  void update( Time const&, const long, const long );
-  void event_hook( DSCurrentEvent& );
+  void update(Time const &, const long, const long);
+  void event_hook(DSCurrentEvent &);
 
   // ------------------------------------------------------------
 
-  typedef std::vector< double > AmpVec_;
+  typedef std::vector<double> AmpVec_;
 
   /**
    * Store independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double mean_;    //!< mean current, in pA
     double std_;     //!< standard deviation of current, in pA
     double std_mod_; //!< standard deviation of current modulation, in pA
@@ -189,18 +178,17 @@ private:
     size_t num_targets_;
 
     Parameters_(); //!< Sets default parameter values
-    Parameters_( const Parameters_& );
-    Parameters_& operator=( const Parameters_& p );
+    Parameters_(const Parameters_ &);
+    Parameters_ &operator=(const Parameters_ &p);
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
     //! Set values from dictionary
-    void set( const DictionaryDatum&, const noise_generator& );
+    void set(const DictionaryDatum &, const noise_generator &);
   };
 
   // ------------------------------------------------------------
 
-  struct State_
-  {
+  struct State_ {
     double y_0_;
     double y_1_;
     double I_avg_; //!< Average of instantaneous currents computed
@@ -208,30 +196,28 @@ private:
 
     State_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
   };
 
   // ------------------------------------------------------------
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< noise_generator >;
-  friend class UniversalDataLogger< noise_generator >;
+  friend class RecordablesMap<noise_generator>;
+  friend class UniversalDataLogger<noise_generator>;
 
   // ------------------------------------------------------------
 
-  struct Buffers_
-  {
+  struct Buffers_ {
     long next_step_; //!< time step of next change in current
     AmpVec_ amps_;   //!< amplitudes, one per target
-    Buffers_( noise_generator& );
-    Buffers_( const Buffers_&, noise_generator& );
-    UniversalDataLogger< noise_generator > logger_;
+    Buffers_(noise_generator &);
+    Buffers_(const Buffers_ &, noise_generator &);
+    UniversalDataLogger<noise_generator> logger_;
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     long dt_steps_;                         //!< update interval in steps
     librandom::NormalRandomDev normal_dev_; //!< random deviate generator
     double omega_;                          //!< Angelfrequency i rad/s
@@ -244,67 +230,52 @@ private:
     double A_11_;
   };
 
-  double
-  get_I_avg_() const
-  {
-    return S_.I_avg_;
-  }
+  double get_I_avg_() const { return S_.I_avg_; }
 
   // ------------------------------------------------------------
 
-  static RecordablesMap< noise_generator > recordablesMap_;
+  static RecordablesMap<noise_generator> recordablesMap_;
 
-  StimulatingDevice< CurrentEvent > device_;
+  StimulatingDevice<CurrentEvent> device_;
   Parameters_ P_;
   State_ S_;
   Variables_ V_;
   Buffers_ B_;
 };
 
-inline port
-noise_generator::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port noise_generator::handles_test_event(DataLoggingRequest &dlr,
+                                                rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-noise_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d );
-  device_.get_status( d );
+inline void noise_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d);
+  device_.get_status(d);
 
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-noise_generator::set_status( const DictionaryDatum& d )
-{
+inline void noise_generator::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_;               // temporary copy in case of errors
   ptmp.num_targets_ = P_.num_targets_; // Copy Constr. does not copy connections
-  ptmp.set( d, *this );                // throws if BadProperty
+  ptmp.set(d, *this);                  // throws if BadProperty
 
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   P_.num_targets_ = ptmp.num_targets_;
 }
 
-inline SignalType
-noise_generator::sends_signal() const
-{
-  return ALL;
-}
+inline SignalType noise_generator::sends_signal() const { return ALL; }
 
-} // namespace
+} // namespace nest
 
 #endif // NOISE_GENERATOR_H

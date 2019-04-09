@@ -51,57 +51,32 @@
  *
  */
 
-class Name
-{
+class Name {
 
 public:
   typedef unsigned int handle_t;
   /**
    * Create Name without value.
    */
-  Name()
-    : handle_( 0 )
-  {
-  }
+  Name() : handle_(0) {}
 
-  Name( const char s[] )
-    : handle_( insert( std::string( s ) ) )
-  {
-  }
-  Name( const std::string& s )
-    : handle_( insert( s ) )
-  {
-  }
-  Name( const Name& n )
-    : handle_( n.handle_ )
-  {
-  }
+  Name(const char s[]) : handle_(insert(std::string(s))) {}
+  Name(const std::string &s) : handle_(insert(s)) {}
+  Name(const Name &n) : handle_(n.handle_) {}
 
   /**
    * Return string represented by Name.
    */
-  const std::string& toString( void ) const;
+  const std::string &toString(void) const;
 
   /**
    * Return table index for Name object.
    */
-  handle_t
-  toIndex( void ) const
-  {
-    return handle_;
-  }
+  handle_t toIndex(void) const { return handle_; }
 
-  bool
-  operator==( const Name& n ) const
-  {
-    return handle_ == n.handle_;
-  }
+  bool operator==(const Name &n) const { return handle_ == n.handle_; }
 
-  bool
-  operator!=( const Name& n ) const
-  {
-    return not( handle_ == n.handle_ );
-  }
+  bool operator!=(const Name &n) const { return not(handle_ == n.handle_); }
 
   /**
    * Non-alphabetic ordering of names.
@@ -109,43 +84,37 @@ public:
    * on string comparison would be very slow. We thus compare based on
    * table indices.
    */
-  bool
-  operator<( const Name& n ) const
-  {
-    return handle_ < n.handle_;
-  }
+  bool operator<(const Name &n) const { return handle_ < n.handle_; }
 
-  static bool
-  lookup( const std::string& s )
-  {
-    HandleMap_& table = handleMapInstance_();
-    return ( table.find( s ) != table.end() );
+  static bool lookup(const std::string &s) {
+    HandleMap_ &table = handleMapInstance_();
+    return (table.find(s) != table.end());
   }
 
   static size_t capacity();
   static size_t num_handles();
 
-  void print_handle( std::ostream& ) const;
+  void print_handle(std::ostream &) const;
 
-  static void list_handles( std::ostream& );
-  static void list( std::ostream& );
-  static void info( std::ostream& );
+  static void list_handles(std::ostream &);
+  static void list(std::ostream &);
+  static void info(std::ostream &);
 
 private:
-  handle_t insert( const std::string& );
+  handle_t insert(const std::string &);
 
   /**
    * Datatype for map from strings to handles.
    */
-  typedef std::map< std::string, handle_t > HandleMap_;
-  typedef std::deque< std::string > HandleTable_;
+  typedef std::map<std::string, handle_t> HandleMap_;
+  typedef std::deque<std::string> HandleTable_;
 
   /**
    * Function returning a reference to the single map instance.
    * Implementation akin to Meyers Singleton, see Alexandrescu, ch 6.4.
    */
-  static HandleMap_& handleMapInstance_();
-  static HandleTable_& handleTableInstance_();
+  static HandleMap_ &handleMapInstance_();
+  static HandleTable_ &handleTableInstance_();
 
   /**
    * Handle for the name represented by the Name object.
@@ -153,22 +122,17 @@ private:
   handle_t handle_;
 };
 
-std::ostream& operator<<( std::ostream&, const Name& );
+std::ostream &operator<<(std::ostream &, const Name &);
 
-
-inline Name::HandleTable_&
-Name::handleTableInstance_()
-{
+inline Name::HandleTable_ &Name::handleTableInstance_() {
   // Meyers singleton, created first time function is invoked.
 
-  static HandleTable_ handleTable( 1, "0" );
+  static HandleTable_ handleTable(1, "0");
 
   return handleTable;
 }
 
-inline Name::HandleMap_&
-Name::handleMapInstance_()
-{
+inline Name::HandleMap_ &Name::handleMapInstance_() {
   // Meyers singleton, created first time function is invoked.
   static HandleMap_ handleMap;
 
@@ -176,6 +140,5 @@ Name::handleMapInstance_()
 
   return handleMap;
 }
-
 
 #endif

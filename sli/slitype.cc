@@ -29,42 +29,28 @@
 // C++ includes:
 #include <cstdlib>
 
-void
-SLIType::settypename( const std::string& s )
-{
-  if ( count == 0 )
-  {
-    assert( Name::lookup( s ) == false );
-    name = new Name( s );
-  }
-  else
-  {
-    assert( Name( s ) == *name );
+void SLIType::settypename(const std::string &s) {
+  if (count == 0) {
+    assert(Name::lookup(s) == false);
+    name = new Name(s);
+  } else {
+    assert(Name(s) == *name);
   }
   ++count;
 }
 
-void
-SLIType::deletetypename( void )
-{
-  assert( count > 0 );
-  if ( count == 1 )
-  {
+void SLIType::deletetypename(void) {
+  assert(count > 0);
+  if (count == 1) {
     delete name;
   }
   --count;
 }
 
-
-void
-SLIType::setdefaultaction( SLIFunction& c )
-{
-  if ( defaultaction == NULL )
-  {
+void SLIType::setdefaultaction(SLIFunction &c) {
+  if (defaultaction == NULL) {
     defaultaction = &c;
-  }
-  else
-  {
-    assert( &c == defaultaction );
+  } else {
+    assert(&c == defaultaction);
   }
 }

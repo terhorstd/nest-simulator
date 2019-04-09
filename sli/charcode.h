@@ -35,15 +35,13 @@
 #include <cstddef>
 #include <vector>
 
-class CharCode : public std::vector< size_t >
-{
+class CharCode : public std::vector<size_t> {
 public:
-  CharCode( size_t, size_t );
+  CharCode(size_t, size_t);
 
-  void Range( size_t, char, char );
-  void Group( size_t, const char* );
-  size_t operator()( char ) const;
+  void Range(size_t, char, char);
+  void Group(size_t, const char *);
+  size_t operator()(char) const;
 };
-
 
 #endif

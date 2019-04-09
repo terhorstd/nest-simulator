@@ -26,6 +26,6 @@
 #include "interpret.h"
 #include "lockptrdatum_impl.h"
 
-template class lockPTRDatum< std::istream, &SLIInterpreter::Istreamtype >;
-template class lockPTRDatum< std::istream, &SLIInterpreter::XIstreamtype >;
-template class lockPTRDatum< std::ostream, &SLIInterpreter::Ostreamtype >;
+template class lockPTRDatum<std::istream, &SLIInterpreter::Istreamtype>;
+template class lockPTRDatum<std::istream, &SLIInterpreter::XIstreamtype>;
+template class lockPTRDatum<std::ostream, &SLIInterpreter::Ostreamtype>;

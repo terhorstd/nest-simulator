@@ -41,9 +41,7 @@
 #define _POSIX_SOURCE
 #endif
 
-
 #include "config.h"
-
 
 #ifdef HAVE_SIGUSR_IGNORED
 #undef __PURE_CNAME
@@ -53,21 +51,17 @@
 #include <signal.h>
 #endif
 
-
-typedef void Sigfunc( int );
-
+typedef void Sigfunc(int);
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 extern int SLIsignalflag;
 
-Sigfunc* posix_signal( int, Sigfunc* );
+Sigfunc *posix_signal(int, Sigfunc *);
 
-
-void SLISignalHandler( int );
+void SLISignalHandler(int);
 
 #ifdef _SYNOD__SET_POSIX_SOURCE
 #undef _SYNOD__SET_POSIX_SOURCE

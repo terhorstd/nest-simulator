@@ -68,8 +68,7 @@
 /*                                                          */
 /************************************************************/
 
-namespace librandom
-{
+namespace librandom {
 
 /** @BeginDocumentation
 Name: rdevdict::gamma - gamma random deviate generator
@@ -94,34 +93,33 @@ Author: Hans Ekkehard Plesser
  * @ingroup RandomDeviateGenerators
  */
 
-class GammaRandomDev : public RandomDev
-{
+class GammaRandomDev : public RandomDev {
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  GammaRandomDev( RngPtr, double a_in = 1.0 ); //!< create with fixed RNG
+  GammaRandomDev(RngPtr, double a_in = 1.0); //!< create with fixed RNG
   GammaRandomDev(
-    double a_in = 1.0 ); //!< create w/o fixed RNG for threaded simulations
+      double a_in = 1.0); //!< create w/o fixed RNG for threaded simulations
 
-  void set_order( double ); //!< set order
-  void set_scale( double ); //!< set scale parameter
+  void set_order(double); //!< set order
+  void set_scale(double); //!< set scale parameter
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
   using RandomDev::operator();
-  double operator()( RngPtr ) const; //!< draw number, threaded
-  double operator()( RngPtr,
-    double ); //!< draw number, threaded, explicit order
+  double operator()(RngPtr) const; //!< draw number, threaded
+  double operator()(RngPtr,
+                    double); //!< draw number, threaded, explicit order
 
 private:
   double unscaled_gamma(
-    RngPtr r ) const; //! worker function creating Gamma(x; order, 1) number
+      RngPtr r) const; //! worker function creating Gamma(x; order, 1) number
 
   double a;  // gamma density order
   double b_; // gamma scale parameter
@@ -132,32 +130,26 @@ private:
   double jv;
 };
 
-inline double
-GammaRandomDev::operator()( RngPtr rthrd, double a )
-{
-  set_order( a );
-  return ( *this )( rthrd );
+inline double GammaRandomDev::operator()(RngPtr rthrd, double a) {
+  set_order(a);
+  return (*this)(rthrd);
 }
 
-inline double
-GammaRandomDev::operator()( RngPtr r ) const
-{
-  return b_ * unscaled_gamma( r );
+inline double GammaRandomDev::operator()(RngPtr r) const {
+  return b_ * unscaled_gamma(r);
 }
 
-inline void
-GammaRandomDev::set_order( double a_in = 1.0 )
-{
-  assert( a_in > 0 );
+inline void GammaRandomDev::set_order(double a_in = 1.0) {
+  assert(a_in > 0);
 
   a = a_in;
 
   bb = a - 1.0;
-  bc = 3.0 * ( a - 0.25 );
+  bc = 3.0 * (a - 0.25);
 
   ju = 1.0 / a;
-  jv = a != 1 ? 1.0 / ( 1 - a ) : 0;
+  jv = a != 1 ? 1.0 / (1 - a) : 0;
 }
-}
+} // namespace librandom
 
 #endif

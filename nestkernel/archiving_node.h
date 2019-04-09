@@ -46,16 +46,14 @@
 
 #define DEBUG_ARCHIVER 1
 
-namespace nest
-{
+namespace nest {
 
 /**
  * \class Archiving_Node
  * a node which archives spike history for the purposes of
  * timing dependent plasticity
  */
-class Archiving_Node : public Node
-{
+class Archiving_Node : public Node {
   using Node::get_synaptic_elements;
 
 public:
@@ -69,7 +67,7 @@ public:
    * \fn Archiving_Node()
    * Copy Constructor.
    */
-  Archiving_Node( const Archiving_Node& );
+  Archiving_Node(const Archiving_Node &);
   /**
 
    * \fn double get_Ca_minus()
@@ -84,7 +82,7 @@ public:
    * actual vacant and connected elements is an integer truncated from this
    * value
    */
-  double get_synaptic_elements( Name n ) const;
+  double get_synaptic_elements(Name n) const;
 
   /**
    * \fn int get_synaptic_elements_vacant(Name n)
@@ -93,27 +91,27 @@ public:
    * Returns a negative number to indicate that synaptic elements
    * must be deleted during the next update
    */
-  int get_synaptic_elements_vacant( Name n ) const;
+  int get_synaptic_elements_vacant(Name n) const;
 
   /**
    * \fn int get_synaptic_elements_connected(Name n)
    * get the number of synaptic element of type n which are currently
    * connected
    */
-  int get_synaptic_elements_connected( Name n ) const;
+  int get_synaptic_elements_connected(Name n) const;
 
   /**
    * \fn std::map<Name, double> get_synaptic_elements()
    * get the number of all synaptic elements for the current Node
    */
-  std::map< Name, double > get_synaptic_elements() const;
+  std::map<Name, double> get_synaptic_elements() const;
 
   /**
    * \fn void update_synaptic_elements()
    * Change the number of synaptic elements in the node depending on the
    * dynamics described by the corresponding growth curve
    */
-  void update_synaptic_elements( double t );
+  void update_synaptic_elements(double t);
 
   /**
    * \fn void decay_synaptic_elements_vacant()
@@ -126,13 +124,13 @@ public:
    * \fn void connect_synaptic_element()
    * Change the number of connected synaptic elements by n
    */
-  void connect_synaptic_element( Name name, int n );
+  void connect_synaptic_element(Name name, int n);
 
   /**
    * \fn double get_K_value(long t)
    * return the Kminus value at t (in ms).
    */
-  double get_K_value( double t );
+  double get_K_value(double t);
 
   /**
    * write the Kminus and triplet_Kminus values at t (in ms) to
@@ -140,14 +138,14 @@ public:
    * @throws UnexpectedEvent
    */
 
-  void get_K_values( double t, double& Kminus, double& triplet_Kminus );
+  void get_K_values(double t, double &Kminus, double &triplet_Kminus);
 
   /**
    * \fn double get_triplet_K_value(std::deque<histentry>::iterator &iter)
    * return the triplet Kminus value for the associated iterator.
    */
 
-  double get_triplet_K_value( const std::deque< histentry >::iterator& iter );
+  double get_triplet_K_value(const std::deque<histentry>::iterator &iter);
 
   /**
    * \fn void get_history(long t1, long t2,
@@ -156,10 +154,8 @@ public:
    * return the spike times (in steps) of spikes which occurred in the range
    * (t1,t2].
    */
-  void get_history( double t1,
-    double t2,
-    std::deque< histentry >::iterator* start,
-    std::deque< histentry >::iterator* finish );
+  void get_history(double t1, double t2, std::deque<histentry>::iterator *start,
+                   std::deque<histentry>::iterator *finish);
 
   /**
    * Register a new incoming STDP connection.
@@ -167,10 +163,10 @@ public:
    * t_first_read: The newly registered synapse will read the history entries
    * with t > t_first_read.
    */
-  void register_stdp_connection( double t_first_read );
+  void register_stdp_connection(double t_first_read);
 
-  void get_status( DictionaryDatum& d ) const;
-  void set_status( const DictionaryDatum& d );
+  void get_status(DictionaryDatum &d) const;
+  void set_status(const DictionaryDatum &d);
 
   /**
    * retrieve the current value of tau_Ca which defines the exponential decay
@@ -183,7 +179,7 @@ protected:
    * \fn void set_spiketime(Time const & t_sp, double offset)
    * record spike history
    */
-  void set_spiketime( Time const& t_sp, double offset = 0.0 );
+  void set_spiketime(Time const &t_sp, double offset = 0.0);
 
   /**
    * \fn double get_spiketime()
@@ -219,7 +215,7 @@ private:
   double last_spike_;
 
   // spiking history needed by stdp synapses
-  std::deque< histentry > history_;
+  std::deque<histentry> history_;
 
   /*
    * Structural plasticity
@@ -242,26 +238,14 @@ private:
   double beta_Ca_;
 
   // Map of the synaptic elements
-  std::map< Name, SynapticElement > synaptic_elements_map_;
+  std::map<Name, SynapticElement> synaptic_elements_map_;
 };
 
-inline double
-Archiving_Node::get_spiketime_ms() const
-{
-  return last_spike_;
-}
+inline double Archiving_Node::get_spiketime_ms() const { return last_spike_; }
 
-inline double
-Archiving_Node::get_tau_Ca() const
-{
-  return tau_Ca_;
-}
+inline double Archiving_Node::get_tau_Ca() const { return tau_Ca_; }
 
-inline double
-Archiving_Node::get_Ca_minus() const
-{
-  return Ca_minus_;
-}
+inline double Archiving_Node::get_Ca_minus() const { return Ca_minus_; }
 
-} // of namespace
+} // namespace nest
 #endif

@@ -25,21 +25,17 @@
 // Includes from sli:
 #include "integerdatum.h"
 
-bool
-array2vector( std::vector< long >& v, const TokenArray a )
-{
+bool array2vector(std::vector<long> &v, const TokenArray a) {
   bool status = true;
 
-  v.reserve( a.size() );
-  for ( Token* t = a.begin(); t != a.end(); ++t )
-  {
-    IntegerDatum* id = dynamic_cast< IntegerDatum* >( t->datum() );
-    if ( id == NULL )
-    {
+  v.reserve(a.size());
+  for (Token *t = a.begin(); t != a.end(); ++t) {
+    IntegerDatum *id = dynamic_cast<IntegerDatum *>(t->datum());
+    if (id == NULL) {
       status = false;
       break;
     }
-    v.push_back( id->get() );
+    v.push_back(id->get());
   }
   return status;
 }

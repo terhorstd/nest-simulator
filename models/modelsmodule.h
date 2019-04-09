@@ -29,14 +29,12 @@
 // Includes from sli:
 #include "slimodule.h"
 
-namespace nest
-{
+namespace nest {
 /**
  * Module supplying all models that are included in the NEST release.
  * @todo Should this be a dynamic module?
  */
-class ModelsModule : public SLIModule
-{
+class ModelsModule : public SLIModule {
 public:
   ModelsModule();
   ~ModelsModule();
@@ -45,13 +43,12 @@ public:
    * Initialize module by registering models with the network.
    * @param SLIInterpreter* SLI interpreter
    */
-  void init( SLIInterpreter* );
+  void init(SLIInterpreter *);
 
-  const std::string name( void ) const;
-  const std::string commandstring( void ) const;
+  const std::string name(void) const;
+  const std::string commandstring(void) const;
 };
 
-
-} // namespace
+} // namespace nest
 
 #endif

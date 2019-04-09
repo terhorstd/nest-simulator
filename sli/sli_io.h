@@ -32,443 +32,298 @@
 // Includes from sli:
 #include "interpret.h"
 
+void init_sli_io(SLIInterpreter *);
 
-void init_sli_io( SLIInterpreter* );
-
-class MathLinkPutStringFunction : public SLIFunction
-{
+class MathLinkPutStringFunction : public SLIFunction {
 public:
-  MathLinkPutStringFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  MathLinkPutStringFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class XIfstreamFunction : public SLIFunction
-{
+class XIfstreamFunction : public SLIFunction {
 public:
-  XIfstreamFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  XIfstreamFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IfstreamFunction : public SLIFunction
-{
+class IfstreamFunction : public SLIFunction {
 public:
-  IfstreamFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IfstreamFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class OfstreamFunction : public SLIFunction
-{
+class OfstreamFunction : public SLIFunction {
 public:
-  OfstreamFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  OfstreamFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class OfsopenFunction : public SLIFunction
-{
+class OfsopenFunction : public SLIFunction {
 public:
-  OfsopenFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  OfsopenFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
 #ifdef HAVE_SSTREAM
 
-class IsstreamFunction : public SLIFunction
-{
+class IsstreamFunction : public SLIFunction {
 public:
-  IsstreamFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IsstreamFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class OsstreamFunction : public SLIFunction
-{
+class OsstreamFunction : public SLIFunction {
 public:
-  OsstreamFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  OsstreamFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class StrSStreamFunction : public SLIFunction
-{
+class StrSStreamFunction : public SLIFunction {
 public:
-  StrSStreamFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  StrSStreamFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 #else
 
-class OstrstreamFunction : public SLIFunction
-{
+class OstrstreamFunction : public SLIFunction {
 public:
-  OstrstreamFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  OstrstreamFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class StrFunction : public SLIFunction
-{
+class StrFunction : public SLIFunction {
 public:
-  StrFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  StrFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 #endif
 
-class PrintFunction : public SLIFunction
-{
+class PrintFunction : public SLIFunction {
 public:
-  PrintFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  PrintFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class PrettyprintFunction : public SLIFunction
-{
+class PrettyprintFunction : public SLIFunction {
 public:
-  PrettyprintFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  PrettyprintFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CloseistreamFunction : public SLIFunction
-{
+class CloseistreamFunction : public SLIFunction {
 public:
-  CloseistreamFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CloseistreamFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CloseostreamFunction : public SLIFunction
-{
+class CloseostreamFunction : public SLIFunction {
 public:
-  CloseostreamFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CloseostreamFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class FlushFunction : public SLIFunction
-{
+class FlushFunction : public SLIFunction {
 public:
-  FlushFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  FlushFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class EndlFunction : public SLIFunction
-{
+class EndlFunction : public SLIFunction {
 public:
-  EndlFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  EndlFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class EndsFunction : public SLIFunction
-{
+class EndsFunction : public SLIFunction {
 public:
-  EndsFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  EndsFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class EatwhiteFunction : public SLIFunction
-{
+class EatwhiteFunction : public SLIFunction {
 public:
-  EatwhiteFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  EatwhiteFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class SetwFunction : public SLIFunction
-{
+class SetwFunction : public SLIFunction {
 public:
-  SetwFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  SetwFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class SetprecisionFunction : public SLIFunction
-{
+class SetprecisionFunction : public SLIFunction {
 public:
-  SetprecisionFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  SetprecisionFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSFixedFunction : public SLIFunction
-{
+class IOSFixedFunction : public SLIFunction {
 public:
-  IOSFixedFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSFixedFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSScientificFunction : public SLIFunction
-{
+class IOSScientificFunction : public SLIFunction {
 public:
-  IOSScientificFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSScientificFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSDefaultFunction : public SLIFunction
-{
+class IOSDefaultFunction : public SLIFunction {
 public:
-  IOSDefaultFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSDefaultFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSShowpointFunction : public SLIFunction
-{
+class IOSShowpointFunction : public SLIFunction {
 public:
-  IOSShowpointFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSShowpointFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSNoshowpointFunction : public SLIFunction
-{
+class IOSNoshowpointFunction : public SLIFunction {
 public:
-  IOSNoshowpointFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSNoshowpointFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSShowbaseFunction : public SLIFunction
-{
+class IOSShowbaseFunction : public SLIFunction {
 public:
-  IOSShowbaseFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSShowbaseFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSNoshowbaseFunction : public SLIFunction
-{
+class IOSNoshowbaseFunction : public SLIFunction {
 public:
-  IOSNoshowbaseFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSNoshowbaseFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSDecFunction : public SLIFunction
-{
+class IOSDecFunction : public SLIFunction {
 public:
-  IOSDecFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSDecFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSHexFunction : public SLIFunction
-{
+class IOSHexFunction : public SLIFunction {
 public:
-  IOSHexFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSHexFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSOctFunction : public SLIFunction
-{
+class IOSOctFunction : public SLIFunction {
 public:
-  IOSOctFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSOctFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSLeftFunction : public SLIFunction
-{
+class IOSLeftFunction : public SLIFunction {
 public:
-  IOSLeftFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSLeftFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSRightFunction : public SLIFunction
-{
+class IOSRightFunction : public SLIFunction {
 public:
-  IOSRightFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSRightFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IOSInternalFunction : public SLIFunction
-{
+class IOSInternalFunction : public SLIFunction {
 public:
-  IOSInternalFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IOSInternalFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class GetcFunction : public SLIFunction
-{
+class GetcFunction : public SLIFunction {
 public:
-  GetcFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  GetcFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class GetsFunction : public SLIFunction
-{
+class GetsFunction : public SLIFunction {
 public:
-  GetsFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  GetsFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class GetlineFunction : public SLIFunction
-{
+class GetlineFunction : public SLIFunction {
 public:
-  GetlineFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  GetlineFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IGoodFunction : public SLIFunction
-{
+class IGoodFunction : public SLIFunction {
 public:
-  IGoodFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IGoodFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IClearFunction : public SLIFunction
-{
+class IClearFunction : public SLIFunction {
 public:
-  IClearFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IClearFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class OClearFunction : public SLIFunction
-{
+class OClearFunction : public SLIFunction {
 public:
-  OClearFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  OClearFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IFailFunction : public SLIFunction
-{
+class IFailFunction : public SLIFunction {
 public:
-  IFailFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IFailFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class OGoodFunction : public SLIFunction
-{
+class OGoodFunction : public SLIFunction {
 public:
-  OGoodFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  OGoodFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class Cvx_fFunction : public SLIFunction
-{
+class Cvx_fFunction : public SLIFunction {
 public:
-  Cvx_fFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  Cvx_fFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class IEofFunction : public SLIFunction
-{
+class IEofFunction : public SLIFunction {
 public:
-  IEofFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  IEofFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class OEofFunction : public SLIFunction
-{
+class OEofFunction : public SLIFunction {
 public:
-  OEofFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  OEofFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class In_AvailFunction : public SLIFunction
-{
+class In_AvailFunction : public SLIFunction {
 public:
-  In_AvailFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  In_AvailFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ReadDoubleFunction : public SLIFunction
-{
+class ReadDoubleFunction : public SLIFunction {
 public:
-  ReadDoubleFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ReadDoubleFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ReadIntFunction : public SLIFunction
-{
+class ReadIntFunction : public SLIFunction {
 public:
-  ReadIntFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ReadIntFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ReadWordFunction : public SLIFunction
-{
+class ReadWordFunction : public SLIFunction {
 public:
-  ReadWordFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ReadWordFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
 #endif

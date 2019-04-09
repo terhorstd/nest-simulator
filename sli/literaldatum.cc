@@ -23,9 +23,7 @@
 // Includes from sli:
 #include "namedatum.h"
 
-void
-LiteralDatum::pprint( std::ostream& out ) const
-{
+void LiteralDatum::pprint(std::ostream &out) const {
   out << '/';
-  print( out );
+  print(out);
 }

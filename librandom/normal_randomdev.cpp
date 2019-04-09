@@ -33,66 +33,49 @@
 #include "sliexceptions.h"
 
 // by default, init as exponential density with mean 1
-librandom::NormalRandomDev::NormalRandomDev( RngPtr r_source )
-  : RandomDev( r_source )
-  , mu_( 0. )
-  , sigma_( 1. )
-{
-}
+librandom::NormalRandomDev::NormalRandomDev(RngPtr r_source)
+    : RandomDev(r_source), mu_(0.), sigma_(1.) {}
 
 // threaded
 librandom::NormalRandomDev::NormalRandomDev()
-  : RandomDev()
-  , mu_( 0. )
-  , sigma_( 1. )
-{
-}
+    : RandomDev(), mu_(0.), sigma_(1.) {}
 
-void
-librandom::NormalRandomDev::set_status( const DictionaryDatum& d )
-{
+void librandom::NormalRandomDev::set_status(const DictionaryDatum &d) {
   double new_mu = mu_;
   double new_sigma = sigma_;
 
-  updateValue< double >( d, names::mu, new_mu );
-  updateValue< double >( d, names::sigma, new_sigma );
+  updateValue<double>(d, names::mu, new_mu);
+  updateValue<double>(d, names::sigma, new_sigma);
 
-  if ( new_sigma < 0. )
-  {
-    throw BadParameterValue( "Normal RDV: sigma >= 0 required." );
+  if (new_sigma < 0.) {
+    throw BadParameterValue("Normal RDV: sigma >= 0 required.");
   }
 
   mu_ = new_mu;
   sigma_ = new_sigma;
 }
 
-void
-librandom::NormalRandomDev::get_status( DictionaryDatum& d ) const
-{
-  RandomDev::get_status( d );
+void librandom::NormalRandomDev::get_status(DictionaryDatum &d) const {
+  RandomDev::get_status(d);
 
-  def< double >( d, names::mu, mu_ );
-  def< double >( d, names::sigma, sigma_ );
+  def<double>(d, names::mu, mu_);
+  def<double>(d, names::sigma, sigma_);
 }
 
-double
-librandom::NormalRandomDev::operator()( RngPtr r ) const
-{
+double librandom::NormalRandomDev::operator()(RngPtr r) const {
   // Box-Muller algorithm, see Knuth TAOCP, vol 2, 3rd ed, p 122
   // we waste one number
   double V1;
   double V2;
   double S;
 
-  do
-  {
+  do {
     V1 = 2 * r->drand() - 1;
     V2 = 2 * r->drand() - 1;
     S = V1 * V1 + V2 * V2;
-  } while ( S >= 1 );
-  if ( S != 0 )
-  {
-    S = V1 * std::sqrt( -2 * std::log( S ) / S );
+  } while (S >= 1);
+  if (S != 0) {
+    S = V1 * std::sqrt(-2 * std::log(S) / S);
   }
 
   return mu_ + sigma_ * S;

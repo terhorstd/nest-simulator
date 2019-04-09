@@ -32,18 +32,14 @@
 // initialization of static members requires template<>
 // see Stroustrup C.13.1 --- HEP 2001-08-09
 template <>
-sli::pool AggregateDatum< std::string, &SLIInterpreter::Stringtype >::memory(
-  sizeof( AggregateDatum< std::string, &SLIInterpreter::Stringtype > ),
-  100,
-  1 );
+sli::pool AggregateDatum<std::string, &SLIInterpreter::Stringtype>::memory(
+    sizeof(AggregateDatum<std::string, &SLIInterpreter::Stringtype>), 100, 1);
 
 template <>
-void
-AggregateDatum< std::string, &SLIInterpreter::Stringtype >::pprint(
-  std::ostream& out ) const
-{
+void AggregateDatum<std::string, &SLIInterpreter::Stringtype>::pprint(
+    std::ostream &out) const {
   out << '(';
-  print( out );
+  print(out);
   out << ')';
 }
 
@@ -51,7 +47,7 @@ AggregateDatum< std::string, &SLIInterpreter::Stringtype >::pprint(
 // because otherwise methods defined in
 // numericdatum_impl.h will not be instantiated
 // Moritz, 2007-04-16
-template class AggregateDatum< std::string, &SLIInterpreter::Stringtype >;
+template class AggregateDatum<std::string, &SLIInterpreter::Stringtype>;
 
 const ToUppercase_sFunction touppercase_sfunction;
 const ToLowercase_sFunction tolowercase_sfunction;
@@ -71,17 +67,15 @@ const ToLowercase_sFunction tolowercase_sfunction;
    Author: Jochen Martin Eppler
    SeeAlso: ToLowercase
 */
-void
-ToUppercase_sFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void ToUppercase_sFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  StringDatum sd = getValue< StringDatum >( i->OStack.top() );
-  std::string* str = dynamic_cast< std::string* >( &sd );
-  std::transform( str->begin(), str->end(), str->begin(), toupper );
+  StringDatum sd = getValue<StringDatum>(i->OStack.top());
+  std::string *str = dynamic_cast<std::string *>(&sd);
+  std::transform(str->begin(), str->end(), str->begin(), toupper);
 
   i->OStack.pop();
-  i->OStack.push( new StringDatum( str->c_str() ) );
+  i->OStack.push(new StringDatum(str->c_str()));
   i->EStack.pop();
 }
 
@@ -100,23 +94,19 @@ ToUppercase_sFunction::execute( SLIInterpreter* i ) const
    Author: Jochen Martin Eppler
    SeeAlso: ToUppercase
 */
-void
-ToLowercase_sFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void ToLowercase_sFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  StringDatum sd = getValue< StringDatum >( i->OStack.top() );
-  std::string* str = dynamic_cast< std::string* >( &sd );
-  std::transform( str->begin(), str->end(), str->begin(), tolower );
+  StringDatum sd = getValue<StringDatum>(i->OStack.top());
+  std::string *str = dynamic_cast<std::string *>(&sd);
+  std::transform(str->begin(), str->end(), str->begin(), tolower);
 
   i->OStack.pop();
-  i->OStack.push( new StringDatum( str->c_str() ) );
+  i->OStack.push(new StringDatum(str->c_str()));
   i->EStack.pop();
 }
 
-void
-init_slistring( SLIInterpreter* i )
-{
-  i->createcommand( "ToUppercase", &touppercase_sfunction );
-  i->createcommand( "ToLowercase", &tolowercase_sfunction );
+void init_slistring(SLIInterpreter *i) {
+  i->createcommand("ToUppercase", &touppercase_sfunction);
+  i->createcommand("ToLowercase", &tolowercase_sfunction);
 }

@@ -29,8 +29,7 @@
 // Includes from nestkernel:
 #include "connection.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: stdp_synapse_hom - Synapse type for spike-timing dependent
@@ -97,8 +96,7 @@ SeeAlso: synapsedict, tsodyks_synapse, static_synapse
  * Class containing the common properties for all synapses of type
  * STDPConnectionHom.
  */
-class STDPHomCommonProperties : public CommonSynapseProperties
-{
+class STDPHomCommonProperties : public CommonSynapseProperties {
 
 public:
   /**
@@ -110,12 +108,12 @@ public:
   /**
    * Get all properties and put them into a dictionary.
    */
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
   /**
    * Set properties from the values given in dictionary.
    */
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
   // data members common to all connections
   double tau_plus_;
@@ -126,18 +124,16 @@ public:
   double Wmax_;
 };
 
-
 /**
  * Class representing an STDP connection with homogeneous parameters, i.e.
  * parameters are the same for all synapses.
  */
-template < typename targetidentifierT >
-class STDPConnectionHom : public Connection< targetidentifierT >
-{
+template <typename targetidentifierT>
+class STDPConnectionHom : public Connection<targetidentifierT> {
 
 public:
   typedef STDPHomCommonProperties CommonPropertiesType;
-  typedef Connection< targetidentifierT > ConnectionBase;
+  typedef Connection<targetidentifierT> ConnectionBase;
 
   /**
    * Default Constructor.
@@ -149,8 +145,7 @@ public:
    * Copy constructor from a property object.
    * Needs to be defined properly in order for GenericConnector to work.
    */
-  STDPConnectionHom( const STDPConnectionHom& );
-
+  STDPConnectionHom(const STDPConnectionHom &);
 
   // Explicitly declare all methods inherited from the dependent base
   // ConnectionBase. This avoids explicit name prefixes in all places these
@@ -164,37 +159,27 @@ public:
   /**
    * Get all properties of this connection and put them into a dictionary.
    */
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
   /**
    * Set properties of this connection from the values given in dictionary.
    */
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
   /**
    * Send an event to the receiver of this connection.
    * \param e The event to send
    */
-  void send( Event& e, thread t, const STDPHomCommonProperties& );
+  void send(Event &e, thread t, const STDPHomCommonProperties &);
 
-  void
-  set_weight( double w )
-  {
-    weight_ = w;
-  }
+  void set_weight(double w) { weight_ = w; }
 
-
-  class ConnTestDummyNode : public ConnTestDummyNodeBase
-  {
+  class ConnTestDummyNode : public ConnTestDummyNodeBase {
   public:
     // Ensure proper overriding of overloaded virtual functions.
     // Return values from functions are ignored.
     using ConnTestDummyNodeBase::handles_test_event;
-    port
-    handles_test_event( SpikeEvent&, rport )
-    {
-      return invalid_port_;
-    }
+    port handles_test_event(SpikeEvent &, rport) { return invalid_port_; }
   };
 
   /*
@@ -210,34 +195,27 @@ public:
    * \param r The target node
    * \param receptor_type The ID of the requested receptor type
    */
-  void
-  check_connection( Node& s,
-    Node& t,
-    rport receptor_type,
-    const CommonPropertiesType& )
-  {
+  void check_connection(Node &s, Node &t, rport receptor_type,
+                        const CommonPropertiesType &) {
     ConnTestDummyNode dummy_target;
-    ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
+    ConnectionBase::check_connection_(dummy_target, s, t, receptor_type);
 
-    t.register_stdp_connection( t_lastspike_ - get_delay() );
+    t.register_stdp_connection(t_lastspike_ - get_delay());
   }
 
 private:
-  double
-  facilitate_( double w, double kplus, const STDPHomCommonProperties& cp )
-  {
-    double norm_w = ( w / cp.Wmax_ )
-      + ( cp.lambda_ * std::pow( 1.0 - ( w / cp.Wmax_ ), cp.mu_plus_ )
-          * kplus );
+  double facilitate_(double w, double kplus,
+                     const STDPHomCommonProperties &cp) {
+    double norm_w =
+        (w / cp.Wmax_) +
+        (cp.lambda_ * std::pow(1.0 - (w / cp.Wmax_), cp.mu_plus_) * kplus);
     return norm_w < 1.0 ? norm_w * cp.Wmax_ : cp.Wmax_;
   }
 
-  double
-  depress_( double w, double kminus, const STDPHomCommonProperties& cp )
-  {
-    double norm_w = ( w / cp.Wmax_ )
-      - ( cp.alpha_ * cp.lambda_ * std::pow( w / cp.Wmax_, cp.mu_minus_ )
-          * kminus );
+  double depress_(double w, double kminus, const STDPHomCommonProperties &cp) {
+    double norm_w =
+        (w / cp.Wmax_) - (cp.alpha_ * cp.lambda_ *
+                          std::pow(w / cp.Wmax_, cp.mu_minus_) * kminus);
     return norm_w > 0.0 ? norm_w * cp.Wmax_ : 0.0;
   }
 
@@ -247,111 +225,93 @@ private:
   double t_lastspike_;
 };
 
-
 //
 // Implementation of class STDPConnectionHom.
 //
 
-template < typename targetidentifierT >
-STDPConnectionHom< targetidentifierT >::STDPConnectionHom()
-  : ConnectionBase()
-  , weight_( 1.0 )
-  , Kplus_( 0.0 )
-  , t_lastspike_( 0.0 )
-{
-}
+template <typename targetidentifierT>
+STDPConnectionHom<targetidentifierT>::STDPConnectionHom()
+    : ConnectionBase(), weight_(1.0), Kplus_(0.0), t_lastspike_(0.0) {}
 
-template < typename targetidentifierT >
-STDPConnectionHom< targetidentifierT >::STDPConnectionHom(
-  const STDPConnectionHom& rhs )
-  : ConnectionBase( rhs )
-  , weight_( rhs.weight_ )
-  , Kplus_( rhs.Kplus_ )
-  , t_lastspike_( rhs.t_lastspike_ )
-{
-}
+template <typename targetidentifierT>
+STDPConnectionHom<targetidentifierT>::STDPConnectionHom(
+    const STDPConnectionHom &rhs)
+    : ConnectionBase(rhs), weight_(rhs.weight_), Kplus_(rhs.Kplus_),
+      t_lastspike_(rhs.t_lastspike_) {}
 
 /**
  * Send an event to the receiver of this connection.
  * \param e The event to send
  * \param p The port under which this connection is stored in the Connector.
  */
-template < typename targetidentifierT >
+template <typename targetidentifierT>
 inline void
-STDPConnectionHom< targetidentifierT >::send( Event& e,
-  thread t,
-  const STDPHomCommonProperties& cp )
-{
+STDPConnectionHom<targetidentifierT>::send(Event &e, thread t,
+                                           const STDPHomCommonProperties &cp) {
   // synapse STDP depressing/facilitation dynamics
 
   const double t_spike = e.get_stamp().get_ms();
 
   // t_lastspike_ = 0 initially
 
-  Node* target = get_target( t );
+  Node *target = get_target(t);
   double dendritic_delay = get_delay();
 
   // get spike history in relevant range (t1, t2] from post-synaptic neuron
-  std::deque< histentry >::iterator start;
-  std::deque< histentry >::iterator finish;
-  target->get_history( t_lastspike_ - dendritic_delay,
-    t_spike - dendritic_delay,
-    &start,
-    &finish );
+  std::deque<histentry>::iterator start;
+  std::deque<histentry>::iterator finish;
+  target->get_history(t_lastspike_ - dendritic_delay, t_spike - dendritic_delay,
+                      &start, &finish);
   // facilitation due to post-synaptic spikes since last pre-synaptic spike
   double minus_dt;
-  while ( start != finish )
-  {
-    minus_dt = t_lastspike_ - ( start->t_ + dendritic_delay );
+  while (start != finish) {
+    minus_dt = t_lastspike_ - (start->t_ + dendritic_delay);
     ++start;
     // get_history() should make sure that
     // start->t_ > t_lastspike - dendritic_delay, i.e. minus_dt < 0
-    assert( minus_dt < -1.0 * kernel().connection_manager.get_stdp_eps() );
+    assert(minus_dt < -1.0 * kernel().connection_manager.get_stdp_eps());
     weight_ =
-      facilitate_( weight_, Kplus_ * std::exp( minus_dt / cp.tau_plus_ ), cp );
+        facilitate_(weight_, Kplus_ * std::exp(minus_dt / cp.tau_plus_), cp);
   }
 
   // depression due to new pre-synaptic spike
   weight_ =
-    depress_( weight_, target->get_K_value( t_spike - dendritic_delay ), cp );
+      depress_(weight_, target->get_K_value(t_spike - dendritic_delay), cp);
 
-  e.set_receiver( *target );
-  e.set_weight( weight_ );
-  e.set_delay_steps( get_delay_steps() );
-  e.set_rport( get_rport() );
+  e.set_receiver(*target);
+  e.set_weight(weight_);
+  e.set_delay_steps(get_delay_steps());
+  e.set_rport(get_rport());
   e();
 
-  Kplus_ = Kplus_ * std::exp( ( t_lastspike_ - t_spike ) / cp.tau_plus_ ) + 1.0;
+  Kplus_ = Kplus_ * std::exp((t_lastspike_ - t_spike) / cp.tau_plus_) + 1.0;
 
   t_lastspike_ = t_spike;
 }
 
-template < typename targetidentifierT >
-void
-STDPConnectionHom< targetidentifierT >::get_status( DictionaryDatum& d ) const
-{
+template <typename targetidentifierT>
+void STDPConnectionHom<targetidentifierT>::get_status(
+    DictionaryDatum &d) const {
 
   // base class properties, different for individual synapse
-  ConnectionBase::get_status( d );
-  def< double >( d, names::weight, weight_ );
+  ConnectionBase::get_status(d);
+  def<double>(d, names::weight, weight_);
 
   // own properties, different for individual synapse
-  def< double >( d, names::Kplus, Kplus_ );
-  def< long >( d, names::size_of, sizeof( *this ) );
+  def<double>(d, names::Kplus, Kplus_);
+  def<long>(d, names::size_of, sizeof(*this));
 }
 
-template < typename targetidentifierT >
-void
-STDPConnectionHom< targetidentifierT >::set_status( const DictionaryDatum& d,
-  ConnectorModel& cm )
-{
+template <typename targetidentifierT>
+void STDPConnectionHom<targetidentifierT>::set_status(const DictionaryDatum &d,
+                                                      ConnectorModel &cm) {
   // base class properties
-  ConnectionBase::set_status( d, cm );
-  updateValue< double >( d, names::weight, weight_ );
+  ConnectionBase::set_status(d, cm);
+  updateValue<double>(d, names::weight, weight_);
 
-  updateValue< double >( d, names::Kplus, Kplus_ );
+  updateValue<double>(d, names::Kplus, Kplus_);
 }
 
-} // of namespace nest
+} // namespace nest
 
 #endif // of #ifndef STDP_CONNECTION_HOM_H

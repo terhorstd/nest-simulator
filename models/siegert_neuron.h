@@ -42,8 +42,7 @@
 #include "ring_buffer.h"
 #include "universal_data_logger.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: siegert_neuron
@@ -109,14 +108,13 @@ Author: Jannis Schuecker, David Dahmen, Jan Hahne
 
 SeeAlso: diffusion_connection
 */
-class siegert_neuron : public Archiving_Node
-{
+class siegert_neuron : public Archiving_Node {
 
 public:
   typedef Node base;
 
   siegert_neuron();
-  siegert_neuron( const siegert_neuron& );
+  siegert_neuron(const siegert_neuron &);
 
   ~siegert_neuron();
 
@@ -128,49 +126,45 @@ public:
   using Node::handle;
   using Node::sends_secondary_event;
 
-  void handle( DiffusionConnectionEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(DiffusionConnectionEvent &);
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( DiffusionConnectionEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(DiffusionConnectionEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void
-  sends_secondary_event( DiffusionConnectionEvent& )
-  {
-  }
+  void sends_secondary_event(DiffusionConnectionEvent &) {}
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
   /** This is the actual update function. The additional boolean parameter
    * determines if the function is called by update (false) or wfr_update (true)
    */
-  bool update_( Time const&, const long, const long, const bool );
+  bool update_(Time const &, const long, const long, const bool);
 
-  void update( Time const&, const long, const long );
-  bool wfr_update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
+  bool wfr_update(Time const &, const long, const long);
 
   // siegert functions and helpers
-  double siegert( double, double );
-  double siegert1( double, double, double, double );
-  double siegert2( double, double, double, double );
+  double siegert(double, double);
+  double siegert1(double, double, double, double);
+  double siegert2(double, double, double, double);
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< siegert_neuron >;
-  friend class UniversalDataLogger< siegert_neuron >;
+  friend class RecordablesMap<siegert_neuron>;
+  friend class UniversalDataLogger<siegert_neuron>;
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     /** Time constant in ms. */
     double tau_;
 
@@ -194,9 +188,9 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
-    void set( const DictionaryDatum& );
+    void set(const DictionaryDatum &);
   };
 
   // ----------------------------------------------------------------
@@ -204,14 +198,13 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
     double r_; //!< Rate
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum& ) const;
-    void set( const DictionaryDatum& );
+    void get(DictionaryDatum &) const;
+    void set(const DictionaryDatum &);
   };
 
   // ----------------------------------------------------------------
@@ -219,19 +212,17 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( siegert_neuron& );
-    Buffers_( const Buffers_&, siegert_neuron& );
+  struct Buffers_ {
+    Buffers_(siegert_neuron &);
+    Buffers_(const Buffers_ &, siegert_neuron &);
 
-    std::vector< double >
-      drift_input_; //!< buffer for drift term received by DiffusionConnection
-    std::vector< double > diffusion_input_; //!< buffer for diffusion term
+    std::vector<double>
+        drift_input_; //!< buffer for drift term received by DiffusionConnection
+    std::vector<double> diffusion_input_; //!< buffer for diffusion term
     // received by DiffusionConnection
-    std::vector< double >
-      last_y_values; //!< remembers y_values from last wfr_update
-    UniversalDataLogger< siegert_neuron >
-      logger_; //!< Logger for all analog data
+    std::vector<double>
+        last_y_values; //!< remembers y_values from last wfr_update
+    UniversalDataLogger<siegert_neuron> logger_; //!< Logger for all analog data
   };
 
   // ----------------------------------------------------------------
@@ -239,8 +230,7 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
 
     // propagators
     double P1_;
@@ -248,11 +238,7 @@ private:
   };
 
   //! Read out the rate
-  double
-  get_rate_() const
-  {
-    return S_.r_;
-  }
+  double get_rate_() const { return S_.r_; }
 
   // ----------------------------------------------------------------
 
@@ -261,86 +247,70 @@ private:
   Variables_ V_;
   Buffers_ B_;
 
-  gsl_integration_workspace* gsl_w_;
+  gsl_integration_workspace *gsl_w_;
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< siegert_neuron > recordablesMap_;
+  static RecordablesMap<siegert_neuron> recordablesMap_;
 };
 
-inline void
-siegert_neuron::update( Time const& origin, const long from, const long to )
-{
-  update_( origin, from, to, false );
+inline void siegert_neuron::update(Time const &origin, const long from,
+                                   const long to) {
+  update_(origin, from, to, false);
 }
 
-inline bool
-siegert_neuron::wfr_update( Time const& origin, const long from, const long to )
-{
+inline bool siegert_neuron::wfr_update(Time const &origin, const long from,
+                                       const long to) {
   State_ old_state = S_; // save state before wfr update
-  const bool wfr_tol_exceeded = update_( origin, from, to, true );
+  const bool wfr_tol_exceeded = update_(origin, from, to, true);
   S_ = old_state; // restore old state
 
   return not wfr_tol_exceeded;
 }
 
-inline port
-siegert_neuron::handles_test_event( DiffusionConnectionEvent&,
-  rport receptor_type )
-{
-  if ( receptor_type == 0 )
-  {
+inline port siegert_neuron::handles_test_event(DiffusionConnectionEvent &,
+                                               rport receptor_type) {
+  if (receptor_type == 0) {
     return 0;
-  }
-  else if ( receptor_type == 1 )
-  {
+  } else if (receptor_type == 1) {
     return 1;
-  }
-  else
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+  } else {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
 }
 
-inline port
-siegert_neuron::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port siegert_neuron::handles_test_event(DataLoggingRequest &dlr,
+                                               rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-siegert_neuron::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d );
-  Archiving_Node::get_status( d );
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+inline void siegert_neuron::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d);
+  Archiving_Node::get_status(d);
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-siegert_neuron::set_status( const DictionaryDatum& d )
-{
+inline void siegert_neuron::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
   State_ stmp = S_;      // temporary copy in case of errors
-  stmp.set( d );         // throws if BadProperty
+  stmp.set(d);           // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // HAVE_GSL
 #endif // SIEGERT_NEURON_H

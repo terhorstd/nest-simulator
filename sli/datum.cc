@@ -32,8 +32,6 @@
 #include "stringdatum.h"
 #include "token.h"
 
-void
-Datum::info( std::ostream& ) const
-{
+void Datum::info(std::ostream &) const {
   //    out << "wflag = " << wflag << std::endl;
 }

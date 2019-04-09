@@ -31,8 +31,7 @@
 #include "rate_transformer_node.h"
 #include "rate_transformer_node_impl.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: tanh_rate - rate model with hyperbolic tangent non-linearity
@@ -92,8 +91,7 @@ Author: David Dahmen, Jan Hahne, Jannis Schuecker
 
 SeeAlso: rate_connection_instantaneous, rate_connection_delayed
 */
-class nonlinearities_tanh_rate
-{
+class nonlinearities_tanh_rate {
 private:
   /** gain factor of gain function */
   double g_;
@@ -103,51 +101,37 @@ private:
 
 public:
   /** sets default parameters */
-  nonlinearities_tanh_rate()
-    : g_( 1.0 )
-    , theta_( 0.0 )
-  {
-  }
+  nonlinearities_tanh_rate() : g_(1.0), theta_(0.0) {}
 
-  void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-  void set( const DictionaryDatum& ); //!< Set values from dicitonary
+  void get(DictionaryDatum &) const; //!< Store current values in dictionary
+  void set(const DictionaryDatum &); //!< Set values from dicitonary
 
-  double input( double h );               // non-linearity on input
-  double mult_coupling_ex( double rate ); // factor of multiplicative coupling
-  double mult_coupling_in( double rate ); // factor of multiplicative coupling
+  double input(double h);               // non-linearity on input
+  double mult_coupling_ex(double rate); // factor of multiplicative coupling
+  double mult_coupling_in(double rate); // factor of multiplicative coupling
 };
 
-inline double
-nonlinearities_tanh_rate::input( double h )
-{
-  return tanh( g_ * ( h - theta_ ) );
+inline double nonlinearities_tanh_rate::input(double h) {
+  return tanh(g_ * (h - theta_));
 }
 
-inline double
-nonlinearities_tanh_rate::mult_coupling_ex( double rate )
-{
+inline double nonlinearities_tanh_rate::mult_coupling_ex(double rate) {
   return 1.;
 }
 
-inline double
-nonlinearities_tanh_rate::mult_coupling_in( double rate )
-{
+inline double nonlinearities_tanh_rate::mult_coupling_in(double rate) {
   return 1.;
 }
 
-typedef rate_neuron_ipn< nest::nonlinearities_tanh_rate > tanh_rate_ipn;
-typedef rate_neuron_opn< nest::nonlinearities_tanh_rate > tanh_rate_opn;
-typedef rate_transformer_node< nest::nonlinearities_tanh_rate >
-  rate_transformer_tanh;
+typedef rate_neuron_ipn<nest::nonlinearities_tanh_rate> tanh_rate_ipn;
+typedef rate_neuron_opn<nest::nonlinearities_tanh_rate> tanh_rate_opn;
+typedef rate_transformer_node<nest::nonlinearities_tanh_rate>
+    rate_transformer_tanh;
 
-template <>
-void RecordablesMap< tanh_rate_ipn >::create();
-template <>
-void RecordablesMap< tanh_rate_opn >::create();
-template <>
-void RecordablesMap< rate_transformer_tanh >::create();
+template <> void RecordablesMap<tanh_rate_ipn>::create();
+template <> void RecordablesMap<tanh_rate_opn>::create();
+template <> void RecordablesMap<rate_transformer_tanh>::create();
 
 } // namespace nest
-
 
 #endif /* #ifndef TANH_RATE_H */

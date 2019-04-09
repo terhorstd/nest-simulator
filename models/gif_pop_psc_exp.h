@@ -32,9 +32,7 @@
 
 #ifdef HAVE_GSL
 
-namespace nest
-{
-
+namespace nest {
 
 class Network;
 
@@ -131,12 +129,11 @@ Authors: Nov 2016, Moritz Deger, Tilo Schwalger, Hesam Setareh
 
 SeeAlso: gif_psc_exp, pp_pop_psc_delta, spike_dilutor
 */
-class gif_pop_psc_exp : public Node
-{
+class gif_pop_psc_exp : public Node {
 
 public:
   gif_pop_psc_exp();
-  gif_pop_psc_exp( const gif_pop_psc_exp& );
+  gif_pop_psc_exp(const gif_pop_psc_exp &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -146,43 +143,42 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
-  double escrate( const double );
-  long draw_poisson( const double n_expect_ );
-  long draw_binomial( const double n_expect_ );
-  double adaptation_kernel( const int k );
+  double escrate(const double);
+  long draw_poisson(const double n_expect_);
+  long draw_binomial(const double n_expect_);
+  double adaptation_kernel(const int k);
   int get_history_size();
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< gif_pop_psc_exp >;
-  friend class UniversalDataLogger< gif_pop_psc_exp >;
+  friend class RecordablesMap<gif_pop_psc_exp>;
+  friend class UniversalDataLogger<gif_pop_psc_exp>;
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
 
     /** Number of neurons in the population. */
     long N_;
@@ -222,17 +218,17 @@ private:
     double tau_syn_in_;
 
     /** Array of time constants */
-    std::vector< double > tau_sfa_;
+    std::vector<double> tau_sfa_;
 
     /** Array of adaptation amplitudes */
-    std::vector< double > q_sfa_;
+    std::vector<double> q_sfa_;
 
     /** Binomial random number switch */
     bool BinoRand_;
 
-    Parameters_();                      //!< Sets default parameter values
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dictionary
+    Parameters_();                     //!< Sets default parameter values
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dictionary
   };
 
   // ----------------------------------------------------------------
@@ -240,8 +236,7 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
 
     double y0_;        // DC input current
     double I_syn_ex_;  // synaptic current
@@ -256,8 +251,8 @@ private:
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum&, const Parameters_& ) const;
-    void set( const DictionaryDatum&, const Parameters_& );
+    void get(DictionaryDatum &, const Parameters_ &) const;
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ----------------------------------------------------------------
@@ -265,10 +260,9 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( gif_pop_psc_exp& );
-    Buffers_( const Buffers_&, gif_pop_psc_exp& );
+  struct Buffers_ {
+    Buffers_(gif_pop_psc_exp &);
+    Buffers_(const Buffers_ &, gif_pop_psc_exp &);
 
     /** buffers and sums up incoming spikes/currents */
     RingBuffer ex_spikes_;
@@ -276,7 +270,7 @@ private:
     RingBuffer currents_;
 
     //! Logger for all analog data
-    UniversalDataLogger< gif_pop_psc_exp > logger_;
+    UniversalDataLogger<gif_pop_psc_exp> logger_;
   };
 
   // ----------------------------------------------------------------
@@ -284,8 +278,7 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
 
     double R_;      // membrane resistance
     double P20_;    // membrane integration constant
@@ -294,10 +287,10 @@ private:
     double P11_in_; // synaptic integration constant
     int k_ref_;     // length of refractory period in time steps
 
-    std::vector< double > Q30_;       // QR adaptation integration constant
-    std::vector< double > Q30K_;      // QR adaptation integration constant
-    std::vector< double > theta_;     // adaptation kernel
-    std::vector< double > theta_tld_; // QR adaptation kernel
+    std::vector<double> Q30_;       // QR adaptation integration constant
+    std::vector<double> Q30K_;      // QR adaptation integration constant
+    std::vector<double> theta_;     // adaptation kernel
+    std::vector<double> theta_tld_; // QR adaptation kernel
 
     double h_; // simulation time step in ms
     double min_double_;
@@ -306,17 +299,17 @@ private:
 
     librandom::PoissonRandomDev poisson_dev_; // Poisson random number generator
     librandom::GSL_BinomialRandomDev
-      bino_dev_; // Binomial random number generator
+        bino_dev_; // Binomial random number generator
 
-    double x_;                     // internal variable of population dynamics
-    double z_;                     // internal variable of population dynamics
-    double lambda_free_;           // hazard rate for non-refractory neurons
-    std::vector< double > m_;      // survival buffer
-    std::vector< double > n_;      // population activity buffer
-    std::vector< double > u_;      // mean of survivals
-    std::vector< double > v_;      // variance of survivals
-    std::vector< double > lambda_; // escape rates buffer
-    std::vector< double > g_;      // adaptation variables
+    double x_;                   // internal variable of population dynamics
+    double z_;                   // internal variable of population dynamics
+    double lambda_free_;         // hazard rate for non-refractory neurons
+    std::vector<double> m_;      // survival buffer
+    std::vector<double> n_;      // population activity buffer
+    std::vector<double> u_;      // mean of survivals
+    std::vector<double> v_;      // variance of survivals
+    std::vector<double> lambda_; // escape rates buffer
+    std::vector<double> g_;      // adaptation variables
 
     int k0_; // rotating index of history buffers
   };
@@ -324,45 +317,20 @@ private:
   // Access functions for UniversalDataLogger -----------------------
 
   //! Read out the real membrane potential
-  double
-  get_V_m_() const
-  {
-    return S_.V_m_;
-  }
+  double get_V_m_() const { return S_.V_m_; }
 
   //! Read out the number of generated spikes
-  double
-  get_n_events_() const
-  {
-    return S_.n_spikes_;
-  }
+  double get_n_events_() const { return S_.n_spikes_; }
 
   //! Read out the adaptation state
-  double
-  get_E_sfa_() const
-  {
-    return S_.theta_hat_;
-  }
+  double get_E_sfa_() const { return S_.theta_hat_; }
 
   //! Read out the expected number of spikes
-  double
-  get_mean_() const
-  {
-    return S_.n_expect_;
-  }
+  double get_mean_() const { return S_.n_expect_; }
 
   //! Read out the synaptic currents
-  double
-  get_I_syn_ex_() const
-  {
-    return S_.I_syn_ex_;
-  }
-  double
-  get_I_syn_in_() const
-  {
-    return S_.I_syn_in_;
-  }
-
+  double get_I_syn_ex_() const { return S_.I_syn_ex_; }
+  double get_I_syn_in_() const { return S_.I_syn_in_; }
 
   // ----------------------------------------------------------------
 
@@ -380,72 +348,57 @@ private:
   /** @} */
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< gif_pop_psc_exp > recordablesMap_;
+  static RecordablesMap<gif_pop_psc_exp> recordablesMap_;
 };
 
-inline port
-gif_pop_psc_exp::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port gif_pop_psc_exp::send_test_event(Node &target, rport receptor_type,
+                                             synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-gif_pop_psc_exp::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port gif_pop_psc_exp::handles_test_event(SpikeEvent &,
+                                                rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-gif_pop_psc_exp::handles_test_event( CurrentEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port gif_pop_psc_exp::handles_test_event(CurrentEvent &,
+                                                rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-gif_pop_psc_exp::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port gif_pop_psc_exp::handles_test_event(DataLoggingRequest &dlr,
+                                                rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-gif_pop_psc_exp::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d, P_ );
+inline void gif_pop_psc_exp::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d, P_);
   // MoD: In models derived from ArchivingNode, here get_status of the
   // parent class is called. Since this model derives from Node, and
   // not from ArchivingNode, this call has been disabled here
   // (Node does not have a comparable method).
   //  Archiving_Node::get_status(d);
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-gif_pop_psc_exp::set_status( const DictionaryDatum& d )
-{
+inline void gif_pop_psc_exp::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
   State_ stmp = S_;      // temporary copy in case of errors
-  stmp.set( d, ptmp );   // throws if BadProperty
+  stmp.set(d, ptmp);     // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
@@ -463,8 +416,7 @@ gif_pop_psc_exp::set_status( const DictionaryDatum& d )
   S_ = stmp;
 }
 
-} // namespace
-
+} // namespace nest
 
 #endif /* HAVE_GSL */
 #endif /* #ifndef PP_POP_PSC_BETA_H */

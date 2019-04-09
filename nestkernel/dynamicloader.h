@@ -37,16 +37,14 @@
 #include "slifunction.h"
 #include "slimodule.h"
 
-namespace nest
-{
+namespace nest {
 
 // structure to store handles and pointers to modules
 struct sDynModule;
 
-typedef std::vector< sDynModule > vecDynModules;
+typedef std::vector<sDynModule> vecDynModules;
 
-typedef std::vector< SLIModule* > vecLinkedModules;
-
+typedef std::vector<SLIModule *> vecLinkedModules;
 
 /**
  * SLI interface of the Ddynamic module loader.
@@ -54,17 +52,15 @@ typedef std::vector< SLIModule* > vecLinkedModules;
  * loading dynamic modules into the kernel to extend its functionality.
  */
 
-class DynamicLoaderModule : public SLIModule
-{
+class DynamicLoaderModule : public SLIModule {
 public:
-  DynamicLoaderModule( SLIInterpreter& interpreter );
+  DynamicLoaderModule(SLIInterpreter &interpreter);
   ~DynamicLoaderModule();
 
-  void init( SLIInterpreter* );
+  void init(SLIInterpreter *);
 
-  const std::string commandstring( void ) const;
-  const std::string name( void ) const;
-
+  const std::string commandstring(void) const;
+  const std::string name(void) const;
 
   /**
    * This static member is called by the constructor of a loadable module that
@@ -74,21 +70,20 @@ public:
    * Later, DynamicLoader will go through all registered modules and initialize
    * them.
    */
-  static int registerLinkedModule( SLIModule* pModule );
+  static int registerLinkedModule(SLIModule *pModule);
 
-  void initLinkedModules( SLIInterpreter& );
+  void initLinkedModules(SLIInterpreter &);
 
 public:
-  class LoadModuleFunction : public SLIFunction
-  {
+  class LoadModuleFunction : public SLIFunction {
   public:
-    LoadModuleFunction( vecDynModules& dyn_modules );
+    LoadModuleFunction(vecDynModules &dyn_modules);
 
   private:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
 
   private:
-    vecDynModules& dyn_modules_;
+    vecDynModules &dyn_modules_;
   };
 
   /** @} */
@@ -102,16 +97,16 @@ private:
    * by DynamicLoaderModule via a Meyers' Singleton (Alexandrescu, ch 6.4).
    * The list is filled by calls to @c registerLinkedModule().
    */
-  static vecLinkedModules& getLinkedModules();
+  static vecLinkedModules &getLinkedModules();
 
   // vector to store handles and pointers to dynamic modules
   vecDynModules dyn_modules;
 
   //! Dictionary for dynamically loaded modules.
-  static Dictionary* moduledict_;
+  static Dictionary *moduledict_;
 };
 
-} // namespace
+} // namespace nest
 
 #endif // HAVE_LIBLTDL
 

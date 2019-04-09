@@ -30,8 +30,7 @@
 #include "common_synapse_properties.h"
 #include "connection.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: stdp_facetshw_synapse_hom - Synapse type for spike-timing dependent
@@ -137,17 +136,15 @@ SeeAlso: stdp_synapse, synapsedict, tsodyks_synapse, static_synapse
 */
 // template class forward declaration required by common properties friend
 // definition
-template < typename targetidentifierT >
-class STDPFACETSHWConnectionHom;
+template <typename targetidentifierT> class STDPFACETSHWConnectionHom;
 
 /**
  * Class containing the common properties for all synapses of type
  * STDPFACETSHWConnectionHom.
  */
-template < typename targetidentifierT >
-class STDPFACETSHWHomCommonProperties : public CommonSynapseProperties
-{
-  friend class STDPFACETSHWConnectionHom< targetidentifierT >;
+template <typename targetidentifierT>
+class STDPFACETSHWHomCommonProperties : public CommonSynapseProperties {
+  friend class STDPFACETSHWConnectionHom<targetidentifierT>;
 
 public:
   /**
@@ -159,25 +156,21 @@ public:
   /**
    * Get all properties and put them into a dictionary.
    */
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
   /**
    * Set properties from the values given in dictionary.
    */
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
   // overloaded for all supported event types
-  void
-  check_event( SpikeEvent& )
-  {
-  }
+  void check_event(SpikeEvent &) {}
 
 private:
   /**
    * Calculate the readout cycle duration
    */
   void calc_readout_cycle_duration_();
-
 
   // data members common to all connections
   double tau_plus_;
@@ -191,29 +184,27 @@ private:
   double driver_readout_time_;
   double readout_cycle_duration_;
   // TODO: TP: size in memory could be reduced
-  std::vector< long > lookuptable_0_;
-  std::vector< long > lookuptable_1_;
-  std::vector< long > lookuptable_2_; // TODO: TP: to save memory one could
-                                      // introduce vector<bool> &
-                                      // BoolVectorDatum
-  std::vector< long > configbit_0_;
-  std::vector< long > configbit_1_;
-  std::vector< long > reset_pattern_;
+  std::vector<long> lookuptable_0_;
+  std::vector<long> lookuptable_1_;
+  std::vector<long> lookuptable_2_; // TODO: TP: to save memory one could
+                                    // introduce vector<bool> &
+                                    // BoolVectorDatum
+  std::vector<long> configbit_0_;
+  std::vector<long> configbit_1_;
+  std::vector<long> reset_pattern_;
 };
-
 
 /**
  * Class representing an STDP connection with homogeneous parameters, i.e.
  * parameters are the same for all synapses.
  */
-template < typename targetidentifierT >
-class STDPFACETSHWConnectionHom : public Connection< targetidentifierT >
-{
+template <typename targetidentifierT>
+class STDPFACETSHWConnectionHom : public Connection<targetidentifierT> {
 
 public:
-  typedef STDPFACETSHWHomCommonProperties< targetidentifierT >
-    CommonPropertiesType;
-  typedef Connection< targetidentifierT > ConnectionBase;
+  typedef STDPFACETSHWHomCommonProperties<targetidentifierT>
+      CommonPropertiesType;
+  typedef Connection<targetidentifierT> ConnectionBase;
 
   /**
    * Default Constructor.
@@ -225,7 +216,7 @@ public:
    * Copy constructor from a property object.
    * Needs to be defined properly in order for GenericConnector to work.
    */
-  STDPFACETSHWConnectionHom( const STDPFACETSHWConnectionHom& );
+  STDPFACETSHWConnectionHom(const STDPFACETSHWConnectionHom &);
 
   // Explicitly declare all methods inherited from the dependent base
   // ConnectionBase. This avoids explicit name prefixes in all places these
@@ -239,35 +230,27 @@ public:
   /**
    * Get all properties of this connection and put them into a dictionary.
    */
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
   /**
    * Set properties of this connection from the values given in dictionary.
    */
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
   /**
    * Send an event to the receiver of this connection.
    * \param e The event to send
    */
-  void send( Event& e,
-    thread t,
-    const STDPFACETSHWHomCommonProperties< targetidentifierT >& );
+  void send(Event &e, thread t,
+            const STDPFACETSHWHomCommonProperties<targetidentifierT> &);
 
-
-  class ConnTestDummyNode : public ConnTestDummyNodeBase
-  {
+  class ConnTestDummyNode : public ConnTestDummyNodeBase {
   public:
     // Ensure proper overriding of overloaded virtual functions.
     // Return values from functions are ignored.
     using ConnTestDummyNodeBase::handles_test_event;
-    port
-    handles_test_event( SpikeEvent&, rport )
-    {
-      return invalid_port_;
-    }
+    port handles_test_event(SpikeEvent &, rport) { return invalid_port_; }
   };
-
 
   /*
    * This function calls check_connection on the sender and checks if the
@@ -282,40 +265,28 @@ public:
    * \param r The target node
    * \param receptor_type The ID of the requested receptor type
    */
-  void
-  check_connection( Node& s,
-    Node& t,
-    rport receptor_type,
-    const CommonPropertiesType& )
-  {
+  void check_connection(Node &s, Node &t, rport receptor_type,
+                        const CommonPropertiesType &) {
     ConnTestDummyNode dummy_target;
 
-    ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
+    ConnectionBase::check_connection_(dummy_target, s, t, receptor_type);
 
-    t.register_stdp_connection( t_lastspike_ - get_delay() );
+    t.register_stdp_connection(t_lastspike_ - get_delay());
   }
 
-  void
-  set_weight( double w )
-  {
-    weight_ = w;
-  }
+  void set_weight(double w) { weight_ = w; }
 
 private:
-  bool eval_function_( double a_causal,
-    double a_acausal,
-    double a_thresh_th,
-    double a_thresh_tl,
-    std::vector< long > configbit );
+  bool eval_function_(double a_causal, double a_acausal, double a_thresh_th,
+                      double a_thresh_tl, std::vector<long> configbit);
 
   // transformation biological weight <-> discrete weight (represented in index
   // of look-up table)
-  unsigned int weight_to_entry_( double weight, double weight_per_lut_entry );
-  double entry_to_weight_( unsigned int discrete_weight,
-    double weight_per_lut_entry );
+  unsigned int weight_to_entry_(double weight, double weight_per_lut_entry);
+  double entry_to_weight_(unsigned int discrete_weight,
+                          double weight_per_lut_entry);
 
-  unsigned int lookup_( unsigned int discrete_weight_,
-    std::vector< long > table );
+  unsigned int lookup_(unsigned int discrete_weight_, std::vector<long> table);
 
   // data members of each connection
   double weight_;
@@ -328,68 +299,53 @@ private:
   long synapse_id_;
   double next_readout_time_;
   unsigned int
-    discrete_weight_; // TODO: TP: only needed in send, move to common
-                      // properties or "static"?
+      discrete_weight_; // TODO: TP: only needed in send, move to common
+                        // properties or "static"?
   double t_lastspike_;
 };
 
-template < typename targetidentifierT >
-inline bool
-STDPFACETSHWConnectionHom< targetidentifierT >::eval_function_( double a_causal,
-  double a_acausal,
-  double a_thresh_th,
-  double a_thresh_tl,
-  std::vector< long > configbit )
-{
+template <typename targetidentifierT>
+inline bool STDPFACETSHWConnectionHom<targetidentifierT>::eval_function_(
+    double a_causal, double a_acausal, double a_thresh_th, double a_thresh_tl,
+    std::vector<long> configbit) {
   // compare charge on capacitors with thresholds and return evaluation bit
-  return ( a_thresh_tl + configbit[ 2 ] * a_causal
-           + configbit[ 1 ] * a_acausal )
-    / ( 1 + configbit[ 2 ] + configbit[ 1 ] )
-    > ( a_thresh_th + configbit[ 0 ] * a_causal + configbit[ 3 ] * a_acausal )
-    / ( 1 + configbit[ 0 ] + configbit[ 3 ] );
+  return (a_thresh_tl + configbit[2] * a_causal + configbit[1] * a_acausal) /
+             (1 + configbit[2] + configbit[1]) >
+         (a_thresh_th + configbit[0] * a_causal + configbit[3] * a_acausal) /
+             (1 + configbit[0] + configbit[3]);
 }
 
-template < typename targetidentifierT >
+template <typename targetidentifierT>
 inline unsigned int
-STDPFACETSHWConnectionHom< targetidentifierT >::weight_to_entry_( double weight,
-  double weight_per_lut_entry )
-{
+STDPFACETSHWConnectionHom<targetidentifierT>::weight_to_entry_(
+    double weight, double weight_per_lut_entry) {
   // returns the discrete weight in terms of the look-up table index
-  return round( weight / weight_per_lut_entry );
+  return round(weight / weight_per_lut_entry);
 }
 
-template < typename targetidentifierT >
-inline double
-STDPFACETSHWConnectionHom< targetidentifierT >::entry_to_weight_(
-  unsigned int discrete_weight,
-  double weight_per_lut_entry )
-{
+template <typename targetidentifierT>
+inline double STDPFACETSHWConnectionHom<targetidentifierT>::entry_to_weight_(
+    unsigned int discrete_weight, double weight_per_lut_entry) {
   // returns the continuous weight
   return discrete_weight * weight_per_lut_entry;
 }
 
-template < typename targetidentifierT >
-inline unsigned int
-STDPFACETSHWConnectionHom< targetidentifierT >::lookup_(
-  unsigned int discrete_weight_,
-  std::vector< long > table )
-{
+template <typename targetidentifierT>
+inline unsigned int STDPFACETSHWConnectionHom<targetidentifierT>::lookup_(
+    unsigned int discrete_weight_, std::vector<long> table) {
   // look-up in table
-  return table[ discrete_weight_ ];
+  return table[discrete_weight_];
 }
-
 
 /**
  * Send an event to the receiver of this connection.
  * \param e The event to send
  * \param p The port under which this connection is stored in the Connector.
  */
-template < typename targetidentifierT >
-inline void
-STDPFACETSHWConnectionHom< targetidentifierT >::send( Event& e,
-  thread t,
-  const STDPFACETSHWHomCommonProperties< targetidentifierT >& cp )
-{
+template <typename targetidentifierT>
+inline void STDPFACETSHWConnectionHom<targetidentifierT>::send(
+    Event &e, thread t,
+    const STDPFACETSHWHomCommonProperties<targetidentifierT> &cp) {
   // synapse STDP dynamics
 
   double t_spike = e.get_stamp().get_ms();
@@ -400,76 +356,62 @@ STDPFACETSHWConnectionHom< targetidentifierT >::send( Event& e,
   // generate wring results on distributed systems,
   // because the number of synapses counted is only
   // the number of synapses local to the current machine
-  STDPFACETSHWHomCommonProperties< targetidentifierT >& cp_nonconst =
-    const_cast< STDPFACETSHWHomCommonProperties< targetidentifierT >& >( cp );
+  STDPFACETSHWHomCommonProperties<targetidentifierT> &cp_nonconst =
+      const_cast<STDPFACETSHWHomCommonProperties<targetidentifierT> &>(cp);
 
   // init the readout time
-  if ( init_flag_ == false )
-  {
+  if (init_flag_ == false) {
     synapse_id_ = cp.no_synapses_;
     ++cp_nonconst.no_synapses_;
     cp_nonconst.calc_readout_cycle_duration_();
-    next_readout_time_ = int( synapse_id_ / cp_nonconst.synapses_per_driver_ )
-      * cp_nonconst.driver_readout_time_;
+    next_readout_time_ = int(synapse_id_ / cp_nonconst.synapses_per_driver_) *
+                         cp_nonconst.driver_readout_time_;
     std::cout << "init synapse " << synapse_id_
               << " - first readout time: " << next_readout_time_ << std::endl;
     init_flag_ = true;
   }
 
   // STDP controller is processing this synapse (synapse driver)?
-  if ( t_spike > next_readout_time_ )
-  {
+  if (t_spike > next_readout_time_) {
     // transform weight to discrete representation
     discrete_weight_ =
-      weight_to_entry_( weight_, cp_nonconst.weight_per_lut_entry_ );
+        weight_to_entry_(weight_, cp_nonconst.weight_per_lut_entry_);
 
     // obtain evaluation bits
-    bool eval_0 = eval_function_(
-      a_causal_, a_acausal_, a_thresh_th_, a_thresh_tl_, cp.configbit_0_ );
-    bool eval_1 = eval_function_(
-      a_causal_, a_acausal_, a_thresh_th_, a_thresh_tl_, cp.configbit_1_ );
+    bool eval_0 = eval_function_(a_causal_, a_acausal_, a_thresh_th_,
+                                 a_thresh_tl_, cp.configbit_0_);
+    bool eval_1 = eval_function_(a_causal_, a_acausal_, a_thresh_th_,
+                                 a_thresh_tl_, cp.configbit_1_);
 
     // select LUT, update weight and reset capacitors
-    if ( eval_0 == true && eval_1 == false )
-    {
-      discrete_weight_ = lookup_( discrete_weight_, cp.lookuptable_0_ );
-      if ( cp.reset_pattern_[ 0 ] )
-      {
+    if (eval_0 == true && eval_1 == false) {
+      discrete_weight_ = lookup_(discrete_weight_, cp.lookuptable_0_);
+      if (cp.reset_pattern_[0]) {
         a_causal_ = 0;
       }
-      if ( cp.reset_pattern_[ 1 ] )
-      {
+      if (cp.reset_pattern_[1]) {
         a_acausal_ = 0;
       }
-    }
-    else if ( eval_0 == false && eval_1 == true )
-    {
-      discrete_weight_ = lookup_( discrete_weight_, cp.lookuptable_1_ );
-      if ( cp.reset_pattern_[ 2 ] )
-      {
+    } else if (eval_0 == false && eval_1 == true) {
+      discrete_weight_ = lookup_(discrete_weight_, cp.lookuptable_1_);
+      if (cp.reset_pattern_[2]) {
         a_causal_ = 0;
       }
-      if ( cp.reset_pattern_[ 3 ] )
-      {
+      if (cp.reset_pattern_[3]) {
         a_acausal_ = 0;
       }
-    }
-    else if ( eval_0 == true && eval_1 == true )
-    {
-      discrete_weight_ = lookup_( discrete_weight_, cp.lookuptable_2_ );
-      if ( cp.reset_pattern_[ 4 ] )
-      {
+    } else if (eval_0 == true && eval_1 == true) {
+      discrete_weight_ = lookup_(discrete_weight_, cp.lookuptable_2_);
+      if (cp.reset_pattern_[4]) {
         a_causal_ = 0;
       }
-      if ( cp.reset_pattern_[ 5 ] )
-      {
+      if (cp.reset_pattern_[5]) {
         a_acausal_ = 0;
       }
     }
     // do nothing, if eval_0 == false and eval_1 == false
 
-    while ( t_spike > next_readout_time_ )
-    {
+    while (t_spike > next_readout_time_) {
       next_readout_time_ += cp_nonconst.readout_cycle_duration_;
     }
     // std::cout << "synapse " << synapse_id_ << " updated at " << t_spike << ",
@@ -477,53 +419,49 @@ STDPFACETSHWConnectionHom< targetidentifierT >::send( Event& e,
     // " << next_readout_time_ << std::endl;
 
     // back-transformation to continuous weight space
-    weight_ = entry_to_weight_( discrete_weight_, cp.weight_per_lut_entry_ );
+    weight_ = entry_to_weight_(discrete_weight_, cp.weight_per_lut_entry_);
   }
 
   // t_lastspike_ = 0 initially
 
-  double dendritic_delay = Time( Time::step( get_delay_steps() ) ).get_ms();
+  double dendritic_delay = Time(Time::step(get_delay_steps())).get_ms();
 
   // get spike history in relevant range (t1, t2] from post-synaptic neuron
-  std::deque< histentry >::iterator start;
-  std::deque< histentry >::iterator finish;
-  get_target( t )->get_history( t_lastspike_ - dendritic_delay,
-    t_spike - dendritic_delay,
-    &start,
-    &finish );
+  std::deque<histentry>::iterator start;
+  std::deque<histentry>::iterator finish;
+  get_target(t)->get_history(t_lastspike_ - dendritic_delay,
+                             t_spike - dendritic_delay, &start, &finish);
   // facilitation due to post-synaptic spikes since last pre-synaptic spike
   double minus_dt = 0;
   double plus_dt = 0;
 
-  if ( start != finish ) // take only first postspike after last prespike
+  if (start != finish) // take only first postspike after last prespike
   {
-    minus_dt = t_lastspike_ - ( start->t_ + dendritic_delay );
+    minus_dt = t_lastspike_ - (start->t_ + dendritic_delay);
   }
 
-  if ( start != finish ) // take only last postspike before current spike
+  if (start != finish) // take only last postspike before current spike
   {
     --finish;
-    plus_dt = ( finish->t_ + dendritic_delay ) - t_spike;
+    plus_dt = (finish->t_ + dendritic_delay) - t_spike;
   }
 
-  if ( minus_dt != 0 )
-  {
-    a_causal_ += std::exp( minus_dt / cp.tau_plus_ );
+  if (minus_dt != 0) {
+    a_causal_ += std::exp(minus_dt / cp.tau_plus_);
   }
 
-  if ( plus_dt != 0 )
-  {
-    a_acausal_ += std::exp( plus_dt / cp.tau_minus_ );
+  if (plus_dt != 0) {
+    a_acausal_ += std::exp(plus_dt / cp.tau_minus_);
   }
 
-  e.set_receiver( *get_target( t ) );
-  e.set_weight( weight_ );
-  e.set_delay_steps( get_delay_steps() );
-  e.set_rport( get_rport() );
+  e.set_receiver(*get_target(t));
+  e.set_weight(weight_);
+  e.set_delay_steps(get_delay_steps());
+  e.set_rport(get_rport());
   e();
 
   t_lastspike_ = t_spike;
 }
-} // of namespace nest
+} // namespace nest
 
 #endif // of #ifndef STDP_CONNECTION_HOM_H

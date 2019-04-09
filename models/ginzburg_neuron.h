@@ -26,8 +26,7 @@
 // Includes from models:
 #include "binary_neuron.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: ginzburg_neuron - Binary stochastic neuron with sigmoidal activation
@@ -113,8 +112,7 @@ Author: Moritz Helias
 
 SeeAlso: pp_psc_delta
 */
-class gainfunction_ginzburg
-{
+class gainfunction_ginzburg {
 private:
   /** threshold of sigmoidal activation function */
   double theta_;
@@ -132,35 +130,26 @@ public:
   /** sets default parameters */
 
   gainfunction_ginzburg()
-    : theta_( 0.0 )
-    , // mV
-    c1_( 0.0 )
-    , // (mV)^-1
-    c2_( 1.0 )
-    ,          // dimensionless
-    c3_( 1.0 ) // (mV)^-1
-  {
-  }
+      : theta_(0.0), // mV
+        c1_(0.0),    // (mV)^-1
+        c2_(1.0),    // dimensionless
+        c3_(1.0)     // (mV)^-1
+  {}
 
-  void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-  void set( const DictionaryDatum& ); //!< Set values from dicitonary
+  void get(DictionaryDatum &) const; //!< Store current values in dictionary
+  void set(const DictionaryDatum &); //!< Set values from dicitonary
 
-  bool operator()( librandom::RngPtr rng, double h );
+  bool operator()(librandom::RngPtr rng, double h);
 };
 
-inline bool
-gainfunction_ginzburg::operator()( librandom::RngPtr rng, double h )
-{
-  return rng->drand()
-    < c1_ * h + c2_ * 0.5 * ( 1.0 + tanh( c3_ * ( h - theta_ ) ) );
+inline bool gainfunction_ginzburg::operator()(librandom::RngPtr rng, double h) {
+  return rng->drand() < c1_ * h + c2_ * 0.5 * (1.0 + tanh(c3_ * (h - theta_)));
 }
 
-typedef binary_neuron< nest::gainfunction_ginzburg > ginzburg_neuron;
+typedef binary_neuron<nest::gainfunction_ginzburg> ginzburg_neuron;
 
-template <>
-void RecordablesMap< ginzburg_neuron >::create();
+template <> void RecordablesMap<ginzburg_neuron>::create();
 
 } // namespace nest
-
 
 #endif /* #ifndef GINZBURG_NEURON_H */

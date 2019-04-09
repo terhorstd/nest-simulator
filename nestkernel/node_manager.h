@@ -38,16 +38,14 @@
 #include "arraydatum.h"
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 
 class SiblingContainer;
 class Node;
 class Subnet;
 class Model;
 
-class NodeManager : public ManagerInterface
-{
+class NodeManager : public ManagerInterface {
 public:
   NodeManager();
   ~NodeManager();
@@ -55,15 +53,15 @@ public:
   virtual void initialize();
   virtual void finalize();
 
-  virtual void set_status( const DictionaryDatum& );
-  virtual void get_status( DictionaryDatum& );
+  virtual void set_status(const DictionaryDatum &);
+  virtual void get_status(DictionaryDatum &);
 
   void reinit_nodes();
   /**
    * Get properties of a node. The specified node must exist.
    * @throws nest::UnknownNode       Target does not exist in the network.
    */
-  DictionaryDatum get_status( index );
+  DictionaryDatum get_status(index);
 
   /**
    * Set properties of a Node. The specified node must exist.
@@ -72,7 +70,7 @@ public:
    *                                          entry.
    * @throws TypeMismatch   Array is not a flat & homogeneous array of integers.
    */
-  void set_status( index, const DictionaryDatum& );
+  void set_status(index, const DictionaryDatum &);
 
   /**
    * Add a number of nodes to the network.
@@ -83,7 +81,7 @@ public:
    * specified.
    * @throws nest::UnknownModelID
    */
-  index add_node( index m, long n = 1 );
+  index add_node(index m, long n = 1);
 
   /**
    * Restore nodes from an array of status dictionaries.
@@ -97,7 +95,7 @@ public:
    * GIDs in the status dictionaties are offset by the GID of the current
    * working node. This allows entire subnetworks to be copied.
    */
-  void restore_nodes( const ArrayDatum& );
+  void restore_nodes(const ArrayDatum &);
 
   /**
    * Reset state of nodes.
@@ -111,7 +109,7 @@ public:
    * Set the state (observable dynamic variables) of a node to model defaults.
    * @see Node::init_state()
    */
-  void init_state( index );
+  void init_state(index);
 
   /**
    * Return total number of network nodes.
@@ -129,27 +127,27 @@ public:
    */
   index get_num_local_devices() const;
 
-  Subnet* get_root() const; ///< return root subnet.
-  Subnet* get_cwn() const;  ///< current working node.
+  Subnet *get_root() const; ///< return root subnet.
+  Subnet *get_cwn() const;  ///< current working node.
 
   /**
    * Change current working node. The specified node must
    * exist and be a subnet.
    * @throws nest::IllegalOperation Target is no subnet.
    */
-  void go_to( index );
+  void go_to(index);
 
-  void print( index, int );
+  void print(index, int);
 
   /**
    * Return true, if the given Node is on the local machine
    */
-  bool is_local_node( Node* ) const;
+  bool is_local_node(Node *) const;
 
   /**
    * Return true, if the given gid is on the local machine
    */
-  bool is_local_gid( index gid ) const;
+  bool is_local_gid(index gid) const;
 
   /**
    * Return pointer of the specified Node.
@@ -160,7 +158,7 @@ public:
    *
    * @ingroup net_access
    */
-  Node* get_node( index, thread thr = 0 );
+  Node *get_node(index, thread thr = 0);
 
   /**
    * Return the Subnet that contains the thread siblings.
@@ -170,7 +168,7 @@ public:
    *
    * @ingroup net_access
    */
-  const SiblingContainer* get_thread_siblings( index n ) const;
+  const SiblingContainer *get_thread_siblings(index n) const;
 
   /**
    * Ensure that all nodes in the network have valid thread-local IDs.
@@ -179,17 +177,17 @@ public:
    */
   void ensure_valid_thread_local_ids();
 
-  Node* thread_lid_to_node( thread t, targetindex thread_local_id ) const;
+  Node *thread_lid_to_node(thread t, targetindex thread_local_id) const;
 
   /**
    * Get list of nodes on given thread.
    */
-  const std::vector< Node* >& get_nodes_on_thread( thread ) const;
+  const std::vector<Node *> &get_nodes_on_thread(thread) const;
 
   /**
    * Get list of nodes on given thread.
    */
-  const std::vector< Node* >& get_wfr_nodes_on_thread( thread ) const;
+  const std::vector<Node *> &get_wfr_nodes_on_thread(thread) const;
 
   /**
    * Prepare nodes for simulation and register nodes in node_list.
@@ -203,11 +201,7 @@ public:
    * @see prepare_nodes()
    * @return number of active nodes
    */
-  size_t
-  get_num_active_nodes()
-  {
-    return num_active_nodes_;
-  };
+  size_t get_num_active_nodes() { return num_active_nodes_; };
 
   /**
    * Invoke post_run_cleanup() on all nodes.
@@ -244,7 +238,7 @@ public:
    */
   size_t local_nodes_size() const;
   bool have_nodes_changed() const;
-  void set_have_nodes_changed( const bool changed );
+  void set_have_nodes_changed(const bool changed);
 
 private:
   /**
@@ -263,29 +257,28 @@ private:
    *        each call so Node::set_status_()
    * @throws UnaccessedDictionaryEntry
    */
-  void set_status_single_node_( Node&,
-    const DictionaryDatum&,
-    bool clear_flags = true );
+  void set_status_single_node_(Node &, const DictionaryDatum &,
+                               bool clear_flags = true);
 
   /**
    * Initialized buffers, register in list of nodes to update/finalize.
    * @see prepare_nodes_()
    */
-  void prepare_node_( Node* );
+  void prepare_node_(Node *);
 
   /**
    * Returns the next local gid after curr_gid (in round robin fashion).
    * In the case of GSD, there might be no valid gids, hence you should still
    * check, if it returns a local gid.
    */
-  index next_local_gid_( index curr_gid ) const;
+  index next_local_gid_(index curr_gid) const;
 
 private:
   SparseNodeArray local_nodes_; //!< The network as sparse array of local nodes
-  Subnet* root_;                //!< Root node.
-  Subnet* current_;             //!< Current working node (for insertion).
+  Subnet *root_;                //!< Root node.
+  Subnet *current_;             //!< Current working node (for insertion).
 
-  Model* siblingcontainer_model_; //!< The model for the SiblingContainer class
+  Model *siblingcontainer_model_; //!< The model for the SiblingContainer class
 
   /**
    * Data structure holding node pointers per thread.
@@ -298,12 +291,12 @@ private:
    * these vectors when the frozen status on nodes is changed (which is
    * essentially undetectable).
    */
-  std::vector< std::vector< Node* > > nodes_vec_;
-  std::vector< std::vector< Node* > >
-    wfr_nodes_vec_;  //!< Nodelists for unfrozen nodes that
-                     //!< use the waveform relaxation method
-  bool wfr_is_used_; //!< there is at least one node that uses
-                     //!< waveform relaxation
+  std::vector<std::vector<Node *>> nodes_vec_;
+  std::vector<std::vector<Node *>>
+      wfr_nodes_vec_; //!< Nodelists for unfrozen nodes that
+                      //!< use the waveform relaxation method
+  bool wfr_is_used_;  //!< there is at least one node that uses
+                      //!< waveform relaxation
   //! Network size when nodes_vec_ was last updated
   index nodes_vec_network_size_;
   size_t num_active_nodes_; //!< number of nodes created by prepare_nodes
@@ -314,84 +307,55 @@ private:
                             //!< since startup or last call to simulate
 };
 
-inline index
-NodeManager::size() const
-{
+inline index NodeManager::size() const {
   return local_nodes_.get_max_gid() + 1;
 }
 
-inline Subnet*
-NodeManager::get_root() const
-{
-  return root_;
+inline Subnet *NodeManager::get_root() const { return root_; }
+
+inline Subnet *NodeManager::get_cwn(void) const { return current_; }
+
+inline bool NodeManager::is_local_gid(index gid) const {
+  return local_nodes_.get_node_by_gid(gid) != 0;
 }
 
-inline Subnet*
-NodeManager::get_cwn( void ) const
-{
-  return current_;
+inline Node *
+NodeManager::thread_lid_to_node(thread t, targetindex thread_local_id) const {
+  return nodes_vec_[t][thread_local_id];
 }
 
-inline bool
-NodeManager::is_local_gid( index gid ) const
-{
-  return local_nodes_.get_node_by_gid( gid ) != 0;
+inline const std::vector<Node *> &
+NodeManager::get_nodes_on_thread(thread t) const {
+  return nodes_vec_.at(t);
 }
 
-inline Node*
-NodeManager::thread_lid_to_node( thread t, targetindex thread_local_id ) const
-{
-  return nodes_vec_[ t ][ thread_local_id ];
+inline const std::vector<Node *> &
+NodeManager::get_wfr_nodes_on_thread(thread t) const {
+  return wfr_nodes_vec_.at(t);
 }
 
-inline const std::vector< Node* >&
-NodeManager::get_nodes_on_thread( thread t ) const
-{
-  return nodes_vec_.at( t );
-}
+inline bool NodeManager::wfr_is_used() const { return wfr_is_used_; }
 
-inline const std::vector< Node* >&
-NodeManager::get_wfr_nodes_on_thread( thread t ) const
-{
-  return wfr_nodes_vec_.at( t );
-}
-
-inline bool
-NodeManager::wfr_is_used() const
-{
-  return wfr_is_used_;
-}
-
-inline SparseNodeArray::const_iterator
-NodeManager::local_nodes_begin() const
-{
+inline SparseNodeArray::const_iterator NodeManager::local_nodes_begin() const {
   return local_nodes_.begin();
 }
 
-inline SparseNodeArray::const_iterator
-NodeManager::local_nodes_end() const
-{
+inline SparseNodeArray::const_iterator NodeManager::local_nodes_end() const {
   return local_nodes_.end();
 }
 
-inline size_t
-NodeManager::local_nodes_size() const
-{
+inline size_t NodeManager::local_nodes_size() const {
   return local_nodes_.size();
 }
 
-inline bool
-NodeManager::have_nodes_changed() const
-{
+inline bool NodeManager::have_nodes_changed() const {
   return have_nodes_changed_;
 }
 
-inline void
-NodeManager::set_have_nodes_changed( const bool changed )
-{
+inline void NodeManager::set_have_nodes_changed(const bool changed) {
   have_nodes_changed_ = changed;
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* NODE_MANAGER_H */

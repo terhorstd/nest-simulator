@@ -66,8 +66,7 @@ class DelayedRateConnectionEvent;
    SeeAlso: Device, RecordingDevice
 */
 
-namespace nest
-{
+namespace nest {
 
 /**
  * Base class for common properties of Stimulating Devices.
@@ -120,26 +119,22 @@ namespace nest
  *
  * @ingroup Devices
  */
-template < typename EmittedEvent >
-class StimulatingDevice : public Device
-{
+template <typename EmittedEvent> class StimulatingDevice : public Device {
 public:
   StimulatingDevice();
-  StimulatingDevice( StimulatingDevice< EmittedEvent > const& );
-  virtual ~StimulatingDevice()
-  {
-  }
+  StimulatingDevice(StimulatingDevice<EmittedEvent> const &);
+  virtual ~StimulatingDevice() {}
 
   /**
    * Determine whether device is active.
    * The argument is the value of the simulation time.
    * @see class comment for details.
    */
-  bool is_active( const Time& ) const;
-  void get_status( DictionaryDatum& d ) const;
+  bool is_active(const Time &) const;
+  void get_status(DictionaryDatum &d) const;
 
   //! Throws IllegalConnection if synapse id differs from initial synapse id
-  void enforce_single_syn_type( synindex );
+  void enforce_single_syn_type(synindex);
 
 private:
   /**
@@ -152,26 +147,21 @@ private:
   synindex first_syn_id_;
 };
 
-template < typename EmittedEvent >
-StimulatingDevice< EmittedEvent >::StimulatingDevice()
-  : Device()
-  , first_syn_id_( invalid_synindex )
-{
-}
+template <typename EmittedEvent>
+StimulatingDevice<EmittedEvent>::StimulatingDevice()
+    : Device(), first_syn_id_(invalid_synindex) {}
 
-template < typename EmittedEvent >
-StimulatingDevice< EmittedEvent >::StimulatingDevice(
-  StimulatingDevice< EmittedEvent > const& sd )
-  : Device( sd )
-  , first_syn_id_( invalid_synindex ) // a new instance can have no connections
-{
-}
+template <typename EmittedEvent>
+StimulatingDevice<EmittedEvent>::StimulatingDevice(
+    StimulatingDevice<EmittedEvent> const &sd)
+    : Device(sd),
+      first_syn_id_(invalid_synindex) // a new instance can have no connections
+{}
 
 // specializations must be declared inside namespace
 template <>
 inline bool
-StimulatingDevice< nest::CurrentEvent >::is_active( const Time& T ) const
-{
+StimulatingDevice<nest::CurrentEvent>::is_active(const Time &T) const {
   /* We have t_min_ = origin_ + start_, t_max_ = origin_ + stop_ in steps.
      We need to check if
         t_min_ - 1 <= T.get_steps() <= t_max_ - 2
@@ -183,10 +173,8 @@ StimulatingDevice< nest::CurrentEvent >::is_active( const Time& T ) const
 }
 
 template <>
-inline bool
-StimulatingDevice< nest::DelayedRateConnectionEvent >::is_active(
-  const Time& T ) const
-{
+inline bool StimulatingDevice<nest::DelayedRateConnectionEvent>::is_active(
+    const Time &T) const {
   // same as for the CurrentEvent
   const long step = T.get_steps() + 1;
   return get_t_min_() <= step && step < get_t_max_();
@@ -194,8 +182,7 @@ StimulatingDevice< nest::DelayedRateConnectionEvent >::is_active(
 
 template <>
 inline bool
-StimulatingDevice< nest::DoubleDataEvent >::is_active( const Time& T ) const
-{
+StimulatingDevice<nest::DoubleDataEvent>::is_active(const Time &T) const {
   // same as for the CurrentEvent
   const long step = T.get_steps() + 1;
   return get_t_min_() <= step and step < get_t_max_();
@@ -203,35 +190,29 @@ StimulatingDevice< nest::DoubleDataEvent >::is_active( const Time& T ) const
 
 template <>
 inline bool
-StimulatingDevice< nest::SpikeEvent >::is_active( const Time& T ) const
-{
+StimulatingDevice<nest::SpikeEvent>::is_active(const Time &T) const {
   /* Input is the time stamp of the spike to be emitted. */
   const long stamp = T.get_steps();
   return get_t_min_() < stamp and stamp <= get_t_max_();
 }
 
-template < typename EmittedEvent >
+template <typename EmittedEvent>
 inline void
-StimulatingDevice< EmittedEvent >::get_status( DictionaryDatum& d ) const
-{
-  ( *d )[ names::element_type ] = LiteralDatum( names::stimulator );
-  Device::get_status( d );
+StimulatingDevice<EmittedEvent>::get_status(DictionaryDatum &d) const {
+  (*d)[names::element_type] = LiteralDatum(names::stimulator);
+  Device::get_status(d);
 }
 
-template < typename EmittedEvent >
-inline void
-nest::StimulatingDevice< EmittedEvent >::enforce_single_syn_type(
-  synindex syn_id )
-{
-  if ( first_syn_id_ == invalid_synindex )
-  {
+template <typename EmittedEvent>
+inline void nest::StimulatingDevice<EmittedEvent>::enforce_single_syn_type(
+    synindex syn_id) {
+  if (first_syn_id_ == invalid_synindex) {
     first_syn_id_ = syn_id;
   }
-  if ( syn_id != first_syn_id_ )
-  {
+  if (syn_id != first_syn_id_) {
     throw IllegalConnection(
-      "All outgoing connections from a device must use the same synapse "
-      "type." );
+        "All outgoing connections from a device must use the same synapse "
+        "type.");
   }
 }
 } // namespace nest

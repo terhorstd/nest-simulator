@@ -32,8 +32,7 @@
 #include "rate_transformer_node.h"
 #include "rate_transformer_node_impl.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: sigmoid_rate_gg_1998 - rate model with sigmoidal gain function
@@ -97,56 +96,45 @@ Author: Mario Senden, Jan Hahne, Jannis Schuecker
 
 SeeAlso: rate_connection_instantaneous, rate_connection_delayed
 */
-class nonlinearities_sigmoid_rate_gg_1998
-{
+class nonlinearities_sigmoid_rate_gg_1998 {
 private:
   /** gain factor of gain function */
   double g_;
 
 public:
   /** sets default parameters */
-  nonlinearities_sigmoid_rate_gg_1998()
-    : g_( 1.0 )
-  {
-  }
+  nonlinearities_sigmoid_rate_gg_1998() : g_(1.0) {}
 
-  void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-  void set( const DictionaryDatum& ); //!< Set values from dicitonary
+  void get(DictionaryDatum &) const; //!< Store current values in dictionary
+  void set(const DictionaryDatum &); //!< Set values from dicitonary
 
-  double input( double h );               // non-linearity on input
-  double mult_coupling_ex( double rate ); // factor of multiplicative coupling
-  double mult_coupling_in( double rate ); // factor of multiplicative coupling
+  double input(double h);               // non-linearity on input
+  double mult_coupling_ex(double rate); // factor of multiplicative coupling
+  double mult_coupling_in(double rate); // factor of multiplicative coupling
 };
 
-inline double
-nonlinearities_sigmoid_rate_gg_1998::input( double h )
-{
-  return pow( g_ * h, 4. ) / ( pow( .1, 4. ) + pow( g_ * h, 4. ) );
+inline double nonlinearities_sigmoid_rate_gg_1998::input(double h) {
+  return pow(g_ * h, 4.) / (pow(.1, 4.) + pow(g_ * h, 4.));
 }
 
 inline double
-nonlinearities_sigmoid_rate_gg_1998::mult_coupling_ex( double rate )
-{
+nonlinearities_sigmoid_rate_gg_1998::mult_coupling_ex(double rate) {
   return 1.;
 }
 
 inline double
-nonlinearities_sigmoid_rate_gg_1998::mult_coupling_in( double rate )
-{
+nonlinearities_sigmoid_rate_gg_1998::mult_coupling_in(double rate) {
   return 1.;
 }
 
-typedef rate_neuron_ipn< nest::nonlinearities_sigmoid_rate_gg_1998 >
-  sigmoid_rate_gg_1998_ipn;
-typedef rate_transformer_node< nest::nonlinearities_sigmoid_rate_gg_1998 >
-  rate_transformer_sigmoid_gg_1998;
+typedef rate_neuron_ipn<nest::nonlinearities_sigmoid_rate_gg_1998>
+    sigmoid_rate_gg_1998_ipn;
+typedef rate_transformer_node<nest::nonlinearities_sigmoid_rate_gg_1998>
+    rate_transformer_sigmoid_gg_1998;
 
-template <>
-void RecordablesMap< sigmoid_rate_gg_1998_ipn >::create();
-template <>
-void RecordablesMap< rate_transformer_sigmoid_gg_1998 >::create();
+template <> void RecordablesMap<sigmoid_rate_gg_1998_ipn>::create();
+template <> void RecordablesMap<rate_transformer_sigmoid_gg_1998>::create();
 
 } // namespace nest
-
 
 #endif /* #ifndef SIGMOID_RATE_GG_1998_H */

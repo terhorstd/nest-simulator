@@ -22,54 +22,41 @@
 
 #include "threshold_lin_rate.h"
 
-namespace nest
-{
+namespace nest {
 
-void
-nonlinearities_threshold_lin_rate::get( DictionaryDatum& d ) const
-{
-  def< double >( d, names::g, g_ );
-  def< double >( d, names::theta, theta_ );
-  def< double >( d, names::alpha, alpha_ );
+void nonlinearities_threshold_lin_rate::get(DictionaryDatum &d) const {
+  def<double>(d, names::g, g_);
+  def<double>(d, names::theta, theta_);
+  def<double>(d, names::alpha, alpha_);
 }
 
-void
-nonlinearities_threshold_lin_rate::set( const DictionaryDatum& d )
-{
-  updateValue< double >( d, names::g, g_ );
-  updateValue< double >( d, names::theta, theta_ );
-  updateValue< double >( d, names::alpha, alpha_ );
+void nonlinearities_threshold_lin_rate::set(const DictionaryDatum &d) {
+  updateValue<double>(d, names::g, g_);
+  updateValue<double>(d, names::theta, theta_);
+  updateValue<double>(d, names::alpha, alpha_);
 }
 
 /*
  * Override the create() method with one call to RecordablesMap::insert_()
  * for each quantity to be recorded.
  */
-template <>
-void
-RecordablesMap< nest::threshold_lin_rate_ipn >::create()
-{
+template <> void RecordablesMap<nest::threshold_lin_rate_ipn>::create() {
   // use standard names whereever you can for consistency!
-  insert_( names::rate, &nest::threshold_lin_rate_ipn::get_rate_ );
-  insert_( names::noise, &nest::threshold_lin_rate_ipn::get_noise_ );
+  insert_(names::rate, &nest::threshold_lin_rate_ipn::get_rate_);
+  insert_(names::noise, &nest::threshold_lin_rate_ipn::get_noise_);
+}
+
+template <> void RecordablesMap<nest::threshold_lin_rate_opn>::create() {
+  // use standard names whereever you can for consistency!
+  insert_(names::rate, &nest::threshold_lin_rate_opn::get_rate_);
+  insert_(names::noise, &nest::threshold_lin_rate_opn::get_noise_);
+  insert_(names::noisy_rate, &nest::threshold_lin_rate_opn::get_noisy_rate_);
 }
 
 template <>
-void
-RecordablesMap< nest::threshold_lin_rate_opn >::create()
-{
+void RecordablesMap<nest::rate_transformer_threshold_lin>::create() {
   // use standard names whereever you can for consistency!
-  insert_( names::rate, &nest::threshold_lin_rate_opn::get_rate_ );
-  insert_( names::noise, &nest::threshold_lin_rate_opn::get_noise_ );
-  insert_( names::noisy_rate, &nest::threshold_lin_rate_opn::get_noisy_rate_ );
-}
-
-template <>
-void
-RecordablesMap< nest::rate_transformer_threshold_lin >::create()
-{
-  // use standard names whereever you can for consistency!
-  insert_( names::rate, &nest::rate_transformer_threshold_lin::get_rate_ );
+  insert_(names::rate, &nest::rate_transformer_threshold_lin::get_rate_);
 }
 
 } // namespace nest

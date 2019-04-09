@@ -58,8 +58,7 @@
 
 extern int SLIsignalflag;
 
-namespace nest
-{
+namespace nest {
 SLIType NestModule::ConnectionType;
 SLIType NestModule::GIDCollectionType;
 
@@ -67,12 +66,9 @@ SLIType NestModule::GIDCollectionType;
 // must already be initialized. NestModule relies on the presence of
 // the following SLI datastructures: Name, Dictionary
 
-NestModule::NestModule()
-{
-}
+NestModule::NestModule() {}
 
-NestModule::~NestModule()
-{
+NestModule::~NestModule() {
   // The network is deleted outside NestModule, since the
   // dynamicloadermodule also needs it
 
@@ -82,18 +78,13 @@ NestModule::~NestModule()
 
 // The following concerns the new module:
 
-const std::string
-NestModule::name( void ) const
-{
-  return std::string( "NEST Kernel 2" ); // Return name of the module
+const std::string NestModule::name(void) const {
+  return std::string("NEST Kernel 2"); // Return name of the module
 }
 
-const std::string
-NestModule::commandstring( void ) const
-{
-  return std::string( "(nest-init) run" );
+const std::string NestModule::commandstring(void) const {
+  return std::string("(nest-init) run");
 }
-
 
 /** @BeginDocumentation
    Name: ChangeSubnet - change the current working subnet.
@@ -113,14 +104,12 @@ NestModule::commandstring( void ) const
    SeeAlso: CurrentSubnet
 */
 
-void
-NestModule::ChangeSubnet_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::ChangeSubnet_iFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  index node_gid = getValue< long >( i->OStack.pick( 0 ) );
+  index node_gid = getValue<long>(i->OStack.pick(0));
 
-  change_subnet( node_gid );
+  change_subnet(node_gid);
 
   i->OStack.pop();
   i->EStack.pop();
@@ -137,12 +126,10 @@ NestModule::ChangeSubnet_iFunction::execute( SLIInterpreter* i ) const
    SeeAlso: ChangeSubnet
    Author: Marc-Oliver Gewaltig
 */
-void
-NestModule::CurrentSubnetFunction::execute( SLIInterpreter* i ) const
-{
+void NestModule::CurrentSubnetFunction::execute(SLIInterpreter *i) const {
   index current = current_subnet();
 
-  i->OStack.push( current );
+  i->OStack.push(current);
   i->EStack.pop();
 }
 
@@ -175,108 +162,88 @@ NestModule::CurrentSubnetFunction::execute( SLIInterpreter* i ) const
    SeeAlso: ShowStatus, GetStatus, info, modeldict, Set, SetStatus_v,
    SetStatus_dict
 */
-void
-NestModule::SetStatus_idFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void NestModule::SetStatus_idFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  DictionaryDatum dict = getValue< DictionaryDatum >( i->OStack.top() );
-  index node_id = getValue< long >( i->OStack.pick( 1 ) );
+  DictionaryDatum dict = getValue<DictionaryDatum>(i->OStack.top());
+  index node_id = getValue<long>(i->OStack.pick(1));
 
   // Network::set_status() performs entry access checks for each
   // target and throws UnaccessedDictionaryEntry where necessary
-  if ( node_id == 0 )
-  {
-    set_kernel_status( dict );
-  }
-  else
-  {
-    set_node_status( node_id, dict );
+  if (node_id == 0) {
+    set_kernel_status(dict);
+  } else {
+    set_node_status(node_id, dict);
   }
 
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
   i->EStack.pop();
 }
 
-void
-NestModule::SetStatus_CDFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void NestModule::SetStatus_CDFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  DictionaryDatum dict = getValue< DictionaryDatum >( i->OStack.top() );
-  ConnectionDatum conn = getValue< ConnectionDatum >( i->OStack.pick( 1 ) );
+  DictionaryDatum dict = getValue<DictionaryDatum>(i->OStack.top());
+  ConnectionDatum conn = getValue<ConnectionDatum>(i->OStack.pick(1));
 
-  set_connection_status( conn, dict );
+  set_connection_status(conn, dict);
 
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
   i->EStack.pop();
 }
 
-void
-NestModule::Cva_CFunction::execute( SLIInterpreter* i ) const
-{
-  ConnectionDatum conn = getValue< ConnectionDatum >( i->OStack.top() );
+void NestModule::Cva_CFunction::execute(SLIInterpreter *i) const {
+  ConnectionDatum conn = getValue<ConnectionDatum>(i->OStack.top());
   ArrayDatum ad;
-  ad.push_back( conn.get_source_gid() );
-  ad.push_back( conn.get_target_gid() );
-  ad.push_back( conn.get_target_thread() );
-  ad.push_back( conn.get_synapse_model_id() );
-  ad.push_back( conn.get_port() );
-  Token result( ad );
-  i->OStack.top().swap( result );
+  ad.push_back(conn.get_source_gid());
+  ad.push_back(conn.get_target_gid());
+  ad.push_back(conn.get_target_thread());
+  ad.push_back(conn.get_synapse_model_id());
+  ad.push_back(conn.get_port());
+  Token result(ad);
+  i->OStack.top().swap(result);
   i->EStack.pop();
 }
 
-void
-NestModule::SetStatus_aaFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void NestModule::SetStatus_aaFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  ArrayDatum dict_a = getValue< ArrayDatum >( i->OStack.top() );
-  ArrayDatum conn_a = getValue< ArrayDatum >( i->OStack.pick( 1 ) );
+  ArrayDatum dict_a = getValue<ArrayDatum>(i->OStack.top());
+  ArrayDatum conn_a = getValue<ArrayDatum>(i->OStack.pick(1));
 
-  if ( ( dict_a.size() != 1 ) and ( dict_a.size() != conn_a.size() ) )
-  {
+  if ((dict_a.size() != 1) and (dict_a.size() != conn_a.size())) {
     throw RangeCheck();
   }
-  if ( dict_a.size() == 1 ) // Broadcast
+  if (dict_a.size() == 1) // Broadcast
   {
-    DictionaryDatum dict = getValue< DictionaryDatum >( dict_a[ 0 ] );
+    DictionaryDatum dict = getValue<DictionaryDatum>(dict_a[0]);
     const size_t n_conns = conn_a.size();
-    for ( size_t con = 0; con < n_conns; ++con )
-    {
-      ConnectionDatum con_id = getValue< ConnectionDatum >( conn_a[ con ] );
+    for (size_t con = 0; con < n_conns; ++con) {
+      ConnectionDatum con_id = getValue<ConnectionDatum>(conn_a[con]);
       dict->clear_access_flags();
-      kernel().connection_manager.set_synapse_status( con_id.get_source_gid(),
-        con_id.get_target_gid(),
-        con_id.get_target_thread(),
-        con_id.get_synapse_model_id(),
-        con_id.get_port(),
-        dict );
+      kernel().connection_manager.set_synapse_status(
+          con_id.get_source_gid(), con_id.get_target_gid(),
+          con_id.get_target_thread(), con_id.get_synapse_model_id(),
+          con_id.get_port(), dict);
 
-      ALL_ENTRIES_ACCESSED( *dict, "SetStatus", "Unread dictionary entries: " );
+      ALL_ENTRIES_ACCESSED(*dict, "SetStatus", "Unread dictionary entries: ");
     }
-  }
-  else
-  {
+  } else {
     const size_t n_conns = conn_a.size();
-    for ( size_t con = 0; con < n_conns; ++con )
-    {
-      DictionaryDatum dict = getValue< DictionaryDatum >( dict_a[ con ] );
-      ConnectionDatum con_id = getValue< ConnectionDatum >( conn_a[ con ] );
+    for (size_t con = 0; con < n_conns; ++con) {
+      DictionaryDatum dict = getValue<DictionaryDatum>(dict_a[con]);
+      ConnectionDatum con_id = getValue<ConnectionDatum>(conn_a[con]);
       dict->clear_access_flags();
-      kernel().connection_manager.set_synapse_status( con_id.get_source_gid(),
-        con_id.get_target_gid(),
-        con_id.get_target_thread(),
-        con_id.get_synapse_model_id(),
-        con_id.get_port(),
-        dict );
+      kernel().connection_manager.set_synapse_status(
+          con_id.get_source_gid(), con_id.get_target_gid(),
+          con_id.get_target_thread(), con_id.get_synapse_model_id(),
+          con_id.get_port(), dict);
 
-      ALL_ENTRIES_ACCESSED( *dict, "SetStatus", "Unread dictionary entries: " );
+      ALL_ENTRIES_ACCESSED(*dict, "SetStatus", "Unread dictionary entries: ");
     }
   }
 
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
   i->EStack.pop();
 }
 
@@ -326,72 +293,58 @@ NestModule::SetStatus_aaFunction::execute( SLIInterpreter* i ) const
    Availability: NEST
    SeeAlso: ShowStatus, info, SetStatus, get, GetStatus_v, GetStatus_dict
 */
-void
-NestModule::GetStatus_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::GetStatus_iFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  index node_id = getValue< long >( i->OStack.pick( 0 ) );
+  index node_id = getValue<long>(i->OStack.pick(0));
   DictionaryDatum dict;
-  if ( node_id == 0 )
-  {
+  if (node_id == 0) {
     dict = get_kernel_status();
-  }
-  else
-  {
-    dict = get_node_status( node_id );
+  } else {
+    dict = get_node_status(node_id);
   }
 
   i->OStack.pop();
-  i->OStack.push( dict );
+  i->OStack.push(dict);
   i->EStack.pop();
 }
 
-void
-NestModule::GetStatus_CFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::GetStatus_CFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  ConnectionDatum conn = getValue< ConnectionDatum >( i->OStack.pick( 0 ) );
+  ConnectionDatum conn = getValue<ConnectionDatum>(i->OStack.pick(0));
 
   long gid = conn.get_source_gid();
-  kernel().node_manager.get_node( gid ); // Just to check if the node exists
+  kernel().node_manager.get_node(gid); // Just to check if the node exists
 
-  DictionaryDatum result_dict =
-    kernel().connection_manager.get_synapse_status( conn.get_source_gid(),
-      conn.get_target_gid(),
-      conn.get_target_thread(),
-      conn.get_synapse_model_id(),
-      conn.get_port() );
+  DictionaryDatum result_dict = kernel().connection_manager.get_synapse_status(
+      conn.get_source_gid(), conn.get_target_gid(), conn.get_target_thread(),
+      conn.get_synapse_model_id(), conn.get_port());
 
   i->OStack.pop();
-  i->OStack.push( result_dict );
+  i->OStack.push(result_dict);
   i->EStack.pop();
 }
 
 // [intvector1,...,intvector_n]  -> [dict1,.../dict_n]
-void
-NestModule::GetStatus_aFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  const ArrayDatum conns = getValue< ArrayDatum >( i->OStack.pick( 0 ) );
+void NestModule::GetStatus_aFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  const ArrayDatum conns = getValue<ArrayDatum>(i->OStack.pick(0));
   size_t n_results = conns.size();
   ArrayDatum result;
-  result.reserve( n_results );
-  for ( size_t nt = 0; nt < n_results; ++nt )
-  {
-    ConnectionDatum con_id = getValue< ConnectionDatum >( conns.get( nt ) );
+  result.reserve(n_results);
+  for (size_t nt = 0; nt < n_results; ++nt) {
+    ConnectionDatum con_id = getValue<ConnectionDatum>(conns.get(nt));
     DictionaryDatum result_dict =
-      kernel().connection_manager.get_synapse_status( con_id.get_source_gid(),
-        con_id.get_target_gid(),
-        con_id.get_target_thread(),
-        con_id.get_synapse_model_id(),
-        con_id.get_port() );
-    result.push_back( result_dict );
+        kernel().connection_manager.get_synapse_status(
+            con_id.get_source_gid(), con_id.get_target_gid(),
+            con_id.get_target_thread(), con_id.get_synapse_model_id(),
+            con_id.get_port());
+    result.push_back(result_dict);
   }
 
   i->OStack.pop();
-  i->OStack.push( result );
+  i->OStack.push(result);
   i->EStack.pop();
 }
 
@@ -402,17 +355,15 @@ NestModule::GetStatus_aFunction::execute( SLIInterpreter* i ) const
   Author: Jochen Martin Eppler
   FirstVersion: September 2008
 */
-void
-NestModule::SetDefaults_l_DFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void NestModule::SetDefaults_l_DFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  const Name name = getValue< Name >( i->OStack.pick( 1 ) );
-  DictionaryDatum params = getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+  const Name name = getValue<Name>(i->OStack.pick(1));
+  DictionaryDatum params = getValue<DictionaryDatum>(i->OStack.pick(0));
 
-  kernel().model_manager.set_model_defaults( name, params );
+  kernel().model_manager.set_model_defaults(name, params);
 
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
   i->EStack.pop();
 }
 
@@ -423,31 +374,27 @@ NestModule::SetDefaults_l_DFunction::execute( SLIInterpreter* i ) const
   Author: Jochen Martin Eppler
   FirstVersion: September 2008
 */
-void
-NestModule::GetDefaults_lFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::GetDefaults_lFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  const Name modelname = getValue< Name >( i->OStack.pick( 0 ) );
+  const Name modelname = getValue<Name>(i->OStack.pick(0));
 
-  DictionaryDatum dict = get_model_defaults( modelname );
+  DictionaryDatum dict = get_model_defaults(modelname);
 
   i->OStack.pop();
-  i->OStack.push( dict );
+  i->OStack.push(dict);
   i->EStack.pop();
 }
 
-void
-NestModule::GetConnections_DFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::GetConnections_DFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  DictionaryDatum dict = getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+  DictionaryDatum dict = getValue<DictionaryDatum>(i->OStack.pick(0));
 
-  ArrayDatum array = get_connections( dict );
+  ArrayDatum array = get_connections(dict);
 
   i->OStack.pop();
-  i->OStack.push( array );
+  i->OStack.push(array);
   i->EStack.pop();
 }
 
@@ -461,14 +408,12 @@ NestModule::GetConnections_DFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: Run, Prepare, Cleanup, unit_conversion
 */
-void
-NestModule::SimulateFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::SimulateFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
   const double time = i->OStack.top();
 
-  simulate( time );
+  simulate(time);
 
   // successful end of simulate
   i->OStack.pop();
@@ -492,19 +437,16 @@ NestModule::SimulateFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: Simulate, unit_conversion, Prepare, Cleanup
 */
-void
-NestModule::RunFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::RunFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
   const double time = i->OStack.top();
 
-  run( time );
+  run(time);
 
   i->OStack.pop();
   i->EStack.pop();
 }
-
 
 /** @BeginDocumentation
    Name: Prepare - prepare the network for a simulation
@@ -522,9 +464,7 @@ NestModule::RunFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: Run, Cleanup, Simulate
 */
-void
-NestModule::PrepareFunction::execute( SLIInterpreter* i ) const
-{
+void NestModule::PrepareFunction::execute(SLIInterpreter *i) const {
   prepare();
   i->EStack.pop();
 }
@@ -545,9 +485,7 @@ NestModule::PrepareFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: Run, Prepare, Simulate
 */
-void
-NestModule::CleanupFunction::execute( SLIInterpreter* i ) const
-{
+void NestModule::CleanupFunction::execute(SLIInterpreter *i) const {
   cleanup();
   i->EStack.pop();
 }
@@ -569,19 +507,17 @@ NestModule::CleanupFunction::execute( SLIInterpreter* i ) const
    are set in new_model.
    Warning: It is impossible to unload modules after use of CopyModel.
  */
-void
-NestModule::CopyModel_l_l_DFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
+void NestModule::CopyModel_l_l_DFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(3);
 
   // fetch existing model name from stack
-  const Name old_name = getValue< Name >( i->OStack.pick( 2 ) );
-  const Name new_name = getValue< Name >( i->OStack.pick( 1 ) );
-  DictionaryDatum params = getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+  const Name old_name = getValue<Name>(i->OStack.pick(2));
+  const Name new_name = getValue<Name>(i->OStack.pick(1));
+  DictionaryDatum params = getValue<DictionaryDatum>(i->OStack.pick(0));
 
-  kernel().model_manager.copy_model( old_name, new_name, params );
+  kernel().model_manager.copy_model(old_name, new_name, params);
 
-  i->OStack.pop( 3 );
+  i->OStack.pop(3);
   i->EStack.pop();
 }
 
@@ -605,93 +541,78 @@ NestModule::CopyModel_l_l_DFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: modeldict, ChangeSubnet
 */
-void
-NestModule::Create_l_iFunction::execute( SLIInterpreter* i ) const
-{
+void NestModule::Create_l_iFunction::execute(SLIInterpreter *i) const {
   // check for stack load
-  i->assert_stack_load( 2 );
+  i->assert_stack_load(2);
 
   // extract arguments
-  const long n_nodes = getValue< long >( i->OStack.pick( 0 ) );
-  if ( n_nodes <= 0 )
-  {
+  const long n_nodes = getValue<long>(i->OStack.pick(0));
+  if (n_nodes <= 0) {
     throw RangeCheck();
   }
 
-  const std::string modname = getValue< std::string >( i->OStack.pick( 1 ) );
+  const std::string modname = getValue<std::string>(i->OStack.pick(1));
 
-  const long last_node_id = create( modname, n_nodes );
+  const long last_node_id = create(modname, n_nodes);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( last_node_id );
+  i->OStack.pop(2);
+  i->OStack.push(last_node_id);
   i->EStack.pop();
 }
 
-void
-NestModule::RestoreNodes_aFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  ArrayDatum node_list = getValue< ArrayDatum >( i->OStack.top() );
+void NestModule::RestoreNodes_aFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  ArrayDatum node_list = getValue<ArrayDatum>(i->OStack.top());
 
-  restore_nodes( node_list );
+  restore_nodes(node_list);
 
   i->OStack.pop();
   i->EStack.pop();
 }
 
-void
-NestModule::GetNodes_i_D_b_bFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 4 );
+void NestModule::GetNodes_i_D_b_bFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(4);
 
-  const bool return_gids_only = getValue< bool >( i->OStack.pick( 0 ) );
-  const bool include_remote = not getValue< bool >( i->OStack.pick( 1 ) );
-  const DictionaryDatum params =
-    getValue< DictionaryDatum >( i->OStack.pick( 2 ) );
-  const index node_id = getValue< long >( i->OStack.pick( 3 ) );
+  const bool return_gids_only = getValue<bool>(i->OStack.pick(0));
+  const bool include_remote = not getValue<bool>(i->OStack.pick(1));
+  const DictionaryDatum params = getValue<DictionaryDatum>(i->OStack.pick(2));
+  const index node_id = getValue<long>(i->OStack.pick(3));
 
   ArrayDatum result =
-    get_nodes( node_id, params, include_remote, return_gids_only );
+      get_nodes(node_id, params, include_remote, return_gids_only);
 
-  i->OStack.pop( 4 );
-  i->OStack.push( result );
+  i->OStack.pop(4);
+  i->OStack.push(result);
   i->EStack.pop();
 }
 
-void
-NestModule::GetChildren_i_D_bFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
+void NestModule::GetChildren_i_D_bFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(3);
 
-  const bool include_remote = not getValue< bool >( i->OStack.pick( 0 ) );
-  const DictionaryDatum params =
-    getValue< DictionaryDatum >( i->OStack.pick( 1 ) );
-  const index node_id = getValue< long >( i->OStack.pick( 2 ) );
+  const bool include_remote = not getValue<bool>(i->OStack.pick(0));
+  const DictionaryDatum params = getValue<DictionaryDatum>(i->OStack.pick(1));
+  const index node_id = getValue<long>(i->OStack.pick(2));
 
-  ArrayDatum result = get_children( node_id, params, include_remote );
+  ArrayDatum result = get_children(node_id, params, include_remote);
 
-  i->OStack.pop( 3 );
-  i->OStack.push( result );
+  i->OStack.pop(3);
+  i->OStack.push(result);
   i->EStack.pop();
 }
 
-void
-NestModule::GetLeaves_i_D_bFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
+void NestModule::GetLeaves_i_D_bFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(3);
 
-  const bool include_remote = not getValue< bool >( i->OStack.pick( 0 ) );
-  const DictionaryDatum params =
-    getValue< DictionaryDatum >( i->OStack.pick( 1 ) );
-  const index node_id = getValue< long >( i->OStack.pick( 2 ) );
+  const bool include_remote = not getValue<bool>(i->OStack.pick(0));
+  const DictionaryDatum params = getValue<DictionaryDatum>(i->OStack.pick(1));
+  const index node_id = getValue<long>(i->OStack.pick(2));
 
-  ArrayDatum result = get_leaves( node_id, params, include_remote );
+  ArrayDatum result = get_leaves(node_id, params, include_remote);
 
-  i->OStack.pop( 3 );
-  i->OStack.push( result );
+  i->OStack.pop(3);
+  i->OStack.push(result);
   i->EStack.pop();
 }
-
 
 /** @BeginDocumentation
    Name: ResetKernel - Put the simulation kernel back to its initial state.
@@ -712,9 +633,7 @@ NestModule::GetLeaves_i_D_bFunction::execute( SLIInterpreter* i ) const
    Author: Marc-oliver Gewaltig
    SeeAlso: ResetNetwork, reset, ResetOptions
 */
-void
-NestModule::ResetKernelFunction::execute( SLIInterpreter* i ) const
-{
+void NestModule::ResetKernelFunction::execute(SLIInterpreter *i) const {
   reset_kernel();
   i->EStack.pop();
 }
@@ -748,9 +667,7 @@ NestModule::ResetKernelFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: ResetKernel, reset
 */
-void
-NestModule::ResetNetworkFunction::execute( SLIInterpreter* i ) const
-{
+void NestModule::ResetNetworkFunction::execute(SLIInterpreter *i) const {
   reset_network();
 
   i->EStack.pop();
@@ -758,73 +675,57 @@ NestModule::ResetNetworkFunction::execute( SLIInterpreter* i ) const
 
 // Disconnect for gid gid syn_model
 // See lib/sli/nest-init.sli for details
-void
-NestModule::Disconnect_i_i_lFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
+void NestModule::Disconnect_i_i_lFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(3);
 
-  index source = getValue< long >( i->OStack.pick( 2 ) );
-  index target = getValue< long >( i->OStack.pick( 1 ) );
-  DictionaryDatum synapse_params =
-    getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+  index source = getValue<long>(i->OStack.pick(2));
+  index target = getValue<long>(i->OStack.pick(1));
+  DictionaryDatum synapse_params = getValue<DictionaryDatum>(i->OStack.pick(0));
 
   // check whether the target is on this process
-  if ( kernel().node_manager.is_local_gid( target ) )
-  {
-    Node* const target_node = kernel().node_manager.get_node( target );
+  if (kernel().node_manager.is_local_gid(target)) {
+    Node *const target_node = kernel().node_manager.get_node(target);
     const thread target_thread = target_node->get_thread();
-    kernel().sp_manager.disconnect_single(
-      source, target_node, target_thread, synapse_params );
+    kernel().sp_manager.disconnect_single(source, target_node, target_thread,
+                                          synapse_params);
   }
 
-  i->OStack.pop( 3 );
+  i->OStack.pop(3);
   i->EStack.pop();
 }
 
 // Disconnect for gidcollection gidcollection conn_spec syn_spec
-void
-NestModule::Disconnect_g_g_D_DFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 4 );
+void NestModule::Disconnect_g_g_D_DFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(4);
 
-  GIDCollectionDatum sources =
-    getValue< GIDCollectionDatum >( i->OStack.pick( 3 ) );
-  GIDCollectionDatum targets =
-    getValue< GIDCollectionDatum >( i->OStack.pick( 2 ) );
-  DictionaryDatum connectivity =
-    getValue< DictionaryDatum >( i->OStack.pick( 1 ) );
-  DictionaryDatum synapse_params =
-    getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+  GIDCollectionDatum sources = getValue<GIDCollectionDatum>(i->OStack.pick(3));
+  GIDCollectionDatum targets = getValue<GIDCollectionDatum>(i->OStack.pick(2));
+  DictionaryDatum connectivity = getValue<DictionaryDatum>(i->OStack.pick(1));
+  DictionaryDatum synapse_params = getValue<DictionaryDatum>(i->OStack.pick(0));
 
   // dictionary access checking is handled by disconnect
-  kernel().sp_manager.disconnect(
-    sources, targets, connectivity, synapse_params );
+  kernel().sp_manager.disconnect(sources, targets, connectivity,
+                                 synapse_params);
 
-  i->OStack.pop( 4 );
+  i->OStack.pop(4);
   i->EStack.pop();
 }
 
 // Connect for gidcollection gidcollection conn_spec syn_spec
 // See lib/sli/nest-init.sli for details
-void
-NestModule::Connect_g_g_D_DFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 4 );
+void NestModule::Connect_g_g_D_DFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(4);
 
-  GIDCollectionDatum sources =
-    getValue< GIDCollectionDatum >( i->OStack.pick( 3 ) );
-  GIDCollectionDatum targets =
-    getValue< GIDCollectionDatum >( i->OStack.pick( 2 ) );
-  DictionaryDatum connectivity =
-    getValue< DictionaryDatum >( i->OStack.pick( 1 ) );
-  DictionaryDatum synapse_params =
-    getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+  GIDCollectionDatum sources = getValue<GIDCollectionDatum>(i->OStack.pick(3));
+  GIDCollectionDatum targets = getValue<GIDCollectionDatum>(i->OStack.pick(2));
+  DictionaryDatum connectivity = getValue<DictionaryDatum>(i->OStack.pick(1));
+  DictionaryDatum synapse_params = getValue<DictionaryDatum>(i->OStack.pick(0));
 
   // dictionary access checking is handled by connect
-  kernel().connection_manager.connect(
-    sources, targets, connectivity, synapse_params );
+  kernel().connection_manager.connect(sources, targets, connectivity,
+                                      synapse_params);
 
-  i->OStack.pop( 4 );
+  i->OStack.pop(4);
   i->EStack.pop();
 }
 
@@ -860,35 +761,30 @@ NestModule::Connect_g_g_D_DFunction::execute( SLIInterpreter* i ) const
    FirstVersion: August 2011
    SeeAlso: Connect
 */
-void
-NestModule::DataConnect_i_D_sFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
+void NestModule::DataConnect_i_D_sFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(3);
 
-  if ( kernel().vp_manager.get_num_threads() > 1 )
-  {
-    throw KernelException( "DataConnect cannot be used with multiple threads" );
+  if (kernel().vp_manager.get_num_threads() > 1) {
+    throw KernelException("DataConnect cannot be used with multiple threads");
   }
 
-  const index source = getValue< long >( i->OStack.pick( 2 ) );
-  DictionaryDatum params = getValue< DictionaryDatum >( i->OStack.pick( 1 ) );
-  const Name synmodel_name = getValue< std::string >( i->OStack.pick( 0 ) );
+  const index source = getValue<long>(i->OStack.pick(2));
+  DictionaryDatum params = getValue<DictionaryDatum>(i->OStack.pick(1));
+  const Name synmodel_name = getValue<std::string>(i->OStack.pick(0));
 
   const Token synmodel =
-    kernel().model_manager.get_synapsedict()->lookup( synmodel_name );
-  if ( synmodel.empty() )
-  {
-    throw UnknownSynapseType( synmodel_name.toString() );
+      kernel().model_manager.get_synapsedict()->lookup(synmodel_name);
+  if (synmodel.empty()) {
+    throw UnknownSynapseType(synmodel_name.toString());
   }
-  const index synmodel_id = static_cast< index >( synmodel );
+  const index synmodel_id = static_cast<index>(synmodel);
 
-  kernel().connection_manager.data_connect_single(
-    source, params, synmodel_id );
+  kernel().connection_manager.data_connect_single(source, params, synmodel_id);
 
-  ALL_ENTRIES_ACCESSED(
-    *params, "Connect", "The following synapse parameters are unused: " );
+  ALL_ENTRIES_ACCESSED(*params, "Connect",
+                       "The following synapse parameters are unused: ");
 
-  i->OStack.pop( 3 );
+  i->OStack.pop(3);
   i->EStack.pop();
 }
 
@@ -924,19 +820,16 @@ NestModule::DataConnect_i_D_sFunction::execute( SLIInterpreter* i ) const
     FirstVersion: May 2012
     SeeAlso: DataConnect_i_D_s, Connect
  */
-void
-NestModule::DataConnect_aFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::DataConnect_aFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  if ( kernel().vp_manager.get_num_threads() > 1 )
-  {
-    throw KernelException( "DataConnect cannot be used with multiple threads" );
+  if (kernel().vp_manager.get_num_threads() > 1) {
+    throw KernelException("DataConnect cannot be used with multiple threads");
   }
 
-  const ArrayDatum connectome = getValue< ArrayDatum >( i->OStack.top() );
+  const ArrayDatum connectome = getValue<ArrayDatum>(i->OStack.top());
 
-  kernel().connection_manager.data_connect_connectome( connectome );
+  kernel().connection_manager.data_connect_connectome(connectome);
   i->OStack.pop();
   i->EStack.pop();
 }
@@ -955,9 +848,7 @@ NestModule::DataConnect_aFunction::execute( SLIInterpreter* i ) const
    Availability: NEST
    Author: Jochen Martin Eppler
 */
-void
-NestModule::MemoryInfoFunction::execute( SLIInterpreter* i ) const
-{
+void NestModule::MemoryInfoFunction::execute(SLIInterpreter *i) const {
   kernel().model_manager.memory_info();
   i->EStack.pop();
 }
@@ -1093,17 +984,15 @@ NestModule::MemoryInfoFunction::execute( SLIInterpreter* i ) const
    Availability: NEST
    Author: Marc-Oliver Gewaltig, Jochen Martin Eppler
 */
-void
-NestModule::PrintNetworkFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void NestModule::PrintNetworkFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  long gid = getValue< long >( i->OStack.pick( 1 ) );
-  long depth = getValue< long >( i->OStack.pick( 0 ) );
+  long gid = getValue<long>(i->OStack.pick(1));
+  long depth = getValue<long>(i->OStack.pick(0));
 
-  print_network( gid, depth - 1 );
+  print_network(gid, depth - 1);
 
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
   i->EStack.pop();
 }
 
@@ -1121,10 +1010,8 @@ NestModule::PrintNetworkFunction::execute( SLIInterpreter* i ) const
    FirstVersion: January 2006
    SeeAlso: NumProcesses, SyncProcesses, ProcessorName
 */
-void
-NestModule::RankFunction::execute( SLIInterpreter* i ) const
-{
-  i->OStack.push( kernel().mpi_manager.get_rank() );
+void NestModule::RankFunction::execute(SLIInterpreter *i) const {
+  i->OStack.push(kernel().mpi_manager.get_rank());
   i->EStack.pop();
 }
 
@@ -1139,10 +1026,8 @@ NestModule::RankFunction::execute( SLIInterpreter* i ) const
    FirstVersion: January 2006
    SeeAlso: Rank, SyncProcesses, ProcessorName
 */
-void
-NestModule::NumProcessesFunction::execute( SLIInterpreter* i ) const
-{
-  i->OStack.push( kernel().mpi_manager.get_num_processes() );
+void NestModule::NumProcessesFunction::execute(SLIInterpreter *i) const {
+  i->OStack.push(kernel().mpi_manager.get_num_processes());
   i->EStack.pop();
 }
 
@@ -1188,15 +1073,14 @@ NestModule::NumProcessesFunction::execute( SLIInterpreter* i ) const
    FirstVersion: July 2011
    SeeAlso: NumProcesses
 */
-void
-NestModule::SetFakeNumProcesses_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  long n_procs = getValue< long >( i->OStack.pick( 0 ) );
+void NestModule::SetFakeNumProcesses_iFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  long n_procs = getValue<long>(i->OStack.pick(0));
 
-  enable_dryrun_mode( n_procs );
+  enable_dryrun_mode(n_procs);
 
-  i->OStack.pop( 1 );
+  i->OStack.pop(1);
   i->EStack.pop();
 }
 
@@ -1213,9 +1097,7 @@ NestModule::SetFakeNumProcesses_iFunction::execute( SLIInterpreter* i ) const
    automatically synchronized without the need for user interaction.
    SeeAlso: Rank, NumProcesses, ProcessorName
 */
-void
-NestModule::SyncProcessesFunction::execute( SLIInterpreter* i ) const
-{
+void NestModule::SyncProcessesFunction::execute(SLIInterpreter *i) const {
   kernel().mpi_manager.synchronize();
   i->EStack.pop();
 }
@@ -1231,26 +1113,22 @@ NestModule::SyncProcessesFunction::execute( SLIInterpreter* i ) const
    Description:
    The function allows a user to test how much time a call the Allgather costs
 */
-void
-NestModule::TimeCommunication_i_i_bFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 3 );
-  long samples = getValue< long >( i->OStack.pick( 2 ) );
-  long num_bytes = getValue< long >( i->OStack.pick( 1 ) );
-  bool offgrid = getValue< bool >( i->OStack.pick( 0 ) );
+void NestModule::TimeCommunication_i_i_bFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(3);
+  long samples = getValue<long>(i->OStack.pick(2));
+  long num_bytes = getValue<long>(i->OStack.pick(1));
+  bool offgrid = getValue<bool>(i->OStack.pick(0));
 
   double time = 0.0;
-  if ( offgrid )
-  {
-    time = kernel().mpi_manager.time_communicate_offgrid( num_bytes, samples );
-  }
-  else
-  {
-    time = kernel().mpi_manager.time_communicate( num_bytes, samples );
+  if (offgrid) {
+    time = kernel().mpi_manager.time_communicate_offgrid(num_bytes, samples);
+  } else {
+    time = kernel().mpi_manager.time_communicate(num_bytes, samples);
   }
 
-  i->OStack.pop( 3 );
-  i->OStack.push( time );
+  i->OStack.pop(3);
+  i->OStack.push(time);
   i->EStack.pop();
 }
 /** @BeginDocumentation
@@ -1266,20 +1144,18 @@ NestModule::TimeCommunication_i_i_bFunction::execute( SLIInterpreter* i ) const
    The function allows a user to test how much time a call the Allgatherv costs
    Does not work for offgrid!!!
 */
-void
-NestModule::TimeCommunicationv_i_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
-  long samples = getValue< long >( i->OStack.pick( 1 ) );
-  long num_bytes = getValue< long >( i->OStack.pick( 0 ) );
-
+void NestModule::TimeCommunicationv_i_iFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(2);
+  long samples = getValue<long>(i->OStack.pick(1));
+  long num_bytes = getValue<long>(i->OStack.pick(0));
 
   double time = 0.0;
 
-  time = kernel().mpi_manager.time_communicatev( num_bytes, samples );
+  time = kernel().mpi_manager.time_communicatev(num_bytes, samples);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( time );
+  i->OStack.pop(2);
+  i->OStack.push(time);
   i->EStack.pop();
 }
 
@@ -1296,21 +1172,18 @@ NestModule::TimeCommunicationv_i_iFunction::execute( SLIInterpreter* i ) const
    The function allows a user to test how much time a call to MPI_Alltoall costs
    SeeAlso: TimeCommunication
  */
-void
-NestModule::TimeCommunicationAlltoall_i_iFunction::execute(
-  SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
-  long samples = getValue< long >( i->OStack.pick( 1 ) );
-  long num_bytes = getValue< long >( i->OStack.pick( 0 ) );
-
+void NestModule::TimeCommunicationAlltoall_i_iFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(2);
+  long samples = getValue<long>(i->OStack.pick(1));
+  long num_bytes = getValue<long>(i->OStack.pick(0));
 
   double time = 0.0;
 
-  time = kernel().mpi_manager.time_communicate_alltoall( num_bytes, samples );
+  time = kernel().mpi_manager.time_communicate_alltoall(num_bytes, samples);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( time );
+  i->OStack.pop(2);
+  i->OStack.push(time);
   i->EStack.pop();
 }
 
@@ -1328,21 +1201,18 @@ NestModule::TimeCommunicationAlltoall_i_iFunction::execute(
    costs
    SeeAlso: TimeCommunication
  */
-void
-NestModule::TimeCommunicationAlltoallv_i_iFunction::execute(
-  SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
-  long samples = getValue< long >( i->OStack.pick( 1 ) );
-  long num_bytes = getValue< long >( i->OStack.pick( 0 ) );
-
+void NestModule::TimeCommunicationAlltoallv_i_iFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(2);
+  long samples = getValue<long>(i->OStack.pick(1));
+  long num_bytes = getValue<long>(i->OStack.pick(0));
 
   double time = 0.0;
 
-  time = kernel().mpi_manager.time_communicate_alltoallv( num_bytes, samples );
+  time = kernel().mpi_manager.time_communicate_alltoallv(num_bytes, samples);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( time );
+  i->OStack.pop(2);
+  i->OStack.push(time);
   i->EStack.pop();
 }
 
@@ -1363,10 +1233,8 @@ NestModule::TimeCommunicationAlltoallv_i_iFunction::execute(
    ProcessorName =
    SeeAlso: Rank, NumProcesses, SyncProcesses
 */
-void
-NestModule::ProcessorNameFunction::execute( SLIInterpreter* i ) const
-{
-  i->OStack.push( kernel().mpi_manager.get_processor_name() );
+void NestModule::ProcessorNameFunction::execute(SLIInterpreter *i) const {
+  i->OStack.push(kernel().mpi_manager.get_processor_name());
   i->EStack.pop();
 }
 
@@ -1387,12 +1255,10 @@ NestModule::ProcessorNameFunction::execute( SLIInterpreter* i ) const
    FirstVersion: October 2012
    SeeAlso: quit, Rank, SyncProcesses, ProcessorName
 */
-void
-NestModule::MPIAbort_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  long exitcode = getValue< long >( i->OStack.pick( 0 ) );
-  kernel().mpi_manager.mpi_abort( exitcode );
+void NestModule::MPIAbort_iFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  long exitcode = getValue<long>(i->OStack.pick(0));
+  kernel().mpi_manager.mpi_abort(exitcode);
   i->EStack.pop();
 }
 #endif
@@ -1438,18 +1304,16 @@ NestModule::MPIAbort_iFunction::execute( SLIInterpreter* i ) const
    Author: Tobias Potjans, Moritz Helias, Diesmann
    SeeAlso: GetGlobalRNG
 */
-void
-NestModule::GetVpRngFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::GetVpRngFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  index target = getValue< long >( i->OStack.pick( 0 ) );
+  index target = getValue<long>(i->OStack.pick(0));
 
-  librandom::RngPtr rng = get_vp_rng_of_gid( target );
+  librandom::RngPtr rng = get_vp_rng_of_gid(target);
 
-  Token rt( new librandom::RngDatum( rng ) );
-  i->OStack.pop( 1 );
-  i->OStack.push_move( rt );
+  Token rt(new librandom::RngDatum(rng));
+  i->OStack.pop(1);
+  i->OStack.push_move(rt);
 
   i->EStack.pop();
 }
@@ -1476,79 +1340,66 @@ NestModule::GetVpRngFunction::execute( SLIInterpreter* i ) const
    Author: Tobias Potjans, Moritz Helias, Diesmann
    SeeAlso: GetVpRNG
 */
-void
-NestModule::GetGlobalRngFunction::execute( SLIInterpreter* i ) const
-{
+void NestModule::GetGlobalRngFunction::execute(SLIInterpreter *i) const {
   librandom::RngPtr rng = get_global_rng();
 
-  Token rt( new librandom::RngDatum( rng ) );
-  i->OStack.push_move( rt );
+  Token rt(new librandom::RngDatum(rng));
+  i->OStack.push_move(rt);
 
   i->EStack.pop();
 }
 
-void
-NestModule::Cvdict_CFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::Cvdict_CFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  ConnectionDatum conn = getValue< ConnectionDatum >( i->OStack.pick( 0 ) );
+  ConnectionDatum conn = getValue<ConnectionDatum>(i->OStack.pick(0));
   DictionaryDatum dict = conn.get_dict();
 
   i->OStack.pop();
-  i->OStack.push( dict );
+  i->OStack.push(dict);
   i->EStack.pop();
 }
 
-void
-NestModule::Cvgidcollection_i_iFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void NestModule::Cvgidcollection_i_iFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  const long first = getValue< long >( i->OStack.pick( 1 ) );
-  const long last = getValue< long >( i->OStack.pick( 0 ) );
-  GIDCollectionDatum gidcoll = GIDCollection( first, last );
+  const long first = getValue<long>(i->OStack.pick(1));
+  const long last = getValue<long>(i->OStack.pick(0));
+  GIDCollectionDatum gidcoll = GIDCollection(first, last);
 
-  i->OStack.pop( 2 );
-  i->OStack.push( gidcoll );
+  i->OStack.pop(2);
+  i->OStack.push(gidcoll);
   i->EStack.pop();
 }
 
-void
-NestModule::Cvgidcollection_iaFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::Cvgidcollection_iaFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  TokenArray gids = getValue< TokenArray >( i->OStack.pick( 0 ) );
-  GIDCollectionDatum gidcoll = GIDCollection( gids );
+  TokenArray gids = getValue<TokenArray>(i->OStack.pick(0));
+  GIDCollectionDatum gidcoll = GIDCollection(gids);
 
   i->OStack.pop();
-  i->OStack.push( gidcoll );
+  i->OStack.push(gidcoll);
   i->EStack.pop();
 }
 
-void
-NestModule::Cvgidcollection_ivFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::Cvgidcollection_ivFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  IntVectorDatum gids = getValue< IntVectorDatum >( i->OStack.pick( 0 ) );
-  GIDCollectionDatum gidcoll = GIDCollection( gids );
+  IntVectorDatum gids = getValue<IntVectorDatum>(i->OStack.pick(0));
+  GIDCollectionDatum gidcoll = GIDCollection(gids);
 
   i->OStack.pop();
-  i->OStack.push( gidcoll );
+  i->OStack.push(gidcoll);
   i->EStack.pop();
 }
 
-void
-NestModule::Size_gFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  GIDCollectionDatum gidcoll =
-    getValue< GIDCollectionDatum >( i->OStack.pick( 0 ) );
+void NestModule::Size_gFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  GIDCollectionDatum gidcoll = getValue<GIDCollectionDatum>(i->OStack.pick(0));
 
   i->OStack.pop();
-  i->OStack.push( gidcoll.size() );
+  i->OStack.push(gidcoll.size());
   i->EStack.pop();
 }
 
@@ -1568,33 +1419,29 @@ NestModule::Size_gFunction::execute( SLIInterpreter* i ) const
    Availability: Only when compiled with MUSIC
    SeeAlso: music_event_in_proxy
 */
-void
-NestModule::SetAcceptableLatencyFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void NestModule::SetAcceptableLatencyFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  std::string port_name = getValue< std::string >( i->OStack.pick( 1 ) );
-  double latency = getValue< double >( i->OStack.pick( 0 ) );
+  std::string port_name = getValue<std::string>(i->OStack.pick(1));
+  double latency = getValue<double>(i->OStack.pick(0));
 
-  kernel().music_manager.set_music_in_port_acceptable_latency(
-    port_name, latency );
+  kernel().music_manager.set_music_in_port_acceptable_latency(port_name,
+                                                              latency);
 
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
   i->EStack.pop();
 }
 
-void
-NestModule::SetMaxBufferedFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 2 );
+void NestModule::SetMaxBufferedFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(2);
 
-  std::string port_name = getValue< std::string >( i->OStack.pick( 1 ) );
-  int maxBuffered = getValue< long >( i->OStack.pick( 0 ) );
+  std::string port_name = getValue<std::string>(i->OStack.pick(1));
+  int maxBuffered = getValue<long>(i->OStack.pick(0));
 
-  kernel().music_manager.set_music_in_port_max_buffered(
-    port_name, maxBuffered );
+  kernel().music_manager.set_music_in_port_max_buffered(port_name, maxBuffered);
 
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
   i->EStack.pop();
 }
 #endif
@@ -1617,32 +1464,27 @@ NestModule::SetMaxBufferedFunction::execute( SLIInterpreter* i ) const
    Author: Mikael Naveau, Sandra Diaz
    FirstVersion: December 2014
 */
-void
-NestModule::SetStructuralPlasticityStatus_DFunction::execute(
-  SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::SetStructuralPlasticityStatus_DFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(1);
   DictionaryDatum structural_plasticity_dictionary =
-    getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
+      getValue<DictionaryDatum>(i->OStack.pick(0));
 
-  kernel().sp_manager.set_status( structural_plasticity_dictionary );
+  kernel().sp_manager.set_status(structural_plasticity_dictionary);
 
-  i->OStack.pop( 1 );
+  i->OStack.pop(1);
   i->EStack.pop();
 }
 
-void
-NestModule::GetStructuralPlasticityStatus_DFunction::execute(
-  SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void NestModule::GetStructuralPlasticityStatus_DFunction::execute(
+    SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  DictionaryDatum current_status =
-    getValue< DictionaryDatum >( i->OStack.pick( 0 ) );
-  kernel().sp_manager.get_status( current_status );
+  DictionaryDatum current_status = getValue<DictionaryDatum>(i->OStack.pick(0));
+  kernel().sp_manager.get_status(current_status);
 
-  i->OStack.pop( 1 );
-  i->OStack.push( current_status );
+  i->OStack.pop(1);
+  i->OStack.push(current_status);
   i->EStack.pop();
 }
 
@@ -1651,10 +1493,8 @@ NestModule::GetStructuralPlasticityStatus_DFunction::execute(
  * dynamic rewiring of the network based on mean electrical activity.
  * @param i
  */
-void
-NestModule::EnableStructuralPlasticity_Function::execute(
-  SLIInterpreter* i ) const
-{
+void NestModule::EnableStructuralPlasticity_Function::execute(
+    SLIInterpreter *i) const {
   kernel().sp_manager.enable_structural_plasticity();
 
   i->EStack.pop();
@@ -1663,10 +1503,8 @@ NestModule::EnableStructuralPlasticity_Function::execute(
  * Disable Structural Plasticity in the network.
  * @param i
  */
-void
-NestModule::DisableStructuralPlasticity_Function::execute(
-  SLIInterpreter* i ) const
-{
+void NestModule::DisableStructuralPlasticity_Function::execute(
+    SLIInterpreter *i) const {
   kernel().sp_manager.disable_structural_plasticity();
 
   i->EStack.pop();
@@ -1680,143 +1518,133 @@ NestModule::DisableStructuralPlasticity_Function::execute(
  *
  * Note: See issue #894
  */
-void
-NestModule::SetStdpEps_dFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  const double stdp_eps = getValue< double >( i->OStack.top() );
+void NestModule::SetStdpEps_dFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  const double stdp_eps = getValue<double>(i->OStack.top());
 
-  kernel().connection_manager.set_stdp_eps( stdp_eps );
+  kernel().connection_manager.set_stdp_eps(stdp_eps);
 
   i->OStack.pop();
   i->EStack.pop();
 }
 
-void
-NestModule::init( SLIInterpreter* i )
-{
-  ConnectionType.settypename( "connectiontype" );
-  ConnectionType.setdefaultaction( SLIInterpreter::datatypefunction );
+void NestModule::init(SLIInterpreter *i) {
+  ConnectionType.settypename("connectiontype");
+  ConnectionType.setdefaultaction(SLIInterpreter::datatypefunction);
 
-  GIDCollectionType.settypename( "gidcollectiontype" );
-  GIDCollectionType.setdefaultaction( SLIInterpreter::datatypefunction );
+  GIDCollectionType.settypename("gidcollectiontype");
+  GIDCollectionType.setdefaultaction(SLIInterpreter::datatypefunction);
 
   // register interface functions with interpreter
-  i->createcommand( "ChangeSubnet", &changesubnet_ifunction, "NEST 3.0" );
-  i->createcommand( "CurrentSubnet", &currentsubnetfunction, "NEST 3.0" );
-  i->createcommand( "GetNodes_i_D_b_b", &getnodes_i_D_b_bfunction, "NEST 3.0" );
-  i->createcommand( "GetLeaves_i_D_b", &getleaves_i_D_bfunction, "NEST 3.0" );
-  i->createcommand(
-    "GetChildren_i_D_b", &getchildren_i_D_bfunction, "NEST 3.0" );
+  i->createcommand("ChangeSubnet", &changesubnet_ifunction, "NEST 3.0");
+  i->createcommand("CurrentSubnet", &currentsubnetfunction, "NEST 3.0");
+  i->createcommand("GetNodes_i_D_b_b", &getnodes_i_D_b_bfunction, "NEST 3.0");
+  i->createcommand("GetLeaves_i_D_b", &getleaves_i_D_bfunction, "NEST 3.0");
+  i->createcommand("GetChildren_i_D_b", &getchildren_i_D_bfunction, "NEST 3.0");
 
-  i->createcommand( "RestoreNodes_a", &restorenodes_afunction );
+  i->createcommand("RestoreNodes_a", &restorenodes_afunction);
 
-  i->createcommand( "SetStatus_id", &setstatus_idfunction );
-  i->createcommand( "SetStatus_CD", &setstatus_CDfunction );
-  i->createcommand( "SetStatus_aa", &setstatus_aafunction );
+  i->createcommand("SetStatus_id", &setstatus_idfunction);
+  i->createcommand("SetStatus_CD", &setstatus_CDfunction);
+  i->createcommand("SetStatus_aa", &setstatus_aafunction);
 
-  i->createcommand( "GetStatus_i", &getstatus_ifunction );
-  i->createcommand( "GetStatus_C", &getstatus_Cfunction );
-  i->createcommand( "GetStatus_a", &getstatus_afunction );
+  i->createcommand("GetStatus_i", &getstatus_ifunction);
+  i->createcommand("GetStatus_C", &getstatus_Cfunction);
+  i->createcommand("GetStatus_a", &getstatus_afunction);
 
-  i->createcommand( "GetConnections_D", &getconnections_Dfunction );
-  i->createcommand( "cva_C", &cva_cfunction );
+  i->createcommand("GetConnections_D", &getconnections_Dfunction);
+  i->createcommand("cva_C", &cva_cfunction);
 
-  i->createcommand( "Simulate_d", &simulatefunction );
-  i->createcommand( "Run_d", &runfunction );
-  i->createcommand( "Prepare", &preparefunction );
-  i->createcommand( "Cleanup", &cleanupfunction );
+  i->createcommand("Simulate_d", &simulatefunction);
+  i->createcommand("Run_d", &runfunction);
+  i->createcommand("Prepare", &preparefunction);
+  i->createcommand("Cleanup", &cleanupfunction);
 
-  i->createcommand( "CopyModel_l_l_D", &copymodel_l_l_Dfunction );
-  i->createcommand( "SetDefaults_l_D", &setdefaults_l_Dfunction );
-  i->createcommand( "GetDefaults_l", &getdefaults_lfunction );
+  i->createcommand("CopyModel_l_l_D", &copymodel_l_l_Dfunction);
+  i->createcommand("SetDefaults_l_D", &setdefaults_l_Dfunction);
+  i->createcommand("GetDefaults_l", &getdefaults_lfunction);
 
-  i->createcommand( "Create_l_i", &create_l_ifunction );
+  i->createcommand("Create_l_i", &create_l_ifunction);
 
-  i->createcommand( "Connect_g_g_D_D", &connect_g_g_D_Dfunction );
+  i->createcommand("Connect_g_g_D_D", &connect_g_g_D_Dfunction);
 
-  i->createcommand(
-    "DataConnect_i_D_s", &dataconnect_i_D_sfunction, "NEST 3.0" );
-  i->createcommand( "DataConnect_a", &dataconnect_afunction, "NEST 3.0" );
+  i->createcommand("DataConnect_i_D_s", &dataconnect_i_D_sfunction, "NEST 3.0");
+  i->createcommand("DataConnect_a", &dataconnect_afunction, "NEST 3.0");
 
-  i->createcommand( "ResetNetwork", &resetnetworkfunction );
-  i->createcommand( "ResetKernel", &resetkernelfunction );
+  i->createcommand("ResetNetwork", &resetnetworkfunction);
+  i->createcommand("ResetKernel", &resetkernelfunction);
 
-  i->createcommand( "MemoryInfo", &memoryinfofunction );
+  i->createcommand("MemoryInfo", &memoryinfofunction);
 
-  i->createcommand( "PrintNetwork", &printnetworkfunction );
+  i->createcommand("PrintNetwork", &printnetworkfunction);
 
-  i->createcommand( "Rank", &rankfunction );
-  i->createcommand( "NumProcesses", &numprocessesfunction );
-  i->createcommand( "SetFakeNumProcesses", &setfakenumprocesses_ifunction );
-  i->createcommand( "SyncProcesses", &syncprocessesfunction );
-  i->createcommand(
-    "TimeCommunication_i_i_b", &timecommunication_i_i_bfunction );
-  i->createcommand( "TimeCommunicationv_i_i", &timecommunicationv_i_ifunction );
-  i->createcommand(
-    "TimeCommunicationAlltoall_i_i", &timecommunicationalltoall_i_ifunction );
-  i->createcommand(
-    "TimeCommunicationAlltoallv_i_i", &timecommunicationalltoallv_i_ifunction );
-  i->createcommand( "ProcessorName", &processornamefunction );
+  i->createcommand("Rank", &rankfunction);
+  i->createcommand("NumProcesses", &numprocessesfunction);
+  i->createcommand("SetFakeNumProcesses", &setfakenumprocesses_ifunction);
+  i->createcommand("SyncProcesses", &syncprocessesfunction);
+  i->createcommand("TimeCommunication_i_i_b", &timecommunication_i_i_bfunction);
+  i->createcommand("TimeCommunicationv_i_i", &timecommunicationv_i_ifunction);
+  i->createcommand("TimeCommunicationAlltoall_i_i",
+                   &timecommunicationalltoall_i_ifunction);
+  i->createcommand("TimeCommunicationAlltoallv_i_i",
+                   &timecommunicationalltoallv_i_ifunction);
+  i->createcommand("ProcessorName", &processornamefunction);
 #ifdef HAVE_MPI
-  i->createcommand( "MPI_Abort", &mpiabort_ifunction );
+  i->createcommand("MPI_Abort", &mpiabort_ifunction);
 #endif
 
-  i->createcommand( "GetVpRNG", &getvprngfunction );
-  i->createcommand( "GetGlobalRNG", &getglobalrngfunction );
+  i->createcommand("GetVpRNG", &getvprngfunction);
+  i->createcommand("GetGlobalRNG", &getglobalrngfunction);
 
-  i->createcommand( "cvdict_C", &cvdict_Cfunction );
+  i->createcommand("cvdict_C", &cvdict_Cfunction);
 
-  i->createcommand( "cvgidcollection_i_i", &cvgidcollection_i_ifunction );
-  i->createcommand( "cvgidcollection_ia", &cvgidcollection_iafunction );
-  i->createcommand( "cvgidcollection_iv", &cvgidcollection_ivfunction );
-  i->createcommand( "size_g", &size_gfunction );
+  i->createcommand("cvgidcollection_i_i", &cvgidcollection_i_ifunction);
+  i->createcommand("cvgidcollection_ia", &cvgidcollection_iafunction);
+  i->createcommand("cvgidcollection_iv", &cvgidcollection_ivfunction);
+  i->createcommand("size_g", &size_gfunction);
 
 #ifdef HAVE_MUSIC
-  i->createcommand( "SetAcceptableLatency", &setacceptablelatency_l_dfunction );
-  i->createcommand( "SetMaxBuffered", &setmaxbuffered_l_ifunction );
+  i->createcommand("SetAcceptableLatency", &setacceptablelatency_l_dfunction);
+  i->createcommand("SetMaxBuffered", &setmaxbuffered_l_ifunction);
 #endif
-  i->createcommand(
-    "EnableStructuralPlasticity", &enablestructuralplasticity_function );
-  i->createcommand(
-    "DisableStructuralPlasticity", &disablestructuralplasticity_function );
-  i->createcommand(
-    "SetStructuralPlasticityStatus", &setstructuralplasticitystatus_Dfunction );
-  i->createcommand(
-    "GetStructuralPlasticityStatus", &getstructuralplasticitystatus_function );
-  i->createcommand( "Disconnect", &disconnect_i_i_lfunction );
-  i->createcommand( "Disconnect_g_g_D_D", &disconnect_g_g_D_Dfunction );
+  i->createcommand("EnableStructuralPlasticity",
+                   &enablestructuralplasticity_function);
+  i->createcommand("DisableStructuralPlasticity",
+                   &disablestructuralplasticity_function);
+  i->createcommand("SetStructuralPlasticityStatus",
+                   &setstructuralplasticitystatus_Dfunction);
+  i->createcommand("GetStructuralPlasticityStatus",
+                   &getstructuralplasticitystatus_function);
+  i->createcommand("Disconnect", &disconnect_i_i_lfunction);
+  i->createcommand("Disconnect_g_g_D_D", &disconnect_g_g_D_Dfunction);
 
-  i->createcommand( "SetStdpEps", &setstdpeps_dfunction );
+  i->createcommand("SetStdpEps", &setstdpeps_dfunction);
 
   // Add connection rules
-  kernel().connection_manager.register_conn_builder< OneToOneBuilder >(
-    "one_to_one" );
-  kernel().connection_manager.register_conn_builder< AllToAllBuilder >(
-    "all_to_all" );
-  kernel().connection_manager.register_conn_builder< FixedInDegreeBuilder >(
-    "fixed_indegree" );
-  kernel().connection_manager.register_conn_builder< FixedOutDegreeBuilder >(
-    "fixed_outdegree" );
-  kernel().connection_manager.register_conn_builder< BernoulliBuilder >(
-    "pairwise_bernoulli" );
-  kernel()
-    .connection_manager.register_conn_builder< SymmetricBernoulliBuilder >(
-      "symmetric_pairwise_bernoulli" );
-  kernel().connection_manager.register_conn_builder< FixedTotalNumberBuilder >(
-    "fixed_total_number" );
+  kernel().connection_manager.register_conn_builder<OneToOneBuilder>(
+      "one_to_one");
+  kernel().connection_manager.register_conn_builder<AllToAllBuilder>(
+      "all_to_all");
+  kernel().connection_manager.register_conn_builder<FixedInDegreeBuilder>(
+      "fixed_indegree");
+  kernel().connection_manager.register_conn_builder<FixedOutDegreeBuilder>(
+      "fixed_outdegree");
+  kernel().connection_manager.register_conn_builder<BernoulliBuilder>(
+      "pairwise_bernoulli");
+  kernel().connection_manager.register_conn_builder<SymmetricBernoulliBuilder>(
+      "symmetric_pairwise_bernoulli");
+  kernel().connection_manager.register_conn_builder<FixedTotalNumberBuilder>(
+      "fixed_total_number");
 
   // Add MSP growth curves
-  kernel().sp_manager.register_growth_curve< GrowthCurveSigmoid >( "sigmoid" );
-  kernel().sp_manager.register_growth_curve< GrowthCurveGaussian >(
-    "gaussian" );
-  kernel().sp_manager.register_growth_curve< GrowthCurveLinear >( "linear" );
+  kernel().sp_manager.register_growth_curve<GrowthCurveSigmoid>("sigmoid");
+  kernel().sp_manager.register_growth_curve<GrowthCurveGaussian>("gaussian");
+  kernel().sp_manager.register_growth_curve<GrowthCurveLinear>("linear");
 
-  Token statusd = i->baselookup( Name( "statusdict" ) );
-  DictionaryDatum dd = getValue< DictionaryDatum >( statusd );
-  dd->insert( Name( "kernelname" ), new StringDatum( "NEST" ) );
-  dd->insert(
-    Name( "is_mpi" ), new BoolDatum( kernel().mpi_manager.is_mpi_used() ) );
+  Token statusd = i->baselookup(Name("statusdict"));
+  DictionaryDatum dd = getValue<DictionaryDatum>(statusd);
+  dd->insert(Name("kernelname"), new StringDatum("NEST"));
+  dd->insert(Name("is_mpi"), new BoolDatum(kernel().mpi_manager.is_mpi_used()));
 }
 
 } // namespace nest

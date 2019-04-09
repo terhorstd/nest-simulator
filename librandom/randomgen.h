@@ -205,8 +205,7 @@
  * Namespace for random number generators.
  */
 
-namespace librandom
-{
+namespace librandom {
 
 class RandomGen;
 
@@ -216,7 +215,7 @@ class RandomGen;
  * A safe pointer that should be used instead of RandomGen*
  * in user code to manage random number generators.
  */
-typedef lockPTR< RandomGen > RngPtr;
+typedef lockPTR<RandomGen> RngPtr;
 
 /**
  * Abstract base class for all random generator objects
@@ -232,8 +231,7 @@ typedef lockPTR< RandomGen > RngPtr;
  * @ingroup RandomNumberGenerators
  */
 
-class RandomGen
-{
+class RandomGen {
 public:
   /**
    * @note All classes derived from RandomGen should
@@ -252,12 +250,12 @@ public:
      RandomGen class. The actual interface to the underlying
      random generator is provided by protected member functions below.
    */
-  double drand( void );                        //!< draw from [0, 1)
-  double operator()( void );                   //!< draw from [0, 1)
-  double drandpos( void );                     //!< draw from (0, 1)
-  unsigned long ulrand( const unsigned long ); //!< draw from [0, n-1]
+  double drand(void);                        //!< draw from [0, 1)
+  double operator()(void);                   //!< draw from [0, 1)
+  double drandpos(void);                     //!< draw from (0, 1)
+  unsigned long ulrand(const unsigned long); //!< draw from [0, n-1]
 
-  void seed( const unsigned long ); //!< set random seed to a new value
+  void seed(const unsigned long); //!< set random seed to a new value
 
   /**
    * Create built-in Knuth Lagged Fibonacci random generator.
@@ -265,13 +263,13 @@ public:
    * where the SLI rngdict is not accessible.
    * @see KnuthLFG
    */
-  static RngPtr create_knuthlfg_rng( unsigned long );
+  static RngPtr create_knuthlfg_rng(unsigned long);
 
   //! Default value for seeding generators in places where no seed is supplied.
   static const unsigned long DefaultSeed;
 
   //! clone a random number generator of same type initialized with given seed
-  virtual RngPtr clone( const unsigned long ) = 0;
+  virtual RngPtr clone(const unsigned long) = 0;
 
 protected:
   /**
@@ -279,20 +277,19 @@ protected:
      random generator.  They must be implemented by each derived
      generator class.
    */
-  virtual void seed_( unsigned long ) = 0; //!< seeding interface
-  virtual double drand_() = 0;             //!< drawing interface
+  virtual void seed_(unsigned long) = 0; //!< seeding interface
+  virtual double drand_() = 0;           //!< drawing interface
 
 private:
   // prohibit copying of RNG
-  RandomGen( const RandomGen& );
+  RandomGen(const RandomGen &);
 };
 
 /**
  * Factory class for random generators.
  * @ingroup RandomNumberGenerators
  */
-class GenericRNGFactory
-{
+class GenericRNGFactory {
 public:
   /**
    * Create generator with given seed.
@@ -301,11 +298,9 @@ public:
    *       seed value, you should explicitly use
    *       RandomGen::DefaultSeed as seed value.
    */
-  virtual RngPtr create( unsigned long ) const = 0;
+  virtual RngPtr create(unsigned long) const = 0;
 
-  virtual ~GenericRNGFactory()
-  {
-  }
+  virtual ~GenericRNGFactory() {}
 };
 
 /**
@@ -313,47 +308,29 @@ public:
  * (non GSL) random generators.
  * @ingroup RandomNumberGenerators
  */
-template < typename Generator >
-class BuiltinRNGFactory : public GenericRNGFactory
-{
-  RngPtr
-  create( unsigned long s ) const
-  {
-    return RngPtr( new Generator( s ) );
-  }
+template <typename Generator>
+class BuiltinRNGFactory : public GenericRNGFactory {
+  RngPtr create(unsigned long s) const { return RngPtr(new Generator(s)); }
 };
 
-inline double
-RandomGen::drand( void )
-{
-  return drand_();
-}
+inline double RandomGen::drand(void) { return drand_(); }
 
-inline double
-RandomGen::operator()( void )
-{
-  return drand();
-}
+inline double RandomGen::operator()(void) { return drand(); }
 
-inline double
-RandomGen::drandpos( void )
-{
+inline double RandomGen::drandpos(void) {
   double r;
 
-  do
-  {
+  do {
     r = drand();
-  } while ( r == 0.0 );
+  } while (r == 0.0);
 
   return r;
 }
 
-inline unsigned long
-RandomGen::ulrand( const unsigned long n )
-{
+inline unsigned long RandomGen::ulrand(const unsigned long n) {
   // no check for size of n required, since n is unsigned long
-  return static_cast< unsigned long >( std::floor( n * drand() ) );
+  return static_cast<unsigned long>(std::floor(n * drand()));
 }
-}
+} // namespace librandom
 
 #endif // RANDOMGEN_H

@@ -30,7 +30,6 @@
 #define _POSIX_SOURCE
 #endif
 
-
 int SLIsignalflag = 0;
 
 /*
@@ -44,10 +43,7 @@ int SLIsignalflag = 0;
        Addison Wesley Longman, Reading, MA
 */
 
-
-Sigfunc*
-posix_signal( int signo, Sigfunc* func )
-{
+Sigfunc *posix_signal(int signo, Sigfunc *func) {
   struct sigaction act, oact;
 
   /* the following comment is from Alpha signal.h: */
@@ -57,37 +53,31 @@ posix_signal( int signo, Sigfunc* func )
    */
 
   /* Thus we cast the supplied pointer! */
-  act.sa_handler = ( void ( * )() ) func;
-  sigemptyset( &act.sa_mask );
+  act.sa_handler = (void (*)())func;
+  sigemptyset(&act.sa_mask);
   act.sa_flags = 0;
-  if ( signo == SIGALRM )
-  {
+  if (signo == SIGALRM) {
 #ifdef SA_INTERRUPT
     act.sa_flags |= SA_INTERRUPT; /* SunOS */
 #endif
-  }
-  else
-  {
+  } else {
 #ifdef SA_RESTART
     act.sa_flags |= SA_RESTART; /* SVR4, 4.3+BSD */
 #endif
   }
-  if ( sigaction( signo, &act, &oact ) < 0 )
-  {
-    return ( SIG_ERR );
+  if (sigaction(signo, &act, &oact) < 0) {
+    return (SIG_ERR);
   }
-  return ( oact.sa_handler );
+  return (oact.sa_handler);
 }
 
-void
-SLISignalHandler( int s )
-{
+void SLISignalHandler(int s) {
   /*
      We explicitly assume signal to be POSIX.1 conforming.
      Store the numeric value of the signal in a global variable.
      its value is later evaluated in the interpreter cycle.
   */
-  if ( SLIsignalflag == 0 ) /* Ignore second signal, if the */
+  if (SLIsignalflag == 0) /* Ignore second signal, if the */
   {
     SLIsignalflag = s; /* first has not been processed.*/
   }

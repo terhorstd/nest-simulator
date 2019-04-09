@@ -38,13 +38,10 @@
 #include "topologymodule.h"
 #include "vose.h"
 
-namespace nest
-{
-template < int D >
-class Layer;
+namespace nest {
+template <int D> class Layer;
 
-template < int D >
-class MaskedLayer;
+template <int D> class MaskedLayer;
 
 /**
  * This class is a representation of the dictionary of connection
@@ -67,16 +64,9 @@ class MaskedLayer;
  * between source driven and target driven connections is which layer
  * coordinates the mask and parameters are defined in.
  */
-class ConnectionCreator
-{
+class ConnectionCreator {
 public:
-  enum ConnectionType
-  {
-    Target_driven,
-    Source_driven,
-    Convergent,
-    Divergent
-  };
+  enum ConnectionType { Target_driven, Source_driven, Convergent, Divergent };
 
   /**
    * Construct a ConnectionCreator with the properties defined in the
@@ -98,15 +88,14 @@ public:
    *   be defined by a dictionary, parametertype, or double.
    * @param dict dictionary containing properties for the connections.
    */
-  ConnectionCreator( DictionaryDatum dict );
+  ConnectionCreator(DictionaryDatum dict);
 
   /**
    * Connect two layers.
    * @param source source layer.
    * @param target target layer.
    */
-  template < int D >
-  void connect( Layer< D >& source, Layer< D >& target );
+  template <int D> void connect(Layer<D> &source, Layer<D> &target);
 
 private:
   /**
@@ -115,66 +104,51 @@ private:
    * The purpose is to avoid code doubling for cases with and without masks.
    * Essentially, the class works as a fancy union.
    */
-  template < int D >
-  class PoolWrapper_
-  {
+  template <int D> class PoolWrapper_ {
   public:
     PoolWrapper_();
     ~PoolWrapper_();
-    void define( MaskedLayer< D >* );
-    void define( std::vector< std::pair< Position< D >, index > >* );
+    void define(MaskedLayer<D> *);
+    void define(std::vector<std::pair<Position<D>, index>> *);
 
-    typename Ntree< D, index >::masked_iterator masked_begin(
-      const Position< D >& pos ) const;
-    typename Ntree< D, index >::masked_iterator masked_end() const;
+    typename Ntree<D, index>::masked_iterator
+    masked_begin(const Position<D> &pos) const;
+    typename Ntree<D, index>::masked_iterator masked_end() const;
 
-    typename std::vector< std::pair< Position< D >, index > >::iterator
-    begin() const;
-    typename std::vector< std::pair< Position< D >, index > >::iterator
-    end() const;
+    typename std::vector<std::pair<Position<D>, index>>::iterator begin() const;
+    typename std::vector<std::pair<Position<D>, index>>::iterator end() const;
 
   private:
-    MaskedLayer< D >* masked_layer_;
-    std::vector< std::pair< Position< D >, index > >* positions_;
+    MaskedLayer<D> *masked_layer_;
+    std::vector<std::pair<Position<D>, index>> *positions_;
   };
 
-  template < typename Iterator, int D >
-  void connect_to_target_( Iterator from,
-    Iterator to,
-    Node* tgt_ptr,
-    const Position< D >& tgt_pos,
-    thread tgt_thread,
-    const Layer< D >& source );
+  template <typename Iterator, int D>
+  void connect_to_target_(Iterator from, Iterator to, Node *tgt_ptr,
+                          const Position<D> &tgt_pos, thread tgt_thread,
+                          const Layer<D> &source);
 
-  template < int D >
-  void target_driven_connect_( Layer< D >& source, Layer< D >& target );
+  template <int D>
+  void target_driven_connect_(Layer<D> &source, Layer<D> &target);
 
-  template < int D >
-  void source_driven_connect_( Layer< D >& source, Layer< D >& target );
+  template <int D>
+  void source_driven_connect_(Layer<D> &source, Layer<D> &target);
 
-  template < int D >
-  void convergent_connect_( Layer< D >& source, Layer< D >& target );
+  template <int D> void convergent_connect_(Layer<D> &source, Layer<D> &target);
 
-  template < int D >
-  void divergent_connect_( Layer< D >& source, Layer< D >& target );
+  template <int D> void divergent_connect_(Layer<D> &source, Layer<D> &target);
 
-  void connect_( index s,
-    Node* target,
-    thread target_thread,
-    double w,
-    double d,
-    index syn );
+  void connect_(index s, Node *target, thread target_thread, double w, double d,
+                index syn);
 
   /**
    * Calculate parameter values for this position.
    *
    * TODO: remove when all four connection variants are refactored
    */
-  template < int D >
-  void get_parameters_( const Position< D >& pos,
-    librandom::RngPtr rng,
-    double& weight,
-    double& delay );
+  template <int D>
+  void get_parameters_(const Position<D> &pos, librandom::RngPtr rng,
+                       double &weight, double &delay);
 
   ConnectionType type_;
   bool allow_autapses_;
@@ -183,34 +157,27 @@ private:
   Selector source_filter_;
   Selector target_filter_;
   index number_of_connections_;
-  lockPTR< AbstractMask > mask_;
-  lockPTR< TopologyParameter > kernel_;
+  lockPTR<AbstractMask> mask_;
+  lockPTR<TopologyParameter> kernel_;
   index synapse_model_;
-  lockPTR< TopologyParameter > weight_;
-  lockPTR< TopologyParameter > delay_;
+  lockPTR<TopologyParameter> weight_;
+  lockPTR<TopologyParameter> delay_;
 
   //! Empty dictionary to pass to connect functions
   const static DictionaryDatum dummy_param_;
 };
 
-inline void
-ConnectionCreator::connect_( index s,
-  Node* target,
-  thread target_thread,
-  double w,
-  double d,
-  index syn )
-{
+inline void ConnectionCreator::connect_(index s, Node *target,
+                                        thread target_thread, double w,
+                                        double d, index syn) {
   // check whether the target is on this process
-  if ( kernel().node_manager.is_local_gid( target->get_gid() ) )
-  {
+  if (kernel().node_manager.is_local_gid(target->get_gid())) {
     // check whether the target is on our thread
     thread tid = kernel().vp_manager.get_thread_id();
-    if ( tid == target_thread )
-    {
+    if (tid == target_thread) {
       // TODO implement in terms of nest-api
-      kernel().connection_manager.connect(
-        s, target, target_thread, syn, dummy_param_, d, w );
+      kernel().connection_manager.connect(s, target, target_thread, syn,
+                                          dummy_param_, d, w);
     }
   }
 }

@@ -20,7 +20,6 @@
  *
  */
 
-
 #ifndef LOGGING_EVENT_H
 #define LOGGING_EVENT_H
 
@@ -31,26 +30,22 @@
 // Includes from libnestutil:
 #include "logging.h"
 
-namespace nest
-{
+namespace nest {
 
-class LoggingEvent
-{
+class LoggingEvent {
 public:
-  LoggingEvent( const severity_t s,
-    const std::string& fctn,
-    const std::string& msg,
-    const std::string& file = "none",
-    const size_t line = 0 );
+  LoggingEvent(const severity_t s, const std::string &fctn,
+               const std::string &msg, const std::string &file = "none",
+               const size_t line = 0);
 
-  friend std::ostream& operator<<( std::ostream&, const LoggingEvent& );
+  friend std::ostream &operator<<(std::ostream &, const LoggingEvent &);
 
 public:
-  const std::string& message;
-  const std::string& function;
+  const std::string &message;
+  const std::string &function;
   const severity_t severity;
   const time_t time_stamp;
-  const std::string& file_name;
+  const std::string &file_name;
   const size_t line_number;
 };
 

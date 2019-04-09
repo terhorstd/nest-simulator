@@ -34,34 +34,21 @@
 #include "sliexceptions.h"
 
 // by default, init as exponential density with mean 1
-librandom::UniformIntRandomDev::UniformIntRandomDev( RngPtr r_source )
-  : RandomDev( r_source )
-  , nmin_( 0 )
-  , nmax_( 0 )
-  , range_( nmax_ - nmin_ + 1 )
-{
-}
+librandom::UniformIntRandomDev::UniformIntRandomDev(RngPtr r_source)
+    : RandomDev(r_source), nmin_(0), nmax_(0), range_(nmax_ - nmin_ + 1) {}
 
 librandom::UniformIntRandomDev::UniformIntRandomDev()
-  : RandomDev()
-  , nmin_( 0 )
-  , nmax_( 0 )
-  , range_( nmax_ - nmin_ + 1 )
-{
-}
+    : RandomDev(), nmin_(0), nmax_(0), range_(nmax_ - nmin_ + 1) {}
 
-void
-librandom::UniformIntRandomDev::set_status( const DictionaryDatum& d )
-{
+void librandom::UniformIntRandomDev::set_status(const DictionaryDatum &d) {
   long new_nmin = nmin_;
   long new_nmax = nmax_;
 
-  updateValue< long >( d, names::low, new_nmin );
-  updateValue< long >( d, names::high, new_nmax );
+  updateValue<long>(d, names::low, new_nmin);
+  updateValue<long>(d, names::high, new_nmax);
 
-  if ( new_nmax < new_nmin )
-  {
-    throw BadParameterValue( "Uniformint RDV: low <= high required." );
+  if (new_nmax < new_nmin) {
+    throw BadParameterValue("Uniformint RDV: low <= high required.");
   }
 
   // The following test is based on
@@ -93,13 +80,11 @@ librandom::UniformIntRandomDev::set_status( const DictionaryDatum& d )
   //  so we need to confirm that n+ - n- != max.
   //  See pull request #61
 
-  const long max = std::numeric_limits< long >::max();
-  if ( ( new_nmin < 0 && new_nmax >= max + new_nmin )
-    || ( new_nmax - new_nmin == max ) )
-  {
-    throw BadParameterValue(
-      String::compose( "Uniformint RDV: high - low < %1 required.",
-        static_cast< double >( max ) ) );
+  const long max = std::numeric_limits<long>::max();
+  if ((new_nmin < 0 && new_nmax >= max + new_nmin) ||
+      (new_nmax - new_nmin == max)) {
+    throw BadParameterValue(String::compose(
+        "Uniformint RDV: high - low < %1 required.", static_cast<double>(max)));
   }
 
   nmin_ = new_nmin;
@@ -107,11 +92,9 @@ librandom::UniformIntRandomDev::set_status( const DictionaryDatum& d )
   range_ = nmax_ - nmin_ + 1;
 }
 
-void
-librandom::UniformIntRandomDev::get_status( DictionaryDatum& d ) const
-{
-  RandomDev::get_status( d );
+void librandom::UniformIntRandomDev::get_status(DictionaryDatum &d) const {
+  RandomDev::get_status(d);
 
-  def< long >( d, names::low, nmin_ );
-  def< long >( d, names::high, nmax_ );
+  def<long>(d, names::low, nmin_);
+  def<long>(d, names::high, nmax_);
 }

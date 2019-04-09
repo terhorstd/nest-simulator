@@ -33,14 +33,11 @@
 /**
  * Returns true, if the string `value` ends with the string `ending`.
  */
-inline bool
-ends_with( std::string const& value, std::string const& ending )
-{
-  if ( ending.size() > value.size() )
-  {
+inline bool ends_with(std::string const &value, std::string const &ending) {
+  if (ending.size() > value.size()) {
     return false;
   }
-  return std::equal( ending.rbegin(), ending.rend(), value.rbegin() );
+  return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
 #endif /* STRING_UTILS_H */

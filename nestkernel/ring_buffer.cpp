@@ -23,82 +23,58 @@
 #include "ring_buffer.h"
 
 nest::RingBuffer::RingBuffer()
-  : buffer_( kernel().connection_manager.get_min_delay()
-        + kernel().connection_manager.get_max_delay(),
-      0.0 )
-{
-}
+    : buffer_(kernel().connection_manager.get_min_delay() +
+                  kernel().connection_manager.get_max_delay(),
+              0.0) {}
 
-void
-nest::RingBuffer::resize()
-{
-  size_t size = kernel().connection_manager.get_min_delay()
-    + kernel().connection_manager.get_max_delay();
-  if ( buffer_.size() != size )
-  {
-    buffer_.resize( size );
+void nest::RingBuffer::resize() {
+  size_t size = kernel().connection_manager.get_min_delay() +
+                kernel().connection_manager.get_max_delay();
+  if (buffer_.size() != size) {
+    buffer_.resize(size);
   }
 }
 
-void
-nest::RingBuffer::clear()
-{
+void nest::RingBuffer::clear() {
   resize(); // does nothing if size is fine
   // clear all elements
-  buffer_.assign( buffer_.size(), 0.0 );
+  buffer_.assign(buffer_.size(), 0.0);
 }
-
 
 nest::MultRBuffer::MultRBuffer()
-  : buffer_( kernel().connection_manager.get_min_delay()
-        + kernel().connection_manager.get_max_delay(),
-      0.0 )
-{
-}
+    : buffer_(kernel().connection_manager.get_min_delay() +
+                  kernel().connection_manager.get_max_delay(),
+              0.0) {}
 
-void
-nest::MultRBuffer::resize()
-{
-  size_t size = kernel().connection_manager.get_min_delay()
-    + kernel().connection_manager.get_max_delay();
-  if ( buffer_.size() != size )
-  {
-    buffer_.resize( size );
+void nest::MultRBuffer::resize() {
+  size_t size = kernel().connection_manager.get_min_delay() +
+                kernel().connection_manager.get_max_delay();
+  if (buffer_.size() != size) {
+    buffer_.resize(size);
   }
 }
 
-void
-nest::MultRBuffer::clear()
-{
+void nest::MultRBuffer::clear() {
   // clear all elements
-  buffer_.assign( buffer_.size(), 0.0 );
+  buffer_.assign(buffer_.size(), 0.0);
 }
-
 
 nest::ListRingBuffer::ListRingBuffer()
-  : buffer_( kernel().connection_manager.get_min_delay()
-      + kernel().connection_manager.get_max_delay() )
-{
-}
+    : buffer_(kernel().connection_manager.get_min_delay() +
+              kernel().connection_manager.get_max_delay()) {}
 
-void
-nest::ListRingBuffer::resize()
-{
-  size_t size = kernel().connection_manager.get_min_delay()
-    + kernel().connection_manager.get_max_delay();
-  if ( buffer_.size() != size )
-  {
-    buffer_.resize( size );
+void nest::ListRingBuffer::resize() {
+  size_t size = kernel().connection_manager.get_min_delay() +
+                kernel().connection_manager.get_max_delay();
+  if (buffer_.size() != size) {
+    buffer_.resize(size);
   }
 }
 
-void
-nest::ListRingBuffer::clear()
-{
+void nest::ListRingBuffer::clear() {
   resize(); // does nothing if size is fine
   // clear all elements
-  for ( unsigned int i = 0; i < buffer_.size(); i++ )
-  {
-    buffer_[ i ].clear();
+  for (unsigned int i = 0; i < buffer_.size(); i++) {
+    buffer_[i].clear();
   }
 }

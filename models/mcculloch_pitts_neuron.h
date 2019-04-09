@@ -26,8 +26,7 @@
 // Includes from models:
 #include "binary_neuron.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: mcculloch_pitts_neuron - Binary deterministic neuron with Heaviside
@@ -100,8 +99,7 @@ Author: Moritz Helias
 
 SeeAlso: pp_psc_delta
 */
-class gainfunction_mcculloch_pitts
-{
+class gainfunction_mcculloch_pitts {
 private:
   /** threshold of sigmoidal activation function */
   double theta_;
@@ -109,27 +107,24 @@ private:
 public:
   /** sets default parameters */
   gainfunction_mcculloch_pitts()
-    : theta_( 0.0 ) // mV
-  {
-  }
+      : theta_(0.0) // mV
+  {}
 
-  void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-  void set( const DictionaryDatum& ); //!< Set values from dicitonary
+  void get(DictionaryDatum &) const; //!< Store current values in dictionary
+  void set(const DictionaryDatum &); //!< Set values from dicitonary
 
-  bool operator()( librandom::RngPtr, double h );
+  bool operator()(librandom::RngPtr, double h);
 };
 
-inline bool
-gainfunction_mcculloch_pitts::operator()( librandom::RngPtr, double h )
-{
+inline bool gainfunction_mcculloch_pitts::operator()(librandom::RngPtr,
+                                                     double h) {
   return h > theta_;
 }
 
-typedef nest::binary_neuron< nest::gainfunction_mcculloch_pitts >
-  mcculloch_pitts_neuron;
+typedef nest::binary_neuron<nest::gainfunction_mcculloch_pitts>
+    mcculloch_pitts_neuron;
 
-template <>
-void RecordablesMap< mcculloch_pitts_neuron >::create();
+template <> void RecordablesMap<mcculloch_pitts_neuron>::create();
 
 } // namespace nest
 

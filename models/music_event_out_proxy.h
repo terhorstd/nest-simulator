@@ -40,8 +40,7 @@
 #include "exceptions.h"
 #include "nest_types.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: music_event_out_proxy - Device to forward spikes to remote applications
@@ -84,29 +83,16 @@ Availability: Only when compiled with MUSIC
 
 SeeAlso: music_event_in_proxy, music_cont_in_proxy, music_message_in_proxy
 */
-class music_event_out_proxy : public DeviceNode
-{
+class music_event_out_proxy : public DeviceNode {
 
 public:
   music_event_out_proxy();
-  music_event_out_proxy( const music_event_out_proxy& );
+  music_event_out_proxy(const music_event_out_proxy &);
   ~music_event_out_proxy();
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  local_receiver() const
-  {
-    return true;
-  }
-  bool
-  one_node_per_process() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return false; }
+  bool local_receiver() const { return true; }
+  bool one_node_per_process() const { return true; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -116,60 +102,54 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  void handle( SpikeEvent& );
+  void handle(SpikeEvent &);
 
-  port handles_test_event( SpikeEvent&, rport );
+  port handles_test_event(SpikeEvent &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
 
-  void
-  update( Time const&, const long, const long )
-  {
-  }
+  void update(Time const &, const long, const long) {}
 
   // ------------------------------------------------------------
 
   struct State_;
 
-  struct Parameters_
-  {
+  struct Parameters_ {
     std::string port_name_; //!< the name of MUSIC port to connect to
 
-    Parameters_();                     //!< Sets default parameter values
-    Parameters_( const Parameters_& ); //!< Recalibrate all times
+    Parameters_();                    //!< Sets default parameter values
+    Parameters_(const Parameters_ &); //!< Recalibrate all times
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum&, State_& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &, State_ &); //!< Set values from dicitonary
   };
 
   // ------------------------------------------------------------
 
-  struct State_
-  {
+  struct State_ {
     bool published_; //!< indicates whether this node has been published already
                      //!< with MUSIC
     int port_width_; //!< the width of the MUSIC port
 
     State_(); //!< Sets default state value
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
     //!< Set values from dictionary
-    void set( const DictionaryDatum&, const Parameters_& );
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
-    MUSIC::EventOutputPort* MP_; //!< The MUSIC event port for output of spikes
-    std::vector< MUSIC::GlobalIndex > index_map_;
-    MUSIC::PermutationIndex* music_perm_ind_; //!< The permutation index needed
+  struct Variables_ {
+    MUSIC::EventOutputPort *MP_; //!< The MUSIC event port for output of spikes
+    std::vector<MUSIC::GlobalIndex> index_map_;
+    MUSIC::PermutationIndex *music_perm_ind_; //!< The permutation index needed
                                               //!< to map the ports of MUSIC.
   };
 
@@ -180,27 +160,23 @@ private:
   Variables_ V_;
 };
 
-inline port
-music_event_out_proxy::handles_test_event( SpikeEvent&, rport receptor_type )
-{
+inline port music_event_out_proxy::handles_test_event(SpikeEvent &,
+                                                      rport receptor_type) {
   // receptor_type i is mapped to channel i of the MUSIC port so we
   // have to generate the index map here, that assigns the channel
   // number to the local index of this connection the local index
   // equals the number of connection
 
-  if ( not S_.published_ )
-  {
-    V_.index_map_.push_back( static_cast< int >( receptor_type ) );
-  }
-  else
-  {
-    throw MUSICPortAlreadyPublished( get_name(), P_.port_name_ );
+  if (not S_.published_) {
+    V_.index_map_.push_back(static_cast<int>(receptor_type));
+  } else {
+    throw MUSICPortAlreadyPublished(get_name(), P_.port_name_);
   }
 
   return receptor_type;
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef MUSIC_EVENT_OUT_PROXY_H */
 

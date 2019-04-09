@@ -27,59 +27,45 @@
 #include <limits>
 
 nest::SliceRingBuffer::SliceRingBuffer()
-  : refract_( std::numeric_limits< long >::max(), 0, 0 )
-{
+    : refract_(std::numeric_limits<long>::max(), 0, 0) {
   //  resize();  // sets up queue_
 }
 
-void
-nest::SliceRingBuffer::resize()
-{
-  long newsize = static_cast< long >( std::ceil(
-    static_cast< double >( kernel().connection_manager.get_min_delay()
-      + kernel().connection_manager.get_max_delay() )
-    / kernel().connection_manager.get_min_delay() ) );
-  if ( queue_.size() != static_cast< unsigned long >( newsize ) )
-  {
-    queue_.resize( newsize );
+void nest::SliceRingBuffer::resize() {
+  long newsize = static_cast<long>(std::ceil(
+      static_cast<double>(kernel().connection_manager.get_min_delay() +
+                          kernel().connection_manager.get_max_delay()) /
+      kernel().connection_manager.get_min_delay()));
+  if (queue_.size() != static_cast<unsigned long>(newsize)) {
+    queue_.resize(newsize);
     clear();
   }
 
 #ifndef HAVE_STL_VECTOR_CAPACITY_BASE_UNITY
   // create 1-element buffers
-  for ( size_t j = 0; j < queue_.size(); ++j )
-  {
-    queue_[ j ].reserve( 1 );
+  for (size_t j = 0; j < queue_.size(); ++j) {
+    queue_[j].reserve(1);
   }
 #endif
 }
 
-void
-nest::SliceRingBuffer::clear()
-{
-  for ( size_t j = 0; j < queue_.size(); ++j )
-  {
-    queue_[ j ].clear();
+void nest::SliceRingBuffer::clear() {
+  for (size_t j = 0; j < queue_.size(); ++j) {
+    queue_[j].clear();
   }
 }
 
-void
-nest::SliceRingBuffer::prepare_delivery()
-{
+void nest::SliceRingBuffer::prepare_delivery() {
   // vector to deliver from in this slice
-  deliver_ =
-    &( queue_[ kernel().event_delivery_manager.get_slice_modulo( 0 ) ] );
+  deliver_ = &(queue_[kernel().event_delivery_manager.get_slice_modulo(0)]);
 
   // sort events, first event last
-  std::sort( deliver_->begin(), deliver_->end(), std::greater< SpikeInfo >() );
+  std::sort(deliver_->begin(), deliver_->end(), std::greater<SpikeInfo>());
 }
 
-void
-nest::SliceRingBuffer::discard_events()
-{
+void nest::SliceRingBuffer::discard_events() {
   // vector to deliver from in this slice
-  deliver_ =
-    &( queue_[ kernel().event_delivery_manager.get_slice_modulo( 0 ) ] );
+  deliver_ = &(queue_[kernel().event_delivery_manager.get_slice_modulo(0)]);
 
   deliver_->clear();
 }

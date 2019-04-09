@@ -23,7 +23,6 @@
 #ifndef SPIN_DETECTOR_H
 #define SPIN_DETECTOR_H
 
-
 // C++ includes:
 #include <vector>
 
@@ -34,8 +33,7 @@
 #include "nest_types.h"
 #include "recording_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: spin_detector - Device for detecting binary states in neurons.
@@ -102,23 +100,14 @@ SeeAlso: spike_detector, Device, RecordingDevice
  *
  * @ingroup Devices
  */
-class spin_detector : public DeviceNode
-{
+class spin_detector : public DeviceNode {
 
 public:
   spin_detector();
-  spin_detector( const spin_detector& );
+  spin_detector(const spin_detector &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  local_receiver() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return false; }
+  bool local_receiver() const { return true; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -129,17 +118,17 @@ public:
   using Node::handles_test_event;
   using Node::receives_signal;
 
-  void handle( SpikeEvent& );
+  void handle(SpikeEvent &);
 
-  port handles_test_event( SpikeEvent&, rport );
+  port handles_test_event(SpikeEvent &, rport);
 
   SignalType receives_signal() const;
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
   void post_run_cleanup();
@@ -153,7 +142,7 @@ private:
    *
    * @see RecordingDevice
    */
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   /**
    * Buffer for binary states.
@@ -176,9 +165,8 @@ private:
    * This does not violate order-independence, since all spikes are delivered
    * from the global queue before any node is updated.
    */
-  struct Buffers_
-  {
-    std::vector< std::vector< Event* > > spikes_;
+  struct Buffers_ {
+    std::vector<std::vector<Event *>> spikes_;
   };
 
   RecordingDevice device_;
@@ -187,34 +175,20 @@ private:
   Time t_last_in_spike_;
 };
 
-inline port
-spin_detector::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port spin_detector::handles_test_event(SpikeEvent &,
+                                              rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline void
-spin_detector::post_run_cleanup()
-{
-  device_.post_run_cleanup();
-}
+inline void spin_detector::post_run_cleanup() { device_.post_run_cleanup(); }
 
-inline void
-spin_detector::finalize()
-{
-  device_.finalize();
-}
+inline void spin_detector::finalize() { device_.finalize(); }
 
-inline SignalType
-spin_detector::receives_signal() const
-{
-  return BINARY;
-}
+inline SignalType spin_detector::receives_signal() const { return BINARY; }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef SPIN_DETECTOR_H */

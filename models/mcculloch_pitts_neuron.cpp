@@ -22,32 +22,24 @@
 
 #include "mcculloch_pitts_neuron.h"
 
-namespace nest
-{
+namespace nest {
 
-void
-gainfunction_mcculloch_pitts::get( DictionaryDatum& d ) const
-{
-  def< double >( d, names::theta, theta_ );
+void gainfunction_mcculloch_pitts::get(DictionaryDatum &d) const {
+  def<double>(d, names::theta, theta_);
 }
 
-void
-gainfunction_mcculloch_pitts::set( const DictionaryDatum& d )
-{
-  updateValue< double >( d, names::theta, theta_ );
+void gainfunction_mcculloch_pitts::set(const DictionaryDatum &d) {
+  updateValue<double>(d, names::theta, theta_);
 }
 
 /*
  * Override the create() method with one call to RecordablesMap::insert_()
  * for each quantity to be recorded.
  */
-template <>
-void
-RecordablesMap< nest::mcculloch_pitts_neuron >::create()
-{
+template <> void RecordablesMap<nest::mcculloch_pitts_neuron>::create() {
   // use standard names whereever you can for consistency!
-  insert_( names::S, &nest::mcculloch_pitts_neuron::get_output_state__ );
-  insert_( names::h, &nest::mcculloch_pitts_neuron::get_input__ );
+  insert_(names::S, &nest::mcculloch_pitts_neuron::get_output_state__);
+  insert_(names::h, &nest::mcculloch_pitts_neuron::get_input__);
 }
 
 } // namespace nest

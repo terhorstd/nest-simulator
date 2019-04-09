@@ -26,8 +26,7 @@
 // Includes from nestkernel:
 #include "node.h"
 
-namespace nest
-{
+namespace nest {
 class SpikeEvent;
 class CurrentEvent;
 
@@ -48,15 +47,10 @@ Author: June 2005, Jochen Martin Eppler
 /**
  * Proxy Node to provide Nodes, where there aren't real Nodes to be
  */
-class proxynode : public Node
-{
+class proxynode : public Node {
 
 public:
-  proxynode()
-    : Node()
-  {
-    set_frozen_( true );
-  }
+  proxynode() : Node() { set_frozen_(true); }
 
   /**
    * Construct proxy node for internal use from
@@ -65,7 +59,7 @@ public:
    * @param model id of represented node
    * @param vp of represented node
    */
-  proxynode( index, index, index, index );
+  proxynode(index, index, index, index);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -79,27 +73,21 @@ public:
 
   using Node::sends_signal;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void sends_secondary_event( GapJunctionEvent& );
+  void sends_secondary_event(GapJunctionEvent &);
 
   SignalType sends_signal() const;
 
-  void sends_secondary_event( InstantaneousRateConnectionEvent& );
+  void sends_secondary_event(InstantaneousRateConnectionEvent &);
 
-  void sends_secondary_event( DiffusionConnectionEvent& );
+  void sends_secondary_event(DiffusionConnectionEvent &);
 
-  void sends_secondary_event( DelayedRateConnectionEvent& );
+  void sends_secondary_event(DelayedRateConnectionEvent &);
 
-  void
-  handle( SpikeEvent& )
-  {
-  }
+  void handle(SpikeEvent &) {}
 
-  void
-  get_status( DictionaryDatum& ) const
-  {
-  }
+  void get_status(DictionaryDatum &) const {}
 
   /**
    * Proxy nodes have no properties.
@@ -108,39 +96,19 @@ public:
    * user might otherwise thaw a proxy node. It also causes
    * problems with dictionary entry checking
    */
-  void
-  set_status( const DictionaryDatum& )
-  {
-    assert( false );
-  }
+  void set_status(const DictionaryDatum &) { assert(false); }
 
   bool is_proxy() const;
 
 private:
-  void
-  init_state_( const Node& )
-  {
-  }
-  void
-  init_buffers_()
-  {
-  }
-  void
-  calibrate()
-  {
-  }
-  void
-  update( Time const&, const long, const long )
-  {
-  }
+  void init_state_(const Node &) {}
+  void init_buffers_() {}
+  void calibrate() {}
+  void update(Time const &, const long, const long) {}
 };
 
-inline bool
-proxynode::is_proxy() const
-{
-  return true;
-}
+inline bool proxynode::is_proxy() const { return true; }
 
-} // namespace
+} // namespace nest
 
 #endif // PROXYNODE_H

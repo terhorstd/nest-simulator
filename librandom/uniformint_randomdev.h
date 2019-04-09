@@ -50,8 +50,7 @@
 /*                                                          */
 /************************************************************/
 
-namespace librandom
-{
+namespace librandom {
 
 /** @BeginDocumentation
 Name: rdevdict::uniform_int - uniform integer random deviate generator
@@ -76,14 +75,13 @@ Author: Hans Ekkehard Plesser
  * @ingroup RandomDeviateGenerators
  */
 
-class UniformIntRandomDev : public RandomDev
-{
+class UniformIntRandomDev : public RandomDev {
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  UniformIntRandomDev( RngPtr r_in );
+  UniformIntRandomDev(RngPtr r_in);
   UniformIntRandomDev(); // threaded
 
   /**
@@ -97,20 +95,16 @@ public:
   using RandomDev::operator();
   using RandomDev::ldev;
 
-  long ldev( RngPtr ) const; //!< draw integer, threaded
-  bool
-  has_ldev() const
-  {
-    return true;
-  }
+  long ldev(RngPtr) const; //!< draw integer, threaded
+  bool has_ldev() const { return true; }
 
-  double operator()( RngPtr rthrd ) const; // threaded
+  double operator()(RngPtr rthrd) const; // threaded
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
 private:
   long nmin_;  //!< smallest permissible number
@@ -118,18 +112,14 @@ private:
   long range_; //!< nmax_ - nmin_ + 1
 };
 
-inline double
-UniformIntRandomDev::operator()( RngPtr rthrd ) const
-{
-  return static_cast< double >( ldev( rthrd ) );
+inline double UniformIntRandomDev::operator()(RngPtr rthrd) const {
+  return static_cast<double>(ldev(rthrd));
 }
 
-inline long
-UniformIntRandomDev::ldev( RngPtr r_s ) const
-{
-  assert( range_ > 0 );
-  return nmin_ + r_s->ulrand( range_ );
+inline long UniformIntRandomDev::ldev(RngPtr r_s) const {
+  assert(range_ > 0);
+  return nmin_ + r_s->ulrand(range_);
 }
-}
+} // namespace librandom
 
 #endif

@@ -33,8 +33,7 @@
 #include "randomdev.h"
 #include "randomgen.h"
 
-namespace librandom
-{
+namespace librandom {
 
 /** @BeginDocumentation
 Name: rdevdict::exponential - exponential random deviate generator
@@ -65,42 +64,31 @@ Author: Hans Ekkehard Plesser
  * @ingroup RandomDeviateGenerators
  */
 
-class ExpRandomDev : public RandomDev
-{
+class ExpRandomDev : public RandomDev {
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  ExpRandomDev( RngPtr r_in )
-    : RandomDev( r_in )
-    , lambda_( 1.0 )
-  {
-  }
-  ExpRandomDev()
-    : RandomDev()
-    , lambda_( 1.0 )
-  {
-  } // threaded
+  ExpRandomDev(RngPtr r_in) : RandomDev(r_in), lambda_(1.0) {}
+  ExpRandomDev() : RandomDev(), lambda_(1.0) {} // threaded
 
   using RandomDev::operator();
-  double operator()( RngPtr rthrd ) const; // threaded
+  double operator()(RngPtr rthrd) const; // threaded
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
 private:
   double lambda_; //!< rate parameter
 };
 
-inline double
-ExpRandomDev::operator()( RngPtr rthrd ) const
-{
-  return -std::log( rthrd->drandpos() ) / lambda_;
+inline double ExpRandomDev::operator()(RngPtr rthrd) const {
+  return -std::log(rthrd->drandpos()) / lambda_;
 }
-}
+} // namespace librandom
 
 #endif

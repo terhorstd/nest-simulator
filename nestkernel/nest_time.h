@@ -40,15 +40,13 @@
 
 class Token;
 
-namespace nest
-{
+namespace nest {
 class Time;
 }
 
-std::ostream& operator<<( std::ostream&, const nest::Time& );
+std::ostream &operator<<(std::ostream &, const nest::Time &);
 
-namespace nest
-{
+namespace nest {
 /**
    Class to handle simulation time and realtime.
    Main idea:
@@ -120,26 +118,15 @@ namespace nest
 /////////////////////////////////////////////////////////////
 
 // This is just to map llabs => abs
-template < class N >
-inline N
-time_abs( const N n )
-{
-  return std::abs( n );
-}
+template <class N> inline N time_abs(const N n) { return std::abs(n); }
 
-template <>
-inline long long
-time_abs( long long n )
-{
-  return llabs( n );
-}
+template <> inline long long time_abs(long long n) { return llabs(n); }
 
 /////////////////////////////////////////////////////////////
 // Time class = tic_t
 /////////////////////////////////////////////////////////////
 
-class Time
-{
+class Time {
   // tic_t: tics in  a step, signed long or long long
   // delay: steps, signed long
   // double: milliseconds (double!)
@@ -151,8 +138,7 @@ class Time
   /////////////////////////////////////////////////////////////
 
 protected:
-  struct Range
-  {
+  struct Range {
     static tic_t TICS_PER_STEP;
     static double TICS_PER_STEP_INV;
     static tic_t TICS_PER_STEP_RND;
@@ -187,55 +173,48 @@ protected:
   friend struct ms;
   friend struct ms_stamp;
 
-  friend bool operator==( const Time& t1, const Time& t2 );
-  friend bool operator!=( const Time& t1, const Time& t2 );
-  friend bool operator<( const Time& t1, const Time& t2 );
-  friend bool operator>( const Time& t1, const Time& t2 );
-  friend bool operator<=( const Time& t1, const Time& t2 );
-  friend bool operator>=( const Time& t1, const Time& t2 );
-  friend Time operator+( const Time& t1, const Time& t2 );
-  friend Time operator-( const Time& t1, const Time& t2 );
-  friend Time operator*( const long factor, const Time& t );
-  friend Time operator*( const Time& t, long factor );
-  friend std::ostream&(::operator<<)( std::ostream&, const Time& );
+  friend bool operator==(const Time &t1, const Time &t2);
+  friend bool operator!=(const Time &t1, const Time &t2);
+  friend bool operator<(const Time &t1, const Time &t2);
+  friend bool operator>(const Time &t1, const Time &t2);
+  friend bool operator<=(const Time &t1, const Time &t2);
+  friend bool operator>=(const Time &t1, const Time &t2);
+  friend Time operator+(const Time &t1, const Time &t2);
+  friend Time operator-(const Time &t1, const Time &t2);
+  friend Time operator*(const long factor, const Time &t);
+  friend Time operator*(const Time &t, long factor);
+  friend std::ostream &(::operator<<)(std::ostream &, const Time &);
 
   /////////////////////////////////////////////////////////////
   // Limits for time, including infinity definitions
   /////////////////////////////////////////////////////////////
 
 protected:
-  struct Limit
-  {
+  struct Limit {
     tic_t tics;
     delay steps;
     double ms;
 
-    Limit( tic_t tics, delay steps, double ms )
-      : tics( tics )
-      , steps( steps )
-      , ms( ms )
-    {
-    }
-    Limit( const tic_t& );
+    Limit(tic_t tics, delay steps, double ms)
+        : tics(tics), steps(steps), ms(ms) {}
+    Limit(const tic_t &);
   };
   static Limit LIM_MAX;
   static Limit LIM_MIN;
-  Time::Limit limit( const tic_t& );
+  Time::Limit limit(const tic_t &);
 
   // max is never larger than tics/INF_MARGIN, and we can use INF_MARGIN
   // to minimize range checks on +/- operations
-  static struct LimitPosInf
-  {
+  static struct LimitPosInf {
     static const tic_t tics = tic_t_max / Range::INF_MARGIN + 1;
     static const delay steps = delay_max;
 #define LIM_POS_INF_ms DBL_MAX // because C++ bites
   } LIM_POS_INF;
 
-  static struct LimitNegInf
-  {
+  static struct LimitNegInf {
     static const tic_t tics = -tic_t_max / Range::INF_MARGIN - 1;
     static const delay steps = -delay_max;
-#define LIM_NEG_INF_ms ( -DBL_MAX ) // c++ bites
+#define LIM_NEG_INF_ms (-DBL_MAX) // c++ bites
   } LIM_NEG_INF;
 
   /////////////////////////////////////////////////////////////
@@ -243,42 +222,27 @@ protected:
   /////////////////////////////////////////////////////////////
 
 public:
-  struct tic
-  {
+  struct tic {
     tic_t t;
-    explicit tic( tic_t t )
-      : t( t ){};
+    explicit tic(tic_t t) : t(t){};
   };
 
-  struct step
-  {
+  struct step {
     delay t;
-    explicit step( delay t )
-      : t( t )
-    {
-    }
+    explicit step(delay t) : t(t) {}
   };
 
-  struct ms
-  {
+  struct ms {
     double t;
-    explicit ms( double t )
-      : t( t )
-    {
-    }
+    explicit ms(double t) : t(t) {}
 
-    static double fromtoken( const Token& t );
-    explicit ms( const Token& t )
-      : t( fromtoken( t ) ){};
+    static double fromtoken(const Token &t);
+    explicit ms(const Token &t) : t(fromtoken(t)){};
   };
 
-  struct ms_stamp
-  {
+  struct ms_stamp {
     double t;
-    explicit ms_stamp( double t )
-      : t( t )
-    {
-    }
+    explicit ms_stamp(double t) : t(t) {}
   };
 
   /////////////////////////////////////////////////////////////
@@ -286,66 +250,47 @@ public:
   /////////////////////////////////////////////////////////////
 
 protected:
-  explicit Time( tic_t tics )
-    : tics( tics )
-  {
-  } // This doesn't check ranges.
+  explicit Time(tic_t tics) : tics(tics) {} // This doesn't check ranges.
   // Ergo: LIM_MAX.tics >= tics >= LIM_MIN.tics or
   //       tics == LIM_POS_INF.tics or LIM_NEG_INF.tics
 
 public:
-  Time()
-    : tics( 0 ){};
+  Time() : tics(0){};
 
   // Default copy constructor: assumes legal time object
   // Defined by compiler.
   // Time(const Time& t);
 
-  Time( tic t )
-    : tics( ( time_abs( t.t ) < LIM_MAX.tics )
-          ? t.t
-          : ( t.t < 0 ) ? LIM_NEG_INF.tics : LIM_POS_INF.tics )
-  {
-  }
+  Time(tic t)
+      : tics((time_abs(t.t) < LIM_MAX.tics)
+                 ? t.t
+                 : (t.t < 0) ? LIM_NEG_INF.tics : LIM_POS_INF.tics) {}
 
-  Time( step t )
-    : tics( ( time_abs( t.t ) < LIM_MAX.steps )
-          ? t.t * Range::TICS_PER_STEP
-          : ( t.t < 0 ) ? LIM_NEG_INF.tics : LIM_POS_INF.tics )
-  {
-  }
+  Time(step t)
+      : tics((time_abs(t.t) < LIM_MAX.steps)
+                 ? t.t * Range::TICS_PER_STEP
+                 : (t.t < 0) ? LIM_NEG_INF.tics : LIM_POS_INF.tics) {}
 
-  Time( ms t )
-    : tics( ( time_abs( t.t ) < LIM_MAX.ms )
-          ? static_cast< tic_t >( t.t * Range::TICS_PER_MS + 0.5 )
-          : ( t.t < 0 ) ? LIM_NEG_INF.tics : LIM_POS_INF.tics )
-  {
-  }
+  Time(ms t)
+      : tics((time_abs(t.t) < LIM_MAX.ms)
+                 ? static_cast<tic_t>(t.t * Range::TICS_PER_MS + 0.5)
+                 : (t.t < 0) ? LIM_NEG_INF.tics : LIM_POS_INF.tics) {}
 
-  static tic_t fromstamp( ms_stamp );
-  Time( ms_stamp t )
-    : tics( fromstamp( t ) )
-  {
-  }
+  static tic_t fromstamp(ms_stamp);
+  Time(ms_stamp t) : tics(fromstamp(t)) {}
 
   /////////////////////////////////////////////////////////////
   // Resolution: set tics per ms, steps per ms
   /////////////////////////////////////////////////////////////
 
-  static void set_resolution( double tics_per_ms );
-  static void set_resolution( double tics_per_ms, double ms_per_step );
+  static void set_resolution(double tics_per_ms);
+  static void set_resolution(double tics_per_ms, double ms_per_step);
   static void reset_resolution();
   static void reset_to_defaults();
 
-  static Time
-  get_resolution()
-  {
-    return Time( Range::TICS_PER_STEP );
-  }
+  static Time get_resolution() { return Time(Range::TICS_PER_STEP); }
 
-  static bool
-  resolution_is_default()
-  {
+  static bool resolution_is_default() {
     return Range::TICS_PER_STEP == Range::TICS_PER_STEP_DEFAULT;
   }
 
@@ -353,43 +298,25 @@ public:
   // Common zero-ary or unary operations
   /////////////////////////////////////////////////////////////
 
-  void
-  set_to_zero()
-  {
-    tics = 0;
-  }
+  void set_to_zero() { tics = 0; }
 
-  void
-  advance()
-  {
+  void advance() {
     tics += Range::TICS_PER_STEP;
     range();
   }
 
-  Time
-  succ() const
-  {
-    return tic( tics + Range::TICS_PER_STEP );
-  } // check range
-  Time
-  pred() const
-  {
-    return tic( tics - Range::TICS_PER_STEP );
-  } // check range
+  Time succ() const { return tic(tics + Range::TICS_PER_STEP); } // check range
+  Time pred() const { return tic(tics - Range::TICS_PER_STEP); } // check range
 
   /////////////////////////////////////////////////////////////
   // Subtypes of Time (bool tests)
   /////////////////////////////////////////////////////////////
 
-  bool
-  is_finite() const
-  {
+  bool is_finite() const {
     return tics != LIM_POS_INF.tics and tics != LIM_NEG_INF.tics;
   }
 
-  bool
-  is_neg_inf() const
-  {
+  bool is_neg_inf() const {
     return tics <= LIM_NEG_INF.tics; // currently tics can never
                                      // become smaller than
                                      // LIM_NEG_INF.tics. however if
@@ -402,87 +329,46 @@ public:
                                      // of just equal.
   }
 
-  bool
-  is_pos_inf() const
-  {
+  bool is_pos_inf() const {
     return tics >= LIM_POS_INF.tics; // see comment for is_neg_inf()
   }
 
-  bool
-  is_grid_time() const
-  {
-    return ( tics % Range::TICS_PER_STEP ) == 0;
-  }
-  bool
-  is_step() const
-  {
-    return tics > 0 and is_grid_time();
-  }
+  bool is_grid_time() const { return (tics % Range::TICS_PER_STEP) == 0; }
+  bool is_step() const { return tics > 0 and is_grid_time(); }
 
-  bool
-  is_multiple_of( const Time& divisor ) const
-  {
-    assert( divisor.tics > 0 );
-    return ( tics % divisor.tics ) == 0;
+  bool is_multiple_of(const Time &divisor) const {
+    assert(divisor.tics > 0);
+    return (tics % divisor.tics) == 0;
   }
 
   /////////////////////////////////////////////////////////////
   // Singleton'ish types
   /////////////////////////////////////////////////////////////
 
-  static Time
-  max()
-  {
-    return Time( LIM_MAX.tics );
-  }
-  static Time
-  min()
-  {
-    return Time( LIM_MIN.tics );
-  }
-  static double
-  get_ms_per_tic()
-  {
-    return Range::MS_PER_TIC;
-  }
-  static Time
-  neg_inf()
-  {
-    return Time( LIM_NEG_INF.tics );
-  }
-  static Time
-  pos_inf()
-  {
-    return Time( LIM_POS_INF.tics );
-  }
+  static Time max() { return Time(LIM_MAX.tics); }
+  static Time min() { return Time(LIM_MIN.tics); }
+  static double get_ms_per_tic() { return Range::MS_PER_TIC; }
+  static Time neg_inf() { return Time(LIM_NEG_INF.tics); }
+  static Time pos_inf() { return Time(LIM_POS_INF.tics); }
 
   /////////////////////////////////////////////////////////////
   // Overflow checks & recalibrate after resolution setting
   /////////////////////////////////////////////////////////////
 
-  void
-  range()
-  {
-    if ( time_abs( tics ) < LIM_MAX.tics )
-    {
+  void range() {
+    if (time_abs(tics) < LIM_MAX.tics) {
       return;
     }
-    tics = ( tics < 0 ) ? LIM_NEG_INF.tics : LIM_POS_INF.tics;
+    tics = (tics < 0) ? LIM_NEG_INF.tics : LIM_POS_INF.tics;
   }
 
-  void
-  calibrate()
-  {
-    range();
-  }
+  void calibrate() { range(); }
 
   /////////////////////////////////////////////////////////////
   // Unary operators
   /////////////////////////////////////////////////////////////
 
-  Time&
-  operator+=( const Time& t )
-  {
+  Time &operator+=(const Time &t) {
     tics += t.tics;
     range();
     return *this;
@@ -492,51 +378,31 @@ public:
   // Convert to external units
   /////////////////////////////////////////////////////////////
 
-  tic_t
-  get_tics() const
-  {
-    return tics;
-  }
-  static tic_t
-  get_tics_per_step()
-  {
-    return Range::TICS_PER_STEP;
-  }
-  static double
-  get_tics_per_ms()
-  {
-    return Range::TICS_PER_MS;
-  }
+  tic_t get_tics() const { return tics; }
+  static tic_t get_tics_per_step() { return Range::TICS_PER_STEP; }
+  static double get_tics_per_ms() { return Range::TICS_PER_MS; }
 
-  double
-  get_ms() const
-  {
-    if ( is_pos_inf() )
-    {
+  double get_ms() const {
+    if (is_pos_inf()) {
       return LIM_POS_INF_ms;
     }
-    if ( is_neg_inf() )
-    {
+    if (is_neg_inf()) {
       return LIM_NEG_INF_ms;
     }
     return Range::MS_PER_TIC * tics;
   }
 
-  delay
-  get_steps() const
-  {
-    if ( is_pos_inf() )
-    {
+  delay get_steps() const {
+    if (is_pos_inf()) {
       return LIM_POS_INF.steps;
     }
-    if ( is_neg_inf() )
-    {
+    if (is_neg_inf()) {
       return LIM_NEG_INF.steps;
     }
 
     // round tics up to nearest step
     // by adding TICS_PER_STEP-1 before division
-    return ( tics + Range::TICS_PER_STEP_RND ) * Range::TICS_PER_STEP_INV;
+    return (tics + Range::TICS_PER_STEP_RND) * Range::TICS_PER_STEP_INV;
   }
 
   /**
@@ -546,16 +412,12 @@ public:
    * ld_round, which is different from ms_stamp --> Time mapping, which rounds
    * up. See #903.
    */
-  static double
-  delay_steps_to_ms( delay steps )
-  {
+  static double delay_steps_to_ms(delay steps) {
     return steps * Range::MS_PER_STEP;
   }
 
-  static delay
-  delay_ms_to_steps( double ms )
-  {
-    return ld_round( ms * Range::STEPS_PER_MS );
+  static delay delay_ms_to_steps(double ms) {
+    return ld_round(ms * Range::STEPS_PER_MS);
   }
 };
 
@@ -571,79 +433,54 @@ const Time TimeZero;
 // Binary operators
 /////////////////////////////////////////////////////////////
 
-inline bool
-operator==( const Time& t1, const Time& t2 )
-{
+inline bool operator==(const Time &t1, const Time &t2) {
   return t1.tics == t2.tics;
 }
 
-inline bool
-operator!=( const Time& t1, const Time& t2 )
-{
+inline bool operator!=(const Time &t1, const Time &t2) {
   return t1.tics != t2.tics;
 }
 
-inline bool
-operator<( const Time& t1, const Time& t2 )
-{
+inline bool operator<(const Time &t1, const Time &t2) {
   return t1.tics < t2.tics;
 }
 
-inline bool
-operator>( const Time& t1, const Time& t2 )
-{
+inline bool operator>(const Time &t1, const Time &t2) {
   return t1.tics > t2.tics;
 }
 
-inline bool
-operator<=( const Time& t1, const Time& t2 )
-{
+inline bool operator<=(const Time &t1, const Time &t2) {
   return t1.tics <= t2.tics;
 }
 
-inline bool
-operator>=( const Time& t1, const Time& t2 )
-{
+inline bool operator>=(const Time &t1, const Time &t2) {
   return t1.tics >= t2.tics;
 }
 
-inline Time
-operator+( const Time& t1, const Time& t2 )
-{
-  return Time::tic( t1.tics + t2.tics ); // check range
+inline Time operator+(const Time &t1, const Time &t2) {
+  return Time::tic(t1.tics + t2.tics); // check range
 }
 
-inline Time
-operator-( const Time& t1, const Time& t2 )
-{
-  return Time::tic( t1.tics - t2.tics ); // check range
+inline Time operator-(const Time &t1, const Time &t2) {
+  return Time::tic(t1.tics - t2.tics); // check range
 }
 
-inline Time operator*( const long factor, const Time& t )
-{
+inline Time operator*(const long factor, const Time &t) {
   const tic_t n = factor * t.tics;
   // if no overflow:
-  if ( t.tics == 0 or n / t.tics == factor )
-  {
-    return Time::tic( n ); // check range
+  if (t.tics == 0 or n / t.tics == factor) {
+    return Time::tic(n); // check range
   }
-  if ( ( t.tics > 0 and factor > 0 ) or ( t.tics < 0 and factor < 0 ) )
-  {
-    return Time( Time::LIM_POS_INF.tics );
-  }
-  else
-  {
-    return Time( Time::LIM_NEG_INF.tics );
+  if ((t.tics > 0 and factor > 0) or (t.tics < 0 and factor < 0)) {
+    return Time(Time::LIM_POS_INF.tics);
+  } else {
+    return Time(Time::LIM_NEG_INF.tics);
   }
 }
 
-inline Time operator*( const Time& t, long factor )
-{
-  return factor * t;
-}
-} // Namespace
+inline Time operator*(const Time &t, long factor) { return factor * t; }
+} // namespace nest
 
-std::ostream& operator<<( std::ostream&, const nest::Time& );
-
+std::ostream &operator<<(std::ostream &, const nest::Time &);
 
 #endif

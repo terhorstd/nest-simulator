@@ -37,44 +37,25 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 
 /**
  * \class GrowthCurve
  * Defines the way the number of synaptic elements changes through time
  * according to the calcium concentration of the neuron.
  */
-class GrowthCurve
-{
+class GrowthCurve {
 public:
-  virtual ~GrowthCurve()
-  {
-  }
-  virtual void get( DictionaryDatum& d ) const = 0;
-  virtual void set( const DictionaryDatum& d ) = 0;
-  virtual double update( double t,
-    double t_minus,
-    double Ca_minus,
-    double z,
-    double tau_Ca,
-    double growth_rate ) const = 0;
-  virtual bool
-  is( Name n )
-  {
-    return n == name_;
-  }
-  Name
-  get_name()
-  {
-    return name_;
-  }
+  virtual ~GrowthCurve() {}
+  virtual void get(DictionaryDatum &d) const = 0;
+  virtual void set(const DictionaryDatum &d) = 0;
+  virtual double update(double t, double t_minus, double Ca_minus, double z,
+                        double tau_Ca, double growth_rate) const = 0;
+  virtual bool is(Name n) { return n == name_; }
+  Name get_name() { return name_; }
 
 protected:
-  GrowthCurve( const Name name )
-    : name_( name )
-  {
-  }
+  GrowthCurve(const Name name) : name_(name) {}
   const Name name_;
 };
 
@@ -131,18 +112,13 @@ protected:
  * dz/dt = nu (1 - (1/eps) * Ca(t)), where nu is the growth rate and
  * eps is the desired average calcium concentration.
  */
-class GrowthCurveLinear : public GrowthCurve
-{
+class GrowthCurveLinear : public GrowthCurve {
 public:
   GrowthCurveLinear();
-  void get( DictionaryDatum& d ) const;
-  void set( const DictionaryDatum& d );
-  double update( double t,
-    double t_minus,
-    double Ca_minus,
-    double z,
-    double tau_Ca,
-    double growth_rate ) const;
+  void get(DictionaryDatum &d) const;
+  void set(const DictionaryDatum &d);
+  double update(double t, double t_minus, double Ca_minus, double z,
+                double tau_Ca, double growth_rate) const;
 
 private:
   double eps_;
@@ -223,18 +199,13 @@ private:
  * to be created, eps is the target mean calcium concentration in the
  * neuron and nu is the growth rate.
  */
-class GrowthCurveGaussian : public GrowthCurve
-{
+class GrowthCurveGaussian : public GrowthCurve {
 public:
   GrowthCurveGaussian();
-  void get( DictionaryDatum& d ) const;
-  void set( const DictionaryDatum& d );
-  double update( double t,
-    double t_minus,
-    double Ca_minus,
-    double z,
-    double tau_Ca,
-    double growth_rate ) const;
+  void get(DictionaryDatum &d) const;
+  void set(const DictionaryDatum &d);
+  double update(double t, double t_minus, double Ca_minus, double z,
+                double tau_Ca, double growth_rate) const;
 
 private:
   double eta_;
@@ -300,24 +271,19 @@ private:
  * neuron, psi controls the width of the sigmoid
  * and nu is the growth rate.
  */
-class GrowthCurveSigmoid : public GrowthCurve
-{
+class GrowthCurveSigmoid : public GrowthCurve {
 public:
   GrowthCurveSigmoid();
-  void get( DictionaryDatum& d ) const;
-  void set( const DictionaryDatum& d );
-  double update( double t,
-    double t_minus,
-    double Ca_minus,
-    double z,
-    double tau_Ca,
-    double growth_rate ) const;
+  void get(DictionaryDatum &d) const;
+  void set(const DictionaryDatum &d);
+  double update(double t, double t_minus, double Ca_minus, double z,
+                double tau_Ca, double growth_rate) const;
 
 private:
   double eps_;
   double psi_;
 };
 
-} // of namespace
+} // namespace nest
 
 #endif

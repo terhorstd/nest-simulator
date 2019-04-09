@@ -22,34 +22,26 @@
 
 #include "erfc_neuron.h"
 
-namespace nest
-{
+namespace nest {
 
-void
-gainfunction_erfc::get( DictionaryDatum& d ) const
-{
-  def< double >( d, names::theta, theta_ );
-  def< double >( d, names::sigma, sigma_ );
+void gainfunction_erfc::get(DictionaryDatum &d) const {
+  def<double>(d, names::theta, theta_);
+  def<double>(d, names::sigma, sigma_);
 }
 
-void
-gainfunction_erfc::set( const DictionaryDatum& d )
-{
-  updateValue< double >( d, names::theta, theta_ );
-  updateValue< double >( d, names::sigma, sigma_ );
+void gainfunction_erfc::set(const DictionaryDatum &d) {
+  updateValue<double>(d, names::theta, theta_);
+  updateValue<double>(d, names::sigma, sigma_);
 }
 
 /*
  * Override the create() method with one call to RecordablesMap::insert_()
  * for each quantity to be recorded.
  */
-template <>
-void
-RecordablesMap< nest::erfc_neuron >::create()
-{
+template <> void RecordablesMap<nest::erfc_neuron>::create() {
   // use standard names whereever you can for consistency!
-  insert_( names::S, &nest::erfc_neuron::get_output_state__ );
-  insert_( names::h, &nest::erfc_neuron::get_input__ );
+  insert_(names::S, &nest::erfc_neuron::get_output_state__);
+  insert_(names::h, &nest::erfc_neuron::get_input__);
 }
 
 } // namespace nest

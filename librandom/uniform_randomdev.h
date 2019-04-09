@@ -50,8 +50,7 @@
 /*                                                          */
 /************************************************************/
 
-namespace librandom
-{
+namespace librandom {
 
 /** @BeginDocumentation
 Name: rdevdict::uniform - uniform random deviate generator
@@ -74,24 +73,23 @@ Author: Hans Ekkehard Plesser
  * @ingroup RandomDeviateGenerators
  */
 
-class UniformRandomDev : public RandomDev
-{
+class UniformRandomDev : public RandomDev {
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  UniformRandomDev( RngPtr r_in );
+  UniformRandomDev(RngPtr r_in);
   UniformRandomDev(); // threaded
 
   using RandomDev::operator();
-  double operator()( RngPtr rthrd ) const; // threaded
+  double operator()(RngPtr rthrd) const; // threaded
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
 private:
   double low_;   //!< lower bound, included
@@ -99,10 +97,8 @@ private:
   double delta_; //!< interval width
 };
 
-inline double
-UniformRandomDev::operator()( RngPtr rthrd ) const
-{
+inline double UniformRandomDev::operator()(RngPtr rthrd) const {
   return low_ + delta_ * rthrd->drand();
 }
-}
+} // namespace librandom
 #endif

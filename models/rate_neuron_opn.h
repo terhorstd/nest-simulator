@@ -41,8 +41,7 @@
 #include "ring_buffer.h"
 #include "universal_data_logger.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: rate_neuron_opn - Base class for rate model with output noise.
@@ -91,15 +90,13 @@ Author: David Dahmen, Jan Hahne, Jannis Schuecker
 
 SeeAlso: lin_rate, tanh_rate, threshold_lin_rate
  */
-template < class TNonlinearities >
-class rate_neuron_opn : public Archiving_Node
-{
+template <class TNonlinearities> class rate_neuron_opn : public Archiving_Node {
 
 public:
   typedef Node base;
 
   rate_neuron_opn();
-  rate_neuron_opn( const rate_neuron_opn& );
+  rate_neuron_opn(const rate_neuron_opn &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -109,28 +106,22 @@ public:
   using Node::handle;
   using Node::sends_secondary_event;
 
-  void handle( InstantaneousRateConnectionEvent& );
-  void handle( DelayedRateConnectionEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(InstantaneousRateConnectionEvent &);
+  void handle(DelayedRateConnectionEvent &);
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( InstantaneousRateConnectionEvent&, rport );
-  port handles_test_event( DelayedRateConnectionEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(InstantaneousRateConnectionEvent &, rport);
+  port handles_test_event(DelayedRateConnectionEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void
-  sends_secondary_event( InstantaneousRateConnectionEvent& )
-  {
-  }
-  void
-  sends_secondary_event( DelayedRateConnectionEvent& )
-  {
-  }
+  void sends_secondary_event(InstantaneousRateConnectionEvent &) {}
+  void sends_secondary_event(DelayedRateConnectionEvent &) {}
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
@@ -139,22 +130,21 @@ private:
   /** This is the actual update function. The additional boolean parameter
    * determines if the function is called by update (false) or wfr_update (true)
    */
-  bool update_( Time const&, const long, const long, const bool );
+  bool update_(Time const &, const long, const long, const bool);
 
-  void update( Time const&, const long, const long );
-  bool wfr_update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
+  bool wfr_update(Time const &, const long, const long);
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< rate_neuron_opn< TNonlinearities > >;
-  friend class UniversalDataLogger< rate_neuron_opn< TNonlinearities > >;
+  friend class RecordablesMap<rate_neuron_opn<TNonlinearities>>;
+  friend class UniversalDataLogger<rate_neuron_opn<TNonlinearities>>;
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
 
     /** Time constant in ms. */
     double tau_;
@@ -176,9 +166,9 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
-    void set( const DictionaryDatum& );
+    void set(const DictionaryDatum &);
   };
 
   // ----------------------------------------------------------------
@@ -186,22 +176,21 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
     double rate_;       //!< Rate
     double noise_;      //!< Noise
     double noisy_rate_; //!< Noisy rate, i.e. rate +noise
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum& ) const;
+    void get(DictionaryDatum &) const;
 
     /** Set values from dictionary.
      * @param dictionary to take data from
      * @param current parameters
      * @param Change in reversal potential E_L specified by this dict
      */
-    void set( const DictionaryDatum& );
+    void set(const DictionaryDatum &);
   };
 
   // ----------------------------------------------------------------
@@ -209,30 +198,26 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( rate_neuron_opn& );
-    Buffers_( const Buffers_&, rate_neuron_opn& );
-
+  struct Buffers_ {
+    Buffers_(rate_neuron_opn &);
+    Buffers_(const Buffers_ &, rate_neuron_opn &);
 
     RingBuffer delayed_rates_ex_; //!< buffer for rate vector received by
     // RateConnectionDelayed from excitatory neurons
     RingBuffer delayed_rates_in_; //!< buffer for rate vector received by
     // RateConnectionDelayed from inhibitory neurons
-    std::vector< double >
-      instant_rates_ex_; //!< buffer for rate vector received
+    std::vector<double> instant_rates_ex_; //!< buffer for rate vector received
     // by RateConnectionInstantaneous from excitatory neurons
-    std::vector< double >
-      instant_rates_in_; //!< buffer for rate vector received
+    std::vector<double> instant_rates_in_; //!< buffer for rate vector received
     // by RateConnectionInstantaneous
-    std::vector< double >
-      last_y_values; //!< remembers y_values from last wfr_update
-    std::vector< double > random_numbers; //!< remembers the random_numbers in
+    std::vector<double>
+        last_y_values; //!< remembers y_values from last wfr_update
+    std::vector<double> random_numbers; //!< remembers the random_numbers in
     // order to apply the same random
     // numbers in each iteration when wfr
     // is used
-    UniversalDataLogger< rate_neuron_opn >
-      logger_; //!< Logger for all analog data
+    UniversalDataLogger<rate_neuron_opn>
+        logger_; //!< Logger for all analog data
   };
 
   // ----------------------------------------------------------------
@@ -240,8 +225,7 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
 
     // propagators
     double P1_;
@@ -256,25 +240,13 @@ private:
   };
 
   //! Read out the rate
-  double
-  get_rate_() const
-  {
-    return S_.rate_;
-  }
+  double get_rate_() const { return S_.rate_; }
 
   //! Read out the noise
-  double
-  get_noise_() const
-  {
-    return S_.noise_;
-  }
+  double get_noise_() const { return S_.noise_; }
 
   //! Read out the noisy rate
-  double
-  get_noisy_rate_() const
-  {
-    return S_.noisy_rate_;
-  }
+  double get_noisy_rate_() const { return S_.noisy_rate_; }
 
   // ----------------------------------------------------------------
 
@@ -284,104 +256,87 @@ private:
   Buffers_ B_;
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< rate_neuron_opn< TNonlinearities > > recordablesMap_;
+  static RecordablesMap<rate_neuron_opn<TNonlinearities>> recordablesMap_;
 };
 
-
-template < class TNonlinearities >
-inline void
-rate_neuron_opn< TNonlinearities >::update( Time const& origin,
-  const long from,
-  const long to )
-{
-  update_( origin, from, to, false );
+template <class TNonlinearities>
+inline void rate_neuron_opn<TNonlinearities>::update(Time const &origin,
+                                                     const long from,
+                                                     const long to) {
+  update_(origin, from, to, false);
 }
 
-template < class TNonlinearities >
-inline bool
-rate_neuron_opn< TNonlinearities >::wfr_update( Time const& origin,
-  const long from,
-  const long to )
-{
+template <class TNonlinearities>
+inline bool rate_neuron_opn<TNonlinearities>::wfr_update(Time const &origin,
+                                                         const long from,
+                                                         const long to) {
   State_ old_state = S_; // save state before wfr update
-  const bool wfr_tol_exceeded = update_( origin, from, to, true );
+  const bool wfr_tol_exceeded = update_(origin, from, to, true);
   S_ = old_state; // restore old state
 
   return not wfr_tol_exceeded;
 }
 
-template < class TNonlinearities >
-inline port
-rate_neuron_opn< TNonlinearities >::handles_test_event(
-  InstantaneousRateConnectionEvent&,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+template <class TNonlinearities>
+inline port rate_neuron_opn<TNonlinearities>::handles_test_event(
+    InstantaneousRateConnectionEvent &, rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-template < class TNonlinearities >
-inline port
-rate_neuron_opn< TNonlinearities >::handles_test_event(
-  DelayedRateConnectionEvent&,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+template <class TNonlinearities>
+inline port rate_neuron_opn<TNonlinearities>::handles_test_event(
+    DelayedRateConnectionEvent &, rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-template < class TNonlinearities >
+template <class TNonlinearities>
 inline port
-rate_neuron_opn< TNonlinearities >::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+rate_neuron_opn<TNonlinearities>::handles_test_event(DataLoggingRequest &dlr,
+                                                     rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-template < class TNonlinearities >
+template <class TNonlinearities>
 inline void
-rate_neuron_opn< TNonlinearities >::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d );
-  Archiving_Node::get_status( d );
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+rate_neuron_opn<TNonlinearities>::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d);
+  Archiving_Node::get_status(d);
+  (*d)[names::recordables] = recordablesMap_.get_list();
 
-  nonlinearities_.get( d );
+  nonlinearities_.get(d);
 }
 
-template < class TNonlinearities >
+template <class TNonlinearities>
 inline void
-rate_neuron_opn< TNonlinearities >::set_status( const DictionaryDatum& d )
-{
+rate_neuron_opn<TNonlinearities>::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
   State_ stmp = S_;      // temporary copy in case of errors
-  stmp.set( d );         // throws if BadProperty
+  stmp.set(d);           // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 
-  nonlinearities_.set( d );
+  nonlinearities_.set(d);
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef RATE_NEURON_OPN_H */

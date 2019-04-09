@@ -44,8 +44,7 @@
 // Includes from sli:
 #include "arraydatum.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 
@@ -88,79 +87,63 @@ Availability: Only when compiled with MUSIC
 
 SeeAlso: music_event_out_proxy, music_event_in_proxy, music_message_in_proxy
 */
-class music_cont_in_proxy : public DeviceNode
-{
+class music_cont_in_proxy : public DeviceNode {
 
 public:
   music_cont_in_proxy();
-  music_cont_in_proxy( const music_cont_in_proxy& );
+  music_cont_in_proxy(const music_cont_in_proxy &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  one_node_per_process() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return false; }
+  bool one_node_per_process() const { return true; }
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
-  void
-  update( Time const&, const long, const long )
-  {
-  }
+  void update(Time const &, const long, const long) {}
 
   // ------------------------------------------------------------
 
   struct State_;
 
-  struct Parameters_
-  {
+  struct Parameters_ {
     std::string port_name_; //!< the name of MUSIC port to connect to
 
-    Parameters_();                     //!< Sets default parameter values
-    Parameters_( const Parameters_& ); //!< Recalibrate all times
+    Parameters_();                    //!< Sets default parameter values
+    Parameters_(const Parameters_ &); //!< Recalibrate all times
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum&, State_& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &, State_ &); //!< Set values from dicitonary
   };
 
   // ------------------------------------------------------------
 
-  struct State_
-  {
+  struct State_ {
     bool published_; //!< indicates whether this node has been published already
                      //!< with MUSIC
     int port_width_; //!< the width of the MUSIC port
 
     State_(); //!< Sets default state value
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
     //! Set values from dictionary
-    void set( const DictionaryDatum&, const Parameters_& );
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ------------------------------------------------------------
 
-  struct Buffers_
-  {
-    std::vector< double > data_; //!< The buffer for incoming data
+  struct Buffers_ {
+    std::vector<double> data_; //!< The buffer for incoming data
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
-    MUSIC::ContInputPort* MP_; //!< The MUSIC cont port for input of data
+  struct Variables_ {
+    MUSIC::ContInputPort *MP_; //!< The MUSIC cont port for input of data
   };
 
   // ------------------------------------------------------------
@@ -171,7 +154,7 @@ private:
   Variables_ V_;
 };
 
-} // namespace
+} // namespace nest
 
 #endif
 

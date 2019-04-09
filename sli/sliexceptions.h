@@ -33,7 +33,6 @@
 
 class SLIInterpreter;
 
-
 #define UNKNOWN "unknown"
 #define UNKNOWN_NUM -1
 
@@ -50,26 +49,18 @@ class SLIInterpreter;
  * @ingroup Exceptions
  */
 
-
 /**
  * Base class for all SLI exceptions.
  * @ingroup Exceptions
  * @ingroup SLIExceptions
  */
-class SLIException : public std::exception
-{
+class SLIException : public std::exception {
   std::string what_;
 
 public:
-  SLIException( char const* const what )
-    : what_( what )
-  {
-  }
+  SLIException(char const *const what) : what_(what) {}
 
-  SLIException( const std::string& what )
-    : what_( what )
-  {
-  }
+  SLIException(const std::string &what) : what_(what) {}
 
   virtual ~SLIException() throw(){};
 
@@ -90,11 +81,7 @@ public:
    *@note The catch clause must be terminated with a return
    *statement, if raiseerror was called.
    */
-  virtual const char*
-  what() const throw()
-  {
-    return what_.c_str();
-  }
+  virtual const char *what() const throw() { return what_.c_str(); }
 
   /**
    * Returns a diagnostic message or empty string.
@@ -107,17 +94,11 @@ public:
  * @ingroup SLIExceptions
  */
 
-class InterpreterError : public SLIException
-{
+class InterpreterError : public SLIException {
 public:
-  virtual ~InterpreterError() throw()
-  {
-  }
+  virtual ~InterpreterError() throw() {}
 
-  InterpreterError( char const* const what )
-    : SLIException( what )
-  {
-  }
+  InterpreterError(char const *const what) : SLIException(what) {}
 };
 
 /**
@@ -127,34 +108,21 @@ public:
  * It essentially packages the message of the wrapped exception,
  * avoiding the need of a clone() operation for each exception type.
  */
-class WrappedThreadException : public SLIException
-{
+class WrappedThreadException : public SLIException {
 public:
-  WrappedThreadException( const std::exception& );
-  virtual ~WrappedThreadException() throw()
-  {
-  }
-  std::string
-  message() const
-  {
-    return message_;
-  }
+  WrappedThreadException(const std::exception &);
+  virtual ~WrappedThreadException() throw() {}
+  std::string message() const { return message_; }
 
 private:
   std::string message_;
 };
 
-class DivisionByZero : public SLIException
-{
+class DivisionByZero : public SLIException {
 public:
-  virtual ~DivisionByZero() throw()
-  {
-  }
+  virtual ~DivisionByZero() throw() {}
 
-  DivisionByZero()
-    : SLIException( "DivisionByZero" )
-  {
-  }
+  DivisionByZero() : SLIException("DivisionByZero") {}
   std::string message() const;
 };
 
@@ -171,45 +139,26 @@ class TypeMismatch : public InterpreterError // SLIException
   std::string provided_;
 
 public:
-  ~TypeMismatch() throw()
-  {
-  }
+  ~TypeMismatch() throw() {}
 
-  TypeMismatch()
-    : InterpreterError( "TypeMismatch" )
-  {
-  }
+  TypeMismatch() : InterpreterError("TypeMismatch") {}
 
-  TypeMismatch( const std::string& expectedType )
-    : InterpreterError( "TypeMismatch" )
-    , expected_( expectedType )
-  {
-  }
+  TypeMismatch(const std::string &expectedType)
+      : InterpreterError("TypeMismatch"), expected_(expectedType) {}
 
-  TypeMismatch( const std::string& expectedType,
-    const std::string& providedType )
-    : InterpreterError( "TypeMismatch" )
-    , expected_( expectedType )
-    , provided_( providedType )
-  {
-  }
+  TypeMismatch(const std::string &expectedType, const std::string &providedType)
+      : InterpreterError("TypeMismatch"), expected_(expectedType),
+        provided_(providedType) {}
 
   std::string message() const;
 };
 
-class SystemSignal : public InterpreterError
-{
+class SystemSignal : public InterpreterError {
   int signal_;
 
 public:
-  ~SystemSignal() throw()
-  {
-  }
-  SystemSignal( int s )
-    : InterpreterError( "SystemSignal" )
-    , signal_( s )
-  {
-  }
+  ~SystemSignal() throw() {}
+  SystemSignal(int s) : InterpreterError("SystemSignal"), signal_(s) {}
 
   std::string message() const;
 };
@@ -219,33 +168,21 @@ public:
  * Exception to be thrown if a given SLI array has the wrong size.
  * @ingroup SLIExceptions
  */
-class RangeCheck : public InterpreterError
-{
+class RangeCheck : public InterpreterError {
   int size_;
 
 public:
-  ~RangeCheck() throw()
-  {
-  }
+  ~RangeCheck() throw() {}
 
-  RangeCheck( int s = 0 )
-    : InterpreterError( "RangeCheck" )
-    , size_( s )
-  {
-  }
+  RangeCheck(int s = 0) : InterpreterError("RangeCheck"), size_(s) {}
 
   std::string message() const;
 };
 
-class ArgumentType : public InterpreterError
-{
+class ArgumentType : public InterpreterError {
   int where; // Number of the parameter that was wrong.
 public:
-  ArgumentType( int w )
-    : InterpreterError( "ArgumentType" )
-    , where( w )
-  {
-  }
+  ArgumentType(int w) : InterpreterError("ArgumentType"), where(w) {}
 
   std::string message() const;
 };
@@ -254,27 +191,17 @@ public:
  * Exception to be thrown if a parameter value
  * is not acceptable.
  */
-class BadParameterValue : public SLIException
-{
+class BadParameterValue : public SLIException {
   std::string msg_;
 
 public:
   //! @param detailed error message
-  BadParameterValue()
-    : SLIException( "BadParameterValue" )
-    , msg_()
-  {
-  }
+  BadParameterValue() : SLIException("BadParameterValue"), msg_() {}
 
-  BadParameterValue( std::string msg )
-    : SLIException( "BadParameterValue" )
-    , msg_( msg )
-  {
-  }
+  BadParameterValue(std::string msg)
+      : SLIException("BadParameterValue"), msg_(msg) {}
 
-  ~BadParameterValue() throw()
-  {
-  }
+  ~BadParameterValue() throw() {}
 
   std::string message() const;
 };
@@ -284,17 +211,11 @@ public:
  * Base Class for all SLI errors related to dictionary processing.
  * @ingroup SLIExceptions
  */
-class DictError : public InterpreterError
-{
+class DictError : public InterpreterError {
 public:
-  virtual ~DictError() throw()
-  {
-  }
+  virtual ~DictError() throw() {}
 
-  DictError( char const* const )
-    : InterpreterError( "DictError" )
-  {
-  }
+  DictError(char const *const) : InterpreterError("DictError") {}
 };
 
 // -------------------- Unknown Name -------------------------
@@ -308,14 +229,9 @@ class UndefinedName : public DictError // was UnknownName
   std::string name_;
 
 public:
-  ~UndefinedName() throw()
-  {
-  }
-  UndefinedName( const std::string& name )
-    : DictError( "UndefinedName" )
-    , name_( name )
-  {
-  }
+  ~UndefinedName() throw() {}
+  UndefinedName(const std::string &name)
+      : DictError("UndefinedName"), name_(name) {}
 
   std::string message() const;
 };
@@ -326,22 +242,16 @@ public:
  * dictionary has the wrong type.
  * @ingroup SLIExceptions
  */
-class EntryTypeMismatch : public DictError
-{
+class EntryTypeMismatch : public DictError {
   std::string expected_;
   std::string provided_;
 
 public:
-  ~EntryTypeMismatch() throw()
-  {
-  }
-  EntryTypeMismatch( const std::string& expectedType,
-    const std::string& providedType )
-    : DictError( "EntryTypeMismatch" )
-    , expected_( expectedType )
-    , provided_( providedType )
-  {
-  }
+  ~EntryTypeMismatch() throw() {}
+  EntryTypeMismatch(const std::string &expectedType,
+                    const std::string &providedType)
+      : DictError("EntryTypeMismatch"), expected_(expectedType),
+        provided_(providedType) {}
 
   std::string message() const;
 };
@@ -351,36 +261,26 @@ public:
  * Exception to be thrown if an error occured while accessing the stack.
  * @ingroup SLIExceptions
  */
-class StackUnderflow : public InterpreterError
-{
+class StackUnderflow : public InterpreterError {
   int needed;
   int given;
 
 public:
-  StackUnderflow( int n, int g )
-    : InterpreterError( "StackUnderflow" )
-    , needed( n )
-    , given( g ){};
+  StackUnderflow(int n, int g)
+      : InterpreterError("StackUnderflow"), needed(n), given(g){};
 
   std::string message() const;
 };
-
 
 // -------------------- I/O Error -------------------------
 /**
  * Exception to be thrown if an error occured in an I/O operation.
  * @ingroup SLIExceptions
  */
-class IOError : public SLIException
-{
+class IOError : public SLIException {
 public:
-  ~IOError() throw()
-  {
-  }
-  IOError()
-    : SLIException( "IOError" )
-  {
-  }
+  ~IOError() throw() {}
+  IOError() : SLIException("IOError") {}
 
   std::string message() const;
 };
@@ -388,24 +288,17 @@ public:
 /**
  * Exception to be thrown if unaccessed dictionary items are found.
  */
-class UnaccessedDictionaryEntry : public DictError
-{
+class UnaccessedDictionaryEntry : public DictError {
   std::string msg_;
 
 public:
-  ~UnaccessedDictionaryEntry() throw()
-  {
-  }
+  ~UnaccessedDictionaryEntry() throw() {}
   // input: string with names of not accessed
-  UnaccessedDictionaryEntry( const std::string& m )
-    : DictError( "UnaccessedDictionaryEntry" )
-    , msg_( m )
-  {
-  }
+  UnaccessedDictionaryEntry(const std::string &m)
+      : DictError("UnaccessedDictionaryEntry"), msg_(m) {}
 
   std::string message() const;
 };
-
 
 // ------------ Module related error --------------------------
 
@@ -415,26 +308,17 @@ public:
  * @ingroup SLIExceptions
  * @todo Shouldn't this be a KernelException?
  */
-class DynamicModuleManagementError : public SLIException
-{
+class DynamicModuleManagementError : public SLIException {
   std::string msg_;
 
 public:
-  ~DynamicModuleManagementError() throw()
-  {
-  }
+  ~DynamicModuleManagementError() throw() {}
 
   DynamicModuleManagementError()
-    : SLIException( "DynamicModuleManagementError" )
-    , msg_()
-  {
-  }
+      : SLIException("DynamicModuleManagementError"), msg_() {}
 
-  DynamicModuleManagementError( std::string msg )
-    : SLIException( "DynamicModuleManagementError" )
-    , msg_( msg )
-  {
-  }
+  DynamicModuleManagementError(std::string msg)
+      : SLIException("DynamicModuleManagementError"), msg_(msg) {}
 
   std::string message() const;
 };
@@ -445,19 +329,13 @@ public:
  * redefine a model, synapse or function name.
  * @ingroup SLIExceptions
  */
-class NamingConflict : public SLIException
-{
+class NamingConflict : public SLIException {
   std::string msg_;
 
 public:
-  ~NamingConflict() throw()
-  {
-  }
-  NamingConflict( const std::string& m )
-    : SLIException( "NamingConflict" )
-    , msg_( m )
-  {
-  }
+  ~NamingConflict() throw() {}
+  NamingConflict(const std::string &m)
+      : SLIException("NamingConflict"), msg_(m) {}
 
   std::string message() const;
 };
@@ -466,19 +344,13 @@ public:
  * Throw if an feature is unavailable.
  * @ingroup SLIExceptions
  */
-class NotImplemented : public SLIException
-{
+class NotImplemented : public SLIException {
   std::string msg_;
 
 public:
-  ~NotImplemented() throw()
-  {
-  }
-  NotImplemented( const std::string& m )
-    : SLIException( "NotImplemented" )
-    , msg_( m )
-  {
-  }
+  ~NotImplemented() throw() {}
+  NotImplemented(const std::string &m)
+      : SLIException("NotImplemented"), msg_(m) {}
 
   std::string message() const;
 };

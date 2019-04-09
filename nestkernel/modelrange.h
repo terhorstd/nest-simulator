@@ -26,40 +26,24 @@
 // Includes from nestkernel:
 #include "nest_types.h"
 
-namespace nest
-{
+namespace nest {
 
-class modelrange
-{
+class modelrange {
 public:
-  modelrange( index model, index first_gid, index last_gid );
-  bool
-  is_in_range( index gid ) const
-  {
-    return ( ( gid >= first_gid_ ) and ( gid <= last_gid_ ) );
+  modelrange(index model, index first_gid, index last_gid);
+  bool is_in_range(index gid) const {
+    return ((gid >= first_gid_) and (gid <= last_gid_));
   }
-  index
-  get_model_id() const
-  {
-    return model_;
-  }
-  index
-  get_first_gid() const
-  {
-    return first_gid_;
-  }
-  index
-  get_last_gid() const
-  {
-    return last_gid_;
-  }
-  void extend_range( index new_last_gid );
+  index get_model_id() const { return model_; }
+  index get_first_gid() const { return first_gid_; }
+  index get_last_gid() const { return last_gid_; }
+  void extend_range(index new_last_gid);
 
 private:
   index model_;
   index first_gid_;
   index last_gid_;
 };
-}
+} // namespace nest
 
 #endif

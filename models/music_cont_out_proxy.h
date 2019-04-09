@@ -26,7 +26,6 @@
 // Generated includes:
 #include "config.h"
 
-
 #ifdef HAVE_MUSIC
 
 // C includes:
@@ -45,8 +44,7 @@
 // Includes from sli:
 #include "arraydatum.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 
@@ -97,28 +95,15 @@ Availability: Only when compiled with MPI and MUSIC
 SeeAlso: music_cont_in_proxy, music_event_out_proxy, music_event_in_proxy,
 music_message_in_proxy
 */
-class music_cont_out_proxy : public DeviceNode
-{
+class music_cont_out_proxy : public DeviceNode {
 
 public:
   music_cont_out_proxy();
-  music_cont_out_proxy( const music_cont_out_proxy& );
+  music_cont_out_proxy(const music_cont_out_proxy &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  local_receiver() const
-  {
-    return true;
-  }
-  bool
-  one_node_per_process() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
+  bool local_receiver() const { return true; }
+  bool one_node_per_process() const { return false; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -128,17 +113,17 @@ public:
   using Node::handle;
   using Node::handles_test_event;
   using Node::sends_signal;
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void handle( DataLoggingReply& );
+  void handle(DataLoggingReply &);
 
   SignalType sends_signal() const;
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 protected:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
   void finalize();
@@ -150,52 +135,46 @@ protected:
    * that information. The sampled nodes must provide data from
    * the previous time slice.
    */
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
 private:
   struct State_; //!< Forward declarations
 
   struct Buffers_;
 
-  struct Parameters_
-  {
-    Parameters_(); //!< Sets default parameter values
-    Parameters_(
-      const Parameters_& ); //!< Copy constructor for parameter values
+  struct Parameters_ {
+    Parameters_();                    //!< Sets default parameter values
+    Parameters_(const Parameters_ &); //!< Copy constructor for parameter values
 
-    Time interval_;                   //!< sampling interval, in ms
-    std::string port_name_;           //!< the name of MUSIC port to connect to
-    std::vector< Name > record_from_; //!< recordables to record from
-    std::vector< long > target_gids_; //!< Neuron GIDs to be observed
+    Time interval_;                 //!< sampling interval, in ms
+    std::string port_name_;         //!< the name of MUSIC port to connect to
+    std::vector<Name> record_from_; //!< recordables to record from
+    std::vector<long> target_gids_; //!< Neuron GIDs to be observed
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum&,
-      const Node&,
-      const State_&,
-      const Buffers_& ); //!< Set values from dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &, const Node &, const State_ &,
+             const Buffers_ &); //!< Set values from dictionary
   };
 
   // ------------------------------------------------------------
 
-  struct State_
-  {
-    State_();                //!< Sets default state value
-    State_( const State_& ); //!< Copy constructor for state values
-    bool published_;         //!< indicates whether this node has been published
-                             //!< already with MUSIC
-    size_t port_width_;      //!< the width of the MUSIC port
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+  struct State_ {
+    State_();               //!< Sets default state value
+    State_(const State_ &); //!< Copy constructor for state values
+    bool published_;        //!< indicates whether this node has been published
+                            //!< already with MUSIC
+    size_t port_width_;     //!< the width of the MUSIC port
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
   };
 
   // ------------------------------------------------------------
 
-  struct Buffers_
-  {
-    Buffers_();                  //!< Initializes default buffer
-    Buffers_( const Buffers_& ); //!< Copy constructor for the data buffer
+  struct Buffers_ {
+    Buffers_();                 //!< Initializes default buffer
+    Buffers_(const Buffers_ &); //!< Copy constructor for the data buffer
     bool has_targets_; //!< Indicates whether the proxy is recording from any
                        //! neurons or not
-    std::vector< double > data_; //!< Recorded data
+    std::vector<double> data_; //!< Recorded data
   };
 
   // ------------------------------------------------------------
@@ -205,13 +184,11 @@ private:
   Buffers_ B_;
 };
 
-inline SignalType
-nest::music_cont_out_proxy::sends_signal() const
-{
+inline SignalType nest::music_cont_out_proxy::sends_signal() const {
   return ALL;
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef HAVE_MUSIC */
 #endif /* #ifndef MUSIC_CONT_OUT_PROXY_H */

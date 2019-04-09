@@ -41,9 +41,7 @@
 // Includes from precise:
 #include "slice_ring_buffer.h"
 
-
-namespace nest
-{
+namespace nest {
 /** @BeginDocumentation
 Name: iaf_psc_exp_ps_lossless - Leaky integrate-and-fire neuron
 with exponential postsynaptic currents; precise implementation;
@@ -107,8 +105,7 @@ Receives: SpikeEvent, CurrentEvent, DataLoggingRequest
 
 SeeAlso: iaf_psc_exp_ps
 */
-class iaf_psc_exp_ps_lossless : public Archiving_Node
-{
+class iaf_psc_exp_ps_lossless : public Archiving_Node {
 public:
   /** Basic constructor.
       This constructor should only be used by GenericModel to create
@@ -123,7 +120,7 @@ public:
       @note The copy constructor MUST NOT be used to create nodes based
       on nodes that have been placed in the network.
   */
-  iaf_psc_exp_ps_lossless( const iaf_psc_exp_ps_lossless& );
+  iaf_psc_exp_ps_lossless(const iaf_psc_exp_ps_lossless &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -133,23 +130,23 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  port handles_test_event( SpikeEvent&, port );
-  port handles_test_event( CurrentEvent&, port );
-  port handles_test_event( DataLoggingRequest&, port );
+  port handles_test_event(SpikeEvent &, port);
+  port handles_test_event(CurrentEvent &, port);
+  port handles_test_event(DataLoggingRequest &, port);
 
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
+  void handle(DataLoggingRequest &);
 
   bool is_off_grid() const // uses off_grid events
   {
     return true;
   }
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
   /** @name Interface functions
@@ -157,7 +154,7 @@ private:
    * only through a Node*.
    */
   //@{
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
@@ -178,18 +175,18 @@ private:
    * While the neuron is refractory, membrane potential (y2_) is
    * clamped to U_reset_.
    */
-  void update( Time const& origin, const long from, const long to );
+  void update(Time const &origin, const long from, const long to);
   //@}
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< iaf_psc_exp_ps_lossless >;
-  friend class UniversalDataLogger< iaf_psc_exp_ps_lossless >;
+  friend class RecordablesMap<iaf_psc_exp_ps_lossless>;
+  friend class UniversalDataLogger<iaf_psc_exp_ps_lossless>;
 
   /**
    * Propagate neuron state.
    * @param dt Interval over which to propagate
    */
-  void propagate_( const double dt );
+  void propagate_(const double dt);
 
   /**
    * Emit a single spike caused by DC current in absence of spike input.
@@ -202,10 +199,8 @@ private:
    * @param t0      Beginning of mini-timestep
    * @param dt      Duration of mini-timestep
    */
-  void emit_spike_( const Time& origin,
-    const long lag,
-    const double t0,
-    const double dt );
+  void emit_spike_(const Time &origin, const long lag, const double t0,
+                   const double dt);
 
   /**
    * Emit a single spike at a precisely given time.
@@ -214,16 +209,15 @@ private:
    * @param lag           Time step within slice
    * @param spike_offset  Time offset for spike
    */
-  void emit_instant_spike_( const Time& origin,
-    const long lag,
-    const double spike_offset );
+  void emit_instant_spike_(const Time &origin, const long lag,
+                           const double spike_offset);
 
   /**
    * Localize threshold crossing by bisectioning.
    * @param   double length of interval since previous event
    * @returns time from previous event to threshold crossing
    */
-  double bisectioning_( const double dt ) const;
+  double bisectioning_(const double dt) const;
 
   /**
    * Retrospective spike detection by state space analysis.
@@ -240,15 +234,14 @@ private:
    * Note that in Algorithm 1 and 2 of [1], a typo interchanges g and f.
    * @returns time interval in which threshold was crossed, or nan.
    */
-  double is_spike_( const double );
+  double is_spike_(const double);
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     /** Membrane time constant in ms. */
     double tau_m_;
 
@@ -285,8 +278,8 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    double set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const;   //!< Store current values in dictionary
+    double set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
   // ----------------------------------------------------------------
@@ -294,8 +287,7 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
     double y0_;       //!< External input current
     double I_syn_ex_; //!< Exc. exponential current
     double I_syn_in_; //!< Inh. exponential current
@@ -307,8 +299,8 @@ private:
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum&, const Parameters_& ) const;
-    void set( const DictionaryDatum&, const Parameters_&, double delta_EL );
+    void get(DictionaryDatum &, const Parameters_ &) const;
+    void set(const DictionaryDatum &, const Parameters_ &, double delta_EL);
   };
 
   // ----------------------------------------------------------------
@@ -316,10 +308,9 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( iaf_psc_exp_ps_lossless& );
-    Buffers_( const Buffers_&, iaf_psc_exp_ps_lossless& );
+  struct Buffers_ {
+    Buffers_(iaf_psc_exp_ps_lossless &);
+    Buffers_(const Buffers_ &, iaf_psc_exp_ps_lossless &);
 
     /**
      * Queue for incoming events.
@@ -329,7 +320,7 @@ private:
     RingBuffer currents_;
 
     //! Logger for all analog data
-    UniversalDataLogger< iaf_psc_exp_ps_lossless > logger_;
+    UniversalDataLogger<iaf_psc_exp_ps_lossless> logger_;
   };
 
   // ----------------------------------------------------------------
@@ -337,8 +328,7 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
     double h_ms_;            //!< Time resolution [ms]
     long refractory_steps_;  //!< Refractory time in steps
     double expm1_tau_m_;     //!< exp(-h/tau_m) - 1
@@ -390,26 +380,10 @@ private:
   // Access functions for UniversalDataLogger -------------------------------
 
   //! Read out the real membrane potential
-  double
-  get_V_m_() const
-  {
-    return S_.y2_ + P_.E_L_;
-  }
-  double
-  get_I_syn_() const
-  {
-    return S_.I_syn_ex_ + S_.I_syn_in_;
-  }
-  double
-  get_I_syn_ex_() const
-  {
-    return S_.I_syn_ex_;
-  }
-  double
-  get_I_syn_in_() const
-  {
-    return S_.I_syn_in_;
-  }
+  double get_V_m_() const { return S_.y2_ + P_.E_L_; }
+  double get_I_syn_() const { return S_.I_syn_ex_ + S_.I_syn_in_; }
+  double get_I_syn_ex_() const { return S_.I_syn_ex_; }
+  double get_I_syn_in_() const { return S_.I_syn_in_; }
   // ----------------------------------------------------------------
 
   /**
@@ -426,70 +400,56 @@ private:
   /** @} */
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< iaf_psc_exp_ps_lossless > recordablesMap_;
+  static RecordablesMap<iaf_psc_exp_ps_lossless> recordablesMap_;
 };
 
-inline port
-iaf_psc_exp_ps_lossless::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port iaf_psc_exp_ps_lossless::send_test_event(Node &target,
+                                                     rport receptor_type,
+                                                     synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
-  return target.handles_test_event( e, receptor_type );
+  e.set_sender(*this);
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-iaf_psc_exp_ps_lossless::handles_test_event( SpikeEvent&, port receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port iaf_psc_exp_ps_lossless::handles_test_event(SpikeEvent &,
+                                                        port receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-iaf_psc_exp_ps_lossless::handles_test_event( CurrentEvent&, port receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port iaf_psc_exp_ps_lossless::handles_test_event(CurrentEvent &,
+                                                        port receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-iaf_psc_exp_ps_lossless::handles_test_event( DataLoggingRequest& dlr,
-  port receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port iaf_psc_exp_ps_lossless::handles_test_event(DataLoggingRequest &dlr,
+                                                        port receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-iaf_psc_exp_ps_lossless::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d, P_ );
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+inline void iaf_psc_exp_ps_lossless::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d, P_);
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-iaf_psc_exp_ps_lossless::set_status( const DictionaryDatum& d )
-{
-  Parameters_ ptmp = P_;           // temporary copy in case of errors
-  double delta_EL = ptmp.set( d ); // throws if BadProperty
-  State_ stmp = S_;                // temporary copy in case of errors
-  stmp.set( d, ptmp, delta_EL );   // throws if BadProperty
+inline void iaf_psc_exp_ps_lossless::set_status(const DictionaryDatum &d) {
+  Parameters_ ptmp = P_;         // temporary copy in case of errors
+  double delta_EL = ptmp.set(d); // throws if BadProperty
+  State_ stmp = S_;              // temporary copy in case of errors
+  stmp.set(d, ptmp, delta_EL);   // throws if BadProperty
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 }
-} // namespace
+} // namespace nest
 #endif // IAF_PSC_EXP_PS_LOSSLESS_H

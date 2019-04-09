@@ -44,121 +44,80 @@
  * ---------------------------------------------------------------- */
 
 nest::music_message_in_proxy::Parameters_::Parameters_()
-  : port_name_( "message_in" )
-  , acceptable_latency_( 0.0 )
-{
-}
+    : port_name_("message_in"), acceptable_latency_(0.0) {}
 
-nest::music_message_in_proxy::Parameters_::Parameters_( const Parameters_& op )
-  : port_name_( op.port_name_ )
-  , acceptable_latency_( op.acceptable_latency_ )
+nest::music_message_in_proxy::Parameters_::Parameters_(const Parameters_ &op)
+    : port_name_(op.port_name_), acceptable_latency_(op.acceptable_latency_)
 
-{
-}
+{}
 
 nest::music_message_in_proxy::State_::State_()
-  : published_( false )
-  , port_width_( -1 )
-{
-}
-
+    : published_(false), port_width_(-1) {}
 
 /* ----------------------------------------------------------------
  * Parameter extraction and manipulation functions
  * ---------------------------------------------------------------- */
 
-void
-nest::music_message_in_proxy::Parameters_::get( DictionaryDatum& d ) const
-{
-  ( *d )[ names::port_name ] = port_name_;
-  ( *d )[ names::acceptable_latency ] = acceptable_latency_;
+void nest::music_message_in_proxy::Parameters_::get(DictionaryDatum &d) const {
+  (*d)[names::port_name] = port_name_;
+  (*d)[names::acceptable_latency] = acceptable_latency_;
 }
 
-void
-nest::music_message_in_proxy::Parameters_::set( const DictionaryDatum& d,
-  State_& s )
-{
-  if ( not s.published_ )
-  {
-    updateValue< string >( d, names::port_name, port_name_ );
-    updateValue< double >( d, names::acceptable_latency, acceptable_latency_ );
+void nest::music_message_in_proxy::Parameters_::set(const DictionaryDatum &d,
+                                                    State_ &s) {
+  if (not s.published_) {
+    updateValue<string>(d, names::port_name, port_name_);
+    updateValue<double>(d, names::acceptable_latency, acceptable_latency_);
   }
 }
 
-void
-nest::music_message_in_proxy::State_::get( DictionaryDatum& d ) const
-{
-  ( *d )[ names::published ] = published_;
-  ( *d )[ names::port_width ] = port_width_;
+void nest::music_message_in_proxy::State_::get(DictionaryDatum &d) const {
+  (*d)[names::published] = published_;
+  (*d)[names::port_width] = port_width_;
 }
 
-void
-nest::music_message_in_proxy::State_::set( const DictionaryDatum&,
-  const Parameters_& )
-{
-}
-
+void nest::music_message_in_proxy::State_::set(const DictionaryDatum &,
+                                               const Parameters_ &) {}
 
 /* ----------------------------------------------------------------
  * Default and copy constructor for node
  * ---------------------------------------------------------------- */
 
 nest::music_message_in_proxy::music_message_in_proxy()
-  : DeviceNode()
-  , P_()
-  , S_()
-{
-}
+    : DeviceNode(), P_(), S_() {}
 
 nest::music_message_in_proxy::music_message_in_proxy(
-  const music_message_in_proxy& n )
-  : DeviceNode( n )
-  , P_( n.P_ )
-  , S_( n.S_ )
-{
-}
-
+    const music_message_in_proxy &n)
+    : DeviceNode(n), P_(n.P_), S_(n.S_) {}
 
 /* ----------------------------------------------------------------
  * Node initialization functions
  * ---------------------------------------------------------------- */
 
-void
-nest::music_message_in_proxy::init_state_( const Node& proto )
-{
-  const music_message_in_proxy& pr =
-    downcast< music_message_in_proxy >( proto );
+void nest::music_message_in_proxy::init_state_(const Node &proto) {
+  const music_message_in_proxy &pr = downcast<music_message_in_proxy>(proto);
 
   S_ = pr.S_;
 }
 
-void
-nest::music_message_in_proxy::init_buffers_()
-{
-}
+void nest::music_message_in_proxy::init_buffers_() {}
 
-void
-nest::music_message_in_proxy::calibrate()
-{
+void nest::music_message_in_proxy::calibrate() {
   // only publish the port once,
-  if ( not S_.published_ )
-  {
-    MUSIC::Setup* s = kernel().music_manager.get_music_setup();
-    if ( s == 0 )
-    {
-      throw MUSICSimulationHasRun( get_name() );
+  if (not S_.published_) {
+    MUSIC::Setup *s = kernel().music_manager.get_music_setup();
+    if (s == 0) {
+      throw MUSICSimulationHasRun(get_name());
     }
 
-    V_.MP_ = s->publishMessageInput( P_.port_name_ );
+    V_.MP_ = s->publishMessageInput(P_.port_name_);
 
-    if ( not V_.MP_->isConnected() )
-    {
-      throw MUSICPortUnconnected( get_name(), P_.port_name_ );
+    if (not V_.MP_->isConnected()) {
+      throw MUSICPortUnconnected(get_name(), P_.port_name_);
     }
 
-    if ( not V_.MP_->hasWidth() )
-    {
-      throw MUSICPortHasNoWidth( get_name(), P_.port_name_ );
+    if (not V_.MP_->hasWidth()) {
+      throw MUSICPortHasNoWidth(get_name(), P_.port_name_);
     }
 
     S_.port_width_ = V_.MP_->width();
@@ -166,16 +125,14 @@ nest::music_message_in_proxy::calibrate()
     // MUSIC wants seconds, NEST has miliseconds
     double acceptable_latency = P_.acceptable_latency_ / 1000.0;
 
-    V_.MP_->map( &B_.message_handler_, acceptable_latency );
+    V_.MP_->map(&B_.message_handler_, acceptable_latency);
     S_.published_ = true;
 
     std::string msg = String::compose(
-      "Mapping MUSIC input port '%1' with width=%2 and acceptable latency=%3 "
-      "ms.",
-      P_.port_name_,
-      S_.port_width_,
-      P_.acceptable_latency_ );
-    LOG( M_INFO, "music_message_in_proxy::calibrate()", msg.c_str() );
+        "Mapping MUSIC input port '%1' with width=%2 and acceptable latency=%3 "
+        "ms.",
+        P_.port_name_, S_.port_width_, P_.acceptable_latency_);
+    LOG(M_INFO, "music_message_in_proxy::calibrate()", msg.c_str());
   }
 }
 

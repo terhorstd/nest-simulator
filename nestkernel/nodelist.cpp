@@ -41,34 +41,29 @@
  *
  */
 
-namespace nest
-{
+namespace nest {
 // -----------------------------------------------------------------------
 
 template <>
-LocalNodeListBase< LocalNodeListIterator >::iterator
-LocalNodeListBase< LocalNodeListIterator >::begin() const
-{
-  if ( empty() )
-  {
+LocalNodeListBase<LocalNodeListIterator>::iterator
+LocalNodeListBase<LocalNodeListIterator>::begin() const {
+  if (empty()) {
     return end();
   }
 
-  Subnet* current_subnet = &subnet_;   // start at wrapped subnet
-  std::vector< Node* >::iterator node; // node we are looking at
+  Subnet *current_subnet = &subnet_;  // start at wrapped subnet
+  std::vector<Node *>::iterator node; // node we are looking at
 
-  do
-  {
-    assert( not current_subnet->local_empty() );
+  do {
+    assert(not current_subnet->local_empty());
     node = current_subnet->local_begin(); // leftmost in current subnet
-    current_subnet = dynamic_cast< Subnet* >( *node ); // attempt descend
-  } while ( current_subnet and not current_subnet->local_empty() );
+    current_subnet = dynamic_cast<Subnet *>(*node); // attempt descend
+  } while (current_subnet and not current_subnet->local_empty());
 
   // Either node is a non-subnet node or and empty subnet, this is
   // the first node.
-  return iterator( node, subnet_.local_end() );
+  return iterator(node, subnet_.local_end());
 }
-
 
 /**
  * NodeList::iterator::operator++()
@@ -81,36 +76,31 @@ LocalNodeListBase< LocalNodeListIterator >::begin() const
  * supply a chached-iterator, which does this work only once.
  */
 
-LocalNodeListIterator LocalNodeListIterator::operator++()
-{
-  if ( current_node_ == list_end_ ) // we are at end
+LocalNodeListIterator LocalNodeListIterator::operator++() {
+  if (current_node_ == list_end_) // we are at end
   {
     return *this;
   }
   // Obtain a pointer to the subnet to which the current node
   // belongs. We need it to check if we have reached the end
   // of that subnet.
-  Subnet* current_subnet = ( *current_node_ )->get_parent();
-  assert( current_subnet != NULL );
+  Subnet *current_subnet = (*current_node_)->get_parent();
+  assert(current_subnet != NULL);
 
   ++current_node_; // go to right neighbor of current node
 
-  if ( current_node_ != current_subnet->local_end() )
-  {
+  if (current_node_ != current_subnet->local_end()) {
     // We have a right neighbor.
-    current_subnet = dynamic_cast< Subnet* >( *current_node_ );
-    while ( current_subnet and not current_subnet->local_empty() )
-    {
+    current_subnet = dynamic_cast<Subnet *>(*current_node_);
+    while (current_subnet and not current_subnet->local_empty()) {
       // current_node_ is a subnet and we descend into it
       current_node_ = current_subnet->local_begin();
-      current_subnet = dynamic_cast< Subnet* >( *current_node_ );
+      current_subnet = dynamic_cast<Subnet *>(*current_node_);
     }
     // current_node_ is either not a subnet or an empty subnet,
     // so we have found the proper right neigbor.
     return *this;
-  }
-  else if ( current_node_ == list_end_ )
-  {
+  } else if (current_node_ == list_end_) {
     return *this;
   } // we are at end of subnet
 
@@ -120,11 +110,11 @@ LocalNodeListIterator LocalNodeListIterator::operator++()
   // Thus current_subnet must have a parent, and we need to ascend to that
   // parent. We find the iterator to the current_subnet in the parent nodelist
   // by index arithmetic.
-  Subnet* parent = current_subnet->get_parent();
-  assert( parent );
+  Subnet *parent = current_subnet->get_parent();
+  assert(parent);
   current_node_ = parent->local_begin() + current_subnet->get_subnet_index();
   // make sure we got iterator to correct node
-  assert( *current_node_ == current_subnet );
+  assert(*current_node_ == current_subnet);
 
   return *this;
 }
@@ -132,19 +122,16 @@ LocalNodeListIterator LocalNodeListIterator::operator++()
 // -----------------------------------------------------------------------
 
 template <>
-LocalNodeListBase< LocalChildListIterator >::iterator
-LocalNodeListBase< LocalChildListIterator >::begin() const
-{
-  if ( empty() )
-  {
+LocalNodeListBase<LocalChildListIterator>::iterator
+LocalNodeListBase<LocalChildListIterator>::begin() const {
+  if (empty()) {
     return end();
   }
-  return iterator( subnet_.local_begin(), subnet_.local_end() );
+  return iterator(subnet_.local_begin(), subnet_.local_end());
 }
 
-LocalChildListIterator LocalChildListIterator::operator++()
-{
-  if ( current_node_ != list_end_ ) // we are at end
+LocalChildListIterator LocalChildListIterator::operator++() {
+  if (current_node_ != list_end_) // we are at end
   {
     ++current_node_;
   }
@@ -154,37 +141,32 @@ LocalChildListIterator LocalChildListIterator::operator++()
 // -----------------------------------------------------------------------
 
 template <>
-LocalNodeListBase< LocalLeafListIterator >::iterator
-LocalNodeListBase< LocalLeafListIterator >::begin() const
-{
-  if ( empty() )
-  {
+LocalNodeListBase<LocalLeafListIterator>::iterator
+LocalNodeListBase<LocalLeafListIterator>::begin() const {
+  if (empty()) {
     return end();
   }
-  Subnet* current_subnet = &subnet_;   // start at wrapped subnet
-  std::vector< Node* >::iterator node; // node we are looking at
+  Subnet *current_subnet = &subnet_;  // start at wrapped subnet
+  std::vector<Node *>::iterator node; // node we are looking at
 
-  do
-  {
-    assert( not current_subnet->local_empty() );
+  do {
+    assert(not current_subnet->local_empty());
     node = current_subnet->local_begin(); // leftmost in current subnet
-    current_subnet = dynamic_cast< Subnet* >( *node ); // attempt descend
-  } while ( current_subnet and not current_subnet->local_empty() );
+    current_subnet = dynamic_cast<Subnet *>(*node); // attempt descend
+  } while (current_subnet and not current_subnet->local_empty());
 
   // Either node is a non-subnet node or and empty subnet. It is a candidate for
   // the first node. The constructor will automatically move on to the first
   // true leaf.
-  return iterator( node, subnet_.local_end() );
+  return iterator(node, subnet_.local_end());
 }
 
 // this is the same code as for the NodeList, except that we skip
-LocalLeafListIterator LocalLeafListIterator::operator++()
-{
-  do
-  {
+LocalLeafListIterator LocalLeafListIterator::operator++() {
+  do {
     ++base_it_;
-  } while ( not base_it_.is_end_() and not is_leaf_( *base_it_ ) );
+  } while (not base_it_.is_end_() and not is_leaf_(*base_it_));
 
   return *this;
 }
-}
+} // namespace nest

@@ -39,21 +39,19 @@
 
 class Dictionary;
 
-namespace nest
-{
+namespace nest {
 
 class LoggingEvent;
 
-class LoggingManager : public ManagerInterface
-{
+class LoggingManager : public ManagerInterface {
 public:
   LoggingManager();
 
   virtual void initialize();
   virtual void finalize();
 
-  virtual void set_status( const DictionaryDatum& );
-  virtual void get_status( DictionaryDatum& );
+  virtual void set_status(const DictionaryDatum &);
+  virtual void get_status(DictionaryDatum &);
 
   /**
    * Register a logging client.
@@ -61,7 +59,7 @@ public:
    * Register a callback function that will receive all subsequent
    * LoggingEvents. For the method signature see logging.h .
    */
-  void register_logging_client( const deliver_logging_event_ptr callback );
+  void register_logging_client(const deliver_logging_event_ptr callback);
 
   /**
    * Set the logging level.
@@ -69,7 +67,7 @@ public:
    * All logging messages with a lower severity will not be
    * forwarded to the logging clients.
    */
-  void set_logging_level( const severity_t level );
+  void set_logging_level(const severity_t level);
 
   /**
    * Get the current logging level.
@@ -85,28 +83,20 @@ public:
    * insted use the LOG() function provided by the logging.h header.
    *
    */
-  void publish_log( const severity_t,
-    const std::string&,
-    const std::string&,
-    const std::string&,
-    const size_t ) const;
+  void publish_log(const severity_t, const std::string &, const std::string &,
+                   const std::string &, const size_t) const;
 
   /**
    * Implements standard behaviour for dictionary entry misses. Use with define
    * ALL_ENTRIES_ACCESSED.
    */
-  void all_entries_accessed( const Dictionary&,
-    const std::string&,
-    const std::string&,
-    const std::string&,
-    const size_t ) const;
+  void all_entries_accessed(const Dictionary &, const std::string &,
+                            const std::string &, const std::string &,
+                            const size_t) const;
 
-  void all_entries_accessed( const Dictionary&,
-    const std::string&,
-    const std::string&,
-    const std::string&,
-    const std::string&,
-    const size_t ) const;
+  void all_entries_accessed(const Dictionary &, const std::string &,
+                            const std::string &, const std::string &,
+                            const std::string &, const size_t) const;
 
 private:
   /**
@@ -115,12 +105,12 @@ private:
    * It iterates all callback from the client_callbacks_ and calls it with the
    * LoggingEvent as argument.
    */
-  void deliver_logging_event_( const LoggingEvent& event ) const;
+  void deliver_logging_event_(const LoggingEvent &event) const;
 
-  void default_logging_callback_( const LoggingEvent& event ) const;
+  void default_logging_callback_(const LoggingEvent &event) const;
 
 private:
-  std::vector< deliver_logging_event_ptr > client_callbacks_;
+  std::vector<deliver_logging_event_ptr> client_callbacks_;
   nest::severity_t logging_level_;
   bool dict_miss_is_error_; //!< whether to throw exception on missed dictionary
                             //!< entries

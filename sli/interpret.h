@@ -60,12 +60,11 @@ class FunctionDatum;
 class BoolDatum;
 
 extern "C" {
-void SLIthrowsignal( int s );
+void SLIthrowsignal(int s);
 }
 
-class SLIInterpreter
-{
-  std::list< SLIModule* > modules;
+class SLIInterpreter {
+  std::list<SLIModule *> modules;
 
   /* Flags and variables to control debugging and
    * optimizations.
@@ -78,29 +77,25 @@ class SLIInterpreter
   int call_depth_;         //!< Current depth of procedure calls.
   int max_call_depth_;     //!< Depth until which procedure calls are debugged.
 
-
   unsigned long cycle_count;
   bool cycle_guard;
   unsigned long cycle_restriction;
 
-
   int verbositylevel;
-  void inittypes( void );
-  void initdictionaries( void );
-  void initbuiltins( void );
-  void initexternals( void );
+  void inittypes(void);
+  void initdictionaries(void);
+  void initbuiltins(void);
+  void initexternals(void);
 
 public:
   unsigned long code_accessed; // for code coverage analysis.
   unsigned long code_executed; // ration should be coverage
 
+  Dictionary *statusdict;
+  Dictionary *errordict;
 
-  Dictionary* statusdict;
-  Dictionary* errordict;
-
-  DictionaryStack* DStack;
-  Parser* parse;
-
+  DictionaryStack *DStack;
+  Parser *parse;
 
   // Names of basics functions
   Name ilookup_name;
@@ -184,15 +179,15 @@ public:
   /** @} */
 
 private:
-  static char const* const M_ALL_NAME;
-  static char const* const M_DEBUG_NAME;
-  static char const* const M_STATUS_NAME;
-  static char const* const M_INFO_NAME;
-  static char const* const M_DEPRECATED_NAME;
-  static char const* const M_WARNING_NAME;
-  static char const* const M_ERROR_NAME;
-  static char const* const M_FATAL_NAME;
-  static char const* const M_QUIET_NAME;
+  static char const *const M_ALL_NAME;
+  static char const *const M_DEBUG_NAME;
+  static char const *const M_STATUS_NAME;
+  static char const *const M_INFO_NAME;
+  static char const *const M_DEPRECATED_NAME;
+  static char const *const M_WARNING_NAME;
+  static char const *const M_ERROR_NAME;
+  static char const *const M_FATAL_NAME;
+  static char const *const M_QUIET_NAME;
 
 public:
   // These static members must be accessible from
@@ -244,14 +239,13 @@ public:
 
   // State variables of the Interpreter
 
-
   Token ct; // callback; see comments in execute(void)
 
   TokenStack OStack;
   TokenStack EStack;
 
   // public member functions:
-  SLIInterpreter( void );
+  SLIInterpreter(void);
   ~SLIInterpreter();
 
   //! Initialise the interpreter by reading in the startup files.
@@ -260,17 +254,17 @@ public:
   /**
    * Execute the supplied command string.
    */
-  int execute( const std::string& );
+  int execute(const std::string &);
 
   /**
    * Execute the supplied token.
    */
-  int execute( const Token& );
+  int execute(const Token &);
 
   /**
    * Start the interpreter and run the startup code.
    */
-  int execute( int v = 0 );
+  int execute(int v = 0);
 
   //  int execute_protected(void);
 
@@ -278,74 +272,70 @@ public:
    * Run the interpreter with a prepared execution stack.
    * The function returns, if the execution stack has reached the given level.
    */
-  int execute_( size_t exitlevel = 0 );
-  int execute_debug_( size_t exitlevel = 0 );
+  int execute_(size_t exitlevel = 0);
+  int execute_debug_(size_t exitlevel = 0);
 
-  void createdouble( Name const&, double );
-  void createcommand( Name const&,
-    SLIFunction const*,
-    std::string deprecation_info = std::string() );
-  void createconstant( Name const&, const Token& );
-
+  void createdouble(Name const &, double);
+  void createcommand(Name const &, SLIFunction const *,
+                     std::string deprecation_info = std::string());
+  void createconstant(Name const &, const Token &);
 
   /** Lookup a name searching all dictionaries on the stack.
    *  The first occurrence is reported. If the Name is not found,
    *  @a VoidToken is returned.
    */
-  const Token& lookup( const Name& n ) const;
-
+  const Token &lookup(const Name &n) const;
 
   /** Lookup a name searching all dictionaries on the stack.
    *  The first occurrence is reported. If the Name is not found,
    *  an UndefinedName exceptiopn is thrown.
    */
-  const Token& lookup2( const Name& n ) const;
+  const Token &lookup2(const Name &n) const;
 
   /** Lookup a name searching only the bottom level dictionary.
    *  If the Name is not found,
    *  @a VoidToken is returned.
    */
-  const Token& baselookup( const Name& n ) const; // lookup in a specified
+  const Token &baselookup(const Name &n) const; // lookup in a specified
 
   /** Test for a name searching all dictionaries on the stack.
    */
-  bool known( const Name& n ) const;
+  bool known(const Name &n) const;
 
   /** Test for a name in the bottom level dictionary.
    */
-  bool baseknown( const Name& n ) const;
+  bool baseknown(const Name &n) const;
 
   /** Bind a Token to a Name.
    *  The token is copied. This can be an expensive operation for large
    *  objects. Also, if the token is popped off one of the stacks after
    *  calling def, it is more reasonable to use SLIInterpreter::def_move.
    */
-  void def( Name const&, Token const& );
+  void def(Name const &, Token const &);
 
   /** Unbind a previously bound Token from a Name.
    * Throws UnknownName Exception.
    */
-  void undef( Name const& );
+  void undef(Name const &);
 
   /** Bind a Token to a Name in the bottom level dictionary.
    *  The Token is copied.
    */
-  void basedef( const Name& n, const Token& t );
+  void basedef(const Name &n, const Token &t);
 
   /** Bind a Token to a Name.
    *  like def, however, the Datum object is moved from the token into the
    *  dictionary, thus, no memory allocation or copying is needed.
    */
-  void def_move( Name const&, Token& );
+  void def_move(Name const &, Token &);
 
   /** Bind a Token to a Name in the bottom level dictionary.
    *  The Token is moved.
    */
-  void basedef_move( const Name& n, Token& t );
+  void basedef_move(const Name &n, Token &t);
 
-  void setcycleguard( Index );
-  void removecycleguard( void );
-
+  void setcycleguard(Index);
+  void removecycleguard(void);
 
   /**
    * Increment call depth level.
@@ -355,11 +345,7 @@ public:
    * This gives the user the opportunity to skip over nested
    * calls during debugging.
    */
-  void
-  inc_call_depth()
-  {
-    ++call_depth_;
-  }
+  void inc_call_depth() { ++call_depth_; }
 
   /**
    * Decrement call depth level.
@@ -369,11 +355,7 @@ public:
    * This gives the user the opportunity to skip over nested
    * calls during debugging.
    */
-  void
-  dec_call_depth()
-  {
-    --call_depth_;
-  }
+  void dec_call_depth() { --call_depth_; }
 
   /**
    * Set call depth level to a specific value.
@@ -383,11 +365,7 @@ public:
    * This gives the user the opportunity to skip over nested
    * calls during debugging.
    */
-  void
-  set_call_depth( int depth )
-  {
-    call_depth_ = depth;
-  }
+  void set_call_depth(int depth) { call_depth_ = depth; }
 
   /**
    * Return current call depth level.
@@ -397,11 +375,7 @@ public:
    * This gives the user the opportunity to skip over nested
    * calls during debugging.
    */
-  int
-  get_call_depth() const
-  {
-    return call_depth_;
-  }
+  int get_call_depth() const { return call_depth_; }
 
   /**
    * Set maximal call depth level to a specific value.
@@ -411,11 +385,7 @@ public:
    * This gives the user the opportunity to skip over nested
    * calls during debugging.
    */
-  void
-  set_max_call_depth( int d )
-  {
-    max_call_depth_ = d;
-  }
+  void set_max_call_depth(int d) { max_call_depth_ = d; }
 
   /**
    * Return value of maximal call depth level.
@@ -425,55 +395,36 @@ public:
    * This gives the user the opportunity to skip over nested
    * calls during debugging.
    */
-  int
-  get_max_call_depth() const
-  {
-    return max_call_depth_;
-  }
+  int get_max_call_depth() const { return max_call_depth_; }
 
   /**
    * Returns true, if step mode is active.
    * The step mode is active in debug mode if
    * call_depth_ < max_call_depth_
    */
-  bool
-  step_mode() const
-  {
-    return debug_mode_ && ( call_depth_ < max_call_depth_ );
+  bool step_mode() const {
+    return debug_mode_ && (call_depth_ < max_call_depth_);
   }
 
   /**
    * Returns true, if debug mode is turned on.
    */
-  bool
-  get_debug_mode() const
-  {
-    return debug_mode_;
-  }
+  bool get_debug_mode() const { return debug_mode_; }
 
   /**
    * Turn debug mode on.
    */
-  void
-  debug_mode_on()
-  {
-    debug_mode_ = true;
-  }
+  void debug_mode_on() { debug_mode_ = true; }
 
   /**
    * Turn debug mode off.
    */
-  void
-  debug_mode_off()
-  {
-    debug_mode_ = false;
-  }
+  void debug_mode_off() { debug_mode_ = false; }
 
   /**
    * Switch stack display on or off in debug mode.
    */
   void toggle_stack_display();
-
 
   /**
    * Show Debug options.
@@ -485,17 +436,12 @@ public:
    * In this function, the user can enter simple commands
    * to debug code executed by the interpreter.
    */
-  char debug_commandline( Token& );
-
+  char debug_commandline(Token &);
 
   /**
    * Returns true, if tailing recursion optimization is done.
    */
-  bool
-  optimize_tailrecursion() const
-  {
-    return opt_tailrecursion_;
-  }
+  bool optimize_tailrecursion() const { return opt_tailrecursion_; }
 
   /**
    * Enable tail-recursion optimization.
@@ -508,11 +454,7 @@ public:
    * optimization removes important information from the
    * execution stack.
    */
-  void
-  optimize_tailrecursion_on()
-  {
-    opt_tailrecursion_ = true;
-  }
+  void optimize_tailrecursion_on() { opt_tailrecursion_ = true; }
 
   /**
    * Disable tail-recursion optimization.
@@ -525,11 +467,7 @@ public:
    * optimization removes important information from the
    * execution stack.
    */
-  void
-  optimize_tailrecursion_off()
-  {
-    opt_tailrecursion_ = false;
-  }
+  void optimize_tailrecursion_off() { opt_tailrecursion_ = false; }
 
   /**
    * True, if a stack backtrace should be shown on error.
@@ -542,11 +480,7 @@ public:
    * disturbing. So it is possible to switch this behavior on and
    * off.
    */
-  bool
-  show_backtrace() const
-  {
-    return show_backtrace_;
-  }
+  bool show_backtrace() const { return show_backtrace_; }
 
   /**
    * Switch stack backtrace on.
@@ -561,7 +495,6 @@ public:
    */
   void backtrace_on();
 
-
   /**
    * Switch stack backtrace off.
    * Whenever an error or stop is raised, the execution stack is
@@ -575,26 +508,13 @@ public:
    */
   void backtrace_off();
 
+  bool catch_errors() const { return catch_errors_; }
 
-  bool
-  catch_errors() const
-  {
-    return catch_errors_;
-  }
+  void catch_errors_on() { catch_errors_ = true; }
 
-  void
-  catch_errors_on()
-  {
-    catch_errors_ = true;
-  }
+  void catch_errors_off() { catch_errors_ = false; }
 
-  void
-  catch_errors_off()
-  {
-    catch_errors_ = false;
-  }
-
-  void stack_backtrace( int n );
+  void stack_backtrace(int n);
 
   /** Cause the SLI interpreter to raise an error.
    *  This function is used by classes derived from SLIFunction to raise
@@ -635,11 +555,7 @@ public:
    *  @see raiseerror(Name),
    *  raiseerror(Name,Name), raiseagain()
    */
-  void
-  raiseerror( const char* err )
-  {
-    raiseerror( Name( err ) );
-  }
+  void raiseerror(const char *err) { raiseerror(Name(err)); }
 
   /** Cause the SLI interpreter to raise an error.
    *  This function is used by classes derived from SLIFunction to raise
@@ -679,7 +595,7 @@ public:
    *  @see raiseerror(const char*),
    *  raiseerror(Name,Name), raiseagain()
    */
-  void raiseerror( Name err );
+  void raiseerror(Name err);
 
   /**
    * Handle exceptions thrown by any execute().
@@ -691,7 +607,7 @@ public:
    *   derived from SLIException.
    * - handling is forwarded to raiserror(Name, Name).
    */
-  void raiseerror( std::exception& err );
+  void raiseerror(std::exception &err);
 
   /** Cause the SLI interpreter to raise an error.
    *  This function is used by classes derived from SLIFunction to raise
@@ -730,7 +646,7 @@ public:
    *  @see raiseerror(const char*), raiseerror(Name),
    *  raiseagain()
    */
-  void raiseerror( Name cmd, Name err );
+  void raiseerror(Name cmd, Name err);
 
   /** Print a description of a raised error.
    *  The errordict members errorname, command and message together
@@ -744,7 +660,7 @@ public:
    *  @see raiseerror(const char*), raiseerror(Name),
    *  raiseerror(Name,Name)
    */
-  void print_error( Token cmd );
+  void print_error(Token cmd);
 
   /** Re-raise the last error.
    *  raiseagain re-raises a previously raised error. This is useful
@@ -756,15 +672,14 @@ public:
    *  @see raiseerror(const char*), raiseerror(Name),
    *  raiseerror(Name,Name)
    */
-  void raiseagain( void );
+  void raiseagain(void);
 
   /** TO BE DOCUMENTED.
    *  @todo Document this function.
    *
    *  @ingroup SLIError
    */
-  void raisesignal( int );
-
+  void raisesignal(int);
 
   // Message loging mechanism
 
@@ -776,7 +691,7 @@ public:
    *  error(), fatal()
    *  @ingroup SLIMessaging
    */
-  void verbosity( int );
+  void verbosity(int);
 
   /** Retrieve the current verbosity level of the SLI messaging mechanism.
    *  Only messages having an error level that is equal to or greater
@@ -801,7 +716,7 @@ public:
    *  error(), fatal()
    *  @ingroup SLIMessaging
    */
-  int verbosity( void ) const;
+  int verbosity(void) const;
 
   /** Display a message.
    *  @param level  The error level that shall be associated with the
@@ -831,37 +746,26 @@ public:
    *  @see verbosity(void), verbosity(int)
    *  @ingroup SLIMessaging
    */
-  void message( int level,
-    const char from[],
-    const char text[],
-    const char errorname[] = "" ) const;
+  void message(int level, const char from[], const char text[],
+               const char errorname[] = "") const;
 
   /** Function used by the message(int, const char*, const char*) function.
    *  Prints a message to the specified output stream.
    *  @param out        output stream
    *  @param levelname  name associated with input level
    */
-  void message( std::ostream& out,
-    const char levelname[],
-    const char from[],
-    const char text[],
-    const char errorname[] = "" ) const;
+  void message(std::ostream &out, const char levelname[], const char from[],
+               const char text[], const char errorname[] = "") const;
 
-  void terminate( int returnvalue = -1 );
+  void terminate(int returnvalue = -1);
 
   //*******************************************************
-  Name getcurrentname( void ) const;
+  Name getcurrentname(void) const;
 
-  unsigned long
-  cycles( void ) const
-  {
-    return cycle_count;
-  }
+  unsigned long cycles(void) const { return cycle_count; }
 
-
-  template < class T >
-  void addmodule( void );
-  void addmodule( SLIModule* );
+  template <class T> void addmodule(void);
+  void addmodule(SLIModule *);
 
   /*
    * Add a linked user module to the interpreter.
@@ -869,17 +773,17 @@ public:
    * by sli-init.sli after all C++ initialization is done.
    * Do not use this for modules loaded at runtime!
    */
-  void addlinkedusermodule( SLIModule* );
+  void addlinkedusermodule(SLIModule *);
 
-  FunctionDatum* Ilookup( void ) const;
-  FunctionDatum* Iiterate( void ) const;
+  FunctionDatum *Ilookup(void) const;
+  FunctionDatum *Iiterate(void) const;
 
   /**
    * Throw StackUnderflow exception if too few elements on stack.
    * @param n Minimum number of elements required on stack.
    * @throw StackUnderflow if fewer that @c n elements on stack.
    */
-  void assert_stack_load( size_t n );
+  void assert_stack_load(size_t n);
 };
 
 // This function template is a workaround for the parameterless
@@ -889,31 +793,19 @@ public:
 // engine.addmodule<ModuleX>();
 // (Stroustrup97), Sec 13.3.1 (p335)
 
-template < class T >
-void
-addmodule( SLIInterpreter& i )
-{
-  i.addmodule( new T );
+template <class T> void addmodule(SLIInterpreter &i) { i.addmodule(new T); }
+
+template <class T> void SLIInterpreter::addmodule(void) {
+  SLIModule *m = new T();
+
+  modules.push_back(m);
+  m->install(std::cout, this);
 }
 
-template < class T >
-void
-SLIInterpreter::addmodule( void )
-{
-  SLIModule* m = new T();
-
-  modules.push_back( m );
-  m->install( std::cout, this );
-}
-
-inline void
-SLIInterpreter::assert_stack_load( size_t n )
-{
-  if ( OStack.load() < n )
-  {
-    throw StackUnderflow( n, OStack.load() );
+inline void SLIInterpreter::assert_stack_load(size_t n) {
+  if (OStack.load() < n) {
+    throw StackUnderflow(n, OStack.load());
   }
 }
-
 
 #endif

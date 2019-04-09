@@ -29,85 +29,58 @@
 // Includes from sli:
 #include "slifunction.h"
 
-class DatatypeFunction : public SLIFunction
-{
+class DatatypeFunction : public SLIFunction {
 public:
-  DatatypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  DatatypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class NametypeFunction : public SLIFunction
-{
+class NametypeFunction : public SLIFunction {
 public:
-  NametypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  NametypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ProceduretypeFunction : public SLIFunction
-{
+class ProceduretypeFunction : public SLIFunction {
 public:
-  ProceduretypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ProceduretypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class LitproceduretypeFunction : public SLIFunction
-{
+class LitproceduretypeFunction : public SLIFunction {
 public:
-  LitproceduretypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  LitproceduretypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class FunctiontypeFunction : public SLIFunction
-{
+class FunctiontypeFunction : public SLIFunction {
 public:
-  FunctiontypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  FunctiontypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class CallbacktypeFunction : public SLIFunction
-{
+class CallbacktypeFunction : public SLIFunction {
 public:
-  CallbacktypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  CallbacktypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class XIstreamtypeFunction : public SLIFunction
-{
+class XIstreamtypeFunction : public SLIFunction {
 public:
-  XIstreamtypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  XIstreamtypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class XIfstreamtypeFunction : public SLIFunction
-{
+class XIfstreamtypeFunction : public SLIFunction {
 public:
-  XIfstreamtypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  XIfstreamtypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class TrietypeFunction : public SLIFunction
-{
+class TrietypeFunction : public SLIFunction {
 public:
-  TrietypeFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  TrietypeFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
 #endif

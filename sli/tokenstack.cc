@@ -25,19 +25,14 @@
     tokenstack.cc
 */
 
-
-void
-TokenStack::dump( std::ostream& out ) const
-{
+void TokenStack::dump(std::ostream &out) const {
   out << '\n';
   out << " --> ";
-  for ( Index i = 0; i < load(); i++ )
-  {
-    if ( i != 0 )
-    {
+  for (Index i = 0; i < load(); i++) {
+    if (i != 0) {
       out << "     ";
     }
-    pick( i ).pprint( out );
+    pick(i).pprint(out);
     out << '\n';
   }
   out << "   "

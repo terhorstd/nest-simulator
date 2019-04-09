@@ -67,7 +67,6 @@
 #include <strstream>
 #endif
 
-
 /** @BeginDocumentation
 Name: backtrace_on - enable stack backtrace on error.
 
@@ -87,9 +86,7 @@ Example:
 SeeAlso:
 backtrace_off
 */
-void
-Backtrace_onFunction::execute( SLIInterpreter* i ) const
-{
+void Backtrace_onFunction::execute(SLIInterpreter *i) const {
   i->backtrace_on();
   i->EStack.pop();
 }
@@ -106,26 +103,20 @@ stack and re-enables tail recursion optimization.
 SeeAlso: backtrace_on
 
 */
-void
-Backtrace_offFunction::execute( SLIInterpreter* i ) const
-{
+void Backtrace_offFunction::execute(SLIInterpreter *i) const {
   i->backtrace_off();
   i->EStack.pop();
 }
 
-void
-OStackdumpFunction::execute( SLIInterpreter* i ) const
-{
+void OStackdumpFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop(); // never forget me!!
 
-  i->OStack.dump( std::cout );
+  i->OStack.dump(std::cout);
 }
-void
-EStackdumpFunction::execute( SLIInterpreter* i ) const
-{
+void EStackdumpFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop(); // never forget me!!
 
-  i->EStack.dump( std::cout );
+  i->EStack.dump(std::cout);
 }
 /** @BeginDocumentation
 Name: loop - repeatedly execute a procedure
@@ -142,25 +133,21 @@ Description:
 
 SeeAlso: exit, repeat, for, forall, forallindexed, Map
 */
-void
-LoopFunction::execute( SLIInterpreter* i ) const
-{
-  if ( i->OStack.load() == 0 )
-  {
-    i->raiseerror( i->StackUnderflowError );
+void LoopFunction::execute(SLIInterpreter *i) const {
+  if (i->OStack.load() == 0) {
+    i->raiseerror(i->StackUnderflowError);
     return;
   }
-  if ( not dynamic_cast< ProcedureDatum* >( i->OStack.top().datum() ) )
-  {
-    i->raiseerror( i->ArgumentTypeError );
+  if (not dynamic_cast<ProcedureDatum *>(i->OStack.top().datum())) {
+    i->raiseerror(i->ArgumentTypeError);
     return;
   }
 
   i->EStack.pop();
-  i->EStack.push_by_ref( i->baselookup( i->mark_name ) );
-  i->EStack.push_move( i->OStack.top() );
-  i->EStack.push_by_pointer( new IntegerDatum( 0 ) );
-  i->EStack.push_by_ref( i->baselookup( i->iloop_name ) );
+  i->EStack.push_by_ref(i->baselookup(i->mark_name));
+  i->EStack.push_move(i->OStack.top());
+  i->EStack.push_by_pointer(new IntegerDatum(0));
+  i->EStack.push_by_ref(i->baselookup(i->iloop_name));
   i->inc_call_depth();
   i->OStack.pop();
 }
@@ -174,25 +161,21 @@ Description: exit can be used to leave loop structures
 
 Remarks: This command does not exit the SLI interpreter! Use quit instead.
 */
-void
-ExitFunction::execute( SLIInterpreter* i ) const
-{
+void ExitFunction::execute(SLIInterpreter *i) const {
 
-  static Token mark = i->baselookup( i->mark_name );
+  static Token mark = i->baselookup(i->mark_name);
 
   size_t n = 1;
   size_t load = i->EStack.load();
-  while ( ( load > n ) && not( i->EStack.pick( n++ ) == mark ) )
-  {
+  while ((load > n) && not(i->EStack.pick(n++) == mark)) {
     // do nothing
   }
-  if ( n >= load )
-  {
-    i->raiseerror( "EStackUnderflow" );
+  if (n >= load) {
+    i->raiseerror("EStackUnderflow");
     return;
   }
   i->dec_call_depth();
-  i->EStack.pop( n );
+  i->EStack.pop(n);
 }
 
 /** @BeginDocumentation
@@ -213,35 +196,27 @@ Examples:  1 0 gt { (1 > 0) = } if -> (1 > 0)
 
 SeeAlso: ifelse
 */
-void
-IfFunction::execute( SLIInterpreter* i ) const
-{
+void IfFunction::execute(SLIInterpreter *i) const {
   // OStack: bool proc
   //          1    0
-  BoolDatum* test;
-  if ( ( i->OStack.load() >= 2 ) )
-  {
+  BoolDatum *test;
+  if ((i->OStack.load() >= 2)) {
     i->EStack.pop();
-    test = dynamic_cast< BoolDatum* >( i->OStack.pick( 1 ).datum() );
-    if ( not test )
-    {
-      throw TypeMismatch( "booltype", "something else" );
+    test = dynamic_cast<BoolDatum *>(i->OStack.pick(1).datum());
+    if (not test) {
+      throw TypeMismatch("booltype", "something else");
     }
 
-    if ( test->get() )
-    {
-      if ( i->step_mode() )
-      {
+    if (test->get()) {
+      if (i->step_mode()) {
         std::cerr << "if:"
                   << " Executing true branch." << std::endl;
       }
-      i->EStack.push_move( i->OStack.top() );
+      i->EStack.push_move(i->OStack.top());
     }
-    i->OStack.pop( 2 );
-  }
-  else
-  {
-    throw StackUnderflow( 2, i->OStack.load() );
+    i->OStack.pop(2);
+  } else {
+    throw StackUnderflow(2, i->OStack.load());
   }
 }
 
@@ -266,46 +241,37 @@ Examples:
 
 SeeAlso: if
 */
-void
-IfelseFunction::execute( SLIInterpreter* i ) const
-{
+void IfelseFunction::execute(SLIInterpreter *i) const {
   // OStack: bool tproc fproc
   //          2    1      0
-  BoolDatum* test;
+  BoolDatum *test;
 
-  if ( i->OStack.load() < 3 )
-  {
-    throw StackUnderflow( 3, i->OStack.load() );
+  if (i->OStack.load() < 3) {
+    throw StackUnderflow(3, i->OStack.load());
   }
 
   i->EStack.pop();
 
-  test = dynamic_cast< BoolDatum* >( i->OStack.pick( 2 ).datum() );
-  if ( not test )
-  {
-    throw TypeMismatch( "booltype", "something else" );
+  test = dynamic_cast<BoolDatum *>(i->OStack.pick(2).datum());
+  if (not test) {
+    throw TypeMismatch("booltype", "something else");
   }
 
-  if ( test->get() )
-  {
-    if ( i->step_mode() )
-    {
+  if (test->get()) {
+    if (i->step_mode()) {
       std::cerr << "ifelse:"
                 << " Executing true branch." << std::endl;
     }
-    i->EStack.push_move( i->OStack.pick( 1 ) );
-  }
-  else
-  {
-    if ( i->step_mode() )
-    {
+    i->EStack.push_move(i->OStack.pick(1));
+  } else {
+    if (i->step_mode()) {
       std::cerr << "ifelse:"
                 << " Executing false branch." << std::endl;
     }
-    i->EStack.push_move( i->OStack.pick( 0 ) );
+    i->EStack.push_move(i->OStack.pick(0));
   }
 
-  i->OStack.pop( 3 );
+  i->OStack.pop(3);
 }
 
 /** @BeginDocumentation
@@ -329,43 +295,34 @@ SLI ]
 
 SeeAlso: for, loop, exit
 */
-void
-RepeatFunction::execute( SLIInterpreter* i ) const
-{
+void RepeatFunction::execute(SLIInterpreter *i) const {
 
   // level  1  0
   // stack: n proc repeat
-  if ( i->OStack.load() >= 2 )
-  {
+  if (i->OStack.load() >= 2) {
     i->EStack.pop();
 
-    ProcedureDatum* proc =
-      dynamic_cast< ProcedureDatum* >( i->OStack.top().datum() );
-    if ( proc )
-    {
-      IntegerDatum* id =
-        dynamic_cast< IntegerDatum* >( i->OStack.pick( 1 ).datum() );
-      if ( id == 0 )
-      {
-        throw ArgumentType( 1 );
+    ProcedureDatum *proc =
+        dynamic_cast<ProcedureDatum *>(i->OStack.top().datum());
+    if (proc) {
+      IntegerDatum *id =
+          dynamic_cast<IntegerDatum *>(i->OStack.pick(1).datum());
+      if (id == 0) {
+        throw ArgumentType(1);
       }
 
-      i->EStack.push_by_ref( i->baselookup( i->mark_name ) );
-      i->EStack.push_move( i->OStack.pick( 1 ) );
-      i->EStack.push_move( i->OStack.pick( 0 ) );
-      i->EStack.push_by_pointer( new IntegerDatum( proc->size() ) );
-      i->EStack.push_by_ref( i->baselookup( i->irepeat_name ) );
+      i->EStack.push_by_ref(i->baselookup(i->mark_name));
+      i->EStack.push_move(i->OStack.pick(1));
+      i->EStack.push_move(i->OStack.pick(0));
+      i->EStack.push_by_pointer(new IntegerDatum(proc->size()));
+      i->EStack.push_by_ref(i->baselookup(i->irepeat_name));
       i->inc_call_depth();
-      i->OStack.pop( 2 );
+      i->OStack.pop(2);
+    } else {
+      throw ArgumentType(0);
     }
-    else
-    {
-      throw ArgumentType( 0 );
-    }
-  }
-  else
-  {
-    throw StackUnderflow( 2, i->OStack.load() );
+  } else {
+    throw StackUnderflow(2, i->OStack.load());
   }
 }
 
@@ -401,17 +358,14 @@ References:   The Red Book, sec. 3.10
 
 SeeAlso: stop, raiseerror
 */
-void
-StoppedFunction::execute( SLIInterpreter* i ) const
-{
-  if ( i->OStack.load() == 0 )
-  {
-    throw StackUnderflow( 1, i->OStack.load() );
+void StoppedFunction::execute(SLIInterpreter *i) const {
+  if (i->OStack.load() == 0) {
+    throw StackUnderflow(1, i->OStack.load());
   }
 
   i->EStack.pop();
-  i->EStack.push_by_pointer( new NameDatum( i->istopped_name ) );
-  i->EStack.push_move( i->OStack.top() );
+  i->EStack.push_by_pointer(new NameDatum(i->istopped_name));
+  i->EStack.push_move(i->OStack.top());
   i->OStack.pop();
 }
 
@@ -435,64 +389,53 @@ References: The Red Book, sec. 3.10
 
 SeeAlso: stopped, raiseerror
 */
-void
-StopFunction::execute( SLIInterpreter* i ) const
-{
+void StopFunction::execute(SLIInterpreter *i) const {
 
   size_t load = i->EStack.load();
-  NameDatum istopped( i->istopped_name );
+  NameDatum istopped(i->istopped_name);
 
   bool found = false;
   size_t n = 1;
 
-  while ( ( load > n ) && not( found ) )
-  {
-    found = i->EStack.pick( n++ ).contains( istopped );
+  while ((load > n) && not(found)) {
+    found = i->EStack.pick(n++).contains(istopped);
   }
 
-  if ( i->catch_errors() && not found )
-  {
+  if (i->catch_errors() && not found) {
     i->debug_mode_on();
   }
 
-  if ( i->get_debug_mode() || i->show_backtrace() )
-  {
-    if ( i->show_backtrace() || not found )
-    {
-      i->stack_backtrace( load - 1 );
+  if (i->get_debug_mode() || i->show_backtrace()) {
+    if (i->show_backtrace() || not found) {
+      i->stack_backtrace(load - 1);
     }
 
     std::cerr << "In stop: An error or stop was raised."
               << " Unrolling stack by " << n << " levels." << std::endl;
-    if ( not found )
-    {
+    if (not found) {
       std::cerr << "No 'stopped' context found." << std::endl
                 << "Stack unrolling will erase the execution stack."
                 << std::endl
                 << "Entering debug mode. Type '?' for help." << std::endl;
     }
 
-    if ( i->get_debug_mode() )
-    {
-      char c = i->debug_commandline( i->EStack.top() );
-      if ( c == 'i' ) // in interactive mode, we leave the stack as it is.
+    if (i->get_debug_mode()) {
+      char c = i->debug_commandline(i->EStack.top());
+      if (c == 'i') // in interactive mode, we leave the stack as it is.
       {
         return;
       }
     }
   }
-  if ( found )
-  {
-    i->OStack.push( true );
-  }
-  else
-  {
-    i->message( 30, "stop", "No stopped context was found! \n" );
+  if (found) {
+    i->OStack.push(true);
+  } else {
+    i->message(30, "stop", "No stopped context was found! \n");
     i->EStack.clear();
     return;
   }
 
-  i->EStack.pop( n );
+  i->EStack.pop(n);
 }
 
 /** @BeginDocumentation
@@ -502,61 +445,52 @@ Name: closeinput - Close current input file.
 FirstVersion: 25 Jul 2005, Gewaltig
 */
 
-void
-CloseinputFunction::execute( SLIInterpreter* i ) const
-{
+void CloseinputFunction::execute(SLIInterpreter *i) const {
   size_t load = i->EStack.load();
 
   bool found = false;
   size_t n = 1;
 
-  while ( ( load > n ) && not( found ) )
-  {
-    found = i->EStack.pick( n++ )->isoftype( SLIInterpreter::XIstreamtype );
+  while ((load > n) && not(found)) {
+    found = i->EStack.pick(n++)->isoftype(SLIInterpreter::XIstreamtype);
   }
 
-  if ( i->catch_errors() || not found )
-  {
+  if (i->catch_errors() || not found) {
     i->debug_mode_on();
   }
 
-  if ( i->get_debug_mode() || i->show_backtrace() )
-  {
-    if ( i->show_backtrace() || not found )
-    {
-      i->stack_backtrace( n );
+  if (i->get_debug_mode() || i->show_backtrace()) {
+    if (i->show_backtrace() || not found) {
+      i->stack_backtrace(n);
     }
 
     std::cerr << "In closeinput: Termination of input file requested."
               << " Unrolling stack by " << n << " levels." << std::endl;
-    if ( not found )
-    {
+    if (not found) {
       std::cerr << "In closeinput: No active input file was found." << std::endl
                 << "Stack unrolling will erase the execution stack."
                 << std::endl
                 << "Entering debug mode. Type '?' for help." << std::endl;
     }
 
-    if ( i->get_debug_mode() )
-    {
-      char c = i->debug_commandline( i->EStack.top() );
-      if ( c == 'i' ) // in interactive mode, we leave the stack as it is.
+    if (i->get_debug_mode()) {
+      char c = i->debug_commandline(i->EStack.top());
+      if (c == 'i') // in interactive mode, we leave the stack as it is.
       {
         return;
       }
     }
   }
 
-  if ( not found )
-  {
-    i->message(
-      30, "closeinput", "No active input file was found. \n  Restarting..." );
+  if (not found) {
+    i->message(30, "closeinput",
+               "No active input file was found. \n  Restarting...");
     i->EStack.clear();
-    i->EStack.push( i->baselookup( Name( "start" ) ) );
+    i->EStack.push(i->baselookup(Name("start")));
     return;
   }
 
-  i->EStack.pop( n );
+  i->EStack.pop(n);
 }
 
 /** @BeginDocumentation
@@ -589,52 +523,40 @@ Note:
  this information. In this case currentname fails, i.e. it will always
  return false
 */
-void
-CurrentnameFunction::execute( SLIInterpreter* i ) const
-{
+void CurrentnameFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
   size_t n = 0; // skip my own name
   size_t load = i->EStack.load();
 
   // top level %%lookup must belong to currentname, so
   // remove it and the name.
-  if ( i->EStack.top() == i->baselookup( i->ilookup_name ) )
-  {
-    assert( load > 2 );
+  if (i->EStack.top() == i->baselookup(i->ilookup_name)) {
+    assert(load > 2);
     n += 2;
   }
 
   bool found = false;
 
-  while ( ( load > n ) && not found )
-  {
-    found = i->EStack.pick( n++ ) == i->baselookup( i->ilookup_name );
+  while ((load > n) && not found) {
+    found = i->EStack.pick(n++) == i->baselookup(i->ilookup_name);
   }
 
-  if ( found )
-  {
-    i->OStack.push( i->EStack.pick( n ) );
-    i->OStack.push( true );
-  }
-  else
-  {
-    i->EStack.push( false );
+  if (found) {
+    i->OStack.push(i->EStack.pick(n));
+    i->OStack.push(true);
+  } else {
+    i->EStack.push(false);
   }
 }
 
-void
-IparsestdinFunction::execute( SLIInterpreter* i ) const
-{
+void IparsestdinFunction::execute(SLIInterpreter *i) const {
   Token t;
 
-  i->parse->readToken( std::cin, t );
-  if ( t.contains( i->parse->scan()->EndSymbol ) )
-  {
+  i->parse->readToken(std::cin, t);
+  if (t.contains(i->parse->scan()->EndSymbol)) {
     i->EStack.pop();
-  }
-  else
-  {
-    i->EStack.push_move( t );
+  } else {
+    i->EStack.push_move(t);
   }
 }
 
@@ -646,77 +568,58 @@ the standard input stream (cin) until an end-of-file symbol is excountered
 or the command exit is executed.
 
 */
-void
-ParsestdinFunction::execute( SLIInterpreter* i ) const
-{
+void ParsestdinFunction::execute(SLIInterpreter *i) const {
   Token t;
 
-  i->parse->readToken( std::cin, t );
-  if ( t.contains( i->parse->scan()->EndSymbol ) )
-  {
+  i->parse->readToken(std::cin, t);
+  if (t.contains(i->parse->scan()->EndSymbol)) {
     i->EStack.pop();
-  }
-  else
-  {
+  } else {
     i->EStack.pop();
-    i->EStack.push_move( t );
+    i->EStack.push_move(t);
   }
 }
 
-void
-IparseFunction::execute( SLIInterpreter* i ) const
-{
+void IparseFunction::execute(SLIInterpreter *i) const {
 
   // Estack: handle  iparse
   // pick      1         0
 
-  XIstreamDatum* is =
-    dynamic_cast< XIstreamDatum* >( i->EStack.pick( 1 ).datum() );
-  assert( is );
-  assert( is->valid() );
+  XIstreamDatum *is = dynamic_cast<XIstreamDatum *>(i->EStack.pick(1).datum());
+  assert(is);
+  assert(is->valid());
 
   Token t;
-  if ( i->parse->readToken( **is, t ) )
-  {
-    if ( t.contains( i->parse->scan()->EndSymbol ) )
-    {
-      i->EStack.pop( 2 );
+  if (i->parse->readToken(**is, t)) {
+    if (t.contains(i->parse->scan()->EndSymbol)) {
+      i->EStack.pop(2);
+    } else {
+      i->EStack.push_move(t);
     }
-    else
-    {
-      i->EStack.push_move( t );
-    }
-  }
-  else
-  {
+  } else {
     i->EStack.swap();
     i->EStack.pop(); // remove stream-token
-    i->raiseerror( "SyntaxError" );
+    i->raiseerror("SyntaxError");
     return;
   }
 }
 
-void
-DefFunction::execute( SLIInterpreter* i ) const
-{
+void DefFunction::execute(SLIInterpreter *i) const {
   // Def should also check the "writeable" Flag of the
   // name!
-  if ( i->OStack.load() < 2 )
-  {
-    throw StackUnderflow( 2, i->OStack.load() );
+  if (i->OStack.load() < 2) {
+    throw StackUnderflow(2, i->OStack.load());
   }
 
-  LiteralDatum* nd =
-    dynamic_cast< LiteralDatum* >( i->OStack.pick( 1 ).datum() );
-  if ( not nd )
-  {
-    throw ArgumentType( 1 );
+  LiteralDatum *nd = dynamic_cast<LiteralDatum *>(i->OStack.pick(1).datum());
+  if (not nd) {
+    throw ArgumentType(1);
   }
 
   // if(nd->writeable())
   // {
-  i->def_move( *nd, i->OStack.top() );
-  i->OStack.pop( 2 );
+  i->def_move(*nd, i->OStack.top());
+  i->OStack.pop(2);
   i->EStack.pop();
   // }
   // else   // Name was write Protected: OStack is left untouched!
@@ -754,24 +657,20 @@ Examples:
 
 SeeAlso: def, undef, begin, end
 */
-void
-SetFunction::execute( SLIInterpreter* i ) const
-{
-  if ( i->OStack.load() < 2 )
-  {
-    throw StackUnderflow( 2, i->OStack.load() );
+void SetFunction::execute(SLIInterpreter *i) const {
+  if (i->OStack.load() < 2) {
+    throw StackUnderflow(2, i->OStack.load());
   }
 
-  LiteralDatum* nd = dynamic_cast< LiteralDatum* >( i->OStack.top().datum() );
-  if ( not nd )
-  {
-    throw ArgumentType( 0 );
+  LiteralDatum *nd = dynamic_cast<LiteralDatum *>(i->OStack.top().datum());
+  if (not nd) {
+    throw ArgumentType(0);
   }
 
   // if(nd->writeable())
   //   {
-  i->def_move( *nd, i->OStack.pick( 1 ) );
-  i->OStack.pop( 2 );
+  i->def_move(*nd, i->OStack.pick(1));
+  i->OStack.pop(2);
   i->EStack.pop();
   //   }
   // else   // Name was write Protected: OStack is left untouched!
@@ -794,31 +693,25 @@ Description: Load tries to find an association for /name in each dictionary
 
 SeeAlso: lookup, def
 */
-void
-LoadFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void LoadFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-  LiteralDatum* name = dynamic_cast< LiteralDatum* >( i->OStack.top().datum() );
-  if ( not name )
-  {
-    i->raiseerror( i->ArgumentTypeError );
+  LiteralDatum *name = dynamic_cast<LiteralDatum *>(i->OStack.top().datum());
+  if (not name) {
+    i->raiseerror(i->ArgumentTypeError);
     return;
   }
 
-  Token contents = i->lookup( *name );
-  if ( contents.datum() )
-  {
+  Token contents = i->lookup(*name);
+  if (contents.datum()) {
     i->OStack.pop();
-    i->OStack.push_move( contents );
+    i->OStack.push_move(contents);
     i->EStack.pop();
-  }
-  else
-  {
-    Name myname( i->getcurrentname() );
+  } else {
+    Name myname(i->getcurrentname());
     i->EStack.pop();
 
-    i->raiseerror( myname, i->UndefinedNameError );
+    i->raiseerror(myname, i->UndefinedNameError);
   }
 }
 
@@ -836,38 +729,30 @@ Description: lookup tries to find an association for /name in each dictionary
 
 SeeAlso: load, def
 */
-void
-LookupFunction::execute( SLIInterpreter* i ) const
-{
+void LookupFunction::execute(SLIInterpreter *i) const {
 
-  if ( i->OStack.load() < 1 )
-  {
-    i->raiseerror( i->StackUnderflowError );
+  if (i->OStack.load() < 1) {
+    i->raiseerror(i->StackUnderflowError);
     return;
   }
 
-  LiteralDatum* name = dynamic_cast< LiteralDatum* >( i->OStack.top().datum() );
-  if ( not name )
-  {
-    i->raiseerror( i->ArgumentTypeError );
+  LiteralDatum *name = dynamic_cast<LiteralDatum *>(i->OStack.top().datum());
+  if (not name) {
+    i->raiseerror(i->ArgumentTypeError);
     return;
   }
 
   i->EStack.pop();
 
-  Token contents = i->lookup( *name );
+  Token contents = i->lookup(*name);
   i->OStack.pop();
-  if ( contents.datum() )
-  {
-    i->OStack.push_move( contents );
-    i->OStack.push( true );
-  }
-  else
-  {
-    i->OStack.push( false );
+  if (contents.datum()) {
+    i->OStack.push_move(contents);
+    i->OStack.push(true);
+  } else {
+    i->OStack.push(false);
   }
 }
-
 
 /** @BeginDocumentation
 Name: for - execute a procedure for a sequence of numbers
@@ -899,23 +784,21 @@ SLI ]
 
 SeeAlso: repeat, exit, loop
 */
-void
-ForFunction::execute( SLIInterpreter* i ) const
-{
+void ForFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  ProcedureDatum* proc =
-    dynamic_cast< ProcedureDatum* >( i->OStack.top().datum() );
-  assert( proc );
+  ProcedureDatum *proc =
+      dynamic_cast<ProcedureDatum *>(i->OStack.top().datum());
+  assert(proc);
 
-  i->EStack.push_by_ref( i->baselookup( i->mark_name ) );
-  i->EStack.push_move( i->OStack.pick( 2 ) ); // increment
-  i->EStack.push_move( i->OStack.pick( 1 ) ); // limit
-  i->EStack.push_move( i->OStack.pick( 3 ) ); // initial as counter
-  i->EStack.push_move( i->OStack.pick( 0 ) ); // procedure
-  i->EStack.push_by_pointer( new IntegerDatum( proc->size() ) );
-  i->EStack.push_by_ref( i->baselookup( i->ifor_name ) ); // %for
+  i->EStack.push_by_ref(i->baselookup(i->mark_name));
+  i->EStack.push_move(i->OStack.pick(2)); // increment
+  i->EStack.push_move(i->OStack.pick(1)); // limit
+  i->EStack.push_move(i->OStack.pick(3)); // initial as counter
+  i->EStack.push_move(i->OStack.pick(0)); // procedure
+  i->EStack.push_by_pointer(new IntegerDatum(proc->size()));
+  i->EStack.push_by_ref(i->baselookup(i->ifor_name)); // %for
   i->inc_call_depth();
-  i->OStack.pop( 4 );
+  i->OStack.pop(4);
 }
 
 /** @BeginDocumentation
@@ -978,51 +861,44 @@ ForFunction::execute( SLIInterpreter* i ) const
 /*  call: obj proc forall     */
 /*  pick   1    0             */
 /******************************/
-void
-Forall_aFunction::execute( SLIInterpreter* i ) const
-{
-  static Token mark( i->baselookup( i->mark_name ) );
-  static Token forall( i->baselookup( i->iforallarray_name ) );
+void Forall_aFunction::execute(SLIInterpreter *i) const {
+  static Token mark(i->baselookup(i->mark_name));
+  static Token forall(i->baselookup(i->iforallarray_name));
 
-  ProcedureDatum* proc =
-    static_cast< ProcedureDatum* >( i->OStack.top().datum() );
-  assert( proc );
+  ProcedureDatum *proc = static_cast<ProcedureDatum *>(i->OStack.top().datum());
+  assert(proc);
 
   i->EStack.pop();
-  i->EStack.push_by_ref( mark );
-  i->EStack.push_move( i->OStack.pick( 1 ) );         // push object
-  i->EStack.push_by_pointer( new IntegerDatum( 0 ) ); // push array counter
-  i->EStack.push_by_ref( i->OStack.pick( 0 ) );       // push procedure
+  i->EStack.push_by_ref(mark);
+  i->EStack.push_move(i->OStack.pick(1));         // push object
+  i->EStack.push_by_pointer(new IntegerDatum(0)); // push array counter
+  i->EStack.push_by_ref(i->OStack.pick(0));       // push procedure
   // push procedure counter
-  i->EStack.push_by_pointer( new IntegerDatum( proc->size() ) );
-  i->EStack.push_by_ref( forall );
-  i->OStack.pop( 2 );
+  i->EStack.push_by_pointer(new IntegerDatum(proc->size()));
+  i->EStack.push_by_ref(forall);
+  i->OStack.pop(2);
   i->inc_call_depth();
 }
-
 
 /******************************/
 /* forall_iter                */
 /*  call: obj proc forall     */
 /*  pick   1    0             */
 /******************************/
-void
-Forall_iterFunction::execute( SLIInterpreter* i ) const
-{
+void Forall_iterFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  ProcedureDatum* proc =
-    dynamic_cast< ProcedureDatum* >( i->OStack.top().datum() );
-  assert( proc );
+  ProcedureDatum *proc =
+      dynamic_cast<ProcedureDatum *>(i->OStack.top().datum());
+  assert(proc);
 
-  i->EStack.push( i->baselookup( i->mark_name ) );
-  i->EStack.push_move( i->OStack.pick( 1 ) ); // push iterator
-  i->EStack.push_move( i->OStack.pick( 0 ) ); // push procedure
+  i->EStack.push(i->baselookup(i->mark_name));
+  i->EStack.push_move(i->OStack.pick(1)); // push iterator
+  i->EStack.push_move(i->OStack.pick(0)); // push procedure
 
-  i->EStack.push( i->baselookup( i->iforalliter_name ) );
-  i->OStack.pop( 2 );
+  i->EStack.push(i->baselookup(i->iforalliter_name));
+  i->OStack.pop(2);
   i->inc_call_depth();
 }
-
 
 /** @BeginDocumentation
    Name: forallindexed - Call a procedure for each element of a list/string
@@ -1063,27 +939,25 @@ Forall_iterFunction::execute( SLIInterpreter* i ) const
 /*  call: obj proc forall     */
 /*  pick   1    0             */
 /******************************/
-void
-Forallindexed_aFunction::execute( SLIInterpreter* i ) const
-{
+void Forallindexed_aFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  ProcedureDatum* proc =
-    dynamic_cast< ProcedureDatum* >( i->OStack.top().datum() );
-  assert( proc );
+  ProcedureDatum *proc =
+      dynamic_cast<ProcedureDatum *>(i->OStack.top().datum());
+  assert(proc);
 
-  i->EStack.push( i->baselookup( i->mark_name ) );
-  i->EStack.push_move( i->OStack.pick( 1 ) ); // push object
+  i->EStack.push(i->baselookup(i->mark_name));
+  i->EStack.push_move(i->OStack.pick(1)); // push object
 
-  ArrayDatum* ad = dynamic_cast< ArrayDatum* >( i->EStack.top().datum() );
-  assert( ad );
+  ArrayDatum *ad = dynamic_cast<ArrayDatum *>(i->EStack.top().datum());
+  assert(ad);
 
-  i->EStack.push( ad->size() );               // push limit
-  i->EStack.push( 0 );                        // push initial counter
-  i->EStack.push_move( i->OStack.pick( 0 ) ); // push procedure
+  i->EStack.push(ad->size());             // push limit
+  i->EStack.push(0);                      // push initial counter
+  i->EStack.push_move(i->OStack.pick(0)); // push procedure
 
-  i->EStack.push( i->baselookup( i->iforallindexedarray_name ) );
+  i->EStack.push(i->baselookup(i->iforallindexedarray_name));
   i->inc_call_depth();
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
 }
 
 /******************************/
@@ -1091,27 +965,25 @@ Forallindexed_aFunction::execute( SLIInterpreter* i ) const
 /*  call: obj proc forall     */
 /*  pick   1    0             */
 /******************************/
-void
-Forallindexed_sFunction::execute( SLIInterpreter* i ) const
-{
+void Forallindexed_sFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  ProcedureDatum* proc =
-    dynamic_cast< ProcedureDatum* >( i->OStack.top().datum() );
-  assert( proc );
+  ProcedureDatum *proc =
+      dynamic_cast<ProcedureDatum *>(i->OStack.top().datum());
+  assert(proc);
 
-  i->EStack.push( i->baselookup( i->mark_name ) );
-  i->EStack.push_move( i->OStack.pick( 1 ) ); // push object
+  i->EStack.push(i->baselookup(i->mark_name));
+  i->EStack.push_move(i->OStack.pick(1)); // push object
 
-  StringDatum* sd = dynamic_cast< StringDatum* >( i->EStack.top().datum() );
-  assert( sd );
+  StringDatum *sd = dynamic_cast<StringDatum *>(i->EStack.top().datum());
+  assert(sd);
 
-  i->EStack.push( sd->size() );               // push limit
-  i->EStack.push( 0 );                        // push initial counter
-  i->EStack.push_move( i->OStack.pick( 0 ) ); // push procedure
+  i->EStack.push(sd->size());             // push limit
+  i->EStack.push(0);                      // push initial counter
+  i->EStack.push_move(i->OStack.pick(0)); // push procedure
 
-  i->EStack.push( i->baselookup( i->iforallindexedstring_name ) );
+  i->EStack.push(i->baselookup(i->iforallindexedstring_name));
   i->inc_call_depth();
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
 }
 
 /******************************/
@@ -1119,27 +991,25 @@ Forallindexed_sFunction::execute( SLIInterpreter* i ) const
 /*  call: obj proc forall     */
 /*  pick   1    0             */
 /******************************/
-void
-Forall_sFunction::execute( SLIInterpreter* i ) const
-{
+void Forall_sFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  ProcedureDatum* proc =
-    dynamic_cast< ProcedureDatum* >( i->OStack.top().datum() );
-  assert( proc );
+  ProcedureDatum *proc =
+      dynamic_cast<ProcedureDatum *>(i->OStack.top().datum());
+  assert(proc);
 
-  i->EStack.push( i->baselookup( i->mark_name ) );
-  i->EStack.push_move( i->OStack.pick( 1 ) ); // push object
+  i->EStack.push(i->baselookup(i->mark_name));
+  i->EStack.push_move(i->OStack.pick(1)); // push object
 
-  StringDatum* sd = dynamic_cast< StringDatum* >( i->EStack.top().datum() );
-  assert( sd );
+  StringDatum *sd = dynamic_cast<StringDatum *>(i->EStack.top().datum());
+  assert(sd);
 
-  i->EStack.push( new IntegerDatum( sd->size() ) ); // push limit
-  i->EStack.push( new IntegerDatum( 0 ) );          // push initial counter
-  i->EStack.push_move( i->OStack.pick( 0 ) );       // push procedure
+  i->EStack.push(new IntegerDatum(sd->size())); // push limit
+  i->EStack.push(new IntegerDatum(0));          // push initial counter
+  i->EStack.push_move(i->OStack.pick(0));       // push procedure
 
-  i->EStack.push( i->baselookup( i->iforallstring_name ) );
+  i->EStack.push(i->baselookup(i->iforallstring_name));
   i->inc_call_depth();
-  i->OStack.pop( 2 );
+  i->OStack.pop(2);
 }
 
 /** @BeginDocumentation
@@ -1191,9 +1061,7 @@ Forall_sFunction::execute( SLIInterpreter* i ) const
  SeeAlso: raiseagain, stop, stopped, errordict
 */
 
-void
-RaiseerrorFunction::execute( SLIInterpreter* i ) const
-{
+void RaiseerrorFunction::execute(SLIInterpreter *i) const {
   // pick :  2     1
   // call : /cmd /err raiseerror
 
@@ -1201,21 +1069,19 @@ RaiseerrorFunction::execute( SLIInterpreter* i ) const
   Token err;
   Token cmd;
 
-  i->OStack.pop_move( err );
-  i->OStack.pop_move( cmd );
+  i->OStack.pop_move(err);
+  i->OStack.pop_move(cmd);
 
-  Name* errorname = dynamic_cast< Name* >( err.datum() );
-  Name* cmdname = dynamic_cast< Name* >( cmd.datum() );
-  if ( ( not errorname ) || ( not cmdname ) )
-  {
-    i->message( SLIInterpreter::M_ERROR,
-      "raiseerror",
-      "Usage: /command /errorname raiserror" );
-    i->raiseerror( "ArgumentType" );
+  Name *errorname = dynamic_cast<Name *>(err.datum());
+  Name *cmdname = dynamic_cast<Name *>(cmd.datum());
+  if ((not errorname) || (not cmdname)) {
+    i->message(SLIInterpreter::M_ERROR, "raiseerror",
+               "Usage: /command /errorname raiserror");
+    i->raiseerror("ArgumentType");
     return;
   }
 
-  i->raiseerror( *cmdname, *errorname );
+  i->raiseerror(*cmdname, *errorname);
 }
 
 /** @BeginDocumentation
@@ -1242,15 +1108,13 @@ RaiseerrorFunction::execute( SLIInterpreter* i ) const
  SeeAlso: handleerror, raiseerror, raiseagain, stop, stopped, errordict
 */
 
-void
-PrinterrorFunction::execute( SLIInterpreter* i ) const
-{
+void PrinterrorFunction::execute(SLIInterpreter *i) const {
   // The name of the command that raised the error should be
   // placed at the top of the OStack.
-  i->assert_stack_load( 1 );
+  i->assert_stack_load(1);
 
   // Call print_error function.
-  i->print_error( i->OStack.top() );
+  i->print_error(i->OStack.top());
 
   i->OStack.pop();
   i->EStack.pop();
@@ -1276,9 +1140,7 @@ PrinterrorFunction::execute( SLIInterpreter* i ) const
  SeeAlso: raiseerror, stop, stopped, errordict
 */
 
-void
-RaiseagainFunction::execute( SLIInterpreter* i ) const
-{
+void RaiseagainFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
   i->raiseagain();
 }
@@ -1288,33 +1150,26 @@ Name: cycles - return the number of elapsed interpreter cycles
 
 Synopsis: cycles -> n
 */
-void
-CyclesFunction::execute( SLIInterpreter* i ) const
-{
+void CyclesFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  Token cycles( new IntegerDatum( i->cycles() ) );
+  Token cycles(new IntegerDatum(i->cycles()));
 
-  i->OStack.push( cycles );
+  i->OStack.push(cycles);
 }
 
-void
-CodeAccessedFunction::execute( SLIInterpreter* i ) const
-{
+void CodeAccessedFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  Token c( new IntegerDatum( i->code_accessed ) );
+  Token c(new IntegerDatum(i->code_accessed));
 
-  i->OStack.push( c );
+  i->OStack.push(c);
 }
 
-void
-CodeExecutedFunction::execute( SLIInterpreter* i ) const
-{
+void CodeExecutedFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  Token c( new IntegerDatum( i->code_executed ) );
+  Token c(new IntegerDatum(i->code_executed));
 
-  i->OStack.push( c );
+  i->OStack.push(c);
 }
-
 
 /** @BeginDocumentation
 Name: quit - leave the SLI interpreter, optionally return exit code
@@ -1355,11 +1210,7 @@ POSIX Programmer's Manual.
 
 SeeAlso: exit
 */
-void
-QuitFunction::execute( SLIInterpreter* i ) const
-{
-  i->EStack.clear();
-}
+void QuitFunction::execute(SLIInterpreter *i) const { i->EStack.clear(); }
 
 /** @BeginDocumentation
 Name: exec - execute an object
@@ -1373,11 +1224,9 @@ Examples: {1 2 add} exec -> 3
 
 SeeAlso: cvx
 */
-void
-ExecFunction::execute( SLIInterpreter* i ) const
-{
+void ExecFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  i->EStack.push_move( i->OStack.top() );
+  i->EStack.push_move(i->OStack.top());
   i->OStack.pop();
 }
 
@@ -1391,60 +1240,49 @@ Description: typeinfo returns a literal name, which represents
 
 SeeAlso: typestack, type
 */
-void
-TypeinfoFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void TypeinfoFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
   i->EStack.pop();
-  Token tn( new LiteralDatum( i->OStack.top()->gettypename() ) );
+  Token tn(new LiteralDatum(i->OStack.top()->gettypename()));
 
-  i->OStack.push_move( tn );
+  i->OStack.push_move(tn);
 }
 
-void
-SwitchFunction::execute( SLIInterpreter* i ) const
-{
+void SwitchFunction::execute(SLIInterpreter *i) const {
   // mark obj1 obj2 ... objn switch
   // Executes obj1 to obj2. If one object executes
   // exit, the execution of all other objects is
   // terminated.
-  Name myname( i->getcurrentname() );
+  Name myname(i->getcurrentname());
   i->EStack.pop();
 
-  Token mark_token( i->baselookup( i->mark_name ) );
+  Token mark_token(i->baselookup(i->mark_name));
 
-  i->EStack.push( mark_token ); // no push_move since token will
-                                // be needed.
-  i->EStack.push( i->baselookup( i->ipop_name ) );
+  i->EStack.push(mark_token); // no push_move since token will
+                              // be needed.
+  i->EStack.push(i->baselookup(i->ipop_name));
 
   unsigned long depth = i->OStack.load();
   unsigned long pos = 0;
-  if ( depth == 0 )
-  {
-    throw TypeMismatch( "At least 1 argument.", "Nothing." );
+  if (depth == 0) {
+    throw TypeMismatch("At least 1 argument.", "Nothing.");
   }
 
-  bool found = ( i->OStack.pick( pos ) == mark_token );
+  bool found = (i->OStack.pick(pos) == mark_token);
 
-  while ( ( pos < depth ) && not found )
-  {
-    i->EStack.push_move( i->OStack.pick( pos ) );
-    found = ( i->OStack.pick( ++pos ) == mark_token );
+  while ((pos < depth) && not found) {
+    i->EStack.push_move(i->OStack.pick(pos));
+    found = (i->OStack.pick(++pos) == mark_token);
   }
-  if ( found )
-  {
-    i->OStack.pop( pos + 1 );
-  }
-  else
-  {
-    i->raiseerror( myname, Name( "UnmatchedMark" ) );
+  if (found) {
+    i->OStack.pop(pos + 1);
+  } else {
+    i->raiseerror(myname, Name("UnmatchedMark"));
   }
 }
 
-void
-SwitchdefaultFunction::execute( SLIInterpreter* i ) const
-{
+void SwitchdefaultFunction::execute(SLIInterpreter *i) const {
   // mark obj1 obj2 ... objn defobj switchdefault
   // checks if n=0.
   // if so, executes defobj.
@@ -1452,68 +1290,54 @@ SwitchdefaultFunction::execute( SLIInterpreter* i ) const
   // If one object executes exit, the execution of all other
   // objects is terminated.
 
-  Name myname( i->getcurrentname() ); // needed for raiseerror
-  i->EStack.pop();                    // no multiple calls !!!
+  Name myname(i->getcurrentname()); // needed for raiseerror
+  i->EStack.pop();                  // no multiple calls !!!
 
-  Token mark_token( i->baselookup( i->mark_name ) );
+  Token mark_token(i->baselookup(i->mark_name));
 
-  i->EStack.push( mark_token );
-  i->EStack.push( i->baselookup( i->ipop_name ) );
+  i->EStack.push(mark_token);
+  i->EStack.push(i->baselookup(i->ipop_name));
 
   unsigned long depth = i->OStack.load();
   unsigned long pos = 0;
-  if ( depth == 0 )
-  {
-    throw TypeMismatch( "At least 1 argument.", "Nothing." );
+  if (depth == 0) {
+    throw TypeMismatch("At least 1 argument.", "Nothing.");
   }
 
-  if ( depth > 1 && i->OStack.pick( 1 ) != mark_token // default action
-    && i->OStack.pick( 0 ) != mark_token )            // is not the only one
+  if (depth > 1 && i->OStack.pick(1) != mark_token // default action
+      && i->OStack.pick(0) != mark_token)          // is not the only one
   {
     i->OStack.pop(); // thus pop it!
   }
 
-  bool found = ( i->OStack.pick( pos ) == mark_token );
+  bool found = (i->OStack.pick(pos) == mark_token);
 
-
-  while ( ( pos < depth ) && not found )
-  {
-    i->EStack.push_move( i->OStack.pick( pos ) );
-    found = ( i->OStack.pick( ++pos ) == mark_token );
+  while ((pos < depth) && not found) {
+    i->EStack.push_move(i->OStack.pick(pos));
+    found = (i->OStack.pick(++pos) == mark_token);
   }
-  if ( found )
-  {
-    i->OStack.pop( pos + 1 );
-  }
-  else
-  {
-    i->raiseerror( myname, Name( "UnmatchedMark" ) );
+  if (found) {
+    i->OStack.pop(pos + 1);
+  } else {
+    i->raiseerror(myname, Name("UnmatchedMark"));
   }
 }
 
-void
-CaseFunction::execute( SLIInterpreter* i ) const
-{
+void CaseFunction::execute(SLIInterpreter *i) const {
   // true  obj case -> obj
   // false obj case -> -
   // case is used in combinaion with the switch statement
 
-
-  if ( i->OStack.pick( 1 ) == i->baselookup( i->true_name ) )
-  {
+  if (i->OStack.pick(1) == i->baselookup(i->true_name)) {
     i->OStack.swap();
     i->OStack.pop();
     i->EStack.pop();
-  }
-  else if ( i->OStack.pick( 1 ) == i->baselookup( i->false_name ) )
-  {
-    i->OStack.pop( 2 );
+  } else if (i->OStack.pick(1) == i->baselookup(i->false_name)) {
+    i->OStack.pop(2);
     i->EStack.pop();
-  }
-  else
-  {
-    Name myname( i->getcurrentname() );
-    i->raiseerror( myname, i->ArgumentTypeError );
+  } else {
+    Name myname(i->getcurrentname());
+    i->raiseerror(myname, i->ArgumentTypeError);
   }
 }
 
@@ -1524,32 +1348,26 @@ Synopsis: mark obj1 ... objn counttomark -> mark obj1 ... objn n
 
 SeeAlso: count
 */
-void
-CounttomarkFunction::execute( SLIInterpreter* i ) const
-{
+void CounttomarkFunction::execute(SLIInterpreter *i) const {
   unsigned long depth = i->OStack.load();
   unsigned long pos = 0;
-  Token mark_token( i->baselookup( i->mark_name ) );
+  Token mark_token(i->baselookup(i->mark_name));
 
   bool found = false;
 
-  while ( ( pos < depth ) && not found )
-  {
-    found = ( i->OStack.pick( pos ) == mark_token );
+  while ((pos < depth) && not found) {
+    found = (i->OStack.pick(pos) == mark_token);
     ++pos;
   }
 
-  if ( found )
-  {
-    Token it( new IntegerDatum( pos - 1 ) );
-    i->OStack.push_move( it );
+  if (found) {
+    Token it(new IntegerDatum(pos - 1));
+    i->OStack.push_move(it);
     i->EStack.pop();
-  }
-  else
-  {
-    Name myname( i->getcurrentname() );
+  } else {
+    Name myname(i->getcurrentname());
     i->EStack.pop();
-    i->raiseerror( myname, Name( "UnmatchedMark" ) );
+    i->raiseerror(myname, Name("UnmatchedMark"));
   }
 }
 
@@ -1577,36 +1395,32 @@ CounttomarkFunction::execute( SLIInterpreter* i ) const
  SeeAlso: pclockspersec, ptimes, realtime, usertime, systemtime, tic, toc
 */
 
-void
-PclocksFunction::execute( SLIInterpreter* i ) const
-{
+void PclocksFunction::execute(SLIInterpreter *i) const {
   struct tms foo;
-  const clock_t realtime = times( &foo );
+  const clock_t realtime = times(&foo);
 
-  if ( realtime == static_cast< clock_t >( -1 ) )
-  {
-    i->message( SLIInterpreter::M_ERROR,
-      "PclocksFunction",
-      "System function times() returned error!" );
-    i->raiseerror( Processes::systemerror( i ) );
+  if (realtime == static_cast<clock_t>(-1)) {
+    i->message(SLIInterpreter::M_ERROR, "PclocksFunction",
+               "System function times() returned error!");
+    i->raiseerror(Processes::systemerror(i));
     return;
   }
 
-  Token rtime( ( long ) realtime );
-  Token utime( ( long ) foo.tms_utime );
-  Token stime( ( long ) foo.tms_stime );
-  Token cutime( ( long ) foo.tms_cutime );
-  Token cstime( ( long ) foo.tms_cstime );
+  Token rtime((long)realtime);
+  Token utime((long)foo.tms_utime);
+  Token stime((long)foo.tms_stime);
+  Token cutime((long)foo.tms_cutime);
+  Token cstime((long)foo.tms_cstime);
 
   ArrayDatum result;
-  result.push_back( rtime );
-  result.push_back( utime );
-  result.push_back( stime );
-  result.push_back( cutime );
-  result.push_back( cstime );
+  result.push_back(rtime);
+  result.push_back(utime);
+  result.push_back(stime);
+  result.push_back(cutime);
+  result.push_back(cstime);
 
   i->EStack.pop();
-  i->OStack.push( result );
+  i->OStack.push(result);
 }
 
 /** @BeginDocumentation
@@ -1628,23 +1442,19 @@ References: man 2 times
 
 SeeAlso: pclocks, ptimes, realtime, usertime, systemtime, tic, toc
 */
-void
-PclockspersecFunction::execute( SLIInterpreter* i ) const
-{
-  const long cps = sysconf( _SC_CLK_TCK );
+void PclockspersecFunction::execute(SLIInterpreter *i) const {
+  const long cps = sysconf(_SC_CLK_TCK);
 
-  if ( cps <= 0 )
-  {
-    i->message( SLIInterpreter::M_ERROR,
-      "PclockspersecFunction",
-      "This system does not support sysconf(_SC_CLK_TCK)!" );
-    i->raiseerror( "FunctionUnsupported" );
+  if (cps <= 0) {
+    i->message(SLIInterpreter::M_ERROR, "PclockspersecFunction",
+               "This system does not support sysconf(_SC_CLK_TCK)!");
+    i->raiseerror("FunctionUnsupported");
     return;
   }
 
-  Token result( cps );
+  Token result(cps);
   i->EStack.pop();
-  i->OStack.push( result );
+  i->OStack.push(result);
 }
 
 /** @BeginDocumentation
@@ -1671,66 +1481,56 @@ PclockspersecFunction::execute( SLIInterpreter* i ) const
  SeeAlso: pclockspersec, ptimes, realtime, usertime, systemtime, tic, toc
 */
 
-void
-PgetrusageFunction::execute( SLIInterpreter* i ) const
-{
+void PgetrusageFunction::execute(SLIInterpreter *i) const {
   DictionaryDatum self;
   DictionaryDatum children;
 
-  if ( not getinfo_( RUSAGE_SELF, self ) )
-  {
-    i->message( SLIInterpreter::M_ERROR,
-      "PgetrusageFunction",
-      "System function getrusage() returned error for self!" );
-    i->raiseerror( Processes::systemerror( i ) );
+  if (not getinfo_(RUSAGE_SELF, self)) {
+    i->message(SLIInterpreter::M_ERROR, "PgetrusageFunction",
+               "System function getrusage() returned error for self!");
+    i->raiseerror(Processes::systemerror(i));
     return;
   }
 
-  if ( not getinfo_( RUSAGE_CHILDREN, children ) )
-  {
-    i->message( SLIInterpreter::M_ERROR,
-      "PgetrusageFunction",
-      "System function getrusage() returned error for children!" );
-    i->raiseerror( Processes::systemerror( i ) );
+  if (not getinfo_(RUSAGE_CHILDREN, children)) {
+    i->message(SLIInterpreter::M_ERROR, "PgetrusageFunction",
+               "System function getrusage() returned error for children!");
+    i->raiseerror(Processes::systemerror(i));
     return;
   }
 
   i->EStack.pop();
-  i->OStack.push( self );
-  i->OStack.push( children );
+  i->OStack.push(self);
+  i->OStack.push(children);
 }
 
-bool
-PgetrusageFunction::getinfo_( int who, DictionaryDatum& dict ) const
-{
+bool PgetrusageFunction::getinfo_(int who, DictionaryDatum &dict) const {
   struct rusage data;
 
-  if ( getrusage( who, &data ) != 0 )
-  {
+  if (getrusage(who, &data) != 0) {
     return false;
   }
 
   dict = new Dictionary;
-  assert( dict.valid() );
+  assert(dict.valid());
 
-  ( *dict )[ "maxrss" ] = data.ru_maxrss;     /* maximum resident set size */
-  ( *dict )[ "ixrss" ] = data.ru_ixrss;       /* integral shared memory size */
-  ( *dict )[ "idrss" ] = data.ru_idrss;       /* integral unshared data size */
-  ( *dict )[ "isrss" ] = data.ru_isrss;       /* integral unshared stack size */
-  ( *dict )[ "minflt" ] = data.ru_minflt;     /* page reclaims */
-  ( *dict )[ "majflt" ] = data.ru_majflt;     /* page faults */
-  ( *dict )[ "nswap" ] = data.ru_nswap;       /* swaps */
-  ( *dict )[ "inblock" ] = data.ru_inblock;   /* block input operations */
-  ( *dict )[ "oublock" ] = data.ru_oublock;   /* block output operations */
-  ( *dict )[ "msgsnd" ] = data.ru_msgsnd;     /* messages sent */
-  ( *dict )[ "msgrcv" ] = data.ru_msgrcv;     /* messages received */
-  ( *dict )[ "nsignals" ] = data.ru_nsignals; /* signals received */
-  ( *dict )[ "nvcsw" ] = data.ru_nvcsw;       /* voluntary context switches */
-  ( *dict )[ "nivcsw" ] = data.ru_nivcsw;     /* involuntary context switches */
+  (*dict)["maxrss"] = data.ru_maxrss;     /* maximum resident set size */
+  (*dict)["ixrss"] = data.ru_ixrss;       /* integral shared memory size */
+  (*dict)["idrss"] = data.ru_idrss;       /* integral unshared data size */
+  (*dict)["isrss"] = data.ru_isrss;       /* integral unshared stack size */
+  (*dict)["minflt"] = data.ru_minflt;     /* page reclaims */
+  (*dict)["majflt"] = data.ru_majflt;     /* page faults */
+  (*dict)["nswap"] = data.ru_nswap;       /* swaps */
+  (*dict)["inblock"] = data.ru_inblock;   /* block input operations */
+  (*dict)["oublock"] = data.ru_oublock;   /* block output operations */
+  (*dict)["msgsnd"] = data.ru_msgsnd;     /* messages sent */
+  (*dict)["msgrcv"] = data.ru_msgrcv;     /* messages received */
+  (*dict)["nsignals"] = data.ru_nsignals; /* signals received */
+  (*dict)["nvcsw"] = data.ru_nvcsw;       /* voluntary context switches */
+  (*dict)["nivcsw"] = data.ru_nivcsw;     /* involuntary context switches */
 
   return true;
 }
-
 
 /** @BeginDocumentation
  Name: time - return wall clock time in s since 1.1.1970 0
@@ -1747,47 +1547,39 @@ PgetrusageFunction::getinfo_( int who, DictionaryDatum& dict ) const
  SeeAlso: clock, usertime, tic, toc, sleep
 */
 
-void
-TimeFunction::execute( SLIInterpreter* i ) const
-{
-  long secs = time( 0 );
-  Token tmp( new IntegerDatum( secs ) );
+void TimeFunction::execute(SLIInterpreter *i) const {
+  long secs = time(0);
+  Token tmp(new IntegerDatum(secs));
   i->EStack.pop();
-  i->OStack.push_move( tmp );
+  i->OStack.push_move(tmp);
 }
 
+void Sleep_dFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
-void
-Sleep_dFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+  const double t = static_cast<double>(i->OStack.pick(0));
 
-  const double t = static_cast< double >( i->OStack.pick( 0 ) );
-
-  if ( t < 0 )
-  {
-    throw BadParameterValue( "t >= 0 required." );
+  if (t < 0) {
+    throw BadParameterValue("t >= 0 required.");
   }
 
-  if ( t > std::numeric_limits< int >::max() )
-  {
-    throw BadParameterValue( String::compose(
-      "t < %1s required.", std::numeric_limits< int >::max() ) );
+  if (t > std::numeric_limits<int>::max()) {
+    throw BadParameterValue(
+        String::compose("t < %1s required.", std::numeric_limits<int>::max()));
   }
 
   /* Since sleep() only handles entire seconds and usleep() only
    * times shorter than 1s, we need to split the sleep; see #973. */
-  const unsigned int t_sec = static_cast< unsigned int >( t );
+  const unsigned int t_sec = static_cast<unsigned int>(t);
   const unsigned int t_musec =
-    std::min( 999999U, static_cast< unsigned int >( ( t - t_sec ) * 1e6 ) );
+      std::min(999999U, static_cast<unsigned int>((t - t_sec) * 1e6));
 
-  sleep( t_sec );
-  usleep( t_musec );
+  sleep(t_sec);
+  usleep(t_musec);
 
   i->OStack.pop();
   i->EStack.pop();
 }
-
 
 /** @BeginDocumentation
 Name: token_s - read a token from a string
@@ -1800,33 +1592,28 @@ References: The Red Book
 SeeAlso: token
 */
 
-void
-Token_sFunction::execute( SLIInterpreter* i ) const
-{
+void Token_sFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  assert( i->OStack.load() > 0 );
+  assert(i->OStack.load() > 0);
 
-  StringDatum* sd = dynamic_cast< StringDatum* >( i->OStack.top().datum() );
-  assert( sd );
+  StringDatum *sd = dynamic_cast<StringDatum *>(i->OStack.top().datum());
+  assert(sd);
 #ifdef HAVE_SSTREAM
-  std::istringstream in( sd->c_str() );
+  std::istringstream in(sd->c_str());
 #else
-  std::istrstream in( sd->c_str() );
+  std::istrstream in(sd->c_str());
 #endif
 
   Token t;
   i->parse->clear_context(); // this clears the previously parsed strings.
-  i->parse->readToken( in, t );
-  if ( t.contains( i->parse->scan()->EndSymbol ) )
-  {
+  i->parse->readToken(in, t);
+  if (t.contains(i->parse->scan()->EndSymbol)) {
     i->OStack.pop();
-    i->OStack.push( false );
-  }
-  else
-  {
-    i->OStack.push_move( t );
-    sd->erase( 0, in.tellg() );
-    i->OStack.push( true );
+    i->OStack.push(false);
+  } else {
+    i->OStack.push_move(t);
+    sd->erase(0, in.tellg());
+    i->OStack.push(true);
   }
 }
 /** @BeginDocumentation
@@ -1840,29 +1627,23 @@ References: The Red Book
 SeeAlso: token
 */
 
-void
-Token_isFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
+void Token_isFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
 
   i->EStack.pop();
 
-  IstreamDatum* sd = dynamic_cast< IstreamDatum* >( i->OStack.top().datum() );
-  if ( not sd )
-  {
-    throw TypeMismatch( "istream", "something else" );
+  IstreamDatum *sd = dynamic_cast<IstreamDatum *>(i->OStack.top().datum());
+  if (not sd) {
+    throw TypeMismatch("istream", "something else");
   }
 
   Token t;
-  i->parse->readToken( **sd, t );
-  if ( t.contains( i->parse->scan()->EndSymbol ) )
-  {
-    i->OStack.push( false );
-  }
-  else
-  {
-    i->OStack.push_move( t );
-    i->OStack.push( true );
+  i->parse->readToken(**sd, t);
+  if (t.contains(i->parse->scan()->EndSymbol)) {
+    i->OStack.push(false);
+  } else {
+    i->OStack.push_move(t);
+    i->OStack.push(true);
   }
 }
 
@@ -1875,36 +1656,30 @@ Synopsis:  string symbol_s -> post any true
 SeeAlso: token
 */
 
-void
-Symbol_sFunction::execute( SLIInterpreter* i ) const
-{
+void Symbol_sFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  assert( i->OStack.load() > 0 );
+  assert(i->OStack.load() > 0);
 
-  StringDatum* sd = dynamic_cast< StringDatum* >( i->OStack.top().datum() );
-  assert( sd );
+  StringDatum *sd = dynamic_cast<StringDatum *>(i->OStack.top().datum());
+  assert(sd);
 #ifdef HAVE_SSTREAM
-  std::istringstream in( sd->c_str() );
+  std::istringstream in(sd->c_str());
 #else
-  std::istrstream in( sd->c_str() );
+  std::istrstream in(sd->c_str());
 #endif
 
   Token t;
   i->parse->clear_context(); // this clears the previously parsed strings.
-  i->parse->readSymbol( in, t );
-  if ( t.contains( i->parse->scan()->EndSymbol ) )
-  {
+  i->parse->readSymbol(in, t);
+  if (t.contains(i->parse->scan()->EndSymbol)) {
     i->OStack.pop();
-    i->OStack.push( false );
-  }
-  else
-  {
-    i->OStack.push_move( t );
-    sd->erase( 0, in.tellg() );
-    i->OStack.push( true );
+    i->OStack.push(false);
+  } else {
+    i->OStack.push_move(t);
+    sd->erase(0, in.tellg());
+    i->OStack.push(true);
   }
 }
-
 
 /** @BeginDocumentation
  Name: setguard - limit the number of interpreter cycles
@@ -1924,18 +1699,14 @@ Symbol_sFunction::execute( SLIInterpreter* i ) const
  SeeAlso: removeguard
 */
 
-void
-SetGuardFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  IntegerDatum* count =
-    dynamic_cast< IntegerDatum* >( i->OStack.top().datum() );
-  assert( count );
-  i->setcycleguard( count->get() );
+void SetGuardFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  IntegerDatum *count = dynamic_cast<IntegerDatum *>(i->OStack.top().datum());
+  assert(count);
+  i->setcycleguard(count->get());
   i->OStack.pop();
   i->EStack.pop();
 }
-
 
 /** @BeginDocumentation
  Name: removeguard - removes the limit on the number of interpreter cycles
@@ -1953,13 +1724,10 @@ SetGuardFunction::execute( SLIInterpreter* i ) const
 
  SeeAlso: setguard
 */
-void
-RemoveGuardFunction::execute( SLIInterpreter* i ) const
-{
+void RemoveGuardFunction::execute(SLIInterpreter *i) const {
   i->removecycleguard();
   i->EStack.pop();
 }
-
 
 /** @BeginDocumentation
 Name: debugon - Start SLI level debugger.
@@ -2010,13 +1778,11 @@ Note: This mode is still experimental.
 
 SeeAlso: debugoff, debug
 */
-void
-DebugOnFunction::execute( SLIInterpreter* i ) const
-{
+void DebugOnFunction::execute(SLIInterpreter *i) const {
   std::cerr << "Starting debug mode." << std::endl;
   i->debug_options();
   i->debug_mode_on();
-  i->set_max_call_depth( i->get_call_depth() + 5 );
+  i->set_max_call_depth(i->get_call_depth() + 5);
   i->EStack.pop();
 }
 
@@ -2046,9 +1812,7 @@ Note: This mode is still experimental.
 
 SeeAlso: debugon, debug
 */
-void
-DebugOffFunction::execute( SLIInterpreter* i ) const
-{
+void DebugOffFunction::execute(SLIInterpreter *i) const {
   i->debug_mode_off();
   i->EStack.pop();
 }
@@ -2065,30 +1829,24 @@ Examples: {1 2 add} debug -> 3
 
 SeeAlso: exec, debugon, debugoff
 */
-void
-DebugFunction::execute( SLIInterpreter* i ) const
-{
-  if ( i->OStack.load() == 0 )
-  {
-    i->raiseerror( i->StackUnderflowError );
+void DebugFunction::execute(SLIInterpreter *i) const {
+  if (i->OStack.load() == 0) {
+    i->raiseerror(i->StackUnderflowError);
     return;
   }
 
   i->EStack.pop();
-  i->EStack.push( new NameDatum( "debugoff" ) );
-  i->EStack.push_move( i->OStack.top() );
-  i->EStack.push( new NameDatum( "debugon" ) );
+  i->EStack.push(new NameDatum("debugoff"));
+  i->EStack.push_move(i->OStack.top());
+  i->EStack.push(new NameDatum("debugon"));
   i->OStack.pop();
 }
 
-void
-SetVerbosityFunction::execute( SLIInterpreter* i ) const
-{
-  assert( i->OStack.load() > 0 );
-  IntegerDatum* count =
-    dynamic_cast< IntegerDatum* >( i->OStack.top().datum() );
-  assert( count );
-  i->verbosity( count->get() );
+void SetVerbosityFunction::execute(SLIInterpreter *i) const {
+  assert(i->OStack.load() > 0);
+  IntegerDatum *count = dynamic_cast<IntegerDatum *>(i->OStack.top().datum());
+  assert(count);
+  i->verbosity(count->get());
   i->OStack.pop();
   i->EStack.pop();
 }
@@ -2101,46 +1859,37 @@ Synopsis: verbosity -> n
 SeeAlso: setverbosity, message
 */
 
-void
-VerbosityFunction::execute( SLIInterpreter* i ) const
-{
-  Token tmp( new IntegerDatum( i->verbosity() ) );
+void VerbosityFunction::execute(SLIInterpreter *i) const {
+  Token tmp(new IntegerDatum(i->verbosity()));
   i->EStack.pop();
-  i->OStack.push_move( tmp );
+  i->OStack.push_move(tmp);
 }
 
-void
-StartFunction::execute( SLIInterpreter* i ) const
-{
+void StartFunction::execute(SLIInterpreter *i) const {
   i->EStack.clear();
-  i->message( SLIInterpreter::M_ERROR,
-    "Start",
-    "Something went wrong "
-    "during initialization of NEST or one of its modules. Probably "
-    "there is a bug in the startup scripts. Please report the output "
-    "of NEST at https://github.com/nest/nest-simulator/issues . You "
-    "can try to find the bug by starting NEST with the option --debug" );
+  i->message(
+      SLIInterpreter::M_ERROR, "Start",
+      "Something went wrong "
+      "during initialization of NEST or one of its modules. Probably "
+      "there is a bug in the startup scripts. Please report the output "
+      "of NEST at https://github.com/nest/nest-simulator/issues . You "
+      "can try to find the bug by starting NEST with the option --debug");
 }
 
-void
-MessageFunction::execute( SLIInterpreter* i ) const
-{
+void MessageFunction::execute(SLIInterpreter *i) const {
   // call : level (from) (message) message
 
-  assert( i->OStack.load() >= 3 );
+  assert(i->OStack.load() >= 3);
 
-  IntegerDatum* lev =
-    dynamic_cast< IntegerDatum* >( i->OStack.pick( 2 ).datum() );
-  assert( lev );
-  StringDatum* frm =
-    dynamic_cast< StringDatum* >( i->OStack.pick( 1 ).datum() );
-  assert( frm );
-  StringDatum* msg =
-    dynamic_cast< StringDatum* >( i->OStack.pick( 0 ).datum() );
-  assert( msg );
+  IntegerDatum *lev = dynamic_cast<IntegerDatum *>(i->OStack.pick(2).datum());
+  assert(lev);
+  StringDatum *frm = dynamic_cast<StringDatum *>(i->OStack.pick(1).datum());
+  assert(frm);
+  StringDatum *msg = dynamic_cast<StringDatum *>(i->OStack.pick(0).datum());
+  assert(msg);
 
-  i->message( lev->get(), frm->c_str(), msg->c_str() );
-  i->OStack.pop( 3 );
+  i->message(lev->get(), frm->c_str(), msg->c_str());
+  i->OStack.pop(3);
   i->EStack.pop();
 }
 
@@ -2150,16 +1899,10 @@ Name: noop - no operation function
 Description: This function does nothing. It is used for benchmark purposes.
 */
 
-void
-NoopFunction::execute( SLIInterpreter* i ) const
-{
-  i->EStack.pop();
-}
-
+void NoopFunction::execute(SLIInterpreter *i) const { i->EStack.pop(); }
 
 const SetGuardFunction setguardfunction;
 const RemoveGuardFunction removeguardfunction;
-
 
 const Backtrace_onFunction backtrace_onfunction;
 const Backtrace_offFunction backtrace_offfunction;
@@ -2238,80 +1981,78 @@ Author: docu by Marc Oliver Gewaltig and Sirko Straube
 SeeAlso: counttomark, arraystore, switch, case
  */
 
-void
-init_slicontrol( SLIInterpreter* i )
-{
+void init_slicontrol(SLIInterpreter *i) {
   // Define the built-in symbols
-  i->def( i->true_name, BoolDatum( true ) );
-  i->def( i->false_name, BoolDatum( false ) );
-  i->def( i->mark_name, LiteralDatum( i->mark_name ) );
-  i->def( Name( "<<" ), LiteralDatum( i->mark_name ) );
+  i->def(i->true_name, BoolDatum(true));
+  i->def(i->false_name, BoolDatum(false));
+  i->def(i->mark_name, LiteralDatum(i->mark_name));
+  i->def(Name("<<"), LiteralDatum(i->mark_name));
 #ifdef PS_ARRAYS
-  i->def( Name( "[" ), LiteralDatum( i->mark_name ) );
+  i->def(Name("["), LiteralDatum(i->mark_name));
 #endif
-  i->def( i->istopped_name, BoolDatum( false ) );
+  i->def(i->istopped_name, BoolDatum(false));
 
-  i->def( i->newerror_name, BoolDatum( false ) );
-  i->def( i->recordstacks_name, BoolDatum( false ) );
+  i->def(i->newerror_name, BoolDatum(false));
+  i->def(i->recordstacks_name, BoolDatum(false));
 
-  i->createcommand( "backtrace_on", &backtrace_onfunction );
-  i->createcommand( "backtrace_off", &backtrace_offfunction );
-  i->createcommand( "estackdump", &estackdumpfunction );
-  i->createcommand( "ostackdump", &ostackdumpfunction );
-  i->createcommand( "loop", &loopfunction );
-  i->createcommand( "exit", &exitfunction );
-  i->createcommand( "quit", &quitfunction );
-  i->createcommand( "if", &iffunction );
-  i->createcommand( "ifelse", &ifelsefunction );
-  i->createcommand( "repeat", &repeatfunction );
-  i->createcommand( "closeinput", &closeinputfunction );
-  i->createcommand( "stop", &stopfunction );
-  i->createcommand( "stopped", &stoppedfunction );
-  i->createcommand( "currentname", &currentnamefunction );
-  i->createcommand( "parsestdin", &parsestdinfunction );
-  i->createcommand( ":parsestdin", &iparsestdinfunction );
-  i->createcommand( "::parse", &iparsefunction );
-  i->createcommand( "start", &startfunction );
-  i->createcommand( "def", &deffunction );
-  i->createcommand( "Set", &setfunction );
-  i->createcommand( "load", &loadfunction );
-  i->createcommand( "lookup", &lookupfunction );
-  i->createcommand( "for", &forfunction );
-  i->createcommand( "forall_a", &forall_afunction );
-  i->createcommand( "forall_iter", &forall_iterfunction );
-  i->createcommand( "forallindexed_a", &forallindexed_afunction );
-  i->createcommand( "forallindexed_s", &forallindexed_sfunction );
-  i->createcommand( "forall_s", &forall_sfunction );
-  i->createcommand( "raiseerror", &raiseerrorfunction );
-  i->createcommand( "print_error", &printerrorfunction );
-  i->createcommand( "raiseagain", &raiseagainfunction );
-  i->createcommand( "cycles", &cyclesfunction );
-  i->createcommand( "code_accessed", &codeaccessedfunction );
-  i->createcommand( "code_executed", &codeexecutedfunction );
-  i->createcommand( "exec", &execfunction );
-  i->createcommand( "typeinfo", &typeinfofunction );
-  i->createcommand( "switch", &switchfunction );
-  i->createcommand( "switchdefault", &switchdefaultfunction );
-  i->createcommand( "case", &casefunction );
-  i->createcommand( "counttomark", &counttomarkfunction );
-  i->createcommand( "pclocks", &pclocksfunction );
-  i->createcommand( "pclockspersec", &pclockspersecfunction );
-  i->createcommand( "pgetrusage", &pgetrusagefunction );
-  i->createcommand( "time", &timefunction );
-  i->createcommand( "sleep_d", &sleep_dfunction );
+  i->createcommand("backtrace_on", &backtrace_onfunction);
+  i->createcommand("backtrace_off", &backtrace_offfunction);
+  i->createcommand("estackdump", &estackdumpfunction);
+  i->createcommand("ostackdump", &ostackdumpfunction);
+  i->createcommand("loop", &loopfunction);
+  i->createcommand("exit", &exitfunction);
+  i->createcommand("quit", &quitfunction);
+  i->createcommand("if", &iffunction);
+  i->createcommand("ifelse", &ifelsefunction);
+  i->createcommand("repeat", &repeatfunction);
+  i->createcommand("closeinput", &closeinputfunction);
+  i->createcommand("stop", &stopfunction);
+  i->createcommand("stopped", &stoppedfunction);
+  i->createcommand("currentname", &currentnamefunction);
+  i->createcommand("parsestdin", &parsestdinfunction);
+  i->createcommand(":parsestdin", &iparsestdinfunction);
+  i->createcommand("::parse", &iparsefunction);
+  i->createcommand("start", &startfunction);
+  i->createcommand("def", &deffunction);
+  i->createcommand("Set", &setfunction);
+  i->createcommand("load", &loadfunction);
+  i->createcommand("lookup", &lookupfunction);
+  i->createcommand("for", &forfunction);
+  i->createcommand("forall_a", &forall_afunction);
+  i->createcommand("forall_iter", &forall_iterfunction);
+  i->createcommand("forallindexed_a", &forallindexed_afunction);
+  i->createcommand("forallindexed_s", &forallindexed_sfunction);
+  i->createcommand("forall_s", &forall_sfunction);
+  i->createcommand("raiseerror", &raiseerrorfunction);
+  i->createcommand("print_error", &printerrorfunction);
+  i->createcommand("raiseagain", &raiseagainfunction);
+  i->createcommand("cycles", &cyclesfunction);
+  i->createcommand("code_accessed", &codeaccessedfunction);
+  i->createcommand("code_executed", &codeexecutedfunction);
+  i->createcommand("exec", &execfunction);
+  i->createcommand("typeinfo", &typeinfofunction);
+  i->createcommand("switch", &switchfunction);
+  i->createcommand("switchdefault", &switchdefaultfunction);
+  i->createcommand("case", &casefunction);
+  i->createcommand("counttomark", &counttomarkfunction);
+  i->createcommand("pclocks", &pclocksfunction);
+  i->createcommand("pclockspersec", &pclockspersecfunction);
+  i->createcommand("pgetrusage", &pgetrusagefunction);
+  i->createcommand("time", &timefunction);
+  i->createcommand("sleep_d", &sleep_dfunction);
 
-  i->createcommand( "token_s", &token_sfunction );
-  i->createcommand( "token_is", &token_isfunction );
+  i->createcommand("token_s", &token_sfunction);
+  i->createcommand("token_is", &token_isfunction);
 
-  i->createcommand( "symbol_s", &symbol_sfunction );
+  i->createcommand("symbol_s", &symbol_sfunction);
 
-  i->createcommand( "setguard", &setguardfunction );
-  i->createcommand( "removeguard", &removeguardfunction );
-  i->createcommand( "setverbosity_i", &setverbosityfunction );
-  i->createcommand( "verbosity", &verbosityfunction );
-  i->createcommand( "message_", &messagefunction );
-  i->createcommand( "noop", &noopfunction );
-  i->createcommand( "debug", &debugfunction );
-  i->createcommand( "debugon", &debugonfunction );
-  i->createcommand( "debugoff", &debugofffunction );
+  i->createcommand("setguard", &setguardfunction);
+  i->createcommand("removeguard", &removeguardfunction);
+  i->createcommand("setverbosity_i", &setverbosityfunction);
+  i->createcommand("verbosity", &verbosityfunction);
+  i->createcommand("message_", &messagefunction);
+  i->createcommand("noop", &noopfunction);
+  i->createcommand("debug", &debugfunction);
+  i->createcommand("debugon", &debugonfunction);
+  i->createcommand("debugoff", &debugofffunction);
 }

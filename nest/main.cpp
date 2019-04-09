@@ -29,9 +29,7 @@
 // Includes from sli:
 #include "interpret.h"
 
-int
-main( int argc, char* argv[] )
-{
+int main(int argc, char *argv[]) {
   /**
    * Create the interpreter object. Due to its dependence
    * on various static objects (e.g. of class Name), the
@@ -39,12 +37,12 @@ main( int argc, char* argv[] )
    */
   SLIInterpreter engine;
 
-  neststartup( &argc, &argv, engine );
+  neststartup(&argc, &argv, engine);
 
   // start the interpreter session
   int exitcode = engine.execute();
 
-  nestshutdown( exitcode );
+  nestshutdown(exitcode);
 
   return exitcode;
 }

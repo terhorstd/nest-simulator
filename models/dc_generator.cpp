@@ -33,37 +33,28 @@
 #include "doubledatum.h"
 #include "integerdatum.h"
 
-namespace nest
-{
-RecordablesMap< dc_generator > dc_generator::recordablesMap_;
+namespace nest {
+RecordablesMap<dc_generator> dc_generator::recordablesMap_;
 
-template <>
-void
-RecordablesMap< dc_generator >::create()
-{
-  insert_( Name( names::I ), &dc_generator::get_I_ );
+template <> void RecordablesMap<dc_generator>::create() {
+  insert_(Name(names::I), &dc_generator::get_I_);
 }
-}
+} // namespace nest
 
 /* ----------------------------------------------------------------
  * Default constructors defining default parameter
  * ---------------------------------------------------------------- */
 
 nest::dc_generator::Parameters_::Parameters_()
-  : amp_( 0.0 ) // pA
-{
-}
+    : amp_(0.0) // pA
+{}
 
-nest::dc_generator::Parameters_::Parameters_( const Parameters_& p )
-  : amp_( p.amp_ )
-{
-}
+nest::dc_generator::Parameters_::Parameters_(const Parameters_ &p)
+    : amp_(p.amp_) {}
 
-nest::dc_generator::Parameters_&
-nest::dc_generator::Parameters_::operator=( const Parameters_& p )
-{
-  if ( this == &p )
-  {
+nest::dc_generator::Parameters_ &nest::dc_generator::Parameters_::
+operator=(const Parameters_ &p) {
+  if (this == &p) {
     return *this;
   }
 
@@ -73,121 +64,82 @@ nest::dc_generator::Parameters_::operator=( const Parameters_& p )
 }
 
 nest::dc_generator::State_::State_()
-  : I_( 0.0 ) // pA
-{
-}
+    : I_(0.0) // pA
+{}
 
+nest::dc_generator::Buffers_::Buffers_(dc_generator &n) : logger_(n) {}
 
-nest::dc_generator::Buffers_::Buffers_( dc_generator& n )
-  : logger_( n )
-{
-}
-
-nest::dc_generator::Buffers_::Buffers_( const Buffers_&, dc_generator& n )
-  : logger_( n )
-{
-}
+nest::dc_generator::Buffers_::Buffers_(const Buffers_ &, dc_generator &n)
+    : logger_(n) {}
 
 /* ----------------------------------------------------------------
  * Parameter extraction and manipulation functions
  * ---------------------------------------------------------------- */
 
-void
-nest::dc_generator::Parameters_::get( DictionaryDatum& d ) const
-{
-  def< double >( d, names::amplitude, amp_ );
+void nest::dc_generator::Parameters_::get(DictionaryDatum &d) const {
+  def<double>(d, names::amplitude, amp_);
 }
 
-void
-nest::dc_generator::Parameters_::set( const DictionaryDatum& d )
-{
-  updateValue< double >( d, names::amplitude, amp_ );
+void nest::dc_generator::Parameters_::set(const DictionaryDatum &d) {
+  updateValue<double>(d, names::amplitude, amp_);
 }
-
 
 /* ----------------------------------------------------------------
  * Default and copy constructor for node
  * ---------------------------------------------------------------- */
 
 nest::dc_generator::dc_generator()
-  : DeviceNode()
-  , device_()
-  , P_()
-  , S_()
-  , B_( *this )
-{
+    : DeviceNode(), device_(), P_(), S_(), B_(*this) {
   recordablesMap_.create();
 }
 
-nest::dc_generator::dc_generator( const dc_generator& n )
-  : DeviceNode( n )
-  , device_( n.device_ )
-  , P_( n.P_ )
-  , S_( n.S_ )
-  , B_( n.B_, *this )
-{
-}
-
+nest::dc_generator::dc_generator(const dc_generator &n)
+    : DeviceNode(n), device_(n.device_), P_(n.P_), S_(n.S_), B_(n.B_, *this) {}
 
 /* ----------------------------------------------------------------
  * Node initialization functions
  * ---------------------------------------------------------------- */
 
-void
-nest::dc_generator::init_state_( const Node& proto )
-{
-  const dc_generator& pr = downcast< dc_generator >( proto );
+void nest::dc_generator::init_state_(const Node &proto) {
+  const dc_generator &pr = downcast<dc_generator>(proto);
 
-  device_.init_state( pr.device_ );
+  device_.init_state(pr.device_);
   S_ = pr.S_;
 }
 
-void
-nest::dc_generator::init_buffers_()
-{
+void nest::dc_generator::init_buffers_() {
   device_.init_buffers();
   B_.logger_.reset();
 }
 
-void
-nest::dc_generator::calibrate()
-{
+void nest::dc_generator::calibrate() {
   B_.logger_.init();
 
   device_.calibrate();
 }
 
-
 /* ----------------------------------------------------------------
  * Update function
  * ---------------------------------------------------------------- */
 
-void
-nest::dc_generator::update( Time const& origin, const long from, const long to )
-{
-  assert(
-    to >= 0 && ( delay ) from < kernel().connection_manager.get_min_delay() );
-  assert( from < to );
+void nest::dc_generator::update(Time const &origin, const long from,
+                                const long to) {
+  assert(to >= 0 && (delay)from < kernel().connection_manager.get_min_delay());
+  assert(from < to);
 
   long start = origin.get_steps();
 
   CurrentEvent ce;
-  ce.set_current( P_.amp_ );
-  for ( long offs = from; offs < to; ++offs )
-  {
+  ce.set_current(P_.amp_);
+  for (long offs = from; offs < to; ++offs) {
     S_.I_ = 0.0;
 
-    if ( device_.is_active( Time::step( start + offs ) ) )
-    {
+    if (device_.is_active(Time::step(start + offs))) {
       S_.I_ = P_.amp_;
-      kernel().event_delivery_manager.send( *this, ce, offs );
+      kernel().event_delivery_manager.send(*this, ce, offs);
     }
-    B_.logger_.record_data( origin.get_steps() + offs );
+    B_.logger_.record_data(origin.get_steps() + offs);
   }
 }
 
-void
-nest::dc_generator::handle( DataLoggingRequest& e )
-{
-  B_.logger_.handle( e );
-}
+void nest::dc_generator::handle(DataLoggingRequest &e) { B_.logger_.handle(e); }

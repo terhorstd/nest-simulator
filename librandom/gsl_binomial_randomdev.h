@@ -43,7 +43,6 @@
 #include <gsl/gsl_randist.h>
 #include <gsl/gsl_rng.h>
 
-
 /** @BeginDocumentation
 Name: rdevdict::gsl_binomial - GSL binomial random deviate generator
 
@@ -66,9 +65,7 @@ SeeAlso: CreateRDV, RandomArray, rdevdict
 Author: Jochen Martin Eppler
 */
 
-
-namespace librandom
-{
+namespace librandom {
 
 /**
  Class GSL_BinomialRandomDev
@@ -89,14 +86,13 @@ namespace librandom
  @ingroup RandomDeviateGenerators
 */
 
-class GSL_BinomialRandomDev : public RandomDev
-{
+class GSL_BinomialRandomDev : public RandomDev {
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  GSL_BinomialRandomDev( RngPtr, double p_s = 0.5, unsigned int n_s = 1 );
-  GSL_BinomialRandomDev( double p_s = 0.5, unsigned int n_s = 1 );
+  GSL_BinomialRandomDev(RngPtr, double p_s = 0.5, unsigned int n_s = 1);
+  GSL_BinomialRandomDev(double p_s = 0.5, unsigned int n_s = 1);
 
   /**
    * set parameters for p and n
@@ -104,9 +100,9 @@ public:
    * p - success probability for single trial
    * n - number of trials
    */
-  void set_p_n( double, unsigned int );
-  void set_p( double );       //!< set p
-  void set_n( unsigned int ); //!< set n
+  void set_p_n(double, unsigned int);
+  void set_p(double);       //!< set p
+  void set_n(unsigned int); //!< set n
 
   /**
    * Import sets of overloaded virtual functions.
@@ -119,35 +115,29 @@ public:
   using RandomDev::operator();
   using RandomDev::ldev;
 
-  long ldev();               //!< draw integer
-  long ldev( RngPtr ) const; //!< draw integer, threaded
-  bool
-  has_ldev() const
-  {
-    return true;
-  }
+  long ldev();             //!< draw integer
+  long ldev(RngPtr) const; //!< draw integer, threaded
+  bool has_ldev() const { return true; }
 
-  double operator()( RngPtr ) const; //!< return as double, threaded
+  double operator()(RngPtr) const; //!< return as double, threaded
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
 private:
   double p_;       //!< probability p of binomial distribution
   unsigned int n_; //!< parameter n in binomial distribution
 
-  gsl_rng* rng_;
+  gsl_rng *rng_;
 };
 
-inline double
-GSL_BinomialRandomDev::operator()( RngPtr rthrd ) const
-{
-  return static_cast< double >( ldev( rthrd ) );
+inline double GSL_BinomialRandomDev::operator()(RngPtr rthrd) const {
+  return static_cast<double>(ldev(rthrd));
 }
-}
+} // namespace librandom
 
 #endif
 

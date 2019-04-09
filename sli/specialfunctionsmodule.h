@@ -47,24 +47,21 @@
 
 // NOTE: all gsl headers are included in specialfunctionsmodule.cc
 
-class SpecialFunctionsModule : public SLIModule
-{
+class SpecialFunctionsModule : public SLIModule {
 
   // Part 1: Methods pertaining to the module ----------------------
 
 public:
-  SpecialFunctionsModule( void ){};
+  SpecialFunctionsModule(void){};
   // ~SpecialFunctionsModule(void);
 
   // The Module is registered by a call to this Function:
-  void init( SLIInterpreter* );
+  void init(SLIInterpreter *);
 
   // This function will return the name of our module:
-  const std::string name( void ) const;
-
+  const std::string name(void) const;
 
   // Part 2: Classes for the implemented functions -----------------
-
 
 public:
   /**
@@ -72,57 +69,41 @@ public:
    * These must be public, since we want to export
    * objects of these.
    */
-  class GammaIncFunction : public SLIFunction
-  {
+  class GammaIncFunction : public SLIFunction {
   public:
-    GammaIncFunction()
-    {
-    }
-    void execute( SLIInterpreter* ) const;
+    GammaIncFunction() {}
+    void execute(SLIInterpreter *) const;
   };
-  class LambertW0Function : public SLIFunction
-  {
+  class LambertW0Function : public SLIFunction {
   public:
-    LambertW0Function()
-    {
-    }
-    void execute( SLIInterpreter* ) const;
+    LambertW0Function() {}
+    void execute(SLIInterpreter *) const;
   };
-  class LambertWm1Function : public SLIFunction
-  {
+  class LambertWm1Function : public SLIFunction {
   public:
-    LambertWm1Function()
-    {
-    }
-    void execute( SLIInterpreter* ) const;
+    LambertWm1Function() {}
+    void execute(SLIInterpreter *) const;
   };
 
-  class ErfFunction : public SLIFunction
-  {
+  class ErfFunction : public SLIFunction {
   public:
-    ErfFunction()
-    {
-    }
-    void execute( SLIInterpreter* ) const;
+    ErfFunction() {}
+    void execute(SLIInterpreter *) const;
   };
 
-  class ErfcFunction : public SLIFunction
-  {
+  class ErfcFunction : public SLIFunction {
   public:
-    ErfcFunction()
-    {
-    }
-    void execute( SLIInterpreter* ) const;
+    ErfcFunction() {}
+    void execute(SLIInterpreter *) const;
   };
 
-  class GaussDiskConvFunction : public SLIFunction
-  {
+  class GaussDiskConvFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
 
     // need constructor and destructor to set up integration workspace
-    GaussDiskConvFunction( void );
-    ~GaussDiskConvFunction( void );
+    GaussDiskConvFunction(void);
+    ~GaussDiskConvFunction(void);
 
   private:
     // quadrature parameters, see GSL Reference
@@ -132,7 +113,7 @@ public:
 
 // integration workspace
 #ifdef HAVE_GSL
-    gsl_integration_workspace* w_;
+    gsl_integration_workspace *w_;
 
     /**
      * Integrand function.
@@ -140,7 +121,7 @@ public:
      *       be passed to the GSL. Alternatively, one could define it
      *       outside the class.
      */
-    static double f_( double, void* );
+    static double f_(double, void *);
     static gsl_function F_; // GSL wrapper struct for it
 #endif
   };
@@ -158,7 +139,6 @@ public:
   // Part 3b: Internal variables
 private:
 };
-
 
 // Part 4: Documentation for all functions -------------------------
 

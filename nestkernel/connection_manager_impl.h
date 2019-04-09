@@ -35,37 +35,29 @@
 #include "kernel_manager.h"
 #include "target_table_devices_impl.h"
 
-namespace nest
-{
+namespace nest {
 
-template < typename ConnBuilder >
-void
-ConnectionManager::register_conn_builder( const std::string& name )
-{
-  assert( not connruledict_->known( name ) );
-  GenericConnBuilderFactory* cb = new ConnBuilderFactory< ConnBuilder >();
-  assert( cb != 0 );
+template <typename ConnBuilder>
+void ConnectionManager::register_conn_builder(const std::string &name) {
+  assert(not connruledict_->known(name));
+  GenericConnBuilderFactory *cb = new ConnBuilderFactory<ConnBuilder>();
+  assert(cb != 0);
   const int id = connbuilder_factories_.size();
-  connbuilder_factories_.push_back( cb );
-  connruledict_->insert( name, id );
+  connbuilder_factories_.push_back(cb);
+  connruledict_->insert(name, id);
 }
 
-inline void
-ConnectionManager::send_to_devices( const thread tid,
-  const index source_gid,
-  Event& e )
-{
+inline void ConnectionManager::send_to_devices(const thread tid,
+                                               const index source_gid,
+                                               Event &e) {
   target_table_devices_.send_to_device(
-    tid, source_gid, e, kernel().model_manager.get_synapse_prototypes( tid ) );
+      tid, source_gid, e, kernel().model_manager.get_synapse_prototypes(tid));
 }
 
-inline void
-ConnectionManager::send_from_device( const thread tid,
-  const index ldid,
-  Event& e )
-{
+inline void ConnectionManager::send_from_device(const thread tid,
+                                                const index ldid, Event &e) {
   target_table_devices_.send_from_device(
-    tid, ldid, e, kernel().model_manager.get_synapse_prototypes( tid ) );
+      tid, ldid, e, kernel().model_manager.get_synapse_prototypes(tid));
 }
 
 } // namespace nest

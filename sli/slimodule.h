@@ -33,8 +33,7 @@ class Dictionary;
 /**
  * Base class for all SLI Interpreter modules.
  */
-class SLIModule
-{
+class SLIModule {
 public:
   virtual ~SLIModule(){};
 
@@ -46,21 +45,21 @@ public:
    * bootstrap sequence the module is initialized, not
    * all services may be available.
    */
-  virtual void init( SLIInterpreter* ) = 0;
+  virtual void init(SLIInterpreter *) = 0;
 
   /**
    * Return name of the module.
    */
-  virtual const std::string name( void ) const = 0;
+  virtual const std::string name(void) const = 0;
 
   /**
    * Return sli command sequence to be executed for initialization.
    */
-  virtual const std::string commandstring( void ) const;
+  virtual const std::string commandstring(void) const;
 
   /**
    * Print installation message via interpreter message command.
    */
-  void install( std::ostream&, SLIInterpreter* );
+  void install(std::ostream &, SLIInterpreter *);
 };
 #endif

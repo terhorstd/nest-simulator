@@ -31,8 +31,7 @@
 #include "rate_transformer_node.h"
 #include "rate_transformer_node_impl.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: lin_rate - Linear rate model
@@ -94,8 +93,7 @@ Author: David Dahmen, Jan Hahne, Jannis Schuecker
 SeeAlso: rate_connection_instantaneous, rate_connection_delayed
 */
 
-class nonlinearities_lin_rate
-{
+class nonlinearities_lin_rate {
 private:
   /** gain factor of gain function */
   double g_;
@@ -110,54 +108,35 @@ private:
 public:
   /** sets default parameters */
   nonlinearities_lin_rate()
-    : g_( 1.0 )
-    , g_ex_( 1.0 )
-    , g_in_( 1.0 )
-    , theta_ex_( 0.0 )
-    , theta_in_( 0.0 )
-  {
-  }
+      : g_(1.0), g_ex_(1.0), g_in_(1.0), theta_ex_(0.0), theta_in_(0.0) {}
 
-  void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-  void set( const DictionaryDatum& ); //!< Set values from dicitonary
+  void get(DictionaryDatum &) const; //!< Store current values in dictionary
+  void set(const DictionaryDatum &); //!< Set values from dicitonary
 
-  double input( double h );               // non-linearity on input
-  double mult_coupling_ex( double rate ); // factor of multiplicative coupling
-  double mult_coupling_in( double rate ); // factor of multiplicative coupling
+  double input(double h);               // non-linearity on input
+  double mult_coupling_ex(double rate); // factor of multiplicative coupling
+  double mult_coupling_in(double rate); // factor of multiplicative coupling
 };
 
-inline double
-nonlinearities_lin_rate::input( double h )
-{
-  return g_ * h;
+inline double nonlinearities_lin_rate::input(double h) { return g_ * h; }
+
+inline double nonlinearities_lin_rate::mult_coupling_ex(double rate) {
+  return g_ex_ * (theta_ex_ - rate);
 }
 
-inline double
-nonlinearities_lin_rate::mult_coupling_ex( double rate )
-{
-  return g_ex_ * ( theta_ex_ - rate );
+inline double nonlinearities_lin_rate::mult_coupling_in(double rate) {
+  return g_in_ * (theta_in_ + rate);
 }
 
-inline double
-nonlinearities_lin_rate::mult_coupling_in( double rate )
-{
-  return g_in_ * ( theta_in_ + rate );
-}
+typedef rate_neuron_ipn<nest::nonlinearities_lin_rate> lin_rate_ipn;
+typedef rate_neuron_opn<nest::nonlinearities_lin_rate> lin_rate_opn;
+typedef rate_transformer_node<nest::nonlinearities_lin_rate>
+    rate_transformer_lin;
 
-typedef rate_neuron_ipn< nest::nonlinearities_lin_rate > lin_rate_ipn;
-typedef rate_neuron_opn< nest::nonlinearities_lin_rate > lin_rate_opn;
-typedef rate_transformer_node< nest::nonlinearities_lin_rate >
-  rate_transformer_lin;
-
-template <>
-void RecordablesMap< lin_rate_ipn >::create();
-template <>
-void RecordablesMap< lin_rate_opn >::create();
-template <>
-void RecordablesMap< rate_transformer_lin >::create();
-
+template <> void RecordablesMap<lin_rate_ipn>::create();
+template <> void RecordablesMap<lin_rate_opn>::create();
+template <> void RecordablesMap<rate_transformer_lin>::create();
 
 } // namespace nest
-
 
 #endif /* #ifndef LIN_RATE_H */

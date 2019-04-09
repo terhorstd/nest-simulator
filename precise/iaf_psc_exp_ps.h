@@ -41,8 +41,7 @@
 // Includes from precise:
 #include "slice_ring_buffer.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: iaf_psc_exp_ps - Leaky integrate-and-fire neuron
@@ -121,8 +120,7 @@ Receives: SpikeEvent, CurrentEvent, DataLoggingRequest
 
 SeeAlso: iaf_psc_exp, iaf_psc_alpha_canon
 */
-class iaf_psc_exp_ps : public Archiving_Node
-{
+class iaf_psc_exp_ps : public Archiving_Node {
 public:
   /** Basic constructor.
       This constructor should only be used by GenericModel to create
@@ -137,7 +135,7 @@ public:
       @note The copy constructor MUST NOT be used to create nodes based
       on nodes that have been placed in the network.
   */
-  iaf_psc_exp_ps( const iaf_psc_exp_ps& );
+  iaf_psc_exp_ps(const iaf_psc_exp_ps &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -147,23 +145,23 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
+  void handle(DataLoggingRequest &);
 
   bool is_off_grid() const // uses off_grid events
   {
     return true;
   }
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
   /** @name Interface functions
@@ -171,7 +169,7 @@ private:
    * only through a Node*.
    */
   //@{
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
@@ -192,19 +190,19 @@ private:
    * While the neuron is refractory, membrane potential (y2_) is
    * clamped to U_reset_.
    */
-  void update( Time const& origin, const long from, const long to );
+  void update(Time const &origin, const long from, const long to);
   //@}
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< iaf_psc_exp_ps >;
-  friend class UniversalDataLogger< iaf_psc_exp_ps >;
+  friend class RecordablesMap<iaf_psc_exp_ps>;
+  friend class UniversalDataLogger<iaf_psc_exp_ps>;
 
   /**
    * Propagate neuron state.
    * Propagate the neuron's state by dt.
    * @param dt Interval over which to propagate
    */
-  void propagate_( const double dt );
+  void propagate_(const double dt);
 
   /**
    * Trigger iterative method to find the precise spike time within
@@ -217,10 +215,8 @@ private:
    * @param t0      Beginning of mini-timestep
    * @param dt      Duration of mini-timestep
    */
-  void emit_spike_( const Time& origin,
-    const long lag,
-    const double t0,
-    const double dt );
+  void emit_spike_(const Time &origin, const long lag, const double t0,
+                   const double dt);
 
   /**
    * Instantaneously emit a spike at the precise time defined by
@@ -230,24 +226,22 @@ private:
    * @param lag           Time step within slice
    * @param spike_offset  Time offset for spike
    */
-  void emit_instant_spike_( const Time& origin,
-    const long lag,
-    const double spike_offset );
+  void emit_instant_spike_(const Time &origin, const long lag,
+                           const double spike_offset);
 
   /**
    * Localize threshold crossing by bisectioning.
    * @param   double length of interval since previous event
    * @returns time from previous event to threshold crossing
    */
-  double bisectioning_( const double dt ) const;
+  double bisectioning_(const double dt) const;
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     /** Membrane time constant in ms. */
     double tau_m_;
 
@@ -284,12 +278,12 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
     /** Set values from dictionary.
      * @returns Change in reversal potential E_L, to be passed to State_::set()
      */
-    double set( const DictionaryDatum& );
+    double set(const DictionaryDatum &);
   };
 
   // ----------------------------------------------------------------
@@ -297,8 +291,7 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
     double y0_;    //!< External input current
     double y1_ex_; //!< Exc. exponetial current
     double y1_in_; //!< Inh. exponetial current
@@ -310,14 +303,14 @@ private:
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum&, const Parameters_& ) const;
+    void get(DictionaryDatum &, const Parameters_ &) const;
 
     /** Set values from dictionary.
      * @param dictionary to take data from
      * @param current parameters
      * @param Change in reversal potential E_L specified by this dict
      */
-    void set( const DictionaryDatum&, const Parameters_&, double );
+    void set(const DictionaryDatum &, const Parameters_ &, double);
   };
 
   // ----------------------------------------------------------------
@@ -325,10 +318,9 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( iaf_psc_exp_ps& );
-    Buffers_( const Buffers_&, iaf_psc_exp_ps& );
+  struct Buffers_ {
+    Buffers_(iaf_psc_exp_ps &);
+    Buffers_(const Buffers_ &, iaf_psc_exp_ps &);
 
     /**
      * Queue for incoming events.
@@ -338,7 +330,7 @@ private:
     RingBuffer currents_;
 
     //! Logger for all analog data
-    UniversalDataLogger< iaf_psc_exp_ps > logger_;
+    UniversalDataLogger<iaf_psc_exp_ps> logger_;
   };
 
   // ----------------------------------------------------------------
@@ -346,8 +338,7 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
     double h_ms_;           //!< Time resolution [ms]
     long refractory_steps_; //!< Refractory time in steps
     double expm1_tau_m_;    //!< exp(-h/tau_m) - 1
@@ -365,11 +356,7 @@ private:
   // Access functions for UniversalDataLogger -------------------------------
 
   //! Read out the real membrane potential
-  double
-  get_V_m_() const
-  {
-    return S_.y2_ + P_.E_L_;
-  }
+  double get_V_m_() const { return S_.y2_ + P_.E_L_; }
 
   // ----------------------------------------------------------------
 
@@ -387,80 +374,66 @@ private:
   /** @} */
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< iaf_psc_exp_ps > recordablesMap_;
+  static RecordablesMap<iaf_psc_exp_ps> recordablesMap_;
 };
 
-inline port
-nest::iaf_psc_exp_ps::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port nest::iaf_psc_exp_ps::send_test_event(Node &target,
+                                                  rport receptor_type, synindex,
+                                                  bool) {
   SpikeEvent e;
-  e.set_sender( *this );
-  return target.handles_test_event( e, receptor_type );
+  e.set_sender(*this);
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-iaf_psc_exp_ps::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port iaf_psc_exp_ps::handles_test_event(SpikeEvent &,
+                                               rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-iaf_psc_exp_ps::handles_test_event( CurrentEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port iaf_psc_exp_ps::handles_test_event(CurrentEvent &,
+                                               rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-iaf_psc_exp_ps::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port iaf_psc_exp_ps::handles_test_event(DataLoggingRequest &dlr,
+                                               rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-iaf_psc_exp_ps::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d, P_ );
-  Archiving_Node::get_status( d );
+inline void iaf_psc_exp_ps::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d, P_);
+  Archiving_Node::get_status(d);
 
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-iaf_psc_exp_ps::set_status( const DictionaryDatum& d )
-{
-  Parameters_ ptmp = P_;                 // temporary copy in case of errors
-  const double delta_EL = ptmp.set( d ); // throws if BadProperty
-  State_ stmp = S_;                      // temporary copy in case of errors
-  stmp.set( d, ptmp, delta_EL );         // throws if BadProperty
+inline void iaf_psc_exp_ps::set_status(const DictionaryDatum &d) {
+  Parameters_ ptmp = P_;               // temporary copy in case of errors
+  const double delta_EL = ptmp.set(d); // throws if BadProperty
+  State_ stmp = S_;                    // temporary copy in case of errors
+  stmp.set(d, ptmp, delta_EL);         // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // IAF_PSC_EXP_PS_H

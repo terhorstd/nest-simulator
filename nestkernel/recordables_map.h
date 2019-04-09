@@ -36,8 +36,7 @@
 #include "arraydatum.h"
 #include "name.h"
 
-namespace nest
-{
+namespace nest {
 /**
  * Map names of recordables to data access functions.
  *
@@ -59,18 +58,15 @@ namespace nest
  * @see multimeter, UniversalDataLogger
  * @ingroup Devices
  */
-template < typename HostNode >
-class RecordablesMap : public std::map< Name, double ( HostNode::* )() const >
-{
-  typedef std::map< Name, double ( HostNode::* )() const > Base_;
+template <typename HostNode>
+class RecordablesMap : public std::map<Name, double (HostNode::*)() const> {
+  typedef std::map<Name, double (HostNode::*)() const> Base_;
 
 public:
-  virtual ~RecordablesMap()
-  {
-  }
+  virtual ~RecordablesMap() {}
 
   //! Datatype for access functions
-  typedef double ( HostNode::*DataAccessFct )() const;
+  typedef double (HostNode::*DataAccessFct)() const;
 
   /**
    * Create the map.
@@ -87,14 +83,11 @@ public:
    *       build the list every time, even though that beats the
    *       goal of being more efficient ...
    */
-  ArrayDatum
-  get_list() const
-  {
+  ArrayDatum get_list() const {
     ArrayDatum recordables;
-    for ( typename Base_::const_iterator it = this->begin(); it != this->end();
-          ++it )
-    {
-      recordables.push_back( new LiteralDatum( it->first ) );
+    for (typename Base_::const_iterator it = this->begin(); it != this->end();
+         ++it) {
+      recordables.push_back(new LiteralDatum(it->first));
     }
     return recordables;
 
@@ -104,10 +97,8 @@ public:
 
 private:
   //! Insertion functions to be used in create(), adds entry to map and list
-  void
-  insert_( const Name& n, const DataAccessFct f )
-  {
-    Base_::insert( std::make_pair( n, f ) );
+  void insert_(const Name &n, const DataAccessFct f) {
+    Base_::insert(std::make_pair(n, f));
 
     // Line below leads to seg-fault if nest is quit right after start,
     // see comment on get_list()
@@ -123,35 +114,22 @@ private:
   // ArrayDatum recordables_;
 };
 
-template < typename HostNode >
-void
-RecordablesMap< HostNode >::create()
-{
-  assert( false );
+template <typename HostNode> void RecordablesMap<HostNode>::create() {
+  assert(false);
 }
 
-
 //! Class that reads out state vector elements, used by UniversalDataLogger
-template < typename HostNode >
-class DataAccessFunctor
-{
+template <typename HostNode> class DataAccessFunctor {
   // Pointer instead of reference required to avoid problems with
   // copying element in std::map when using libc++ under C++11.
-  HostNode* parent_;
+  HostNode *parent_;
   size_t elem_;
 
 public:
-  DataAccessFunctor( HostNode& n, size_t elem )
-    : parent_( &n )
-    , elem_( elem ){};
+  DataAccessFunctor(HostNode &n, size_t elem) : parent_(&n), elem_(elem){};
 
-  double
-  operator()() const
-  {
-    return parent_->get_state_element( elem_ );
-  };
+  double operator()() const { return parent_->get_state_element(elem_); };
 };
-
 
 /**
  * Map names of recordables to DataAccessFunctors.
@@ -166,19 +144,16 @@ public:
  * @see multimeter, UniversalDataLogger
  * @ingroup Devices
  */
-template < typename HostNode >
+template <typename HostNode>
 class DynamicRecordablesMap
-  : public std::map< Name, const DataAccessFunctor< HostNode > >
-{
-  typedef std::map< Name, const DataAccessFunctor< HostNode > > Base_;
+    : public std::map<Name, const DataAccessFunctor<HostNode>> {
+  typedef std::map<Name, const DataAccessFunctor<HostNode>> Base_;
 
 public:
-  virtual ~DynamicRecordablesMap()
-  {
-  }
+  virtual ~DynamicRecordablesMap() {}
 
   //! Datatype for access callable
-  typedef DataAccessFunctor< HostNode > DataAccessFct;
+  typedef DataAccessFunctor<HostNode> DataAccessFct;
 
   /**
    * Create the map.
@@ -186,7 +161,7 @@ public:
    * Recordables map and must fill the map. This should happen
    * as part of the original constructor for the Node.
    */
-  void create( HostNode& n );
+  void create(HostNode &n);
 
   /**
    * Obtain SLI list of all recordables, for use by get_status().
@@ -195,49 +170,39 @@ public:
    *       build the list every time, even though that beats the
    *       goal of being more efficient ...
    */
-  ArrayDatum
-  get_list() const
-  {
+  ArrayDatum get_list() const {
     ArrayDatum recordables;
-    for ( typename Base_::const_iterator it = this->begin(); it != this->end();
-          ++it )
-    {
-      recordables.push_back( new LiteralDatum( it->first ) );
+    for (typename Base_::const_iterator it = this->begin(); it != this->end();
+         ++it) {
+      recordables.push_back(new LiteralDatum(it->first));
     }
     return recordables;
   }
 
   //! Insertion functions to be used in create(), adds entry to map and list
-  void
-  insert( const Name& n, const DataAccessFct& f )
-  {
-    Base_::insert( std::make_pair( n, f ) );
+  void insert(const Name &n, const DataAccessFct &f) {
+    Base_::insert(std::make_pair(n, f));
   }
 
   //! Erase functions to be used when setting state, removes entry from map and
   //! list
-  void
-  erase( const Name& n )
-  {
+  void erase(const Name &n) {
     // .toString() required as work-around for #339, remove when #348 is solved.
-    typename DynamicRecordablesMap< HostNode >::iterator it =
-      this->find( n.toString() );
+    typename DynamicRecordablesMap<HostNode>::iterator it =
+        this->find(n.toString());
     // If the Name is not in the map, throw an error
-    if ( it == this->end() )
-    {
-      throw KeyError( n, "DynamicRecordablesMap", "erase" );
+    if (it == this->end()) {
+      throw KeyError(n, "DynamicRecordablesMap", "erase");
     }
 
-    Base_::erase( it );
+    Base_::erase(it);
   }
 };
 
-template < typename HostNode >
-void
-DynamicRecordablesMap< HostNode >::create( HostNode& n )
-{
-  assert( false );
+template <typename HostNode>
+void DynamicRecordablesMap<HostNode>::create(HostNode &n) {
+  assert(false);
 }
-}
+} // namespace nest
 
 #endif

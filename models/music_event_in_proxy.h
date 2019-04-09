@@ -37,8 +37,7 @@
 #include "event.h"
 #include "nest_types.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: music_event_in_proxy - A device which receives spikes from MUSIC.
@@ -87,23 +86,14 @@ Availability: Only when compiled with MUSIC
 SeeAlso: SetAcceptableLatency, music_event_out_proxy, music_cont_in_proxy,
 music_message_in_proxy
 */
-class music_event_in_proxy : public DeviceNode
-{
+class music_event_in_proxy : public DeviceNode {
 
 public:
   music_event_in_proxy();
-  music_event_in_proxy( const music_event_in_proxy& );
+  music_event_in_proxy(const music_event_in_proxy &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  } // a copy on each process
-  bool
-  one_node_per_process() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return false; } // a copy on each process
+  bool one_node_per_process() const { return true; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -113,53 +103,48 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  void handle( SpikeEvent& );
-  port send_test_event( Node&, rport, synindex, bool );
+  void handle(SpikeEvent &);
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
-  void
-  update( Time const&, const long, const long )
-  {
-  }
+  void update(Time const &, const long, const long) {}
 
   // ------------------------------------------------------------
   struct State_;
 
-  struct Parameters_
-  {
+  struct Parameters_ {
     std::string port_name_; //!< the name of MUSIC port to connect to
     int channel_;           //!< the MUSIC channel of the port
 
-    Parameters_();                     //!< Sets default parameter values
-    Parameters_( const Parameters_& ); //!< Recalibrate all times
+    Parameters_();                    //!< Sets default parameter values
+    Parameters_(const Parameters_ &); //!< Recalibrate all times
 
-    void get( DictionaryDatum& ) const;
+    void get(DictionaryDatum &) const;
 
     /**
      * Set values from dicitonary.
      */
-    void set( const DictionaryDatum&, State_& );
+    void set(const DictionaryDatum &, State_ &);
   };
 
   // ------------------------------------------------------------
 
-  struct State_
-  {
+  struct State_ {
     bool registered_; //!< indicates whether this node has been registered
                       //!< already with MUSIC
 
     State_(); //!< Sets default state value
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
     //!< Set values from dictionary
-    void set( const DictionaryDatum&, const Parameters_& );
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ------------------------------------------------------------
@@ -168,19 +153,16 @@ private:
   State_ S_;
 };
 
-inline port
-music_event_in_proxy::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port music_event_in_proxy::send_test_event(Node &target,
+                                                  rport receptor_type, synindex,
+                                                  bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-} // namespace
+} // namespace nest
 
 #endif
 

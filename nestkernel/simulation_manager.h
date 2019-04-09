@@ -36,26 +36,24 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 class Node;
 
-class SimulationManager : public ManagerInterface
-{
+class SimulationManager : public ManagerInterface {
 public:
   SimulationManager();
 
   virtual void initialize();
   virtual void finalize();
 
-  virtual void set_status( const DictionaryDatum& );
-  virtual void get_status( DictionaryDatum& );
+  virtual void set_status(const DictionaryDatum &);
+  virtual void get_status(DictionaryDatum &);
 
   /**
       check for errors in time before run
       @throws KernelException if illegal time passed
   */
-  void assert_valid_simtime( Time const& );
+  void assert_valid_simtime(Time const &);
 
   /*
      Simulate can be broken up into .. prepare... run.. run.. cleanup..
@@ -73,7 +71,7 @@ public:
      calls to get_status(), but any changes to the network are undefined,
      leading serious risk of incorrect results.
   */
-  void run( Time const& );
+  void run(Time const &);
   /**
      Closes a set of runs, doing finalizations such as file closures.
      After cleanup() is called, no more run()s can be called before another
@@ -85,7 +83,7 @@ public:
    * Simulate for the given time .
    * calls prepare(); run(Time&); cleanup();
    */
-  void simulate( Time const& );
+  void simulate(Time const &);
 
   /**
    * Returns true if waveform relaxation is used.
@@ -110,7 +108,7 @@ public:
   /**
    * Get the time at the beginning of the current time slice.
    */
-  Time const& get_slice_origin() const;
+  Time const &get_slice_origin() const;
 
   /**
    * Get the time at the beginning of the previous time slice.
@@ -144,7 +142,7 @@ public:
 
   //! Return current simulation time.
   // TODO: Precisely how defined? Rename!
-  Time const& get_clock() const;
+  Time const &get_clock() const;
 
   //! Return start of current time slice, in steps.
   // TODO: rename / precisely how defined?
@@ -155,12 +153,12 @@ public:
   delay get_to_step() const;
 
   //! Sorts source table and connections and create new target table.
-  void update_connection_infrastructure( const thread tid );
+  void update_connection_infrastructure(const thread tid);
 
 private:
   void call_update_(); //!< actually run simulation, aka wrap update_
   void update_();      //! actually perform simulation
-  bool wfr_update_( Node* );
+  bool wfr_update_(Node *);
   void advance_time_();   //!< Update time to next time step
   void print_progress_(); //!< TODO: Remove, replace by logging!
 
@@ -194,73 +192,36 @@ private:
                                    //!< relaxation method
 };
 
-inline Time const&
-SimulationManager::get_slice_origin() const
-{
+inline Time const &SimulationManager::get_slice_origin() const {
   return clock_;
 }
 
-inline Time const
-SimulationManager::get_time() const
-{
-  assert( not simulating_ );
-  return clock_ + Time::step( from_step_ );
+inline Time const SimulationManager::get_time() const {
+  assert(not simulating_);
+  return clock_ + Time::step(from_step_);
 }
 
-inline bool
-SimulationManager::has_been_simulated() const
-{
-  return simulated_;
-}
+inline bool SimulationManager::has_been_simulated() const { return simulated_; }
 
-inline size_t
-SimulationManager::get_slice() const
-{
-  return slice_;
-}
+inline size_t SimulationManager::get_slice() const { return slice_; }
 
-inline Time const&
-SimulationManager::get_clock() const
-{
-  return clock_;
-}
+inline Time const &SimulationManager::get_clock() const { return clock_; }
 
-inline delay
-SimulationManager::get_from_step() const
-{
-  return from_step_;
-}
+inline delay SimulationManager::get_from_step() const { return from_step_; }
 
-inline delay
-SimulationManager::get_to_step() const
-{
-  return to_step_;
-}
+inline delay SimulationManager::get_to_step() const { return to_step_; }
 
-inline bool
-SimulationManager::use_wfr() const
-{
-  return use_wfr_;
-}
+inline bool SimulationManager::use_wfr() const { return use_wfr_; }
 
-inline double
-SimulationManager::get_wfr_comm_interval() const
-{
+inline double SimulationManager::get_wfr_comm_interval() const {
   return wfr_comm_interval_;
 }
 
-inline double
-SimulationManager::get_wfr_tol() const
-{
-  return wfr_tol_;
-}
+inline double SimulationManager::get_wfr_tol() const { return wfr_tol_; }
 
-inline size_t
-SimulationManager::get_wfr_interpolation_order() const
-{
+inline size_t SimulationManager::get_wfr_interpolation_order() const {
   return wfr_interpolation_order_;
 }
-}
-
+} // namespace nest
 
 #endif /* SIMULATION_MANAGER_H */

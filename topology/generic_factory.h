@@ -32,8 +32,7 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 class AbstractGeneric;
 
 /**
@@ -44,12 +43,10 @@ class AbstractGeneric;
  * containing parameters for the mask) or a specialized factory function.
  * @see Alexandrescu, A (2001). Modern C++ Design, Addison-Wesley, ch. 8.
  */
-template < class BaseT >
-class GenericFactory
-{
+template <class BaseT> class GenericFactory {
 public:
-  typedef BaseT* ( *CreatorFunction )( const DictionaryDatum& d );
-  typedef std::map< Name, CreatorFunction > AssocMap;
+  typedef BaseT *(*CreatorFunction)(const DictionaryDatum &d);
+  typedef std::map<Name, CreatorFunction> AssocMap;
 
   /**
    * Factory function.
@@ -57,7 +54,7 @@ public:
    * @param d    Dictionary containing parameters for this subtype.
    * @returns dynamically allocated new object.
    */
-  BaseT* create( const Name& name, const DictionaryDatum& d ) const;
+  BaseT *create(const Name &name, const DictionaryDatum &d) const;
 
   /**
    * Register a new subtype. The type name must not already exist. The
@@ -67,8 +64,7 @@ public:
    * @param name subtype name.
    * @returns true if subtype was successfully registered.
    */
-  template < class T >
-  bool register_subtype( const Name& name );
+  template <class T> bool register_subtype(const Name &name);
 
   /**
    * Register a new subtype. The type name must not already exist.
@@ -77,52 +73,41 @@ public:
    *                from a const DictionaryDatum& containing parameters
    * @returns true if mask was successfully registered.
    */
-  bool register_subtype( const Name& name, CreatorFunction creator );
+  bool register_subtype(const Name &name, CreatorFunction creator);
 
 private:
-  template < class T >
-  static BaseT* new_from_dict_( const DictionaryDatum& d );
+  template <class T> static BaseT *new_from_dict_(const DictionaryDatum &d);
 
   AssocMap associations_;
 };
 
-template < class BaseT >
-inline BaseT*
-GenericFactory< BaseT >::create( const Name& name,
-  const DictionaryDatum& d ) const
-{
-  typename AssocMap::const_iterator i = associations_.find( name );
-  if ( i != associations_.end() )
-  {
-    return ( i->second )( d );
+template <class BaseT>
+inline BaseT *GenericFactory<BaseT>::create(const Name &name,
+                                            const DictionaryDatum &d) const {
+  typename AssocMap::const_iterator i = associations_.find(name);
+  if (i != associations_.end()) {
+    return (i->second)(d);
   }
-  throw UndefinedName( name.toString() );
+  throw UndefinedName(name.toString());
 }
 
-template < class BaseT >
-template < class T >
-inline bool
-GenericFactory< BaseT >::register_subtype( const Name& name )
-{
-  return register_subtype( name, new_from_dict_< T > );
+template <class BaseT>
+template <class T>
+inline bool GenericFactory<BaseT>::register_subtype(const Name &name) {
+  return register_subtype(name, new_from_dict_<T>);
 }
 
-template < class BaseT >
-inline bool
-GenericFactory< BaseT >::register_subtype( const Name& name,
-  CreatorFunction creator )
-{
-  return associations_
-    .insert( std::pair< Name, CreatorFunction >( name, creator ) )
-    .second;
+template <class BaseT>
+inline bool GenericFactory<BaseT>::register_subtype(const Name &name,
+                                                    CreatorFunction creator) {
+  return associations_.insert(std::pair<Name, CreatorFunction>(name, creator))
+      .second;
 }
 
-template < class BaseT >
-template < class T >
-BaseT*
-GenericFactory< BaseT >::new_from_dict_( const DictionaryDatum& d )
-{
-  return new T( d );
+template <class BaseT>
+template <class T>
+BaseT *GenericFactory<BaseT>::new_from_dict_(const DictionaryDatum &d) {
+  return new T(d);
 }
 
 } // namespace nest

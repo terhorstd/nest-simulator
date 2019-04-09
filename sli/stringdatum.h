@@ -51,7 +51,6 @@
 //      void pprint(ostream &) const;
 //  };
 
-
 /* These are declarations to specialize the static memory pool BEFORE
    we instantiate the AggregateDatum. Note, that this is only a declaration,
    because we do not provide an initializer (see ISO14882 Sec.  14.7.3.15.)
@@ -66,35 +65,27 @@
 */
 #ifndef HAVE_STATIC_TEMPLATE_DECLARATION_FAILS
 template <>
-sli::pool AggregateDatum< std::string, &SLIInterpreter::Stringtype >::memory;
+sli::pool AggregateDatum<std::string, &SLIInterpreter::Stringtype>::memory;
 #endif
 
-
 template <>
-void AggregateDatum< std::string, &SLIInterpreter::Stringtype >::pprint(
-  std::ostream& out ) const;
+void AggregateDatum<std::string, &SLIInterpreter::Stringtype>::pprint(
+    std::ostream &out) const;
 
+typedef AggregateDatum<std::string, &SLIInterpreter::Stringtype> StringDatum;
 
-typedef AggregateDatum< std::string, &SLIInterpreter::Stringtype > StringDatum;
+void init_slistring(SLIInterpreter *);
 
-void init_slistring( SLIInterpreter* );
-
-class ToUppercase_sFunction : public SLIFunction
-{
+class ToUppercase_sFunction : public SLIFunction {
 public:
-  ToUppercase_sFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ToUppercase_sFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
-class ToLowercase_sFunction : public SLIFunction
-{
+class ToLowercase_sFunction : public SLIFunction {
 public:
-  ToLowercase_sFunction()
-  {
-  }
-  void execute( SLIInterpreter* ) const;
+  ToLowercase_sFunction() {}
+  void execute(SLIInterpreter *) const;
 };
 
 #endif

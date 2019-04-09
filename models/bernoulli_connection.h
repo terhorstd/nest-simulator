@@ -20,7 +20,6 @@
  *
  */
 
-
 #ifndef BERNOULLI_CONNECTION_H
 #define BERNOULLI_CONNECTION_H
 
@@ -28,8 +27,7 @@
 #include "connection.h"
 #include "kernel_manager.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: bernoulli_synapse - Static synapse with stochastic transmission.
@@ -74,35 +72,26 @@ Lognormal Recurrent Network Model for Burst Generation during Hippocampal
 Sharp Waves, Journal of Neuroscience 28 October 2015, 35 (43) 14585-14601,
 DOI: 10.1523/JNEUROSCI.4944-14.2015
 */
-template < typename targetidentifierT >
-class BernoulliConnection : public Connection< targetidentifierT >
-{
+template <typename targetidentifierT>
+class BernoulliConnection : public Connection<targetidentifierT> {
 public:
   // this line determines which common properties to use
   typedef CommonSynapseProperties CommonPropertiesType;
-  typedef Connection< targetidentifierT > ConnectionBase;
+  typedef Connection<targetidentifierT> ConnectionBase;
 
   /**
    * Default Constructor.
    * Sets default values for all parameters. Needed by GenericConnectorModel.
    */
-  BernoulliConnection()
-    : ConnectionBase()
-    , weight_( 1.0 )
-    , p_transmit_( 1.0 )
-  {
-  }
+  BernoulliConnection() : ConnectionBase(), weight_(1.0), p_transmit_(1.0) {}
 
   /**
    * Copy constructor from a property object.
    * Needs to be defined properly in order for GenericConnector to work.
    */
-  BernoulliConnection( const BernoulliConnection& rhs )
-    : ConnectionBase( rhs )
-    , weight_( rhs.weight_ )
-    , p_transmit_( rhs.p_transmit_ )
-  {
-  }
+  BernoulliConnection(const BernoulliConnection &rhs)
+      : ConnectionBase(rhs), weight_(rhs.weight_),
+        p_transmit_(rhs.p_transmit_) {}
 
   // Explicitly declare all methods inherited from the dependent base
   // ConnectionBase. This avoids explicit name prefixes in all places these
@@ -112,101 +101,78 @@ public:
   using ConnectionBase::get_rport;
   using ConnectionBase::get_target;
 
-
-  class ConnTestDummyNode : public ConnTestDummyNodeBase
-  {
+  class ConnTestDummyNode : public ConnTestDummyNodeBase {
   public:
     // Ensure proper overriding of overloaded virtual functions.
     // Return values from functions are ignored.
     using ConnTestDummyNodeBase::handles_test_event;
-    port
-    handles_test_event( SpikeEvent&, rport )
-    {
-      return invalid_port_;
-    }
+    port handles_test_event(SpikeEvent &, rport) { return invalid_port_; }
   };
 
-  void
-  check_connection( Node& s,
-    Node& t,
-    rport receptor_type,
-    const CommonPropertiesType& )
-  {
+  void check_connection(Node &s, Node &t, rport receptor_type,
+                        const CommonPropertiesType &) {
     ConnTestDummyNode dummy_target;
-    ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
+    ConnectionBase::check_connection_(dummy_target, s, t, receptor_type);
   }
 
-  void
-  send( Event& e, thread t, const CommonSynapseProperties& )
-  {
-    SpikeEvent e_spike = static_cast< SpikeEvent& >( e );
+  void send(Event &e, thread t, const CommonSynapseProperties &) {
+    SpikeEvent e_spike = static_cast<SpikeEvent &>(e);
 
-    librandom::RngPtr rng = kernel().rng_manager.get_rng( t );
+    librandom::RngPtr rng = kernel().rng_manager.get_rng(t);
     const unsigned long n_spikes_in = e_spike.get_multiplicity();
     unsigned long n_spikes_out = 0;
 
-    for ( unsigned long n = 0; n < n_spikes_in; ++n )
-    {
-      if ( rng->drand() < p_transmit_ )
-      {
+    for (unsigned long n = 0; n < n_spikes_in; ++n) {
+      if (rng->drand() < p_transmit_) {
         ++n_spikes_out;
       }
     }
 
-    if ( n_spikes_out > 0 )
-    {
-      e_spike.set_multiplicity( n_spikes_out );
-      e.set_weight( weight_ );
-      e.set_delay_steps( get_delay_steps() );
-      e.set_receiver( *get_target( t ) );
-      e.set_rport( get_rport() );
+    if (n_spikes_out > 0) {
+      e_spike.set_multiplicity(n_spikes_out);
+      e.set_weight(weight_);
+      e.set_delay_steps(get_delay_steps());
+      e.set_receiver(*get_target(t));
+      e.set_rport(get_rport());
       e();
     }
 
     // Resets multiplicity for consistency
-    e_spike.set_multiplicity( n_spikes_in );
+    e_spike.set_multiplicity(n_spikes_in);
   }
 
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
-  void
-  set_weight( double w )
-  {
-    weight_ = w;
-  }
+  void set_weight(double w) { weight_ = w; }
 
 private:
   double weight_;
   double p_transmit_;
 };
 
-template < typename targetidentifierT >
-void
-BernoulliConnection< targetidentifierT >::get_status( DictionaryDatum& d ) const
-{
-  ConnectionBase::get_status( d );
-  def< double >( d, names::weight, weight_ );
-  def< double >( d, names::p_transmit, p_transmit_ );
-  def< long >( d, names::size_of, sizeof( *this ) );
+template <typename targetidentifierT>
+void BernoulliConnection<targetidentifierT>::get_status(
+    DictionaryDatum &d) const {
+  ConnectionBase::get_status(d);
+  def<double>(d, names::weight, weight_);
+  def<double>(d, names::p_transmit, p_transmit_);
+  def<long>(d, names::size_of, sizeof(*this));
 }
 
-template < typename targetidentifierT >
-void
-BernoulliConnection< targetidentifierT >::set_status( const DictionaryDatum& d,
-  ConnectorModel& cm )
-{
-  ConnectionBase::set_status( d, cm );
-  updateValue< double >( d, names::weight, weight_ );
-  updateValue< double >( d, names::p_transmit, p_transmit_ );
+template <typename targetidentifierT>
+void BernoulliConnection<targetidentifierT>::set_status(
+    const DictionaryDatum &d, ConnectorModel &cm) {
+  ConnectionBase::set_status(d, cm);
+  updateValue<double>(d, names::weight, weight_);
+  updateValue<double>(d, names::p_transmit, p_transmit_);
 
-  if ( p_transmit_ < 0 || p_transmit_ > 1 )
-  {
-    throw BadProperty( "Spike transmission probability must be in [0, 1]." );
+  if (p_transmit_ < 0 || p_transmit_ > 1) {
+    throw BadProperty("Spike transmission probability must be in [0, 1].");
   }
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef BERNOULLI_CONNECTION_H */

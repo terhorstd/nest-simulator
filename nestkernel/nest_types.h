@@ -46,8 +46,7 @@
  * Namespace for the NEST simulation kernel.
  */
 
-namespace nest
-{
+namespace nest {
 
 /**
  * \file nest_types.h
@@ -82,7 +81,7 @@ const tic_t tic_t_min = LONG_MIN;
  */
 typedef size_t index;
 #ifndef SIZE_MAX
-#define SIZE_MAX ( static_cast< std::size_t >( -1 ) )
+#define SIZE_MAX (static_cast<std::size_t>(-1))
 #endif
 const index invalid_index = SIZE_MAX;
 
@@ -92,7 +91,7 @@ const index invalid_index = SIZE_MAX;
 typedef unsigned char synindex;
 // const synindex invalid_synindex = UCHAR_MAX;
 const synindex invalid_synindex =
-  63; // number of synapse types limited by size of syn_id in target.h
+    63; // number of synapse types limited by size of syn_id in target.h
 
 /**
  * Unsigned short type for compact target representation.
@@ -173,13 +172,7 @@ const long delay_max = LONG_MAX;
  * that can in a meaningful way be connected to either neuron model
  * can use the wildcard ALL, that will match any connection partner.
  */
-enum SignalType
-{
-  NONE = 0,
-  SPIKE = 1,
-  BINARY = 2,
-  ALL = SPIKE | BINARY
-};
+enum SignalType { NONE = 0, SPIKE = 1, BINARY = 2, ALL = SPIKE | BINARY };
 }
 
 #endif // NEST_TYPES_H

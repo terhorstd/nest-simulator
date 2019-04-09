@@ -42,9 +42,7 @@
 #include "ring_buffer.h"
 #include "universal_data_logger.h"
 
-
-namespace nest
-{
+namespace nest {
 /**
  * Function computing right-hand side of ODE for GSL solver.
  * @note Must be declared here so we can befriend it in class.
@@ -55,7 +53,8 @@ namespace nest
  *       through a function pointer.
  * @param void* Pointer to model neuron instance.
  */
-extern "C" int aeif_psc_delta_dynamics( double, const double*, double*, void* );
+extern "C" int aeif_psc_delta_dynamics(double, const double *, double *,
+                                       void *);
 
 /** @BeginDocumentation
 Name: aeif_psc_delta - Current-based adaptive exponential integrate-and-fire
@@ -124,12 +123,11 @@ References: Brette R and Gerstner W (2005) Adaptive Exponential
 
 SeeAlso: iaf_psc_delta, aeif_cond_exp, aeif_psc_exp
 */
-class aeif_psc_delta : public Archiving_Node
-{
+class aeif_psc_delta : public Archiving_Node {
 
 public:
   aeif_psc_delta();
-  aeif_psc_delta( const aeif_psc_delta& );
+  aeif_psc_delta(const aeif_psc_delta &);
   ~aeif_psc_delta();
 
   /**
@@ -140,42 +138,41 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
-  void handle( DataLoggingRequest& );
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
-  void update( const Time&, const long, const long );
+  void update(const Time &, const long, const long);
 
   // END Boilerplate function declarations ----------------------------
 
   // Friends --------------------------------------------------------
 
   // make dynamics function quasi-member
-  friend int aeif_psc_delta_dynamics( double, const double*, double*, void* );
+  friend int aeif_psc_delta_dynamics(double, const double *, double *, void *);
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class RecordablesMap< aeif_psc_delta >;
-  friend class UniversalDataLogger< aeif_psc_delta >;
+  friend class RecordablesMap<aeif_psc_delta>;
+  friend class UniversalDataLogger<aeif_psc_delta>;
 
 private:
   // ----------------------------------------------------------------
 
   //! Independent parameters
-  struct Parameters_
-  {
+  struct Parameters_ {
     double V_peak_;  //!< Spike detection threshold in mV
     double V_reset_; //!< Reset Potential in mV
 
@@ -198,8 +195,8 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
 public:
@@ -210,8 +207,7 @@ public:
    * @note Copy constructor and assignment operator required because
    *       of C-style array.
    */
-  struct State_
-  {
+  struct State_ {
     /** Accumulate spikes arriving during refractory period, discounted for
         decay until end of refractory period.
     */
@@ -222,23 +218,18 @@ public:
      * identifies the elements of the vector. It must be public to be
      * accessible from the iteration function.
      */
-    enum StateVecElems
-    {
-      V_M = 0,
-      W,
-      STATE_VEC_SIZE
-    };
+    enum StateVecElems { V_M = 0, W, STATE_VEC_SIZE };
 
     //! neuron state, must be C-array for GSL solver
-    double y_[ STATE_VEC_SIZE ];
+    double y_[STATE_VEC_SIZE];
     unsigned int r_; //!< number of refractory steps remaining
 
-    State_( const Parameters_& ); //!< Default initialization
-    State_( const State_& );
-    State_& operator=( const State_& );
+    State_(const Parameters_ &); //!< Default initialization
+    State_(const State_ &);
+    State_ &operator=(const State_ &);
 
-    void get( DictionaryDatum& ) const;
-    void set( const DictionaryDatum&, const Parameters_& );
+    void get(DictionaryDatum &) const;
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ----------------------------------------------------------------
@@ -246,22 +237,21 @@ public:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( aeif_psc_delta& );                  //!< Sets buffer pointers to 0
-    Buffers_( const Buffers_&, aeif_psc_delta& ); //!< Sets buffer pointers to 0
+  struct Buffers_ {
+    Buffers_(aeif_psc_delta &);                   //!< Sets buffer pointers to 0
+    Buffers_(const Buffers_ &, aeif_psc_delta &); //!< Sets buffer pointers to 0
 
     //! Logger for all analog data
-    UniversalDataLogger< aeif_psc_delta > logger_;
+    UniversalDataLogger<aeif_psc_delta> logger_;
 
     /** buffers and sums up incoming spikes/currents */
     RingBuffer spikes_;
     RingBuffer currents_;
 
     /** GSL ODE stuff */
-    gsl_odeiv_step* s_;    //!< stepping function
-    gsl_odeiv_control* c_; //!< adaptive stepsize control function
-    gsl_odeiv_evolve* e_;  //!< evolution function
+    gsl_odeiv_step *s_;    //!< stepping function
+    gsl_odeiv_control *c_; //!< adaptive stepsize control function
+    gsl_odeiv_evolve *e_;  //!< evolution function
     gsl_odeiv_system sys_; //!< struct describing the GSL system
 
     // IntergrationStep_ should be reset with the neuron on ResetNetwork,
@@ -286,8 +276,7 @@ public:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
+  struct Variables_ {
     /**
      * Threshold detection for spike events: P.V_peak if Delta_T > 0.,
      * P.V_th if Delta_T == 0.
@@ -306,11 +295,8 @@ public:
   // Access functions for UniversalDataLogger -------------------------------
 
   //! Read out state vector elements, used by UniversalDataLogger
-  template < State_::StateVecElems elem >
-  double
-  get_y_elem_() const
-  {
-    return S_.y_[ elem ];
+  template <State_::StateVecElems elem> double get_y_elem_() const {
+    return S_.y_[elem];
   }
 
   // ----------------------------------------------------------------
@@ -321,82 +307,67 @@ public:
   Buffers_ B_;
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< aeif_psc_delta > recordablesMap_;
+  static RecordablesMap<aeif_psc_delta> recordablesMap_;
 };
 
-inline port
-aeif_psc_delta::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port aeif_psc_delta::send_test_event(Node &target, rport receptor_type,
+                                            synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-aeif_psc_delta::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port aeif_psc_delta::handles_test_event(SpikeEvent &,
+                                               rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-aeif_psc_delta::handles_test_event( CurrentEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port aeif_psc_delta::handles_test_event(CurrentEvent &,
+                                               rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-aeif_psc_delta::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port aeif_psc_delta::handles_test_event(DataLoggingRequest &dlr,
+                                               rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-aeif_psc_delta::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d );
-  Archiving_Node::get_status( d );
+inline void aeif_psc_delta::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d);
+  Archiving_Node::get_status(d);
 
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-aeif_psc_delta::set_status( const DictionaryDatum& d )
-{
+inline void aeif_psc_delta::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
   State_ stmp = S_;      // temporary copy in case of errors
-  stmp.set( d, ptmp );   // throws if BadProperty
+  stmp.set(d, ptmp);     // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // HAVE_GSL
 #endif // AEIF_PSC_delta_H

@@ -77,27 +77,20 @@
 */
 
 mynest::StepPatternBuilder::StepPatternBuilder(
-  const nest::GIDCollection& sources,
-  const nest::GIDCollection& targets,
-  const DictionaryDatum& conn_spec,
-  const DictionaryDatum& syn_spec )
-  : nest::ConnBuilder( sources, targets, conn_spec, syn_spec )
-  , source_step_( ( *conn_spec )[ Name( "source_step" ) ] )
-  , target_step_( ( *conn_spec )[ Name( "target_step" ) ] )
-{
-  if ( source_step_ < 1 )
-  {
-    throw nest::BadParameter( "source_step >= 1 required." );
+    const nest::GIDCollection &sources, const nest::GIDCollection &targets,
+    const DictionaryDatum &conn_spec, const DictionaryDatum &syn_spec)
+    : nest::ConnBuilder(sources, targets, conn_spec, syn_spec),
+      source_step_((*conn_spec)[Name("source_step")]),
+      target_step_((*conn_spec)[Name("target_step")]) {
+  if (source_step_ < 1) {
+    throw nest::BadParameter("source_step >= 1 required.");
   }
-  if ( target_step_ < 1 )
-  {
-    throw nest::BadParameter( "target_step >= 1 required." );
+  if (target_step_ < 1) {
+    throw nest::BadParameter("target_step >= 1 required.");
   }
 }
 
-void
-mynest::StepPatternBuilder::connect_()
-{
+void mynest::StepPatternBuilder::connect_() {
 // This code is based on AllToAllBuilder, except that we step
 // by source_step_ and target_step_ except for stepping by 1.
 
@@ -109,55 +102,44 @@ mynest::StepPatternBuilder::connect_()
 
     {
       // allocate pointer to thread-specific random generator
-      librandom::RngPtr rng = nest::kernel().rng_manager.get_rng( tid );
+      librandom::RngPtr rng = nest::kernel().rng_manager.get_rng(tid);
 
-      for ( nest::GIDCollection::const_iterator tgid = targets_->begin();
-            tgid != targets_->end();
-            tgid = advance_( tgid, targets_->end(), target_step_ ) )
-      {
-        for ( nest::GIDCollection::const_iterator sgid = sources_->begin();
-              sgid != sources_->end();
-              sgid = advance_( sgid, sources_->end(), source_step_ ) )
-        {
-          if ( not autapses_ and *sgid == *tgid )
-          {
-            skip_conn_parameter_( tid );
+      for (nest::GIDCollection::const_iterator tgid = targets_->begin();
+           tgid != targets_->end();
+           tgid = advance_(tgid, targets_->end(), target_step_)) {
+        for (nest::GIDCollection::const_iterator sgid = sources_->begin();
+             sgid != sources_->end();
+             sgid = advance_(sgid, sources_->end(), source_step_)) {
+          if (not autapses_ and *sgid == *tgid) {
+            skip_conn_parameter_(tid);
             continue;
           }
-          if ( not change_connected_synaptic_elements( *sgid, *tgid, tid, 1 ) )
-          {
-            for ( nest::GIDCollection::const_iterator sgid = sources_->begin();
-                  sgid != sources_->end();
-                  ++sgid )
-            {
-              skip_conn_parameter_( tid );
+          if (not change_connected_synaptic_elements(*sgid, *tgid, tid, 1)) {
+            for (nest::GIDCollection::const_iterator sgid = sources_->begin();
+                 sgid != sources_->end(); ++sgid) {
+              skip_conn_parameter_(tid);
             }
             continue;
           }
-          nest::Node* const target =
-            nest::kernel().node_manager.get_node( *tgid, tid );
+          nest::Node *const target =
+              nest::kernel().node_manager.get_node(*tgid, tid);
           const nest::thread target_thread = target->get_thread();
-          single_connect_( *sgid, *target, target_thread, rng );
+          single_connect_(*sgid, *target, target_thread, rng);
         }
       }
-    }
-    catch ( std::exception& err )
-    {
+    } catch (std::exception &err) {
       // We must create a new exception here, err's lifetime ends at
       // the end of the catch block.
-      exceptions_raised_.at( tid ) =
-        lockPTR< WrappedThreadException >( new WrappedThreadException( err ) );
+      exceptions_raised_.at(tid) =
+          lockPTR<WrappedThreadException>(new WrappedThreadException(err));
     }
   }
 }
 
-nest::GIDCollection::const_iterator&
-mynest::StepPatternBuilder::advance_( nest::GIDCollection::const_iterator& it,
-  const nest::GIDCollection::const_iterator& end,
-  size_t step )
-{
-  while ( step > 0 and it != end )
-  {
+nest::GIDCollection::const_iterator &mynest::StepPatternBuilder::advance_(
+    nest::GIDCollection::const_iterator &it,
+    const nest::GIDCollection::const_iterator &end, size_t step) {
+  while (step > 0 and it != end) {
     --step;
     ++it;
   }

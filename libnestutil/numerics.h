@@ -35,14 +35,13 @@
 #include <math.h>
 #endif
 
-#if defined( HAVE_STD_ISNAN )
+#if defined(HAVE_STD_ISNAN)
 #include <cmath>
-#elif defined( HAVE_ISNAN )
+#elif defined(HAVE_ISNAN)
 #include <math.h>
 #endif
 
-namespace numerics
-{
+namespace numerics {
 
 extern const double e;
 extern const double pi;
@@ -51,31 +50,24 @@ extern const double nan;
 /** Supply expm1() function independent of system.
  *  @note Implemented inline for efficiency.
  */
-inline double
-expm1( double x )
-{
+inline double expm1(double x) {
 #if HAVE_EXPM1
-  return ::expm1( x ); // use library implementation if available
+  return ::expm1(x); // use library implementation if available
 #else
   // compute using Taylor series, see GSL
   // e^x-1 = x + x^2/2! + x^3/3! + ...
-  if ( x == 0 )
-  {
+  if (x == 0) {
     return 0;
   }
-  if ( std::abs( x ) > std::log( 2.0 ) )
-  {
-    return std::exp( x ) - 1;
-  }
-  else
-  {
+  if (std::abs(x) > std::log(2.0)) {
+    return std::exp(x) - 1;
+  } else {
     double sum = x;
     double term = x * x / 2;
     long n = 2;
 
-    while ( std::abs( term )
-      > std::abs( sum ) * std::numeric_limits< double >::epsilon() )
-    {
+    while (std::abs(term) >
+           std::abs(sum) * std::numeric_limits<double>::epsilon()) {
       sum += term;
       ++n;
       term *= x / n;
@@ -86,21 +78,17 @@ expm1( double x )
 #endif
 }
 
-template < typename T >
-bool
-is_nan( T f )
-{
-#if defined( HAVE_STD_ISNAN )
-  return std::isnan( f );
-#elif defined( HAVE_ISNAN )
-  return isnan( f );
+template <typename T> bool is_nan(T f) {
+#if defined(HAVE_STD_ISNAN)
+  return std::isnan(f);
+#elif defined(HAVE_ISNAN)
+  return isnan(f);
 #else
-  assert( false ); // HAVE_STD_ISNAN or HAVE_ISNAN is required
+  assert(false); // HAVE_STD_ISNAN or HAVE_ISNAN is required
   return false;
 #endif
 }
-}
-
+} // namespace numerics
 
 // later also in namespace
 /**
@@ -110,7 +98,7 @@ is_nan( T f )
  * @note [-1/2, 1/2) -> 0 and in general [ (2n-1)/2, (2n+1)/2 ) -> n
  * @see dround
  */
-long ld_round( double );
+long ld_round(double);
 
 /**
  * Round to nearest int, rounding midpoints upwards.
@@ -119,12 +107,11 @@ long ld_round( double );
  * @note [-1/2, 1/2) -> 0 and in general [ (2n-1)/2, (2n+1)/2 ) -> n
  * @see ld_round
  */
-double dround( double );
+double dround(double);
 
 /**
  * Return integer part of argument.
  */
-double dtruncate( double );
-
+double dtruncate(double);
 
 #endif

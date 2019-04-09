@@ -35,8 +35,7 @@ class Dictionary;
 /**
  *  Provides random numbers and deviates to SLI.
  */
-class RandomNumbers : public SLIModule
-{
+class RandomNumbers : public SLIModule {
 public:
   static SLIType RngType;        // actual RNG
   static SLIType RngFactoryType; // random generator factory
@@ -44,20 +43,13 @@ public:
   static SLIType RdvType;        // random deviate generator
   static SLIType RdvFactoryType; // random deviate generator factory
 
-
   RandomNumbers(){};
   ~RandomNumbers();
 
-  const std::string
-  name( void ) const
-  {
-    return "RandomNumbers";
-  }
+  const std::string name(void) const { return "RandomNumbers"; }
 
-  const std::string
-  commandstring( void ) const
-  {
-    return std::string( "(librandom) run" );
+  const std::string commandstring(void) const {
+    return std::string("(librandom) run");
   }
 
   /**
@@ -65,71 +57,61 @@ public:
    * The random number generator
    * and the random deviate generator dictionaries are set up.
    */
-  void init( SLIInterpreter* );
+  void init(SLIInterpreter *);
 
   //! Returns global random number generator dictionary
-  static const Dictionary& get_rngdict();
+  static const Dictionary &get_rngdict();
 
   //! Returns global random deviate generator dictionary
-  static const Dictionary& get_rdvdict();
+  static const Dictionary &get_rdvdict();
 
   // RNG creation function
-  class CreateRNGFunction : public SLIFunction
-  {
+  class CreateRNGFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
   // RNG creation function
-  class CreateRDVFunction : public SLIFunction
-  {
+  class CreateRDVFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class SetStatus_vdFunction : public SLIFunction
-  {
+  class SetStatus_vdFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class GetStatus_vFunction : public SLIFunction
-  {
+  class GetStatus_vFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
   // RNG access functions
-  class IrandFunction : public SLIFunction
-  {
+  class IrandFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class DrandFunction : public SLIFunction
-  {
+  class DrandFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class SeedFunction : public SLIFunction
-  {
+  class SeedFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class RandomArrayFunction : public SLIFunction
-  {
+  class RandomArrayFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class RandomFunction : public SLIFunction
-  {
+  class RandomFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
-
 
   // create function
   CreateRNGFunction createrngfunction;
@@ -149,28 +131,24 @@ public:
 
 private:
   //! Utility function for registering number generators
-  template < typename NumberGenerator >
-  void register_rng_( const std::string& name, Dictionary& dict );
+  template <typename NumberGenerator>
+  void register_rng_(const std::string &name, Dictionary &dict);
 
   //! Utility function for registering deviate generators
-  template < typename DeviateGenerator >
-  void register_rdv_( const std::string& name, Dictionary& dict );
+  template <typename DeviateGenerator>
+  void register_rdv_(const std::string &name, Dictionary &dict);
 
-  static Dictionary* rngdict_; //!< manages random number generators
-  static Dictionary* rdvdict_; //!< manages random deviate generators
+  static Dictionary *rngdict_; //!< manages random number generators
+  static Dictionary *rdvdict_; //!< manages random deviate generators
 };
 
-inline const Dictionary&
-RandomNumbers::get_rngdict()
-{
-  assert( rngdict_ );
+inline const Dictionary &RandomNumbers::get_rngdict() {
+  assert(rngdict_);
   return *rngdict_;
 }
 
-inline const Dictionary&
-RandomNumbers::get_rdvdict()
-{
-  assert( rdvdict_ );
+inline const Dictionary &RandomNumbers::get_rdvdict() {
+  assert(rdvdict_);
   return *rdvdict_;
 }
 

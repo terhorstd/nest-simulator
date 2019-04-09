@@ -37,8 +37,7 @@
 // Includes from sli:
 #include "dictutils.h"
 
-namespace nest
-{
+namespace nest {
 
 /**
  * Base class for all Models.
@@ -52,25 +51,18 @@ namespace nest
  * @ingroup user_interface
  * @see Node
  */
-class Model
-{
+class Model {
 public:
-  Model( const std::string& name );
-  Model( const Model& m )
-    : name_( m.name_ )
-    , type_id_( m.type_id_ )
-    , memory_( m.memory_ )
-  {
-  }
+  Model(const std::string &name);
+  Model(const Model &m)
+      : name_(m.name_), type_id_(m.type_id_), memory_(m.memory_) {}
 
-  virtual ~Model()
-  {
-  }
+  virtual ~Model() {}
 
   /**
    * Create clone with new name.
    */
-  virtual Model* clone( const std::string& ) const = 0;
+  virtual Model *clone(const std::string &) const = 0;
 
   /**
    * Set number of threads based on number set in network.
@@ -86,9 +78,9 @@ public:
    * is allowed to modify the Model object for
    * 'administrative' purposes.
    */
-  Node* allocate( thread t );
+  Node *allocate(thread t);
 
-  void free( thread t, Node* );
+  void free(thread t, Node *);
 
   /**
    * Deletes all nodes which belong to this model.
@@ -105,7 +97,7 @@ public:
    * @param t Thread for which the Nodes are reserved.
    * @param n Number of Nodes to be allocated.
    */
-  void reserve_additional( thread t, size_t n );
+  void reserve_additional(thread t, size_t n);
 
   /**
    * Return name of the Model.
@@ -141,7 +133,7 @@ public:
    * @param d Dictionary with named parameter settings.
    * @ingroup status_interface
    */
-  void set_status( DictionaryDatum );
+  void set_status(DictionaryDatum);
 
   /**
    * Export properties of the prototype node by setting
@@ -149,15 +141,14 @@ public:
    * @param d Dictionary.
    * @ingroup status_interface
    */
-  DictionaryDatum get_status( void );
+  DictionaryDatum get_status(void);
 
-  virtual port send_test_event( Node&, rport, synindex, bool ) = 0;
+  virtual port send_test_event(Node &, rport, synindex, bool) = 0;
 
-  virtual void sends_secondary_event( GapJunctionEvent& ge ) = 0;
-  virtual void sends_secondary_event(
-    InstantaneousRateConnectionEvent& re ) = 0;
-  virtual void sends_secondary_event( DiffusionConnectionEvent& de ) = 0;
-  virtual void sends_secondary_event( DelayedRateConnectionEvent& re ) = 0;
+  virtual void sends_secondary_event(GapJunctionEvent &ge) = 0;
+  virtual void sends_secondary_event(InstantaneousRateConnectionEvent &re) = 0;
+  virtual void sends_secondary_event(DiffusionConnectionEvent &de) = 0;
+  virtual void sends_secondary_event(DelayedRateConnectionEvent &re) = 0;
 
   /**
    * Check what type of signal this model is sending.
@@ -175,56 +166,47 @@ public:
   /**
    * Return const reference to the prototype.
    */
-  virtual Node const& get_prototype( void ) const = 0;
+  virtual Node const &get_prototype(void) const = 0;
 
   /**
    * Set the model id on the prototype.
    */
-  virtual void set_model_id( int ) = 0;
+  virtual void set_model_id(int) = 0;
 
   /**
    * Issue deprecation warning on first call if model is deprecated.
    *
    * @param calling function
    */
-  virtual void deprecation_warning( const std::string& ) = 0;
+  virtual void deprecation_warning(const std::string &) = 0;
 
   /**
    * Set the model id on the prototype.
    */
-  void
-  set_type_id( index id )
-  {
-    type_id_ = id;
-  }
+  void set_type_id(index id) { type_id_ = id; }
 
-  index
-  get_type_id() const
-  {
-    return type_id_;
-  }
+  index get_type_id() const { return type_id_; }
 
 private:
-  virtual void set_status_( DictionaryDatum ) = 0;
+  virtual void set_status_(DictionaryDatum) = 0;
 
   virtual DictionaryDatum get_status_() = 0;
-
 
   /**
    * Set the number of threads.
    * @see set_threads()
    */
-  void set_threads_( thread t );
+  void set_threads_(thread t);
 
   /**
    * Initialize the pool allocator with the Node specific values.
    */
-  virtual void init_memory_( sli::pool& ) = 0;
+  virtual void init_memory_(sli::pool &) = 0;
 
   /**
    * Allocate a new object at the specified memory position.
    */
-  virtual Node* allocate_( void* ) = 0;
+  virtual Node *allocate_(void *) = 0;
 
   /**
    * Name of the Model.
@@ -244,28 +226,19 @@ private:
   /**
    * Memory for all nodes sorted by threads.
    */
-  std::vector< sli::pool > memory_;
+  std::vector<sli::pool> memory_;
 };
 
-
-inline Node*
-Model::allocate( thread t )
-{
-  assert( ( size_t ) t < memory_.size() );
-  return allocate_( memory_[ t ].alloc() );
+inline Node *Model::allocate(thread t) {
+  assert((size_t)t < memory_.size());
+  return allocate_(memory_[t].alloc());
 }
 
-inline void
-Model::free( thread t, Node* n )
-{
-  assert( ( size_t ) t < memory_.size() );
-  memory_[ t ].free( n );
+inline void Model::free(thread t, Node *n) {
+  assert((size_t)t < memory_.size());
+  memory_[t].free(n);
 }
 
-inline std::string
-Model::get_name() const
-{
-  return name_;
-}
-}
+inline std::string Model::get_name() const { return name_; }
+} // namespace nest
 #endif

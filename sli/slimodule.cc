@@ -25,17 +25,11 @@
 // Includes from sli:
 #include "interpret.h"
 
-void
-SLIModule::install( std::ostream&, SLIInterpreter* i )
-{
+void SLIModule::install(std::ostream &, SLIInterpreter *i) {
   // Output stream is now set by the message level.
   // i->message(out, 5, name().c_str(), "Initializing.");
-  i->message( 5, name().c_str(), "Initializing." );
-  init( i );
+  i->message(5, name().c_str(), "Initializing.");
+  init(i);
 }
 
-const std::string
-SLIModule::commandstring( void ) const
-{
-  return std::string();
-}
+const std::string SLIModule::commandstring(void) const { return std::string(); }

@@ -31,13 +31,11 @@
 // Includes from topology:
 #include "position.h"
 
-namespace nest
-{
+namespace nest {
 
 class AbstractMask;
 
-template < int D >
-class Mask;
+template <int D> class Mask;
 
 /**
  * A Ntree object represents a subtree or leaf in a Ntree structure. Any
@@ -48,67 +46,53 @@ class Mask;
  * mother ntree.
  *
  */
-template < int D, class T, int max_capacity = 100, int max_depth = 10 >
-class Ntree
-{
+template <int D, class T, int max_capacity = 100, int max_depth = 10>
+class Ntree {
 public:
   static const int N = 1 << D;
 
-  typedef Position< D > key_type;
+  typedef Position<D> key_type;
   typedef T mapped_type;
-  typedef std::pair< Position< D >, T > value_type;
-  typedef value_type& reference;
-  typedef const value_type& const_reference;
+  typedef std::pair<Position<D>, T> value_type;
+  typedef value_type &reference;
+  typedef const value_type &const_reference;
 
   /**
    * Iterator iterating the nodes in a Quadtree.
    */
-  class iterator
-  {
+  class iterator {
   public:
     /**
      * Initialize an invalid iterator.
      */
-    iterator()
-      : ntree_( 0 )
-      , top_( 0 )
-      , node_( 0 )
-    {
-    }
+    iterator() : ntree_(0), top_(0), node_(0) {}
 
     /**
      * Initialize an iterator to point to the first node in the first
      * non-empty leaf within the tree below this Ntree.
      */
-    iterator( Ntree& q );
+    iterator(Ntree &q);
 
     /**
      * Initialize an iterator to point to the nth node in this Ntree,
      * which must be a leaf. The top of the tree is the first ancestor of
      * the Ntree.
      */
-    iterator( Ntree& q, index n );
+    iterator(Ntree &q, index n);
 
-    value_type& operator*()
-    {
-      return ntree_->nodes_[ node_ ];
-    }
-    value_type* operator->()
-    {
-      return &ntree_->nodes_[ node_ ];
-    }
+    value_type &operator*() { return ntree_->nodes_[node_]; }
+    value_type *operator->() { return &ntree_->nodes_[node_]; }
 
     /**
      * Move the iterator to the next node within the tree. May cause the
      * iterator to become invalid if there are no more nodes.
      */
-    iterator& operator++();
+    iterator &operator++();
 
     /**
      * Postfix increment operator.
      */
-    iterator operator++( int )
-    {
+    iterator operator++(int) {
       iterator tmp = *this;
       ++*this;
       return tmp;
@@ -118,15 +102,11 @@ public:
      * Iterators are equal if they point to the same node in the same
      * ntree.
      */
-    bool
-    operator==( const iterator& other ) const
-    {
-      return ( other.ntree_ == ntree_ ) && ( other.node_ == node_ );
+    bool operator==(const iterator &other) const {
+      return (other.ntree_ == ntree_) && (other.node_ == node_);
     }
-    bool
-    operator!=( const iterator& other ) const
-    {
-      return ( other.ntree_ != ntree_ ) || ( other.node_ != node_ );
+    bool operator!=(const iterator &other) const {
+      return (other.ntree_ != ntree_) || (other.node_ != node_);
     }
 
   protected:
@@ -136,58 +116,41 @@ public:
      */
     void next_leaf_();
 
-    Ntree* ntree_;
-    Ntree* top_;
+    Ntree *ntree_;
+    Ntree *top_;
     index node_;
   };
 
   /**
    * Iterator iterating the nodes in a Quadtree inside a Mask.
    */
-  class masked_iterator
-  {
+  class masked_iterator {
   public:
     /**
      * Initialize an invalid iterator.
      */
-    masked_iterator()
-      : ntree_( 0 )
-      , top_( 0 )
-      , allin_top_( 0 )
-      , node_( 0 )
-      , mask_( 0 )
-    {
-    }
+    masked_iterator() : ntree_(0), top_(0), allin_top_(0), node_(0), mask_(0) {}
 
     /**
      * Initialize an iterator to point to the first leaf node inside the
      * mask within the tree below this Ntree.
      */
-    masked_iterator( Ntree& q,
-      const Mask< D >& mask,
-      const Position< D >& anchor );
+    masked_iterator(Ntree &q, const Mask<D> &mask, const Position<D> &anchor);
 
-    value_type& operator*()
-    {
-      return ntree_->nodes_[ node_ ];
-    }
-    value_type* operator->()
-    {
-      return &ntree_->nodes_[ node_ ];
-    }
+    value_type &operator*() { return ntree_->nodes_[node_]; }
+    value_type *operator->() { return &ntree_->nodes_[node_]; }
 
     /**
      * Move the iterator to the next node inside the mask within the
      * tree. May cause the iterator to become invalid if there are no
      * more nodes.
      */
-    masked_iterator& operator++();
+    masked_iterator &operator++();
 
     /**
      * Postfix increment operator.
      */
-    masked_iterator operator++( int )
-    {
+    masked_iterator operator++(int) {
       masked_iterator tmp = *this;
       ++*this;
       return tmp;
@@ -197,15 +160,11 @@ public:
      * Iterators are equal if they point to the same node in the same
      * ntree.
      */
-    bool
-    operator==( const masked_iterator& other ) const
-    {
-      return ( other.ntree_ == ntree_ ) && ( other.node_ == node_ );
+    bool operator==(const masked_iterator &other) const {
+      return (other.ntree_ == ntree_) && (other.node_ == node_);
     }
-    bool
-    operator!=( const masked_iterator& other ) const
-    {
-      return ( other.ntree_ != ntree_ ) || ( other.node_ != node_ );
+    bool operator!=(const masked_iterator &other) const {
+      return (other.ntree_ != ntree_) || (other.node_ != node_);
     }
 
   protected:
@@ -236,13 +195,13 @@ public:
      */
     void next_anchor_();
 
-    Ntree* ntree_;
-    Ntree* top_;
-    Ntree* allin_top_;
+    Ntree *ntree_;
+    Ntree *top_;
+    Ntree *allin_top_;
     index node_;
-    const Mask< D >* mask_;
-    Position< D > anchor_;
-    std::vector< Position< D > > anchors_;
+    const Mask<D> *mask_;
+    Position<D> anchor_;
+    std::vector<Position<D>> anchors_;
     index current_anchor_;
   };
 
@@ -252,11 +211,8 @@ public:
    * @param lower_left  Lower left corner of ntree.
    * @param extent      Size (width,height) of ntree.
    */
-  Ntree( const Position< D >& lower_left,
-    const Position< D >& extent,
-    std::bitset< D > periodic = 0,
-    Ntree* parent = 0,
-    int subquad = 0 );
+  Ntree(const Position<D> &lower_left, const Position<D> &extent,
+        std::bitset<D> periodic = 0, Ntree *parent = 0, int subquad = 0);
 
   /**
    * Delete Ntree recursively.
@@ -268,22 +224,22 @@ public:
    * Inserts node in correct leaf in quadtree.
    * @returns iterator pointing to inserted node.
    */
-  iterator insert( Position< D > pos, const T& node );
+  iterator insert(Position<D> pos, const T &node);
 
   /**
    * std::multimap like insert method
    */
-  iterator insert( const value_type& val );
+  iterator insert(const value_type &val);
 
   /**
    * STL container compatible insert method (the first argument is ignored)
    */
-  iterator insert( iterator, const value_type& val );
+  iterator insert(iterator, const value_type &val);
 
   /**
    * @returns member nodes in ntree and their position.
    */
-  std::vector< value_type > get_nodes();
+  std::vector<value_type> get_nodes();
 
   /**
    * Applies a Mask to this ntree.
@@ -291,42 +247,28 @@ public:
    * @param anchor  position to center mask in.
    * @returns member nodes in ntree inside mask.
    */
-  std::vector< value_type > get_nodes( const Mask< D >& mask,
-    const Position< D >& anchor );
+  std::vector<value_type> get_nodes(const Mask<D> &mask,
+                                    const Position<D> &anchor);
 
   /**
    * This function returns a node iterator which will traverse the
    * subtree below this Ntree.
    * @returns iterator for nodes in quadtree.
    */
-  iterator
-  begin()
-  {
-    return iterator( *this );
-  }
+  iterator begin() { return iterator(*this); }
 
-  iterator
-  end()
-  {
-    return iterator();
-  }
+  iterator end() { return iterator(); }
 
   /**
    * This function returns a masked node iterator which will traverse the
    * subtree below this Ntree, skipping nodes outside the mask.
    * @returns iterator for nodes in quadtree.
    */
-  masked_iterator
-  masked_begin( const Mask< D >& mask, const Position< D >& anchor )
-  {
-    return masked_iterator( *this, mask, anchor );
+  masked_iterator masked_begin(const Mask<D> &mask, const Position<D> &anchor) {
+    return masked_iterator(*this, mask, anchor);
   }
 
-  masked_iterator
-  masked_end()
-  {
-    return masked_iterator();
-  }
+  masked_iterator masked_end() { return masked_iterator(); }
 
   /**
    * @returns true if ntree is a leaf.
@@ -343,123 +285,101 @@ protected:
   /**
    * Append this ntree's nodes to the vector
    */
-  void append_nodes_( std::vector< value_type >& );
+  void append_nodes_(std::vector<value_type> &);
 
   /**
    * Append this ntree's nodes inside the mask to the vector
    */
-  void append_nodes_( std::vector< value_type >&,
-    const Mask< D >&,
-    const Position< D >& );
+  void append_nodes_(std::vector<value_type> &, const Mask<D> &,
+                     const Position<D> &);
 
   /**
    * @returns the subquad number for this position
    */
-  int subquad_( const Position< D >& );
+  int subquad_(const Position<D> &);
 
-  Position< D > lower_left_;
-  Position< D > extent_;
+  Position<D> lower_left_;
+  Position<D> extent_;
 
   bool leaf_;
 
-  std::vector< value_type > nodes_;
+  std::vector<value_type> nodes_;
 
-  Ntree* parent_;
+  Ntree *parent_;
   int my_subquad_; ///< This Ntree's subquad number within parent
   int my_depth_;   ///< This Ntree's depth in the tree
-  Ntree* children_[ N ];
-  std::bitset< D > periodic_; ///< periodic b.c.
+  Ntree *children_[N];
+  std::bitset<D> periodic_; ///< periodic b.c.
 
   friend class iterator;
   friend class masked_iterator;
 };
 
-template < int D, class T, int max_capacity, int max_depth >
-Ntree< D, T, max_capacity, max_depth >::Ntree( const Position< D >& lower_left,
-  const Position< D >& extent,
-  std::bitset< D > periodic,
-  Ntree< D, T, max_capacity, max_depth >* parent,
-  int subquad )
-  : lower_left_( lower_left )
-  , extent_( extent )
-  , leaf_( true )
-  , parent_( parent )
-  , my_subquad_( subquad )
-  , my_depth_( parent ? parent->my_depth_ + 1 : 0 )
-  , periodic_( periodic )
-{
-}
+template <int D, class T, int max_capacity, int max_depth>
+Ntree<D, T, max_capacity, max_depth>::Ntree(
+    const Position<D> &lower_left, const Position<D> &extent,
+    std::bitset<D> periodic, Ntree<D, T, max_capacity, max_depth> *parent,
+    int subquad)
+    : lower_left_(lower_left), extent_(extent), leaf_(true), parent_(parent),
+      my_subquad_(subquad), my_depth_(parent ? parent->my_depth_ + 1 : 0),
+      periodic_(periodic) {}
 
-template < int D, class T, int max_capacity, int max_depth >
-Ntree< D, T, max_capacity, max_depth >::~Ntree()
-{
-  if ( leaf_ )
-  {
+template <int D, class T, int max_capacity, int max_depth>
+Ntree<D, T, max_capacity, max_depth>::~Ntree() {
+  if (leaf_) {
     return;
   } // if T is a vector class, we do not delete the pointees
 
-  for ( size_t n = 0; n < static_cast< size_t >( N ); ++n )
-  {
-    delete children_[ n ]; // calls destructor in child, thus recursing
+  for (size_t n = 0; n < static_cast<size_t>(N); ++n) {
+    delete children_[n]; // calls destructor in child, thus recursing
   }
 }
 
-template < int D, class T, int max_capacity, int max_depth >
-Ntree< D, T, max_capacity, max_depth >::iterator::iterator( Ntree& q, index n )
-  : ntree_( &q )
-  , top_( &q )
-  , node_( n )
-{
-  assert( ntree_->leaf_ );
+template <int D, class T, int max_capacity, int max_depth>
+Ntree<D, T, max_capacity, max_depth>::iterator::iterator(Ntree &q, index n)
+    : ntree_(&q), top_(&q), node_(n) {
+  assert(ntree_->leaf_);
 
   // First ancestor
-  while ( top_->parent_ )
-  {
+  while (top_->parent_) {
     top_ = top_->parent_;
   }
 }
 
-template < int D, class T, int max_capacity, int max_depth >
-bool
-Ntree< D, T, max_capacity, max_depth >::is_leaf() const
-{
+template <int D, class T, int max_capacity, int max_depth>
+bool Ntree<D, T, max_capacity, max_depth>::is_leaf() const {
   return leaf_;
 }
 
-
-template < int D, class T, int max_capacity, int max_depth >
-std::vector< std::pair< Position< D >, T > >
-Ntree< D, T, max_capacity, max_depth >::get_nodes()
-{
-  std::vector< std::pair< Position< D >, T > > result;
-  append_nodes_( result );
+template <int D, class T, int max_capacity, int max_depth>
+std::vector<std::pair<Position<D>, T>>
+Ntree<D, T, max_capacity, max_depth>::get_nodes() {
+  std::vector<std::pair<Position<D>, T>> result;
+  append_nodes_(result);
   return result;
 }
 
-template < int D, class T, int max_capacity, int max_depth >
-std::vector< std::pair< Position< D >, T > >
-Ntree< D, T, max_capacity, max_depth >::get_nodes( const Mask< D >& mask,
-  const Position< D >& anchor )
-{
-  std::vector< std::pair< Position< D >, T > > result;
-  append_nodes_( result, mask, anchor );
+template <int D, class T, int max_capacity, int max_depth>
+std::vector<std::pair<Position<D>, T>>
+Ntree<D, T, max_capacity, max_depth>::get_nodes(const Mask<D> &mask,
+                                                const Position<D> &anchor) {
+  std::vector<std::pair<Position<D>, T>> result;
+  append_nodes_(result, mask, anchor);
   return result;
 }
 
-template < int D, class T, int max_capacity, int max_depth >
-typename Ntree< D, T, max_capacity, max_depth >::iterator
-Ntree< D, T, max_capacity, max_depth >::insert(
-  const std::pair< Position< D >, T >& val )
-{
-  return insert( val.first, val.second );
+template <int D, class T, int max_capacity, int max_depth>
+typename Ntree<D, T, max_capacity, max_depth>::iterator
+Ntree<D, T, max_capacity, max_depth>::insert(
+    const std::pair<Position<D>, T> &val) {
+  return insert(val.first, val.second);
 }
 
-template < int D, class T, int max_capacity, int max_depth >
-typename Ntree< D, T, max_capacity, max_depth >::iterator
-Ntree< D, T, max_capacity, max_depth >::insert( iterator,
-  const std::pair< Position< D >, T >& val )
-{
-  return insert( val.first, val.second );
+template <int D, class T, int max_capacity, int max_depth>
+typename Ntree<D, T, max_capacity, max_depth>::iterator
+Ntree<D, T, max_capacity, max_depth>::insert(
+    iterator, const std::pair<Position<D>, T> &val) {
+  return insert(val.first, val.second);
 }
 
 } // namespace nest

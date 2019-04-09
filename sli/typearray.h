@@ -30,6 +30,6 @@
 // Includes from sli:
 #include "name.h"
 
-typedef std::vector< Name > TypeArray;
+typedef std::vector<Name> TypeArray;
 
 #endif

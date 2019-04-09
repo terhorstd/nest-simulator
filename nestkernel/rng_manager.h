@@ -39,22 +39,18 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 
-class RNGManager : public ManagerInterface
-{
+class RNGManager : public ManagerInterface {
 public:
   RNGManager();
-  virtual ~RNGManager()
-  {
-  }
+  virtual ~RNGManager() {}
 
   virtual void initialize();
   virtual void finalize();
 
-  virtual void set_status( const DictionaryDatum& );
-  virtual void get_status( DictionaryDatum& );
+  virtual void set_status(const DictionaryDatum &);
+  virtual void get_status(DictionaryDatum &);
 
   /**
    * Get random number client of a thread.
@@ -62,7 +58,7 @@ public:
    * context.  One may consider to introduce an additional
    * RNG just for the non-threaded context.
    */
-  librandom::RngPtr get_rng( thread thrd = 0 ) const;
+  librandom::RngPtr get_rng(thread thrd = 0) const;
 
   /**
    * Get global random number client.
@@ -78,7 +74,7 @@ private:
    * Vector of random number generators for threads.
    * There must be PRECISELY one rng per thread.
    */
-  std::vector< librandom::RngPtr > rng_;
+  std::vector<librandom::RngPtr> rng_;
 
   /**
    * Global random number generator.
@@ -88,7 +84,7 @@ private:
 
   //! The seeds of the local RNGs. These do not necessarily describe the
   //! state of the RNGs.
-  std::vector< long > rng_seeds_;
+  std::vector<long> rng_seeds_;
 
   //! The seed of the global RNG, not necessarily describing the
   //! state of the GRNG.
@@ -97,17 +93,11 @@ private:
 }; // class RNGManager
 } // namespace nest
 
-inline librandom::RngPtr
-nest::RNGManager::get_rng( nest::thread t ) const
-{
-  assert( t < static_cast< nest::thread >( rng_.size() ) );
-  return rng_[ t ];
+inline librandom::RngPtr nest::RNGManager::get_rng(nest::thread t) const {
+  assert(t < static_cast<nest::thread>(rng_.size()));
+  return rng_[t];
 }
 
-inline librandom::RngPtr
-nest::RNGManager::get_grng() const
-{
-  return grng_;
-}
+inline librandom::RngPtr nest::RNGManager::get_grng() const { return grng_; }
 
 #endif /* RNG_MANAGER_H */

@@ -33,152 +33,120 @@
 #include "connection_label.h"
 #include "kernel_manager.h"
 
+namespace nest {
 
-namespace nest
-{
-
-template < class ModelT >
-index
-ModelManager::register_node_model( const Name& name,
-  bool private_model,
-  std::string deprecation_info )
-{
-  if ( not private_model and modeldict_->known( name ) )
-  {
-    std::string msg = String::compose(
-      "A model called '%1' already exists.\n"
-      "Please choose a different name!",
-      name );
-    throw NamingConflict( msg );
+template <class ModelT>
+index ModelManager::register_node_model(const Name &name, bool private_model,
+                                        std::string deprecation_info) {
+  if (not private_model and modeldict_->known(name)) {
+    std::string msg = String::compose("A model called '%1' already exists.\n"
+                                      "Please choose a different name!",
+                                      name);
+    throw NamingConflict(msg);
   }
 
-  Model* model =
-    new GenericModel< ModelT >( name.toString(), deprecation_info );
-  return register_node_model_( model, private_model );
+  Model *model = new GenericModel<ModelT>(name.toString(), deprecation_info);
+  return register_node_model_(model, private_model);
 }
 
-template < class ModelT >
-index
-ModelManager::register_preconf_node_model( const Name& name,
-  DictionaryDatum& conf,
-  bool private_model,
-  std::string deprecation_info )
-{
-  if ( not private_model and modeldict_->known( name ) )
-  {
-    std::string msg = String::compose(
-      "A model called '%1' already exists.\n"
-      "Please choose a different name!",
-      name );
-    throw NamingConflict( msg );
+template <class ModelT>
+index ModelManager::register_preconf_node_model(const Name &name,
+                                                DictionaryDatum &conf,
+                                                bool private_model,
+                                                std::string deprecation_info) {
+  if (not private_model and modeldict_->known(name)) {
+    std::string msg = String::compose("A model called '%1' already exists.\n"
+                                      "Please choose a different name!",
+                                      name);
+    throw NamingConflict(msg);
   }
 
-  Model* model =
-    new GenericModel< ModelT >( name.toString(), deprecation_info );
+  Model *model = new GenericModel<ModelT>(name.toString(), deprecation_info);
   conf->clear_access_flags();
-  model->set_status( conf );
+  model->set_status(conf);
   std::string missed;
   // we only get here from C++ code, no need for exception
-  assert( conf->all_accessed( missed ) );
-  return register_node_model_( model, private_model );
+  assert(conf->all_accessed(missed));
+  return register_node_model_(model, private_model);
 }
 
-template < typename ConnectionT, template < typename > class ConnectorModelT >
-void
-ModelManager::register_connection_model( const std::string& name,
-  const bool requires_symmetric,
-  const bool requires_clopath_archiving )
-{
-  ConnectorModel* cf = new ConnectorModelT< ConnectionT >( name,
-    /*is_primary=*/true,
-    /*has_delay=*/true,
-    requires_symmetric,
-    /*supports_wfr*/ false,
-    requires_clopath_archiving );
-  register_connection_model_( cf );
-
-  if ( not ends_with( name, "_hpc" ) )
-  {
-    cf = new ConnectorModelT< ConnectionLabel< ConnectionT > >( name + "_lbl",
+template <typename ConnectionT, template <typename> class ConnectorModelT>
+void ModelManager::register_connection_model(
+    const std::string &name, const bool requires_symmetric,
+    const bool requires_clopath_archiving) {
+  ConnectorModel *cf = new ConnectorModelT<ConnectionT>(
+      name,
       /*is_primary=*/true,
-      /*has_delay=*/true,
-      requires_symmetric,
-      /*supports_wfr=*/false,
-      requires_clopath_archiving );
-    register_connection_model_( cf );
+      /*has_delay=*/true, requires_symmetric,
+      /*supports_wfr*/ false, requires_clopath_archiving);
+  register_connection_model_(cf);
+
+  if (not ends_with(name, "_hpc")) {
+    cf = new ConnectorModelT<ConnectionLabel<ConnectionT>>(
+        name + "_lbl",
+        /*is_primary=*/true,
+        /*has_delay=*/true, requires_symmetric,
+        /*supports_wfr=*/false, requires_clopath_archiving);
+    register_connection_model_(cf);
   }
 }
 
-template < typename ConnectionT >
-void
-ModelManager::register_connection_model( const std::string& name,
-  const bool requires_symmetric,
-  const bool requires_clopath_archiving )
-{
-  register_connection_model< ConnectionT, GenericConnectorModel >(
-    name, requires_symmetric, requires_clopath_archiving );
+template <typename ConnectionT>
+void ModelManager::register_connection_model(
+    const std::string &name, const bool requires_symmetric,
+    const bool requires_clopath_archiving) {
+  register_connection_model<ConnectionT, GenericConnectorModel>(
+      name, requires_symmetric, requires_clopath_archiving);
 }
 
 /**
  * Register a synape with default Connector and without any common properties.
  */
-template < typename ConnectionT >
-void
-ModelManager::register_secondary_connection_model( const std::string& name,
-  const bool has_delay,
-  const bool requires_symmetric,
-  const bool supports_wfr )
-{
-  ConnectorModel* cm = new GenericSecondaryConnectorModel< ConnectionT >(
-    name, has_delay, requires_symmetric, supports_wfr );
+template <typename ConnectionT>
+void ModelManager::register_secondary_connection_model(
+    const std::string &name, const bool has_delay,
+    const bool requires_symmetric, const bool supports_wfr) {
+  ConnectorModel *cm = new GenericSecondaryConnectorModel<ConnectionT>(
+      name, has_delay, requires_symmetric, supports_wfr);
 
-  synindex syn_id = register_connection_model_( cm );
+  synindex syn_id = register_connection_model_(cm);
 
   // idea: save *cm in data structure
   // otherwise when number of threads is increased no way to get further
   // elements
-  if ( secondary_connector_models_.size() < syn_id + ( unsigned int ) 1 )
-  {
-    secondary_connector_models_.resize( syn_id + 1, NULL );
+  if (secondary_connector_models_.size() < syn_id + (unsigned int)1) {
+    secondary_connector_models_.resize(syn_id + 1, NULL);
   }
 
-  secondary_connector_models_[ syn_id ] = cm;
+  secondary_connector_models_[syn_id] = cm;
 
-  ConnectionT::EventType::set_syn_id( syn_id );
+  ConnectionT::EventType::set_syn_id(syn_id);
 
   // create labeled secondary event connection model
-  cm = new GenericSecondaryConnectorModel< ConnectionLabel< ConnectionT > >(
-    name + "_lbl", has_delay, requires_symmetric, supports_wfr );
+  cm = new GenericSecondaryConnectorModel<ConnectionLabel<ConnectionT>>(
+      name + "_lbl", has_delay, requires_symmetric, supports_wfr);
 
-  syn_id = register_connection_model_( cm );
+  syn_id = register_connection_model_(cm);
 
   // idea: save *cm in data structure
   // otherwise when number of threads is increased no way to get further
   // elements
-  if ( secondary_connector_models_.size() < syn_id + ( unsigned int ) 1 )
-  {
-    secondary_connector_models_.resize( syn_id + 1, NULL );
+  if (secondary_connector_models_.size() < syn_id + (unsigned int)1) {
+    secondary_connector_models_.resize(syn_id + 1, NULL);
   }
 
-  secondary_connector_models_[ syn_id ] = cm;
+  secondary_connector_models_[syn_id] = cm;
 
-  ConnectionT::EventType::set_syn_id( syn_id );
+  ConnectionT::EventType::set_syn_id(syn_id);
 }
 
-inline Node*
-ModelManager::get_proxy_node( thread tid, index gid )
-{
-  return proxy_nodes_[ tid ].at(
-    kernel().modelrange_manager.get_model_id( gid ) );
+inline Node *ModelManager::get_proxy_node(thread tid, index gid) {
+  return proxy_nodes_[tid].at(kernel().modelrange_manager.get_model_id(gid));
 }
 
-
-inline bool
-ModelManager::is_model_in_use( index i )
-{
-  return kernel().modelrange_manager.model_in_use( i );
+inline bool ModelManager::is_model_in_use(index i) {
+  return kernel().modelrange_manager.model_in_use(i);
 }
-
 
 } // namespace nest
 

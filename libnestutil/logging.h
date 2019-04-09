@@ -26,32 +26,30 @@
 /**
  *
  */
-#define LOG( s, fctn, msg )                   \
-  nest::kernel().logging_manager.publish_log( \
-    ( s ), ( fctn ), ( msg ), __FILE__, __LINE__ )
+#define LOG(s, fctn, msg)                                                      \
+  nest::kernel().logging_manager.publish_log((s), (fctn), (msg), __FILE__,     \
+                                             __LINE__)
 
 /**
  *
  */
-#define ALL_ENTRIES_ACCESSED( d, fctn, msg )           \
-  nest::kernel().logging_manager.all_entries_accessed( \
-    ( d ), ( fctn ), ( msg ), __FILE__, __LINE__ )
+#define ALL_ENTRIES_ACCESSED(d, fctn, msg)                                     \
+  nest::kernel().logging_manager.all_entries_accessed((d), (fctn), (msg),      \
+                                                      __FILE__, __LINE__)
 
 /**
  *
  */
-#define ALL_ENTRIES_ACCESSED2( d, fctn, msg1, msg2 )   \
-  nest::kernel().logging_manager.all_entries_accessed( \
-    ( d ), ( fctn ), ( msg1 ), ( msg2 ), __FILE__, __LINE__ )
+#define ALL_ENTRIES_ACCESSED2(d, fctn, msg1, msg2)                             \
+  nest::kernel().logging_manager.all_entries_accessed(                         \
+      (d), (fctn), (msg1), (msg2), __FILE__, __LINE__)
 
-namespace nest
-{
+namespace nest {
 
 class LoggingEvent;
 class LoggingDeliverer;
 
-enum severity_t
-{
+enum severity_t {
   M_ALL = 0,
   M_DEBUG = 5,
   M_STATUS = 7,
@@ -63,7 +61,7 @@ enum severity_t
   M_QUIET = 100
 };
 
-typedef void ( *deliver_logging_event_ptr )( const LoggingEvent& e );
-}
+typedef void (*deliver_logging_event_ptr)(const LoggingEvent &e);
+} // namespace nest
 
 #endif

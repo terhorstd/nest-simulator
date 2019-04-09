@@ -39,33 +39,23 @@
  * Default constructors defining default parameter
  * ---------------------------------------------------------------- */
 
-nest::spike_dilutor::Parameters_::Parameters_()
-  : p_copy_( 1.0 )
-{
-}
+nest::spike_dilutor::Parameters_::Parameters_() : p_copy_(1.0) {}
 
-nest::spike_dilutor::Parameters_::Parameters_( const Parameters_& p )
-  : p_copy_( p.p_copy_ )
-{
-}
+nest::spike_dilutor::Parameters_::Parameters_(const Parameters_ &p)
+    : p_copy_(p.p_copy_) {}
 
 /* ----------------------------------------------------------------
  * Parameter extraction and manipulation functions
  * ---------------------------------------------------------------- */
 
-void
-nest::spike_dilutor::Parameters_::get( DictionaryDatum& d ) const
-{
-  ( *d )[ names::p_copy ] = p_copy_;
+void nest::spike_dilutor::Parameters_::get(DictionaryDatum &d) const {
+  (*d)[names::p_copy] = p_copy_;
 }
 
-void
-nest::spike_dilutor::Parameters_::set( const DictionaryDatum& d )
-{
-  updateValue< double >( d, names::p_copy, p_copy_ );
-  if ( p_copy_ < 0 || p_copy_ > 1 )
-  {
-    throw BadProperty( "Copy probability must be in [0, 1]." );
+void nest::spike_dilutor::Parameters_::set(const DictionaryDatum &d) {
+  updateValue<double>(d, names::p_copy, p_copy_);
+  if (p_copy_ < 0 || p_copy_ > 1) {
+    throw BadProperty("Copy probability must be in [0, 1].");
   }
 }
 
@@ -73,80 +63,56 @@ nest::spike_dilutor::Parameters_::set( const DictionaryDatum& d )
  * Default and copy constructor for node
  * ---------------------------------------------------------------- */
 
-nest::spike_dilutor::spike_dilutor()
-  : DeviceNode()
-  , device_()
-  , P_()
-{
-}
+nest::spike_dilutor::spike_dilutor() : DeviceNode(), device_(), P_() {}
 
-nest::spike_dilutor::spike_dilutor( const spike_dilutor& n )
-  : DeviceNode( n )
-  , device_( n.device_ )
-  , P_( n.P_ )
-{
-}
+nest::spike_dilutor::spike_dilutor(const spike_dilutor &n)
+    : DeviceNode(n), device_(n.device_), P_(n.P_) {}
 
 /* ----------------------------------------------------------------
  * Node initialization functions
  * ---------------------------------------------------------------- */
 
-void
-nest::spike_dilutor::init_state_( const Node& proto )
-{
-  const spike_dilutor& pr = downcast< spike_dilutor >( proto );
+void nest::spike_dilutor::init_state_(const Node &proto) {
+  const spike_dilutor &pr = downcast<spike_dilutor>(proto);
 
-  device_.init_state( pr.device_ );
+  device_.init_state(pr.device_);
 }
 
-void
-nest::spike_dilutor::init_buffers_()
-{
+void nest::spike_dilutor::init_buffers_() {
   B_.n_spikes_.clear(); // includes resize
   device_.init_buffers();
 }
 
-void
-nest::spike_dilutor::calibrate()
-{
-  device_.calibrate();
-}
+void nest::spike_dilutor::calibrate() { device_.calibrate(); }
 
 /* ----------------------------------------------------------------
  * Other functions
  * ---------------------------------------------------------------- */
 
-void
-nest::spike_dilutor::update( Time const& T, const long from, const long to )
-{
-  assert(
-    to >= 0 && ( delay ) from < kernel().connection_manager.get_min_delay() );
-  assert( from < to );
+void nest::spike_dilutor::update(Time const &T, const long from,
+                                 const long to) {
+  assert(to >= 0 && (delay)from < kernel().connection_manager.get_min_delay());
+  assert(from < to);
 
-  for ( long lag = from; lag < to; ++lag )
-  {
-    if ( not device_.is_active( T ) )
-    {
+  for (long lag = from; lag < to; ++lag) {
+    if (not device_.is_active(T)) {
       return; // no spikes to be repeated
     }
 
     // generate spikes of mother process for each time slice
     unsigned long n_mother_spikes =
-      static_cast< unsigned long >( B_.n_spikes_.get_value( lag ) );
+        static_cast<unsigned long>(B_.n_spikes_.get_value(lag));
 
-    if ( n_mother_spikes )
-    {
+    if (n_mother_spikes) {
       DSSpikeEvent se;
 
-      se.set_multiplicity( n_mother_spikes );
-      kernel().event_delivery_manager.send( *this, se, lag );
+      se.set_multiplicity(n_mother_spikes);
+      kernel().event_delivery_manager.send(*this, se, lag);
     }
   }
 }
 
-void
-nest::spike_dilutor::event_hook( DSSpikeEvent& e )
-{
+void nest::spike_dilutor::event_hook(DSSpikeEvent &e) {
   // note: event_hook() receives a reference of the spike event that
   // was originally created in the update function. there we set
   // the multiplicty to store the number of mother spikes. the *same*
@@ -158,31 +124,26 @@ nest::spike_dilutor::event_hook( DSSpikeEvent& e )
   // event_hook().
   // reichert
 
-  librandom::RngPtr rng = kernel().rng_manager.get_rng( get_thread() );
+  librandom::RngPtr rng = kernel().rng_manager.get_rng(get_thread());
   unsigned long n_mother_spikes = e.get_multiplicity();
   unsigned long n_spikes = 0;
 
-  for ( unsigned long n = 0; n < n_mother_spikes; n++ )
-  {
-    if ( rng->drand() < P_.p_copy_ )
-    {
+  for (unsigned long n = 0; n < n_mother_spikes; n++) {
+    if (rng->drand() < P_.p_copy_) {
       n_spikes++;
     }
   }
 
-  if ( n_spikes > 0 )
-  {
-    e.set_multiplicity( n_spikes );
-    e.get_receiver().handle( e );
+  if (n_spikes > 0) {
+    e.set_multiplicity(n_spikes);
+    e.get_receiver().handle(e);
   }
 
-  e.set_multiplicity( n_mother_spikes );
+  e.set_multiplicity(n_mother_spikes);
 }
 
-void
-nest::spike_dilutor::handle( SpikeEvent& e )
-{
+void nest::spike_dilutor::handle(SpikeEvent &e) {
   B_.n_spikes_.add_value(
-    e.get_rel_delivery_steps( kernel().simulation_manager.get_slice_origin() ),
-    static_cast< double >( e.get_multiplicity() ) );
+      e.get_rel_delivery_steps(kernel().simulation_manager.get_slice_origin()),
+      static_cast<double>(e.get_multiplicity()));
 }

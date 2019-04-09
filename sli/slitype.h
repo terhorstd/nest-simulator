@@ -34,7 +34,6 @@
 #include "name.h"
 #include "slifunction.h"
 
-
 /* class SLIType represents the SLI type information. Each
    Datum object carries a pointer to the SLIType object, representing the
    SLI type of its contents.
@@ -49,43 +48,30 @@
 
 class SLIInterpreter;
 
-class SLIType
-{
+class SLIType {
   unsigned int count;
 
-  Name* name;
-  SLIFunction* defaultaction;
+  Name *name;
+  SLIFunction *defaultaction;
 
-  SLIType& operator=( const SLIType& );
-  SLIType( const SLIType& );
+  SLIType &operator=(const SLIType &);
+  SLIType(const SLIType &);
 
 public:
-  SLIType( void )
-    : count( 0 )
-    , name( NULL )
-    , defaultaction( NULL )
-  {
-  }
-  ~SLIType()
-  {
-  }
+  SLIType(void) : count(0), name(NULL), defaultaction(NULL) {}
+  ~SLIType() {}
 
-  void settypename( const std::string& s );
-  void deletetypename( void );
+  void settypename(const std::string &s);
+  void deletetypename(void);
 
-  const Name&
-  gettypename( void ) const
-  {
+  const Name &gettypename(void) const {
     //      assert( name !=NULL);
     return *name;
   }
 
-  void setdefaultaction( SLIFunction& );
+  void setdefaultaction(SLIFunction &);
 
-
-  SLIFunction*
-  getaction( void ) const
-  {
+  SLIFunction *getaction(void) const {
     // assert(defaultaction != NULL);
     // If this fails, we have created a datum before the types were initialised.
     return defaultaction;

@@ -32,73 +32,57 @@
 #include "slifunction.h"
 #include "slimodule.h"
 
-
-class FilesystemModule : public SLIModule
-{
-  class FileNamesFunction : public SLIFunction
-  {
+class FilesystemModule : public SLIModule {
+  class FileNamesFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class SetDirectoryFunction : public SLIFunction
-  {
+  class SetDirectoryFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class DirectoryFunction : public SLIFunction
-  {
+  class DirectoryFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class MoveFileFunction : public SLIFunction
-  {
+  class MoveFileFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class CopyFileFunction : public SLIFunction
-  {
+  class CopyFileFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class DeleteFileFunction : public SLIFunction
-  {
+  class DeleteFileFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class MakeDirectoryFunction : public SLIFunction
-  {
+  class MakeDirectoryFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class RemoveDirectoryFunction : public SLIFunction
-  {
+  class RemoveDirectoryFunction : public SLIFunction {
   public:
-    void execute( SLIInterpreter* ) const;
+    void execute(SLIInterpreter *) const;
   };
 
-  class TmpNamFunction : public SLIFunction
-  {
+  class TmpNamFunction : public SLIFunction {
   public:
-    TmpNamFunction()
-    {
-    }
-    void execute( SLIInterpreter* ) const;
+    TmpNamFunction() {}
+    void execute(SLIInterpreter *) const;
   };
 
-  class CompareFilesFunction : public SLIFunction
-  {
+  class CompareFilesFunction : public SLIFunction {
   public:
-    CompareFilesFunction()
-    {
-    }
-    void execute( SLIInterpreter* ) const;
+    CompareFilesFunction() {}
+    void execute(SLIInterpreter *) const;
   };
 
 public:
@@ -113,12 +97,12 @@ public:
   TmpNamFunction tmpnamfunction;
   CompareFilesFunction comparefilesfunction;
 
-  FilesystemModule( void ){};
+  FilesystemModule(void){};
   ~FilesystemModule(){};
 
-  void init( SLIInterpreter* );
-  const std::string name( void ) const;
-  const std::string commandstring( void ) const;
+  void init(SLIInterpreter *);
+  const std::string name(void) const;
+  const std::string commandstring(void) const;
 };
 
 #endif

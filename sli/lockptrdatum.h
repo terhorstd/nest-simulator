@@ -39,29 +39,18 @@
      This class must not be a base class.
      The equals operator depends on that fact.
 */
-template < class D, SLIType* slt >
-class lockPTRDatum : public lockPTR< D >, public TypedDatum< slt >
-{
-  Datum*
-  clone( void ) const
-  {
-    return new lockPTRDatum< D, slt >( *this );
-  }
+template <class D, SLIType *slt>
+class lockPTRDatum : public lockPTR<D>, public TypedDatum<slt> {
+  Datum *clone(void) const { return new lockPTRDatum<D, slt>(*this); }
 
 public:
-  lockPTRDatum()
-  {
-  }
+  lockPTRDatum() {}
 
   //   template<SLIType *st>
   //   lockPTRDatum(const lockPTRDatum<D,st> &d):lockPTR<D>(d),
   //   TypedDatum<slt>(){}
 
-  lockPTRDatum( const lockPTR< D > d )
-    : lockPTR< D >( d )
-    , TypedDatum< slt >()
-  {
-  }
+  lockPTRDatum(const lockPTR<D> d) : lockPTR<D>(d), TypedDatum<slt>() {}
 
   /* Constructor from D* d
      By the definition of lockPTR, d must be unique. It will be
@@ -70,35 +59,24 @@ public:
      including constructing any other instances of this class with
      that data, except via copy constructor.
   */
-  lockPTRDatum( D* d )
-    : lockPTR< D >( d )
-    , TypedDatum< slt >()
-  {
-  }
+  lockPTRDatum(D *d) : lockPTR<D>(d), TypedDatum<slt>() {}
 
   /* Constructor from D d
      Like the above, this is actually a constructor to a D*, so d
      should be dynamically allocated, and any reference discarded
      after this construction.
    */
-  lockPTRDatum( D& d )
-    : lockPTR< D >( d )
-    , TypedDatum< slt >()
-  {
-  }
+  lockPTRDatum(D &d) : lockPTR<D>(d), TypedDatum<slt>() {}
 
-  ~lockPTRDatum()
-  {
-  } // this class must not be a base class
+  ~lockPTRDatum() {} // this class must not be a base class
 
-  void print( std::ostream& ) const;
-  void pprint( std::ostream& ) const;
-  void info( std::ostream& ) const;
-
+  void print(std::ostream &) const;
+  void pprint(std::ostream &) const;
+  void info(std::ostream &) const;
 
   // tests for equality via lockPTR<D>::operator==
   // It is defined as identity of the underly D, i.e. &this->D == &other->D
-  bool equals( const Datum* ) const;
+  bool equals(const Datum *) const;
 
   /* operator=
     The assignment operator is defaulted.
@@ -114,9 +92,8 @@ public:
     implementation is defined.
   */
 private:
-  bool operator==( lockPTR< D >& );
+  bool operator==(lockPTR<D> &);
 };
-
 
 /******************************************/
 

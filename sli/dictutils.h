@@ -54,18 +54,15 @@
  * @throws UnknownName An entry of the given name is not known in the
  * dictionary.
  */
-template < typename FT >
-FT
-getValue( const DictionaryDatum& d, Name const n )
-{
+template <typename FT> FT getValue(const DictionaryDatum &d, Name const n) {
   // We must take a reference, so that access information can be stored in the
   // token.
-  const Token& t = d->lookup2( n );
+  const Token &t = d->lookup2(n);
 
   /* if (!t.empty()) */
   /*   throw UndefinedName(n.toString()); */
 
-  return getValue< FT >( t );
+  return getValue<FT>(t);
 }
 
 /** Get the value of an existing dictionary entry and check that it is in a
@@ -83,50 +80,37 @@ getValue( const DictionaryDatum& d, Name const n )
  * dictionary.
  * @throws RangeCheck if a value is outside the range
  */
-inline double
-get_double_in_range( const DictionaryDatum& d,
-  Name const n,
-  double min,
-  double max,
-  int mode = 2 )
-{
+inline double get_double_in_range(const DictionaryDatum &d, Name const n,
+                                  double min, double max, int mode = 2) {
   // We must take a reference, so that access information can be stored in the
   // token.
-  const Token& t = d->lookup2( n );
-  DoubleDatum* dd = dynamic_cast< DoubleDatum* >( t.datum() );
+  const Token &t = d->lookup2(n);
+  DoubleDatum *dd = dynamic_cast<DoubleDatum *>(t.datum());
   double x = 0.0;
 
-  if ( dd != 0 )
-  {
+  if (dd != 0) {
     x = dd->get();
-  }
-  else
-  {
-    IntegerDatum* id = dynamic_cast< IntegerDatum* >( t.datum() );
-    if ( id == 0 )
-    {
+  } else {
+    IntegerDatum *id = dynamic_cast<IntegerDatum *>(t.datum());
+    if (id == 0) {
       throw TypeMismatch();
     }
 
-    x = static_cast< double >( id->get() );
+    x = static_cast<double>(id->get());
   }
-  switch ( mode )
-  {
+  switch (mode) {
   case 0:
-    if ( min < x and x < max )
-    {
+    if (min < x and x < max) {
       return x;
     }
     break;
   case 1:
-    if ( min <= x and x < max )
-    {
+    if (min <= x and x < max) {
       return x;
     }
     break;
   case 2:
-    if ( min <= x and x <= max )
-    {
+    if (min <= x and x <= max) {
       return x;
     }
     break;
@@ -151,50 +135,37 @@ get_double_in_range( const DictionaryDatum& d,
  * dictionary.
  * @throws RangeCheck if a value is outside the range
  */
-inline long
-get_long_in_range( const DictionaryDatum& d,
-  Name const n,
-  long min,
-  long max,
-  int mode = 2 )
-{
+inline long get_long_in_range(const DictionaryDatum &d, Name const n, long min,
+                              long max, int mode = 2) {
   // We must take a reference, so that access information can be stored in the
   // token.
-  const Token& t = d->lookup2( n );
-  DoubleDatum* dd = dynamic_cast< DoubleDatum* >( t.datum() );
+  const Token &t = d->lookup2(n);
+  DoubleDatum *dd = dynamic_cast<DoubleDatum *>(t.datum());
   long x = 0;
 
-  if ( dd != 0 )
-  {
+  if (dd != 0) {
     x = dd->get();
-  }
-  else
-  {
-    IntegerDatum* id = dynamic_cast< IntegerDatum* >( t.datum() );
-    if ( id == 0 )
-    {
+  } else {
+    IntegerDatum *id = dynamic_cast<IntegerDatum *>(t.datum());
+    if (id == 0) {
       throw TypeMismatch();
     }
 
-    x = static_cast< double >( id->get() );
+    x = static_cast<double>(id->get());
   }
-  switch ( mode )
-  {
+  switch (mode) {
   case 0:
-    if ( min < x and x < max )
-    {
+    if (min < x and x < max) {
       return x;
     }
     break;
   case 1:
-    if ( min <= x and x < max )
-    {
+    if (min <= x and x < max) {
       return x;
     }
     break;
   case 2:
-    if ( min <= x and x <= max )
-    {
+    if (min <= x and x <= max) {
       return x;
     }
     break;
@@ -203,19 +174,16 @@ get_long_in_range( const DictionaryDatum& d,
   }
   throw RangeCheck();
 }
-
 
 /** Define a new dictionary entry from a fundamental type.
  * @ingroup DictUtils
  * @throws TypeMismatch Fundamental type and requested SLI type are
  * incompatible.
  */
-template < typename FT, class D >
-void
-def2( DictionaryDatum& d, Name const n, FT const& value )
-{
-  Token t = newToken2< FT, D >( value );
-  d->insert_move( n, t );
+template <typename FT, class D>
+void def2(DictionaryDatum &d, Name const n, FT const &value) {
+  Token t = newToken2<FT, D>(value);
+  d->insert_move(n, t);
 }
 
 /** Define a new dictionary entry from a fundamental type.
@@ -223,12 +191,10 @@ def2( DictionaryDatum& d, Name const n, FT const& value )
  * @throws TypeMismatch Creating a Token from the fundamental type failed,
  *         probably due to a missing template specialization.
  */
-template < typename FT >
-void
-def( DictionaryDatum& d, Name const n, FT const& value )
-{
-  Token t( value ); // we hope that we have a constructor for this.
-  d->insert_move( n, t );
+template <typename FT>
+void def(DictionaryDatum &d, Name const n, FT const &value) {
+  Token t(value); // we hope that we have a constructor for this.
+  d->insert_move(n, t);
 }
 
 /** Update a variable from a dictionary entry if it exists, skip call if it
@@ -236,10 +202,8 @@ def( DictionaryDatum& d, Name const n, FT const& value )
  * @ingroup DictUtils
  * @throws see getValue(DictionaryDatum, Name)
  */
-template < typename FT, typename VT >
-bool
-updateValue( DictionaryDatum const& d, Name const n, VT& value )
-{
+template <typename FT, typename VT>
+bool updateValue(DictionaryDatum const &d, Name const n, VT &value) {
   // We will test for the name, and do nothing if it does not exist,
   // instead of simply trying to getValue() it and catching a possible
   // exception. The latter works, however, but non-existing names are
@@ -249,14 +213,13 @@ updateValue( DictionaryDatum const& d, Name const n, VT& value )
 
   // We must take a reference, so that access information can be stored in the
   // token.
-  const Token& t = d->lookup( n );
+  const Token &t = d->lookup(n);
 
-  if ( t.empty() )
-  {
+  if (t.empty()) {
     return false;
   }
 
-  value = getValue< FT >( t );
+  value = getValue<FT>(t);
   return true;
 }
 
@@ -265,58 +228,49 @@ updateValue( DictionaryDatum const& d, Name const n, VT& value )
  * @ingroup DictUtils
  * @throws see getValue(DictionaryDatum, Name)
  */
-template < typename FT, typename VT, class C >
-void
-updateValue2( DictionaryDatum const& d,
-  Name const n,
-  C& obj,
-  void ( C::*setfunc )( VT ) )
-{
-  if ( d->known( n ) ) // Does name exist in the dictionary?
+template <typename FT, typename VT, class C>
+void updateValue2(DictionaryDatum const &d, Name const n, C &obj,
+                  void (C::*setfunc)(VT)) {
+  if (d->known(n)) // Does name exist in the dictionary?
   {
     // yes, call the function for update.
-    ( obj.*setfunc )( getValue< FT >( d, n ) );
+    (obj.*setfunc)(getValue<FT>(d, n));
   }
 }
-
 
 /** Create a property of type ArrayDatum in the dictionary, if it does not
  * already exist.
  * @ingroup DictUtils
  */
-void initialize_property_array( DictionaryDatum& d, Name propname );
-
+void initialize_property_array(DictionaryDatum &d, Name propname);
 
 /** Create a property of type DoubleVectorDatum in the dictionary, if it does
  * not already exist.
  * @ingroup DictUtils
  */
-void initialize_property_doublevector( DictionaryDatum& d, Name propname );
-
+void initialize_property_doublevector(DictionaryDatum &d, Name propname);
 
 /** Create a property of type IntVectorDatum in the dictionary, if it does not
  * already exist.
  * @ingroup DictUtils
  */
-void initialize_property_intvector( DictionaryDatum& d, Name propname );
-
+void initialize_property_intvector(DictionaryDatum &d, Name propname);
 
 /** Append a value to a property ArrayDatum in the dictionary.
  * This is the version for scalar values
  * @ingroup DictUtils
  */
-template < typename PropT >
-inline void
-append_property( DictionaryDatum& d, Name propname, const PropT& prop )
-{
-  Token t = d->lookup( propname );
-  assert( not t.empty() );
+template <typename PropT>
+inline void append_property(DictionaryDatum &d, Name propname,
+                            const PropT &prop) {
+  Token t = d->lookup(propname);
+  assert(not t.empty());
 
-  ArrayDatum* arrd = dynamic_cast< ArrayDatum* >( t.datum() );
-  assert( arrd != 0 );
+  ArrayDatum *arrd = dynamic_cast<ArrayDatum *>(t.datum());
+  assert(arrd != 0);
 
-  Token prop_token( prop );
-  arrd->push_back_dont_clone( prop_token );
+  Token prop_token(prop);
+  arrd->push_back_dont_clone(prop_token);
 }
 
 /** Append a value to a property DoubleVectorDatum in the dictionary.
@@ -325,39 +279,33 @@ append_property( DictionaryDatum& d, Name propname, const PropT& prop )
  */
 template <>
 inline void
-append_property< std::vector< double > >( DictionaryDatum& d,
-  Name propname,
-  const std::vector< double >& prop )
-{
-  Token t = d->lookup( propname );
-  assert( not t.empty() );
+append_property<std::vector<double>>(DictionaryDatum &d, Name propname,
+                                     const std::vector<double> &prop) {
+  Token t = d->lookup(propname);
+  assert(not t.empty());
 
-  DoubleVectorDatum* arrd = dynamic_cast< DoubleVectorDatum* >( t.datum() );
-  assert( arrd != 0 );
+  DoubleVectorDatum *arrd = dynamic_cast<DoubleVectorDatum *>(t.datum());
+  assert(arrd != 0);
 
-  ( *arrd )->insert( ( *arrd )->end(), prop.begin(), prop.end() );
+  (*arrd)->insert((*arrd)->end(), prop.begin(), prop.end());
 }
-
 
 /** Append a value to a property IntVectorDatum in the dictionary.
  * This is a specialization for appending vector<long>s to vector<long>s
  * @ingroup DictUtils
  */
 template <>
-inline void
-append_property< std::vector< long > >( DictionaryDatum& d,
-  Name propname,
-  const std::vector< long >& prop )
-{
-  Token t = d->lookup( propname );
-  assert( not t.empty() );
+inline void append_property<std::vector<long>>(DictionaryDatum &d,
+                                               Name propname,
+                                               const std::vector<long> &prop) {
+  Token t = d->lookup(propname);
+  assert(not t.empty());
 
-  IntVectorDatum* arrd = dynamic_cast< IntVectorDatum* >( t.datum() );
-  assert( arrd != 0 );
+  IntVectorDatum *arrd = dynamic_cast<IntVectorDatum *>(t.datum());
+  assert(arrd != 0);
 
-  ( *arrd )->insert( ( *arrd )->end(), prop.begin(), prop.end() );
+  (*arrd)->insert((*arrd)->end(), prop.begin(), prop.end());
 }
-
 
 /** Provide a value to a property DoubleVectorDatum in the dictionary.
  * In contrast to append_property, this function adds the value only once
@@ -366,7 +314,7 @@ append_property< std::vector< long > >( DictionaryDatum& d,
  * recording_decive.
  * @ingroup DictUtils
  */
-void provide_property( DictionaryDatum&, Name, const std::vector< double >& );
+void provide_property(DictionaryDatum &, Name, const std::vector<double> &);
 
 /** Provide a value to a property IntVectorDatum in the dictionary.
  * In contrast to append_property, this function adds the value only once
@@ -375,8 +323,7 @@ void provide_property( DictionaryDatum&, Name, const std::vector< double >& );
  * recording_decive.
  * @ingroup DictUtils
  */
-void provide_property( DictionaryDatum&, Name, const std::vector< long >& );
-
+void provide_property(DictionaryDatum &, Name, const std::vector<long> &);
 
 /** Add values of a vector<double> to a property DoubleVectorDatum in the
  * dictionary. This variant of append_property is for adding vector<double>s to
@@ -384,7 +331,6 @@ void provide_property( DictionaryDatum&, Name, const std::vector< long >& );
  * threads when multimeter is running in accumulation mode.
  * @ingroup DictUtils
  */
-void
-accumulate_property( DictionaryDatum&, Name, const std::vector< double >& );
+void accumulate_property(DictionaryDatum &, Name, const std::vector<double> &);
 
 #endif

@@ -43,8 +43,7 @@
   by the same name as before).
  */
 
-class FunctionDatum : public TypedDatum< &SLIInterpreter::Functiontype >
-{
+class FunctionDatum : public TypedDatum<&SLIInterpreter::Functiontype> {
   static sli::pool memory;
 
   Name name;
@@ -55,22 +54,14 @@ class FunctionDatum : public TypedDatum< &SLIInterpreter::Functiontype >
   std::string deprecation_info_;
   bool deprecation_warning_issued_;
 
-  Datum*
-  clone( void ) const
-  {
-    return new FunctionDatum( *this );
-  }
+  Datum *clone(void) const { return new FunctionDatum(*this); }
 
-  Datum*
-  get_ptr()
-  {
+  Datum *get_ptr() {
     Datum::addReference();
     return this;
   }
 
-  SLIFunction const&
-  operator=( SLIFunction const& f )
-  {
+  SLIFunction const &operator=(SLIFunction const &f) {
     std::cerr << "Warning: Definition of FunctionDatum (" << name
               << ") changed!!\n";
 
@@ -79,23 +70,18 @@ class FunctionDatum : public TypedDatum< &SLIInterpreter::Functiontype >
   }
 
 public:
-  FunctionDatum( FunctionDatum const& fd )
-    : TypedDatum< &SLIInterpreter::Functiontype >( fd )
-    , name( fd.name )
-    , deprecation_info_( fd.deprecation_info_ )
-    , deprecation_warning_issued_( false )
-  {
+  FunctionDatum(FunctionDatum const &fd)
+      : TypedDatum<&SLIInterpreter::Functiontype>(fd), name(fd.name),
+        deprecation_info_(fd.deprecation_info_),
+        deprecation_warning_issued_(false) {
     set_executable();
   }
 
-  FunctionDatum( Name const& n,
-    SLIFunction const* f,
-    const std::string& deprecation_info )
-    : TypedDatum< &SLIInterpreter::Functiontype >()
-    , name( n )
-    , deprecation_info_( deprecation_info )
-    , deprecation_warning_issued_( false )
-  {
+  FunctionDatum(Name const &n, SLIFunction const *f,
+                const std::string &deprecation_info)
+      : TypedDatum<&SLIInterpreter::Functiontype>(), name(n),
+        deprecation_info_(deprecation_info),
+        deprecation_warning_issued_(false) {
     //! Here, we shortcut the default action of the type object and directly
     //! place the function pointer in the datum's action field. Thus, we
     //! avoid an extra virtual function call.
@@ -103,87 +89,58 @@ public:
     set_executable();
   }
 
-  void
-  execute( SLIInterpreter* i )
-  {
-    if ( not( deprecation_warning_issued_ or deprecation_info_.empty() ) )
-    {
-      i->message( SLIInterpreter::M_DEPRECATED,
-        "SLIInterpreter",
-        ( "SLI function " + name.toString() + " is deprecated in "
-          + deprecation_info_ + "." )
-          .c_str() );
+  void execute(SLIInterpreter *i) {
+    if (not(deprecation_warning_issued_ or deprecation_info_.empty())) {
+      i->message(SLIInterpreter::M_DEPRECATED, "SLIInterpreter",
+                 ("SLI function " + name.toString() + " is deprecated in " +
+                  deprecation_info_ + ".")
+                     .c_str());
       deprecation_warning_issued_ = true;
     }
 
-    action->execute( i );
+    action->execute(i);
   }
 
-  void
-  print( std::ostream& o ) const
-  {
-    o << '-' << name << '-';
-  }
+  void print(std::ostream &o) const { o << '-' << name << '-'; }
 
-  void
-  pprint( std::ostream& o ) const
-  {
-    print( o );
-  }
+  void pprint(std::ostream &o) const { print(o); }
 
-  void
-  info( std::ostream& out ) const
-  {
+  void info(std::ostream &out) const {
     out << "FunctionDatum::info\n";
     out << "name = " << name << std::endl;
   }
 
-  bool
-  equals( Datum const* dat ) const
-  {
-    const FunctionDatum* fd =
-      dynamic_cast< FunctionDatum* >( const_cast< Datum* >( dat ) );
-    if ( fd == NULL )
-    {
+  bool equals(Datum const *dat) const {
+    const FunctionDatum *fd =
+        dynamic_cast<FunctionDatum *>(const_cast<Datum *>(dat));
+    if (fd == NULL) {
       return false;
     }
 
     return action == fd->action;
   }
 
-  const Name&
-  getname( void ) const
-  {
-    return name;
-  }
+  const Name &getname(void) const { return name; }
 
-  void backtrace( SLIInterpreter*, int ) const;
+  void backtrace(SLIInterpreter *, int) const;
 
-  static void*
-  operator new( size_t size )
-  {
-    if ( size != sizeof( FunctionDatum ) )
-    {
-      return ::operator new( size );
+  static void *operator new(size_t size) {
+    if (size != sizeof(FunctionDatum)) {
+      return ::operator new(size);
     }
     return memory.alloc();
   }
 
-  static void
-  operator delete( void* p, size_t size )
-  {
-    if ( p == NULL )
-    {
+  static void operator delete(void *p, size_t size) {
+    if (p == NULL) {
       return;
     }
-    if ( size != sizeof( FunctionDatum ) )
-    {
-      ::operator delete( p );
+    if (size != sizeof(FunctionDatum)) {
+      ::operator delete(p);
       return;
     }
-    memory.free( p );
+    memory.free(p);
   }
 };
-
 
 #endif

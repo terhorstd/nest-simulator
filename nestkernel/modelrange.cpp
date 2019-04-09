@@ -22,15 +22,9 @@
 
 #include "modelrange.h"
 
-nest::modelrange::modelrange( index model, index first_gid, index last_gid )
-  : model_( model )
-  , first_gid_( first_gid )
-  , last_gid_( last_gid )
-{
-}
+nest::modelrange::modelrange(index model, index first_gid, index last_gid)
+    : model_(model), first_gid_(first_gid), last_gid_(last_gid) {}
 
-void
-nest::modelrange::extend_range( index new_last_gid )
-{
+void nest::modelrange::extend_range(index new_last_gid) {
   last_gid_ = new_last_gid;
 }

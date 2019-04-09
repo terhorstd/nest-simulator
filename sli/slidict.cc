@@ -57,13 +57,11 @@
 
 */
 
-void
-DictFunction::execute( SLIInterpreter* i ) const
-{
+void DictFunction::execute(SLIInterpreter *i) const {
   // create a new dictionary
 
   i->EStack.pop(); // never forget me
-  i->OStack.push( DictionaryDatum( new Dictionary ) );
+  i->OStack.push(DictionaryDatum(new Dictionary));
 }
 
 /** @BeginDocumentation
@@ -98,44 +96,32 @@ DictFunction::execute( SLIInterpreter* i ) const
    SeeAlso: get_d, known, dict, <<>>, clonedict
 
 */
-void
-DictputFunction::execute( SLIInterpreter* i ) const
-{
-  if ( i->OStack.load() >= 3 )
-  {
+void DictputFunction::execute(SLIInterpreter *i) const {
+  if (i->OStack.load() >= 3) {
     //  call: dict key val
-    DictionaryDatum* dict =
-      dynamic_cast< DictionaryDatum* >( i->OStack.pick( 2 ).datum() );
-    if ( dict != 0 )
-    {
-      LiteralDatum* key =
-        dynamic_cast< LiteralDatum* >( i->OStack.pick( 1 ).datum() );
-      if ( key != 0 )
-      {
-        ( *dict )->insert_move( *key, i->OStack.top() );
+    DictionaryDatum *dict =
+        dynamic_cast<DictionaryDatum *>(i->OStack.pick(2).datum());
+    if (dict != 0) {
+      LiteralDatum *key =
+          dynamic_cast<LiteralDatum *>(i->OStack.pick(1).datum());
+      if (key != 0) {
+        (*dict)->insert_move(*key, i->OStack.top());
 #ifdef DICTSTACK_CACHE
-        if ( ( *dict )->is_on_dictstack() )
-        {
-          i->DStack->clear_token_from_cache( *key );
+        if ((*dict)->is_on_dictstack()) {
+          i->DStack->clear_token_from_cache(*key);
         }
 #endif
-        i->OStack.pop( 3 );
+        i->OStack.pop(3);
         i->EStack.pop(); // never forget me
         return;
+      } else {
+        throw ArgumentType(1);
       }
-      else
-      {
-        throw ArgumentType( 1 );
-      }
+    } else {
+      throw ArgumentType(2);
     }
-    else
-    {
-      throw ArgumentType( 2 );
-    }
-  }
-  else
-  {
-    throw StackUnderflow( 3, i->OStack.load() );
+  } else {
+    throw StackUnderflow(3, i->OStack.load());
   }
 }
 
@@ -167,39 +153,28 @@ DictputFunction::execute( SLIInterpreter* i ) const
    SeeAlso: put_d, lookup, known
 
 */
-void
-DictgetFunction::execute( SLIInterpreter* i ) const
-{
+void DictgetFunction::execute(SLIInterpreter *i) const {
   //  call: dict key -> val
-  if ( i->OStack.load() >= 2 )
-  {
-    DictionaryDatum* dict =
-      dynamic_cast< DictionaryDatum* >( i->OStack.pick( 1 ).datum() );
-    if ( dict != 0 )
-    {
-      LiteralDatum* key =
-        dynamic_cast< LiteralDatum* >( i->OStack.pick( 0 ).datum() );
-      if ( key != 0 )
-      {
-        Token value = ( *dict )->lookup2( *key );
+  if (i->OStack.load() >= 2) {
+    DictionaryDatum *dict =
+        dynamic_cast<DictionaryDatum *>(i->OStack.pick(1).datum());
+    if (dict != 0) {
+      LiteralDatum *key =
+          dynamic_cast<LiteralDatum *>(i->OStack.pick(0).datum());
+      if (key != 0) {
+        Token value = (*dict)->lookup2(*key);
         i->EStack.pop(); // never forget me
-        i->OStack.pop( 2 );
-        i->OStack.push_move( value );
+        i->OStack.pop(2);
+        i->OStack.push_move(value);
         return;
+      } else {
+        throw ArgumentType(0);
       }
-      else
-      {
-        throw ArgumentType( 0 );
-      }
+    } else {
+      throw ArgumentType(1);
     }
-    else
-    {
-      throw ArgumentType( 1 );
-    }
-  }
-  else
-  {
-    throw StackUnderflow( 2, i->OStack.load() );
+  } else {
+    throw StackUnderflow(2, i->OStack.load());
   }
 }
 /** @BeginDocumentation
@@ -231,21 +206,18 @@ Total number of dictionary entries: 3
    SeeAlso: info_ds, topinfo_d, who, whos
 
 */
-void
-DictinfoFunction::execute( SLIInterpreter* i ) const
-{
+void DictinfoFunction::execute(SLIInterpreter *i) const {
   //  call: ostream dict
 
-  assert( i->OStack.load() > 1 );
-  OstreamDatum* outd =
-    dynamic_cast< OstreamDatum* >( i->OStack.pick( 1 ).datum() );
-  DictionaryDatum* dict =
-    dynamic_cast< DictionaryDatum* >( i->OStack.top().datum() );
-  assert( dict != NULL );
-  assert( outd != NULL );
+  assert(i->OStack.load() > 1);
+  OstreamDatum *outd = dynamic_cast<OstreamDatum *>(i->OStack.pick(1).datum());
+  DictionaryDatum *dict =
+      dynamic_cast<DictionaryDatum *>(i->OStack.top().datum());
+  assert(dict != NULL);
+  assert(outd != NULL);
   i->EStack.pop();
-  ( *dict )->info( **outd );
-  i->OStack.pop( 2 );
+  (*dict)->info(**outd);
+  i->OStack.pop(2);
 }
 
 /** @BeginDocumentation
@@ -263,37 +235,32 @@ DictinfoFunction::execute( SLIInterpreter* i ) const
  SeeAlso: length
 */
 
-void
-Length_dFunction::execute( SLIInterpreter* i ) const
-{
+void Length_dFunction::execute(SLIInterpreter *i) const {
   //  call: dict length_d -> int
 
-  assert( i->OStack.load() > 0 );
-  DictionaryDatum* dict =
-    dynamic_cast< DictionaryDatum* >( i->OStack.top().datum() );
-  assert( dict != NULL );
+  assert(i->OStack.load() > 0);
+  DictionaryDatum *dict =
+      dynamic_cast<DictionaryDatum *>(i->OStack.top().datum());
+  assert(dict != NULL);
   i->EStack.pop();
-  Token st( new IntegerDatum( ( *dict )->size() ) );
+  Token st(new IntegerDatum((*dict)->size()));
   i->OStack.pop();
-  i->OStack.push_move( st );
+  i->OStack.push_move(st);
 }
 
-void
-Empty_DFunction::execute( SLIInterpreter* i ) const
-{
+void Empty_DFunction::execute(SLIInterpreter *i) const {
   // call: dict empty_D dict bool
-  assert( i->OStack.load() > 0 );
+  assert(i->OStack.load() > 0);
 
-  DictionaryDatum const* const dd =
-    dynamic_cast< DictionaryDatum const* const >( i->OStack.top().datum() );
+  DictionaryDatum const *const dd =
+      dynamic_cast<DictionaryDatum const *const>(i->OStack.top().datum());
 
-  assert( dd != NULL );
+  assert(dd != NULL);
 
-  i->OStack.push_by_pointer( new BoolDatum( ( *dd )->empty() ) );
+  i->OStack.push_by_pointer(new BoolDatum((*dd)->empty()));
 
   i->EStack.pop();
 }
-
 
 /** @BeginDocumentation
    Name: countdictstack - return number of dictionaries on the dictionary stack.
@@ -311,14 +278,12 @@ Empty_DFunction::execute( SLIInterpreter* i ) const
    SeeAlso: dictstack, cleardictstack, whos
 
 */
-void
-CountdictstackFunction::execute( SLIInterpreter* i ) const
-{
+void CountdictstackFunction::execute(SLIInterpreter *i) const {
   //  call: Countdictstack -> int
 
   i->EStack.pop();
-  Token st( new IntegerDatum( i->DStack->size() ) );
-  i->OStack.push_move( st );
+  Token st(new IntegerDatum(i->DStack->size()));
+  i->OStack.push_move(st);
 }
 
 /** @BeginDocumentation
@@ -333,16 +298,14 @@ CountdictstackFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: currentdict, countdictstack, cleardictstack, whos
 */
-void
-DictstackFunction::execute( SLIInterpreter* i ) const
-{
+void DictstackFunction::execute(SLIInterpreter *i) const {
   //  call: -  dictstack ->  array
 
   i->EStack.pop();
   TokenArray ta;
-  i->DStack->toArray( ta );
-  Token st( new ArrayDatum( ta ) );
-  i->OStack.push_move( st );
+  i->DStack->toArray(ta);
+  Token st(new ArrayDatum(ta));
+  i->OStack.push_move(st);
 }
 
 /** @BeginDocumentation
@@ -354,15 +317,13 @@ DictstackFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: dictstack, begin, end, cleardictstack, who, whos
 */
-void
-CurrentdictFunction::execute( SLIInterpreter* i ) const
-{
+void CurrentdictFunction::execute(SLIInterpreter *i) const {
   //  call: -  currentdict -> dict
 
   i->EStack.pop();
   Token dt;
-  i->DStack->top( dt );
-  i->OStack.push_move( dt );
+  i->DStack->top(dt);
+  i->OStack.push_move(dt);
 }
 
 /** @BeginDocumentation
@@ -375,13 +336,10 @@ CurrentdictFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: dictstack, begin, end, currentdict, who, whos
 */
-void
-CleardictstackFunction::execute( SLIInterpreter* i ) const
-{
+void CleardictstackFunction::execute(SLIInterpreter *i) const {
   // Pop all non-permanent dictionaries
   i->EStack.pop();
-  while ( i->DStack->size() > 2 )
-  {
+  while (i->DStack->size() > 2) {
     i->DStack->pop();
   }
 }
@@ -399,16 +357,14 @@ CleardictstackFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: dictstack, currentdict, info, who, whos
 */
-void
-DicttopinfoFunction::execute( SLIInterpreter* i ) const
-{
+void DicttopinfoFunction::execute(SLIInterpreter *i) const {
   //  call: ostream Dicttopinfo
 
-  assert( i->OStack.load() > 0 );
-  OstreamDatum* outd = dynamic_cast< OstreamDatum* >( i->OStack.top().datum() );
-  assert( outd != NULL );
+  assert(i->OStack.load() > 0);
+  OstreamDatum *outd = dynamic_cast<OstreamDatum *>(i->OStack.top().datum());
+  assert(outd != NULL);
   i->EStack.pop();
-  i->DStack->top_info( **outd );
+  i->DStack->top_info(**outd);
   i->OStack.pop();
 }
 
@@ -428,16 +384,14 @@ DicttopinfoFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso:  dictstack, info, topinfo_d, who, whos
 */
-void
-WhoFunction::execute( SLIInterpreter* i ) const
-{
+void WhoFunction::execute(SLIInterpreter *i) const {
   //  call: ostream
 
-  assert( i->OStack.load() > 0 );
-  OstreamDatum* outd = dynamic_cast< OstreamDatum* >( i->OStack.top().datum() );
-  assert( outd != NULL );
+  assert(i->OStack.load() > 0);
+  OstreamDatum *outd = dynamic_cast<OstreamDatum *>(i->OStack.top().datum());
+  assert(outd != NULL);
   i->EStack.pop();
-  i->DStack->info( **outd );
+  i->DStack->info(**outd);
   i->OStack.pop();
 }
 
@@ -456,30 +410,22 @@ WhoFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: end, get_d, dictstack, cleardictstack, countdictstack
 */
-void
-DictbeginFunction::execute( SLIInterpreter* i ) const
-{
+void DictbeginFunction::execute(SLIInterpreter *i) const {
   //  call: dict
 
-  if ( i->OStack.load() > 0 )
-  {
-    DictionaryDatum* dict =
-      dynamic_cast< DictionaryDatum* >( i->OStack.top().datum() );
-    if ( dict != NULL )
-    {
+  if (i->OStack.load() > 0) {
+    DictionaryDatum *dict =
+        dynamic_cast<DictionaryDatum *>(i->OStack.top().datum());
+    if (dict != NULL) {
       i->EStack.pop();
-      i->DStack->push( *dict );
+      i->DStack->push(*dict);
       i->OStack.pop();
       return;
+    } else {
+      i->raiseerror(i->ArgumentTypeError);
     }
-    else
-    {
-      i->raiseerror( i->ArgumentTypeError );
-    }
-  }
-  else
-  {
-    i->raiseerror( i->StackUnderflowError );
+  } else {
+    i->raiseerror(i->StackUnderflowError);
   }
 }
 
@@ -500,17 +446,13 @@ DictbeginFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: begin, dictstack, cleardictstack, countdictstack
 */
-void
-DictendFunction::execute( SLIInterpreter* i ) const
-{
-  if ( i->DStack->size() > 2 ) // keep at least systemdict and userdict
-  {                            // see sli-init.sli for details
+void DictendFunction::execute(SLIInterpreter *i) const {
+  if (i->DStack->size() > 2) // keep at least systemdict and userdict
+  {                          // see sli-init.sli for details
     i->DStack->pop();
     i->EStack.pop();
-  }
-  else
-  {
-    i->raiseerror( "DictStackUnderflow" );
+  } else {
+    i->raiseerror("DictStackUnderflow");
   }
 }
 
@@ -552,45 +494,33 @@ DictendFunction::execute( SLIInterpreter* i ) const
    Author: docu edited by Marc Oliver Gewaltig and Sirko Straube
    SeeAlso: get_d, put_d, known, lookup, info
 */
-void
-UndefFunction::execute( SLIInterpreter* i ) const
-{
+void UndefFunction::execute(SLIInterpreter *i) const {
   //  call: dict key -> -
 
-  if ( i->OStack.load() > 1 )
-  {
-    DictionaryDatum* dict =
-      dynamic_cast< DictionaryDatum* >( i->OStack.pick( 1 ).datum() );
-    if ( dict != NULL )
-    {
-      LiteralDatum* key =
-        dynamic_cast< LiteralDatum* >( i->OStack.pick( 0 ).datum() );
-      if ( key != NULL )
-      {
+  if (i->OStack.load() > 1) {
+    DictionaryDatum *dict =
+        dynamic_cast<DictionaryDatum *>(i->OStack.pick(1).datum());
+    if (dict != NULL) {
+      LiteralDatum *key =
+          dynamic_cast<LiteralDatum *>(i->OStack.pick(0).datum());
+      if (key != NULL) {
         i->EStack.pop();
 #ifdef DICTSTACK_CACHE
-        if ( ( *dict )->is_on_dictstack() )
-        {
-          i->DStack->clear_token_from_cache( *key );
+        if ((*dict)->is_on_dictstack()) {
+          i->DStack->clear_token_from_cache(*key);
         }
 #endif
-        ( *dict )->erase( *key );
-        i->OStack.pop( 2 );
+        (*dict)->erase(*key);
+        i->OStack.pop(2);
         return;
+      } else {
+        throw ArgumentType(0);
       }
-      else
-      {
-        throw ArgumentType( 0 );
-      }
+    } else {
+      throw ArgumentType(1);
     }
-    else
-    {
-      throw ArgumentType( 1 );
-    }
-  }
-  else
-  {
-    throw StackUnderflow( 2, i->OStack.load() );
+  } else {
+    throw StackUnderflow(2, i->OStack.load());
   }
 }
 
@@ -639,62 +569,54 @@ Total number of entries: 1
    References: The Red Book
    SeeAlso: clonedict, begin, cleardictstack, dict, dictstack, info, end
 */
-void
-DictconstructFunction::execute( SLIInterpreter* i ) const
-{
+void DictconstructFunction::execute(SLIInterpreter *i) const {
   // call: mark key1 val1 ... keyn valn -> dict
 
   size_t load = i->OStack.load();
-  if ( load == 0 )
-  {
-    throw StackUnderflow( 1, 0 );
+  if (load == 0) {
+    throw StackUnderflow(1, 0);
   }
 
-  DictionaryDatum* dictd = new DictionaryDatum( new Dictionary );
-  Token dict( dictd );
+  DictionaryDatum *dictd = new DictionaryDatum(new Dictionary);
+  Token dict(dictd);
 
-  LiteralDatum* key = NULL;
-  static Token mark = i->baselookup( i->mark_name );
+  LiteralDatum *key = NULL;
+  static Token mark = i->baselookup(i->mark_name);
 
   size_t n = 0; //!< pick(1) is the first literal, then we count in steps of 2
-  while ( ( n < load ) && not( i->OStack.pick( n ) == mark ) )
-  {
-    Token& val = ( i->OStack.pick( n ) );
-    key = dynamic_cast< LiteralDatum* >( i->OStack.pick( n + 1 ).datum() );
-    if ( key == NULL )
-    {
-      i->message( 30,
-        "DictConstruct",
-        "Literal expected. Maybe initializer list is in the wrong order." );
-      i->raiseerror( i->ArgumentTypeError );
+  while ((n < load) && not(i->OStack.pick(n) == mark)) {
+    Token &val = (i->OStack.pick(n));
+    key = dynamic_cast<LiteralDatum *>(i->OStack.pick(n + 1).datum());
+    if (key == NULL) {
+      i->message(
+          30, "DictConstruct",
+          "Literal expected. Maybe initializer list is in the wrong order.");
+      i->raiseerror(i->ArgumentTypeError);
       delete dictd;
       return;
     }
-    ( *dictd )->insert_move( *key, val );
+    (*dictd)->insert_move(*key, val);
     n += 2; // count number of elements
   }
 
-  if ( n == load )
-  {
-    i->message( 30, "DictConstruct", "<< expected." );
-    i->raiseerror( i->ArgumentTypeError );
+  if (n == load) {
+    i->message(30, "DictConstruct", "<< expected.");
+    i->raiseerror(i->ArgumentTypeError);
     return;
   }
 
-  if ( n % 2 != 0 ) // there must be an even number of objects
-  {                 // above the mark
-    i->message( 30,
-      "DictConstruct",
-      "Initializer list must be pairs of literal and value." );
-    i->raiseerror( i->ArgumentTypeError );
+  if (n % 2 != 0) // there must be an even number of objects
+  {               // above the mark
+    i->message(30, "DictConstruct",
+               "Initializer list must be pairs of literal and value.");
+    i->raiseerror(i->ArgumentTypeError);
     return;
   }
 
   i->EStack.pop();
-  i->OStack.pop( n );
-  i->OStack.top().move( dict );
+  i->OStack.pop(n);
+  i->OStack.top().move(dict);
 }
-
 
 /** @BeginDocumentation
    Name: known - check whether a name is defined in a dictionary or object
@@ -712,20 +634,17 @@ DictconstructFunction::execute( SLIInterpreter* i ) const
    SeeAlso: lookup
 
 */
-void
-KnownFunction::execute( SLIInterpreter* i ) const
-{
+void KnownFunction::execute(SLIInterpreter *i) const {
   //  call: dict key -> bool
 
-  DictionaryDatum* dict =
-    dynamic_cast< DictionaryDatum* >( i->OStack.pick( 1 ).datum() );
-  LiteralDatum* key =
-    dynamic_cast< LiteralDatum* >( i->OStack.pick( 0 ).datum() );
+  DictionaryDatum *dict =
+      dynamic_cast<DictionaryDatum *>(i->OStack.pick(1).datum());
+  LiteralDatum *key = dynamic_cast<LiteralDatum *>(i->OStack.pick(0).datum());
 
-  bool known = ( *dict )->known( *key );
+  bool known = (*dict)->known(*key);
   i->EStack.pop(); // never forget me
-  i->OStack.pop( 1 );
-  i->OStack.top() = new BoolDatum( known );
+  i->OStack.pop(1);
+  i->OStack.top() = new BoolDatum(known);
 }
 
 /** @BeginDocumentation
@@ -736,20 +655,17 @@ KnownFunction::execute( SLIInterpreter* i ) const
    SeeAlso: <<>>, clonedict, dictstack
 
 */
-void
-CleardictFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  DictionaryDatum* dict =
-    dynamic_cast< DictionaryDatum* >( i->OStack.top().datum() );
-  assert( dict != NULL );
+void CleardictFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  DictionaryDatum *dict =
+      dynamic_cast<DictionaryDatum *>(i->OStack.top().datum());
+  assert(dict != NULL);
 #ifdef DICTSTACK_CACHE
-  if ( ( *dict )->is_on_dictstack() )
-  {
-    i->DStack->clear_dict_from_cache( *dict );
+  if ((*dict)->is_on_dictstack()) {
+    i->DStack->clear_dict_from_cache(*dict);
   }
 #endif
-  ( *dict )->clear();
+  (*dict)->clear();
   i->EStack.pop(); // never forget me
   i->OStack.pop();
 }
@@ -777,15 +693,13 @@ CleardictFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: <<>>, dict, cleardict
 */
-void
-ClonedictFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  DictionaryDatum* dict =
-    dynamic_cast< DictionaryDatum* >( i->OStack.top().datum() );
-  assert( dict != NULL );
+void ClonedictFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  DictionaryDatum *dict =
+      dynamic_cast<DictionaryDatum *>(i->OStack.top().datum());
+  assert(dict != NULL);
 
-  i->OStack.push( DictionaryDatum( new Dictionary( *( *dict ) ) ) );
+  i->OStack.push(DictionaryDatum(new Dictionary(*(*dict))));
   i->EStack.pop(); // never forget me
 }
 
@@ -846,26 +760,23 @@ ClonedictFunction::execute( SLIInterpreter* i ) const
    SeeAlso: keys, values, <<>>, cva, cvdict
 
 */
-void
-Cva_dFunction::execute( SLIInterpreter* i ) const
-{
+void Cva_dFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  assert( i->OStack.load() > 0 );
-  DictionaryDatum* dict =
-    dynamic_cast< DictionaryDatum* >( i->OStack.top().datum() );
-  assert( dict != NULL );
-  ArrayDatum* ad = new ArrayDatum();
-  ad->reserve( ( *dict )->size() * 2 );
+  assert(i->OStack.load() > 0);
+  DictionaryDatum *dict =
+      dynamic_cast<DictionaryDatum *>(i->OStack.top().datum());
+  assert(dict != NULL);
+  ArrayDatum *ad = new ArrayDatum();
+  ad->reserve((*dict)->size() * 2);
 
-  for ( TokenMap::const_iterator t = ( *dict )->begin(); t != ( *dict )->end();
-        ++t )
-  {
-    Token nt( new LiteralDatum( ( *t ).first ) );
-    ad->push_back_move( nt );
-    ad->push_back( ( *t ).second );
+  for (TokenMap::const_iterator t = (*dict)->begin(); t != (*dict)->end();
+       ++t) {
+    Token nt(new LiteralDatum((*t).first));
+    ad->push_back_move(nt);
+    ad->push_back((*t).second);
   }
   i->OStack.pop();
-  i->OStack.push( ad );
+  i->OStack.push(ad);
 }
 
 /** @BeginDocumentation
@@ -899,25 +810,22 @@ Cva_dFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: keys, values, <<>>, cva, cvdict
 */
-void
-KeysFunction::execute( SLIInterpreter* i ) const
-{
+void KeysFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  assert( i->OStack.load() > 0 );
-  DictionaryDatum* dict =
-    dynamic_cast< DictionaryDatum* >( i->OStack.top().datum() );
-  assert( dict != NULL );
-  ArrayDatum* ad = new ArrayDatum();
+  assert(i->OStack.load() > 0);
+  DictionaryDatum *dict =
+      dynamic_cast<DictionaryDatum *>(i->OStack.top().datum());
+  assert(dict != NULL);
+  ArrayDatum *ad = new ArrayDatum();
 
-  for ( TokenMap::const_iterator t = ( *dict )->begin(); t != ( *dict )->end();
-        ++t )
-  {
-    Token nt( new LiteralDatum( ( *t ).first ) );
-    assert( not nt.empty() );
-    ad->push_back_move( nt );
+  for (TokenMap::const_iterator t = (*dict)->begin(); t != (*dict)->end();
+       ++t) {
+    Token nt(new LiteralDatum((*t).first));
+    assert(not nt.empty());
+    ad->push_back_move(nt);
   }
   i->OStack.pop();
-  i->OStack.push( ad );
+  i->OStack.push(ad);
 }
 
 /** @BeginDocumentation
@@ -951,46 +859,37 @@ KeysFunction::execute( SLIInterpreter* i ) const
 
    SeeAlso: keys, values, <<>>, cva, cvdict
 */
-void
-ValuesFunction::execute( SLIInterpreter* i ) const
-{
+void ValuesFunction::execute(SLIInterpreter *i) const {
   i->EStack.pop();
-  assert( i->OStack.load() > 0 );
-  DictionaryDatum* dict =
-    dynamic_cast< DictionaryDatum* >( i->OStack.top().datum() );
-  assert( dict != NULL );
-  ArrayDatum* ad = new ArrayDatum();
+  assert(i->OStack.load() > 0);
+  DictionaryDatum *dict =
+      dynamic_cast<DictionaryDatum *>(i->OStack.top().datum());
+  assert(dict != NULL);
+  ArrayDatum *ad = new ArrayDatum();
 
-  for ( TokenMap::const_iterator t = ( *dict )->begin(); t != ( *dict )->end();
-        ++t )
-  {
-    ad->push_back( ( *t ).second );
+  for (TokenMap::const_iterator t = (*dict)->begin(); t != (*dict)->end();
+       ++t) {
+    ad->push_back((*t).second);
   }
   i->OStack.pop();
-  i->OStack.push( ad );
+  i->OStack.push(ad);
 }
 
-void
-RestoredstackFunction::execute( SLIInterpreter* i ) const
-{
-  i->assert_stack_load( 1 );
-  ArrayDatum* ad = dynamic_cast< ArrayDatum* >( i->OStack.top().datum() );
-  assert( ad != NULL );
+void RestoredstackFunction::execute(SLIInterpreter *i) const {
+  i->assert_stack_load(1);
+  ArrayDatum *ad = dynamic_cast<ArrayDatum *>(i->OStack.top().datum());
+  assert(ad != NULL);
   TokenArray ta = *ad;
-  DictionaryStack* olddstack = i->DStack; // copy current dstack
+  DictionaryStack *olddstack = i->DStack; // copy current dstack
   i->DStack = new DictionaryStack;
-  for ( size_t j = 0; j < ta.size(); ++j )
-  {
-    try
-    {
-      DictionaryDatum dict = getValue< DictionaryDatum >( ta[ j ] );
-      i->DStack->push( ta[ j ] );
-    }
-    catch ( ... )
-    {
+  for (size_t j = 0; j < ta.size(); ++j) {
+    try {
+      DictionaryDatum dict = getValue<DictionaryDatum>(ta[j]);
+      i->DStack->push(ta[j]);
+    } catch (...) {
       delete i->DStack;
       i->DStack = olddstack;
-      i->raiseerror( i->ArgumentTypeError );
+      i->raiseerror(i->ArgumentTypeError);
       return;
     }
   }
@@ -1022,30 +921,28 @@ const KeysFunction keysfunction;
 const ValuesFunction valuesfunction;
 const RestoredstackFunction restoredstackfunction;
 
-void
-init_slidict( SLIInterpreter* i )
-{
-  i->createcommand( "dict", &dictfunction );
-  i->createcommand( "put_d", &dictputfunction );
-  i->createcommand( "get_d", &dictgetfunction );
-  i->createcommand( "info_d", &dictinfofunction );
-  i->createcommand( "length_d", &length_dfunction );
-  i->createcommand( "empty_D", &empty_Dfunction );
-  i->createcommand( "topinfo_d", &dicttopinfofunction );
-  i->createcommand( "info_ds", &whofunction );
-  i->createcommand( "begin", &dictbeginfunction );
-  i->createcommand( i->end_name, &dictendfunction );
-  i->createcommand( "undef", &undeffunction );
-  i->createcommand( ">>", &dictconstructfunction );
-  i->createcommand( "dictstack", &dictstackfunction );
-  i->createcommand( "countdictstack", &countdictstackfunction );
-  i->createcommand( "cleardictstack", &cleardictstackfunction );
-  i->createcommand( "currentdict", &currentdictfunction );
-  i->createcommand( "known", &knownfunction );
-  i->createcommand( "cleardict", &cleardictfunction );
-  i->createcommand( "clonedict", &clonedictfunction );
-  i->createcommand( "cva_d", &cva_dfunction );
-  i->createcommand( "keys", &keysfunction );
-  i->createcommand( "values", &valuesfunction );
-  i->createcommand( "restoredstack", &restoredstackfunction );
+void init_slidict(SLIInterpreter *i) {
+  i->createcommand("dict", &dictfunction);
+  i->createcommand("put_d", &dictputfunction);
+  i->createcommand("get_d", &dictgetfunction);
+  i->createcommand("info_d", &dictinfofunction);
+  i->createcommand("length_d", &length_dfunction);
+  i->createcommand("empty_D", &empty_Dfunction);
+  i->createcommand("topinfo_d", &dicttopinfofunction);
+  i->createcommand("info_ds", &whofunction);
+  i->createcommand("begin", &dictbeginfunction);
+  i->createcommand(i->end_name, &dictendfunction);
+  i->createcommand("undef", &undeffunction);
+  i->createcommand(">>", &dictconstructfunction);
+  i->createcommand("dictstack", &dictstackfunction);
+  i->createcommand("countdictstack", &countdictstackfunction);
+  i->createcommand("cleardictstack", &cleardictstackfunction);
+  i->createcommand("currentdict", &currentdictfunction);
+  i->createcommand("known", &knownfunction);
+  i->createcommand("cleardict", &cleardictfunction);
+  i->createcommand("clonedict", &clonedictfunction);
+  i->createcommand("cva_d", &cva_dfunction);
+  i->createcommand("keys", &keysfunction);
+  i->createcommand("values", &valuesfunction);
+  i->createcommand("restoredstack", &restoredstackfunction);
 }

@@ -23,7 +23,6 @@
 #ifndef CORRELATION_DETECTOR_H
 #define CORRELATION_DETECTOR_H
 
-
 // C++ includes:
 #include <deque>
 #include <vector>
@@ -34,9 +33,7 @@
 #include "node.h"
 #include "pseudo_recording_device.h"
 
-
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: correlation_detector - Device for evaluating cross correlation between
@@ -146,22 +143,17 @@ SeeAlso: spike_detector, Device, PseudoRecordingDevice
 
 Availability: NEST
 */
-class correlation_detector : public Node
-{
+class correlation_detector : public Node {
 
 public:
   correlation_detector();
-  correlation_detector( const correlation_detector& );
+  correlation_detector(const correlation_detector &);
 
   /**
    * This device has proxies, so that it will receive
    * spikes also from sources which live on other threads.
    */
-  bool
-  has_proxies() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return true; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -171,19 +163,19 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  void handle( SpikeEvent& ); //!< @todo implement if-else in term of function
+  void handle(SpikeEvent &); //!< @todo implement if-else in term of function
 
-  port handles_test_event( SpikeEvent&, rport );
+  port handles_test_event(SpikeEvent &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   // ------------------------------------------------------------
 
@@ -191,52 +183,45 @@ private:
    * Spike structure to store in the deque of recently
    * received events
    */
-  struct Spike_
-  {
+  struct Spike_ {
     long timestep_;
     double weight_;
 
-    Spike_( long timestep, double weight )
-      : timestep_( timestep )
-      , weight_( weight )
-    {
-    }
+    Spike_(long timestep, double weight)
+        : timestep_(timestep), weight_(weight) {}
 
     /**
      * Greater operator needed for insertion sort.
      */
-    inline bool
-    operator>( const Spike_& second ) const
-    {
+    inline bool operator>(const Spike_ &second) const {
       return timestep_ > second.timestep_;
     }
   };
 
-  typedef std::deque< Spike_ > SpikelistType;
+  typedef std::deque<Spike_> SpikelistType;
 
   // ------------------------------------------------------------
 
   struct State_;
 
-  struct Parameters_
-  {
+  struct Parameters_ {
 
     Time delta_tau_; //!< width of correlation histogram bins
     Time tau_max_;   //!< maximum time difference of events to detect
     Time Tstart_;    //!< start of recording
     Time Tstop_;     //!< end of recording
 
-    Parameters_();                     //!< Sets default parameter values
-    Parameters_( const Parameters_& ); //!< Recalibrate all times
+    Parameters_();                    //!< Sets default parameter values
+    Parameters_(const Parameters_ &); //!< Recalibrate all times
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
     /**
      * Set values from dicitonary.
      * @returns true if the state needs to be reset after a change of
      *          binwidth or tau_max.
      */
-    bool set( const DictionaryDatum&, const correlation_detector& );
+    bool set(const DictionaryDatum &, const correlation_detector &);
   };
 
   // ------------------------------------------------------------
@@ -250,32 +235,31 @@ private:
    * @note State_ only contains read-out values, so we copy-construct
    *       using the default c'tor.
    */
-  struct State_
-  {
-    std::vector< long > n_events_;          //!< spike counters
-    std::vector< SpikelistType > incoming_; //!< incoming spikes, sorted
+  struct State_ {
+    std::vector<long> n_events_;          //!< spike counters
+    std::vector<SpikelistType> incoming_; //!< incoming spikes, sorted
 
     /** Weighted histogram.
      * @note Data type is double to accommodate weights.
      */
-    std::vector< double > histogram_;
+    std::vector<double> histogram_;
 
     //! used for Kahan summation algorithm
-    std::vector< double > histogram_correction_;
+    std::vector<double> histogram_correction_;
 
     //! Unweighted histogram.
-    std::vector< long > count_histogram_;
+    std::vector<long> count_histogram_;
 
     State_(); //!< initialize default state
 
-    void get( DictionaryDatum& ) const;
+    void get(DictionaryDatum &) const;
 
     /**
      * @param bool if true, force state reset
      */
-    void set( const DictionaryDatum&, const Parameters_&, bool );
+    void set(const DictionaryDatum &, const Parameters_ &, bool);
 
-    void reset( const Parameters_& );
+    void reset(const Parameters_ &);
   };
 
   // ------------------------------------------------------------
@@ -285,41 +269,34 @@ private:
   State_ S_;
 };
 
-inline port
-correlation_detector::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type < 0 || receptor_type > 1 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port correlation_detector::handles_test_event(SpikeEvent &,
+                                                     rport receptor_type) {
+  if (receptor_type < 0 || receptor_type > 1) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
 
   return receptor_type;
 }
 
-inline void
-nest::correlation_detector::get_status( DictionaryDatum& d ) const
-{
-  device_.get_status( d );
-  P_.get( d );
-  S_.get( d );
+inline void nest::correlation_detector::get_status(DictionaryDatum &d) const {
+  device_.get_status(d);
+  P_.get(d);
+  S_.get(d);
 
-  ( *d )[ names::element_type ] = LiteralDatum( names::recorder );
+  (*d)[names::element_type] = LiteralDatum(names::recorder);
 }
 
-inline void
-nest::correlation_detector::set_status( const DictionaryDatum& d )
-{
+inline void nest::correlation_detector::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_;
-  const bool reset_required = ptmp.set( d, *this );
+  const bool reset_required = ptmp.set(d, *this);
   State_ stmp = S_;
-  stmp.set( d, P_, reset_required );
+  stmp.set(d, P_, reset_required);
 
-  device_.set_status( d );
+  device_.set_status(d);
   P_ = ptmp;
   S_ = stmp;
 }
 
-
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef CORRELATION_DETECTOR_H */

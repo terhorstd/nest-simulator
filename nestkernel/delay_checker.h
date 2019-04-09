@@ -29,19 +29,17 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 class TimeConverter;
 
-class DelayChecker
-{
+class DelayChecker {
 public:
   DelayChecker();
-  DelayChecker( const DelayChecker& );
+  DelayChecker(const DelayChecker &);
 
-  const Time& get_min_delay() const;
+  const Time &get_min_delay() const;
 
-  const Time& get_max_delay() const;
+  const Time &get_max_delay() const;
 
   /**
    * This method freezes the min/ max delay update in SetDefaults of connections
@@ -64,7 +62,7 @@ public:
    *
    * @note Not const, since it may update delay extrema as a side-effect.
    */
-  void assert_valid_delay_ms( double );
+  void assert_valid_delay_ms(double);
 
   /**
    * Raise exception if either of the two delays in steps is invalid.
@@ -76,14 +74,14 @@ public:
    *       working with continuous delays.
    * @note Not const, since it may update delay extrema as a side-effect.
    */
-  void assert_two_valid_delays_steps( delay, delay );
+  void assert_two_valid_delays_steps(delay, delay);
 
   bool get_user_set_delay_extrema() const;
 
-  void calibrate( const TimeConverter& );
+  void calibrate(const TimeConverter &);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
   Time min_delay_;              //!< Minimal delay of all created synapses.
@@ -93,36 +91,19 @@ private:
   bool freeze_delay_update_;
 };
 
-inline const Time&
-DelayChecker::get_min_delay() const
-{
-  return min_delay_;
-}
+inline const Time &DelayChecker::get_min_delay() const { return min_delay_; }
 
-inline const Time&
-DelayChecker::get_max_delay() const
-{
-  return max_delay_;
-}
+inline const Time &DelayChecker::get_max_delay() const { return max_delay_; }
 
-inline bool
-DelayChecker::get_user_set_delay_extrema() const
-{
+inline bool DelayChecker::get_user_set_delay_extrema() const {
   return user_set_delay_extrema_;
 }
 
-inline void
-DelayChecker::freeze_delay_update()
-{
-  freeze_delay_update_ = true;
-}
+inline void DelayChecker::freeze_delay_update() { freeze_delay_update_ = true; }
 
-inline void
-DelayChecker::enable_delay_update()
-{
+inline void DelayChecker::enable_delay_update() {
   freeze_delay_update_ = false;
 }
-}
-
+} // namespace nest
 
 #endif /* DELAY_CHECKER_H */

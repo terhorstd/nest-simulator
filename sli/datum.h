@@ -31,8 +31,7 @@
 /* -----                                                   */
 /*  base class for all Data Objects                        */
 /***********************************************************/
-class Datum
-{
+class Datum {
 
   friend class Token;
 
@@ -40,8 +39,7 @@ class Datum
    * Virtual copy constructor.
    * Use this function to lazily copy a datum.
    */
-  virtual Datum* clone( void ) const = 0;
-
+  virtual Datum *clone(void) const = 0;
 
   /**
    * Returns a reference counted pointer to the datum, or a new pointer, if the
@@ -50,171 +48,93 @@ class Datum
    * because changes affect all other references as well.
    */
 
-  virtual Datum*
-  get_ptr()
-  {
-    return clone();
-  }
+  virtual Datum *get_ptr() { return clone(); }
 
 protected:
   // Putting the following variables here, avoids a number of virtual
   // functions.
 
-  const SLIType* type;       //!< Pointer to type object.
-  const SLIFunction* action; //!< Shortcut to the SLIType default action.
+  const SLIType *type;       //!< Pointer to type object.
+  const SLIFunction *action; //!< Shortcut to the SLIType default action.
   mutable unsigned int reference_count_;
   bool executable_;
 
+  Datum() : type(NULL), action(NULL), reference_count_(1), executable_(true) {}
 
-  Datum()
-    : type( NULL )
-    , action( NULL )
-    , reference_count_( 1 )
-    , executable_( true )
-  {
-  }
+  Datum(const SLIType *t)
+      : type(t), action(t->getaction()), reference_count_(1),
+        executable_(true) {}
 
-
-  Datum( const SLIType* t )
-    : type( t )
-    , action( t->getaction() )
-    , reference_count_( 1 )
-    , executable_( true )
-  {
-  }
-
-  Datum( const Datum& d )
-    : type( d.type )
-    , action( d.action )
-    , reference_count_( 1 )
-    , executable_( d.executable_ )
-  {
-  }
-
+  Datum(const Datum &d)
+      : type(d.type), action(d.action), reference_count_(1),
+        executable_(d.executable_) {}
 
 public:
   virtual ~Datum(){};
 
+  void addReference() const { ++reference_count_; }
 
-  void
-  addReference() const
-  {
-    ++reference_count_;
-  }
-
-  void
-  removeReference()
-  {
+  void removeReference() {
     --reference_count_;
-    if ( reference_count_ == 0 )
-    {
+    if (reference_count_ == 0) {
       delete this;
     }
   }
 
-  size_t
-  numReferences() const
-  {
-    return reference_count_;
-  }
+  size_t numReferences() const { return reference_count_; }
 
-  bool
-  is_executable() const
-  {
-    return executable_;
-  }
+  bool is_executable() const { return executable_; }
 
-  void
-  set_executable()
-  {
-    executable_ = true;
-  }
+  void set_executable() { executable_ = true; }
 
-  void
-  unset_executable()
-  {
-    executable_ = false;
-  }
+  void unset_executable() { executable_ = false; }
 
-  virtual void print( std::ostream& ) const = 0;
-  virtual void pprint( std::ostream& ) const = 0;
+  virtual void print(std::ostream &) const = 0;
+  virtual void pprint(std::ostream &) const = 0;
 
-  virtual void
-  list( std::ostream& out, std::string prefix, int length ) const
-  {
-    if ( length == 0 )
-    {
+  virtual void list(std::ostream &out, std::string prefix, int length) const {
+    if (length == 0) {
       prefix = "-->" + prefix;
-    }
-    else
-    {
+    } else {
       prefix = "   " + prefix;
     }
     out << prefix;
-    print( out );
+    print(out);
   }
 
-  virtual void
-  input_form( std::ostream& out ) const
-  {
-    pprint( out );
-  }
+  virtual void input_form(std::ostream &out) const { pprint(out); }
 
-  virtual bool
-  equals( const Datum* d ) const
-  {
-    return this == d;
-  }
+  virtual bool equals(const Datum *d) const { return this == d; }
 
-  virtual void info( std::ostream& ) const;
+  virtual void info(std::ostream &) const;
 
-  const Name&
-  gettypename( void ) const
-  {
-    return type->gettypename();
-  }
+  const Name &gettypename(void) const { return type->gettypename(); }
 
-  bool
-  isoftype( SLIType const& t ) const
-  {
+  bool isoftype(SLIType const &t) const {
     // or: *type==t, there is only one t with same contents !
-    return ( type == &t );
+    return (type == &t);
   }
 
-  virtual void
-  execute( SLIInterpreter* i )
-  {
-    action->execute( i );
-  }
+  virtual void execute(SLIInterpreter *i) { action->execute(i); }
 };
 
-template < SLIType* slt >
-class TypedDatum : public Datum
-{
+template <SLIType *slt> class TypedDatum : public Datum {
 public:
-  TypedDatum( void )
-    : Datum( slt )
-  {
-  }
+  TypedDatum(void) : Datum(slt) {}
 
   // This is here solely for default assignment operators in
   // derived classes synthesized by the compiler. It does nothing but return
   // itself.
 protected:
-  TypedDatum( const TypedDatum< slt >& d )
-    : Datum( d )
-  {
-  }
-  const TypedDatum< slt >& operator=( const TypedDatum< slt >& );
+  TypedDatum(const TypedDatum<slt> &d) : Datum(d) {}
+  const TypedDatum<slt> &operator=(const TypedDatum<slt> &);
 };
 
-template < SLIType* slt >
-inline const TypedDatum< slt >&
-TypedDatum< slt >::operator=( const TypedDatum< slt >& )
-{
+template <SLIType *slt>
+inline const TypedDatum<slt> &TypedDatum<slt>::
+operator=(const TypedDatum<slt> &) {
   //  assert( type == d.type );
   return *this;
 }
-
 
 #endif

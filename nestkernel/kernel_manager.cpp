@@ -22,54 +22,33 @@
 
 #include "kernel_manager.h"
 
-nest::KernelManager* nest::KernelManager::kernel_manager_instance_ = 0;
+nest::KernelManager *nest::KernelManager::kernel_manager_instance_ = 0;
 
-void
-nest::KernelManager::create_kernel_manager()
-{
-#pragma omp critical( create_kernel_manager )
+void nest::KernelManager::create_kernel_manager() {
+#pragma omp critical(create_kernel_manager)
   {
-    if ( kernel_manager_instance_ == 0 )
-    {
+    if (kernel_manager_instance_ == 0) {
       kernel_manager_instance_ = new KernelManager();
-      assert( kernel_manager_instance_ );
+      assert(kernel_manager_instance_);
     }
   }
 }
 
-void
-nest::KernelManager::destroy_kernel_manager()
-{
-  kernel_manager_instance_->logging_manager.set_logging_level( M_QUIET );
+void nest::KernelManager::destroy_kernel_manager() {
+  kernel_manager_instance_->logging_manager.set_logging_level(M_QUIET);
   kernel_manager_instance_->finalize();
   delete kernel_manager_instance_;
 }
 
 nest::KernelManager::KernelManager()
-  : logging_manager()
-  , io_manager()
-  , mpi_manager()
-  , vp_manager()
-  , rng_manager()
-  , simulation_manager()
-  , modelrange_manager()
-  , connection_manager()
-  , sp_manager()
-  , event_delivery_manager()
-  , model_manager()
-  , music_manager()
-  , node_manager()
-  , initialized_( false )
-{
-}
+    : logging_manager(), io_manager(), mpi_manager(), vp_manager(),
+      rng_manager(), simulation_manager(), modelrange_manager(),
+      connection_manager(), sp_manager(), event_delivery_manager(),
+      model_manager(), music_manager(), node_manager(), initialized_(false) {}
 
-nest::KernelManager::~KernelManager()
-{
-}
+nest::KernelManager::~KernelManager() {}
 
-void
-nest::KernelManager::initialize()
-{
+void nest::KernelManager::initialize() {
   logging_manager.initialize(); // must come first so others can log
   io_manager.initialize();      // independent of others
 
@@ -108,9 +87,7 @@ nest::KernelManager::initialize()
   initialized_ = true;
 }
 
-void
-nest::KernelManager::finalize()
-{
+void nest::KernelManager::finalize() {
   initialized_ = false;
 
   // reverse order of calls as in initialize()
@@ -132,23 +109,19 @@ nest::KernelManager::finalize()
   logging_manager.finalize();
 }
 
-void
-nest::KernelManager::reset()
-{
+void nest::KernelManager::reset() {
   finalize();
   initialize();
 }
 
-void
-nest::KernelManager::change_num_threads( size_t num_threads )
-{
+void nest::KernelManager::change_num_threads(size_t num_threads) {
   node_manager.finalize();
   connection_manager.finalize();
   model_manager.finalize();
   modelrange_manager.finalize();
   rng_manager.finalize();
 
-  vp_manager.set_num_threads( num_threads );
+  vp_manager.set_num_threads(num_threads);
 
   rng_manager.initialize();
   // independent of threads, but node_manager needs it reset
@@ -160,49 +133,45 @@ nest::KernelManager::change_num_threads( size_t num_threads )
   node_manager.initialize();
 }
 
-void
-nest::KernelManager::set_status( const DictionaryDatum& dict )
-{
-  assert( is_initialized() );
-  logging_manager.set_status( dict );
-  io_manager.set_status( dict );
+void nest::KernelManager::set_status(const DictionaryDatum &dict) {
+  assert(is_initialized());
+  logging_manager.set_status(dict);
+  io_manager.set_status(dict);
 
-  mpi_manager.set_status( dict );
-  vp_manager.set_status( dict );
+  mpi_manager.set_status(dict);
+  vp_manager.set_status(dict);
 
   // set RNGs --- MUST come after n_threads_ is updated
-  rng_manager.set_status( dict );
-  simulation_manager.set_status( dict );
-  modelrange_manager.set_status( dict );
-  model_manager.set_status( dict );
-  connection_manager.set_status( dict );
-  sp_manager.set_status( dict );
+  rng_manager.set_status(dict);
+  simulation_manager.set_status(dict);
+  modelrange_manager.set_status(dict);
+  model_manager.set_status(dict);
+  connection_manager.set_status(dict);
+  sp_manager.set_status(dict);
 
-  event_delivery_manager.set_status( dict );
-  music_manager.set_status( dict );
+  event_delivery_manager.set_status(dict);
+  music_manager.set_status(dict);
 
-  node_manager.set_status( dict ); // has to be called last
+  node_manager.set_status(dict); // has to be called last
 }
 
-void
-nest::KernelManager::get_status( DictionaryDatum& dict )
-{
-  assert( is_initialized() );
-  logging_manager.get_status( dict );
-  io_manager.get_status( dict );
+void nest::KernelManager::get_status(DictionaryDatum &dict) {
+  assert(is_initialized());
+  logging_manager.get_status(dict);
+  io_manager.get_status(dict);
 
-  mpi_manager.get_status( dict );
-  vp_manager.get_status( dict );
+  mpi_manager.get_status(dict);
+  vp_manager.get_status(dict);
 
-  rng_manager.get_status( dict );
-  simulation_manager.get_status( dict );
-  modelrange_manager.get_status( dict );
-  model_manager.get_status( dict );
-  connection_manager.get_status( dict );
-  sp_manager.get_status( dict );
+  rng_manager.get_status(dict);
+  simulation_manager.get_status(dict);
+  modelrange_manager.get_status(dict);
+  model_manager.get_status(dict);
+  connection_manager.get_status(dict);
+  sp_manager.get_status(dict);
 
-  event_delivery_manager.get_status( dict );
-  music_manager.get_status( dict );
+  event_delivery_manager.get_status(dict);
+  music_manager.get_status(dict);
 
-  node_manager.get_status( dict );
+  node_manager.get_status(dict);
 }

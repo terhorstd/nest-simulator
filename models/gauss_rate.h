@@ -32,9 +32,7 @@
 #include "rate_transformer_node.h"
 #include "rate_transformer_node_impl.h"
 
-
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: gauss_rate - rate model with Gaussian gain function
@@ -95,8 +93,7 @@ Author: Mario Senden, Jan Hahne, Jannis Schuecker
 
 SeeAlso: rate_connection_instantaneous, rate_connection_delayed
 */
-class nonlinearities_gauss_rate
-{
+class nonlinearities_gauss_rate {
 private:
   /** gain factor of gain function */
   double g_;
@@ -105,49 +102,35 @@ private:
 
 public:
   /** sets default parameters */
-  nonlinearities_gauss_rate()
-    : g_( 1.0 )
-    , mu_( 0.0 )
-    , sigma_( 0.0 )
-  {
-  }
+  nonlinearities_gauss_rate() : g_(1.0), mu_(0.0), sigma_(0.0) {}
 
-  void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-  void set( const DictionaryDatum& ); //!< Set values from dicitonary
+  void get(DictionaryDatum &) const; //!< Store current values in dictionary
+  void set(const DictionaryDatum &); //!< Set values from dicitonary
 
-  double input( double h );               // non-linearity on input
-  double mult_coupling_ex( double rate ); // factor of multiplicative coupling
-  double mult_coupling_in( double rate ); // factor of multiplicative coupling
+  double input(double h);               // non-linearity on input
+  double mult_coupling_ex(double rate); // factor of multiplicative coupling
+  double mult_coupling_in(double rate); // factor of multiplicative coupling
 };
 
-inline double
-nonlinearities_gauss_rate::input( double h )
-{
-  return g_ * ( std::exp( -pow( h - mu_, 2. ) / ( 2. * pow( sigma_, 2. ) ) ) );
+inline double nonlinearities_gauss_rate::input(double h) {
+  return g_ * (std::exp(-pow(h - mu_, 2.) / (2. * pow(sigma_, 2.))));
 }
 
-inline double
-nonlinearities_gauss_rate::mult_coupling_ex( double rate )
-{
+inline double nonlinearities_gauss_rate::mult_coupling_ex(double rate) {
   return 1.;
 }
 
-inline double
-nonlinearities_gauss_rate::mult_coupling_in( double rate )
-{
+inline double nonlinearities_gauss_rate::mult_coupling_in(double rate) {
   return 1.;
 }
 
-typedef rate_neuron_ipn< nest::nonlinearities_gauss_rate > gauss_rate_ipn;
-typedef rate_transformer_node< nest::nonlinearities_gauss_rate >
-  rate_transformer_gauss;
+typedef rate_neuron_ipn<nest::nonlinearities_gauss_rate> gauss_rate_ipn;
+typedef rate_transformer_node<nest::nonlinearities_gauss_rate>
+    rate_transformer_gauss;
 
-template <>
-void RecordablesMap< gauss_rate_ipn >::create();
-template <>
-void RecordablesMap< rate_transformer_gauss >::create();
+template <> void RecordablesMap<gauss_rate_ipn>::create();
+template <> void RecordablesMap<rate_transformer_gauss>::create();
 
 } // namespace nest
-
 
 #endif /* #ifndef GAUSS_RATE_H */

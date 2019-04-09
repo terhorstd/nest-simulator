@@ -36,8 +36,7 @@
 #include "nest_types.h"
 #include "stimulating_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: poisson_generator_ps - simulate neuron firing with Poisson processes
@@ -68,33 +67,24 @@ Sends: SpikeEvent
 
 SeeAlso: poisson_generator, spike_generator, Device, StimulatingDevice
 */
-class poisson_generator_ps : public DeviceNode
-{
+class poisson_generator_ps : public DeviceNode {
 
 public:
   poisson_generator_ps();
-  poisson_generator_ps( const poisson_generator_ps& );
+  poisson_generator_ps(const poisson_generator_ps &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  is_off_grid() const
-  {
-    return true;
-  } // uses off_grid events
+  bool has_proxies() const { return false; }
+  bool is_off_grid() const { return true; } // uses off_grid events
 
   using Node::event_hook;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
@@ -107,22 +97,21 @@ private:
    * information.
    * @see event_hook, DSSpikeEvent
    */
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   /**
    * Send out spikes.
    * Called once per target to dispatch actual output spikes.
    * @param contains target information.
    */
-  void event_hook( DSSpikeEvent& );
+  void event_hook(DSSpikeEvent &);
 
   // ------------------------------------------------------------
 
   /**
    * Store independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double rate_;      //!< process rate [Hz]
     double dead_time_; //!< dead time [ms]
 
@@ -136,15 +125,14 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
   // ------------------------------------------------------------
 
-  struct Buffers_
-  {
-    typedef std::pair< Time, double > SpikeTime;
+  struct Buffers_ {
+    typedef std::pair<Time, double> SpikeTime;
 
     /**
      * Time of next spike represented as time stamp and offset, for each target.
@@ -153,13 +141,12 @@ private:
      * @note first == Time::neg_inf() marks that no spike has been generated yet
      *   and that an initial interval needs to be drawn.
      */
-    std::vector< SpikeTime > next_spike_;
+    std::vector<SpikeTime> next_spike_;
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     double inv_rate_ms_;              //!< 1000.0 / Parameters_.rate_
     librandom::ExpRandomDev exp_dev_; //!< random deviate generator
 
@@ -180,61 +167,51 @@ private:
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< CurrentEvent > device_;
+  StimulatingDevice<CurrentEvent> device_;
   Parameters_ P_;
   Variables_ V_;
   Buffers_ B_;
 };
 
-inline port
-poisson_generator_ps::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool dummy_target )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port poisson_generator_ps::send_test_event(Node &target,
+                                                  rport receptor_type,
+                                                  synindex syn_id,
+                                                  bool dummy_target) {
+  device_.enforce_single_syn_type(syn_id);
 
-  if ( dummy_target )
-  {
+  if (dummy_target) {
     DSSpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
-  }
-  else
-  {
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
+  } else {
     SpikeEvent e;
-    e.set_sender( *this );
-    const port p = target.handles_test_event( e, receptor_type );
-    if ( p != invalid_port_ and not is_model_prototype() )
-    {
+    e.set_sender(*this);
+    const port p = target.handles_test_event(e, receptor_type);
+    if (p != invalid_port_ and not is_model_prototype()) {
       ++P_.num_targets_; // count number of targets
     }
     return p;
   }
 }
 
-inline void
-poisson_generator_ps::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  device_.get_status( d );
+inline void poisson_generator_ps::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  device_.get_status(d);
 }
 
-inline void
-poisson_generator_ps::set_status( const DictionaryDatum& d )
-{
+inline void poisson_generator_ps::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
 
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // POISSON_GENERATOR_PS_H

@@ -64,31 +64,25 @@
 // Includes from librandom:
 #include "randomgen.h"
 
-namespace librandom
-{
+namespace librandom {
 /**
  * Mersenne Twister MT19937.
  * This class implements the 32-bit MT19937 Mersenne Twister
  * RNG by Matsumoto and Nishimura. The implementation wraps a C++ class
  * around the originial code.
  */
-class MT19937 : public RandomGen
-{
+class MT19937 : public RandomGen {
 public:
   //! Create generator with given seed
-  explicit MT19937( unsigned long );
+  explicit MT19937(unsigned long);
 
   ~MT19937(){};
 
-  RngPtr
-  clone( unsigned long s )
-  {
-    return RngPtr( new MT19937( s ) );
-  }
+  RngPtr clone(unsigned long s) { return RngPtr(new MT19937(s)); }
 
 private:
   //! implements seeding for RandomGen
-  void seed_( unsigned long );
+  void seed_(unsigned long);
 
   //! implements drawing a single [0,1) number for RandomGen
   double drand_();
@@ -97,7 +91,7 @@ private:
   // functions inherited from C-version of mt19937
 
   /* initializes mt[N] with a seed */
-  void init_genrand( unsigned long );
+  void init_genrand(unsigned long);
 
   /* generates a random number on [0,0xffffffff]-interval */
   unsigned long genrand_int32();
@@ -113,23 +107,16 @@ private:
   static const unsigned long LOWER_MASK; /* least significant r bits */
   static const double I2DFactor_;        //!< int to double factor
 
-  std::vector< unsigned long > mt; /* the array for the state vector  */
-  int mti;                         /* mti==N+1 means mt[N] is not initialized */
+  std::vector<unsigned long> mt; /* the array for the state vector  */
+  int mti;                       /* mti==N+1 means mt[N] is not initialized */
 };
-}
+} // namespace librandom
 
-inline double
-librandom::MT19937::drand_()
-{
-  return genrand_real2();
-}
+inline double librandom::MT19937::drand_() { return genrand_real2(); }
 
-inline double
-librandom::MT19937::genrand_real2()
-{
+inline double librandom::MT19937::genrand_real2() {
   return I2DFactor_ * genrand_int32();
   /* divided by 2^32 */
 }
-
 
 #endif

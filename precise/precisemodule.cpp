@@ -56,56 +56,43 @@
 #include "parrot_neuron_ps.h"
 #include "poisson_generator_ps.h"
 
-namespace nest
-{
+namespace nest {
 
 /* At the time when PreciseModule is constructed, the SLI Interpreter
    must already be initialized. PreciseModule relies on the presence of
    the following SLI datastructures: Name, Dictionary
 */
 
-PreciseModule::PreciseModule()
-{
-}
+PreciseModule::PreciseModule() {}
 
-PreciseModule::~PreciseModule()
-{
-}
+PreciseModule::~PreciseModule() {}
 
-const std::string
-PreciseModule::name( void ) const
-{
+const std::string PreciseModule::name(void) const {
   return std::string(
-    "NEST Precise Spike-Timing Models Module" ); // Return name of the module
+      "NEST Precise Spike-Timing Models Module"); // Return name of the module
 }
 
-const std::string
-PreciseModule::commandstring( void ) const
-{
-  return std::string( "" ); // Run associated SLI startup script
+const std::string PreciseModule::commandstring(void) const {
+  return std::string(""); // Run associated SLI startup script
 }
 
 //-------------------------------------------------------------------------------------
 
-void
-PreciseModule::init( SLIInterpreter* )
-{
+void PreciseModule::init(SLIInterpreter *) {
   // register models
-  kernel().model_manager.register_node_model< iaf_psc_delta_canon >(
-    "iaf_psc_delta_canon" );
-  kernel().model_manager.register_node_model< iaf_psc_alpha_canon >(
-    "iaf_psc_alpha_canon" );
-  kernel().model_manager.register_node_model< iaf_psc_alpha_presc >(
-    "iaf_psc_alpha_presc" );
-  kernel().model_manager.register_node_model< iaf_psc_exp_ps >(
-    "iaf_psc_exp_ps" );
-  kernel().model_manager.register_node_model< iaf_psc_exp_ps_lossless >(
-    "iaf_psc_exp_ps_lossless" );
-  kernel().model_manager.register_node_model< poisson_generator_ps >(
-    "poisson_generator_ps" );
-  kernel().model_manager.register_node_model< parrot_neuron_ps >(
-    "parrot_neuron_ps" );
+  kernel().model_manager.register_node_model<iaf_psc_delta_canon>(
+      "iaf_psc_delta_canon");
+  kernel().model_manager.register_node_model<iaf_psc_alpha_canon>(
+      "iaf_psc_alpha_canon");
+  kernel().model_manager.register_node_model<iaf_psc_alpha_presc>(
+      "iaf_psc_alpha_presc");
+  kernel().model_manager.register_node_model<iaf_psc_exp_ps>("iaf_psc_exp_ps");
+  kernel().model_manager.register_node_model<iaf_psc_exp_ps_lossless>(
+      "iaf_psc_exp_ps_lossless");
+  kernel().model_manager.register_node_model<poisson_generator_ps>(
+      "poisson_generator_ps");
+  kernel().model_manager.register_node_model<parrot_neuron_ps>(
+      "parrot_neuron_ps");
 } // PreciseModule::init()
-
 
 } // namespace nest

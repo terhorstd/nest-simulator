@@ -30,8 +30,7 @@
 #include "nest_types.h"
 #include "ring_buffer.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: parrot_neuron - Neuron that repeats incoming spikes.
@@ -74,8 +73,7 @@ Plesser
 
 FirstVersion: May 2006
 */
-class parrot_neuron : public Archiving_Node
-{
+class parrot_neuron : public Archiving_Node {
 
 public:
   parrot_neuron();
@@ -90,80 +88,57 @@ public:
   using Node::receives_signal;
   using Node::sends_signal;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
   SignalType sends_signal() const;
   SignalType receives_signal() const;
 
-  void handle( SpikeEvent& );
-  port handles_test_event( SpikeEvent&, rport );
+  void handle(SpikeEvent &);
+  port handles_test_event(SpikeEvent &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void
-  init_state_( const Node& )
-  {
-  } // no state
+  void init_state_(const Node &) {} // no state
   void init_buffers_();
-  void
-  calibrate()
-  {
-  } // no variables
+  void calibrate() {} // no variables
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   /**
      Buffers and accumulates the number of incoming spikes per time step;
      RingBuffer stores doubles; for now the numbers are casted.
   */
-  struct Buffers_
-  {
+  struct Buffers_ {
     RingBuffer n_spikes_;
   };
 
   Buffers_ B_;
 };
 
-inline port
-parrot_neuron::send_test_event( Node& target,
-  rport receptor_type,
-  synindex,
-  bool )
-{
+inline port parrot_neuron::send_test_event(Node &target, rport receptor_type,
+                                           synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-parrot_neuron::handles_test_event( SpikeEvent&, rport receptor_type )
-{
+inline port parrot_neuron::handles_test_event(SpikeEvent &,
+                                              rport receptor_type) {
   // Allow connections to port 0 (spikes to be repeated)
   // and port 1 (spikes to be ignored).
-  if ( receptor_type == 0 or receptor_type == 1 )
-  {
+  if (receptor_type == 0 or receptor_type == 1) {
     return receptor_type;
-  }
-  else
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+  } else {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
 }
 
-inline SignalType
-parrot_neuron::sends_signal() const
-{
-  return ALL;
-}
+inline SignalType parrot_neuron::sends_signal() const { return ALL; }
 
-inline SignalType
-parrot_neuron::receives_signal() const
-{
-  return ALL;
-}
+inline SignalType parrot_neuron::receives_signal() const { return ALL; }
 
-} // namespace
+} // namespace nest
 
 #endif // PARROT_NEURON_H

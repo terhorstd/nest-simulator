@@ -34,8 +34,7 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace mynest
-{
+namespace mynest {
 
 /** @BeginDocumentation
 Name: pif_psc_alpha - Perfect integrate-and-fire neuron model with alpha PSC
@@ -87,8 +86,7 @@ Hans Ekkehard Plesser, based on iaf_psc_alpha
 
 SeeAlso: iaf_psc_delta, iaf_psc_exp, iaf_psc_alpha
 */
-class pif_psc_alpha : public nest::Archiving_Node
-{
+class pif_psc_alpha : public nest::Archiving_Node {
 public:
   /**
    * The constructor is only used to create the model prototype in the model
@@ -104,7 +102,7 @@ public:
    *       Initialization of buffers and interal variables is deferred to
    *       @c init_buffers_() and @c calibrate().
    */
-  pif_psc_alpha( const pif_psc_alpha& );
+  pif_psc_alpha(const pif_psc_alpha &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -117,7 +115,7 @@ public:
   /**
    * Used to validate that we can send SpikeEvent to desired target:port.
    */
-  nest::port send_test_event( nest::Node&, nest::port, nest::synindex, bool );
+  nest::port send_test_event(nest::Node &, nest::port, nest::synindex, bool);
 
   /**
    * @defgroup mynest_handle Functions handling incoming events.
@@ -125,23 +123,23 @@ public:
    * defining @c handle() and @c connect_sender() for the given event.
    * @{
    */
-  void handle( nest::SpikeEvent& );         //! accept spikes
-  void handle( nest::CurrentEvent& );       //! accept input current
-  void handle( nest::DataLoggingRequest& ); //! allow recording with multimeter
+  void handle(nest::SpikeEvent &);         //! accept spikes
+  void handle(nest::CurrentEvent &);       //! accept input current
+  void handle(nest::DataLoggingRequest &); //! allow recording with multimeter
 
-  nest::port handles_test_event( nest::SpikeEvent&, nest::port );
-  nest::port handles_test_event( nest::CurrentEvent&, nest::port );
-  nest::port handles_test_event( nest::DataLoggingRequest&, nest::port );
+  nest::port handles_test_event(nest::SpikeEvent &, nest::port);
+  nest::port handles_test_event(nest::CurrentEvent &, nest::port);
+  nest::port handles_test_event(nest::DataLoggingRequest &, nest::port);
   /** @} */
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
   //! Reset parameters and state of neuron.
 
   //! Reset state of neuron.
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
 
   //! Reset internal buffers of neuron.
   void init_buffers_();
@@ -150,11 +148,11 @@ private:
   void calibrate();
 
   //! Take neuron through given time interval
-  void update( nest::Time const&, const long, const long );
+  void update(nest::Time const &, const long, const long);
 
   // The next two classes need to be friends to access the State_ class/member
-  friend class nest::RecordablesMap< pif_psc_alpha >;
-  friend class nest::UniversalDataLogger< pif_psc_alpha >;
+  friend class nest::RecordablesMap<pif_psc_alpha>;
+  friend class nest::UniversalDataLogger<pif_psc_alpha>;
 
   /**
    * Free parameters of the neuron.
@@ -174,8 +172,7 @@ private:
    *         as C-style arrays, you need to define the copy constructor and
    *         assignment operator to copy those members.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double C_m;     //!< Membrane capacitance, in pF.
     double I_e;     //!< Intrinsic DC current, in nA.
     double tau_syn; //!< Synaptic time constant, in ms.
@@ -187,10 +184,10 @@ private:
     Parameters_();
 
     //! Store parameter values in dictionary.
-    void get( DictionaryDatum& ) const;
+    void get(DictionaryDatum &) const;
 
     //! Set parameter values from dictionary.
-    void set( const DictionaryDatum& );
+    void set(const DictionaryDatum &);
   };
 
   /**
@@ -212,8 +209,7 @@ private:
    *         as C-style arrays, you need to define the copy constructor and
    *         assignment operator to copy those members.
    */
-  struct State_
-  {
+  struct State_ {
     double V_m;      //!< Membrane potential, in mV.
     double dI_syn;   //!< Derivative of synaptic current, in nA/ms.
     double I_syn;    //!< Synaptic current, in nA.
@@ -227,17 +223,17 @@ private:
      * state can be initialized in accordance with parameters, e.g.,
      * initializing the membrane potential with the resting potential.
      */
-    State_( const Parameters_& );
+    State_(const Parameters_ &);
 
     /** Store state values in dictionary. */
-    void get( DictionaryDatum& ) const;
+    void get(DictionaryDatum &) const;
 
     /**
      * Set membrane potential from dictionary.
      * @note Receives Parameters_ so it can test that the new membrane potential
      *       is below threshold.
      */
-    void set( const DictionaryDatum&, const Parameters_& );
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   /**
@@ -251,17 +247,16 @@ private:
    *       has members that cannot destroy themselves, Buffers_ will need a
    *       destructor.
    */
-  struct Buffers_
-  {
-    Buffers_( pif_psc_alpha& );
-    Buffers_( const Buffers_&, pif_psc_alpha& );
+  struct Buffers_ {
+    Buffers_(pif_psc_alpha &);
+    Buffers_(const Buffers_ &, pif_psc_alpha &);
 
     nest::RingBuffer spikes;   //!< Buffer incoming spikes through delay, as sum
     nest::RingBuffer currents; //!< Buffer incoming currents through delay,
                                //!< as sum
 
     //! Logger for all analog data
-    nest::UniversalDataLogger< pif_psc_alpha > logger_;
+    nest::UniversalDataLogger<pif_psc_alpha> logger_;
   };
 
   /**
@@ -273,8 +268,7 @@ private:
    *       has members that cannot destroy themselves, Variables_ will need a
    *       destructor.
    */
-  struct Variables_
-  {
+  struct Variables_ {
     double P11;
     double P21;
     double P22;
@@ -292,11 +286,7 @@ private:
    * @{
    */
   //! Read out the real membrane potential
-  double
-  get_V_m_() const
-  {
-    return S_.V_m;
-  }
+  double get_V_m_() const { return S_.V_m; }
   /** @} */
 
   /**
@@ -315,104 +305,90 @@ private:
   Buffers_ B_;    //!< Buffers.
 
   //! Mapping of recordables names to access functions
-  static nest::RecordablesMap< pif_psc_alpha > recordablesMap_;
+  static nest::RecordablesMap<pif_psc_alpha> recordablesMap_;
 
   /** @} */
 };
 
-inline nest::port
-mynest::pif_psc_alpha::send_test_event( nest::Node& target,
-  nest::port receptor_type,
-  nest::synindex,
-  bool )
-{
+inline nest::port mynest::pif_psc_alpha::send_test_event(
+    nest::Node &target, nest::port receptor_type, nest::synindex, bool) {
   // You should usually not change the code in this function.
   // It confirms that the target of connection @c c accepts @c SpikeEvent on
   // the given @c receptor_type.
   nest::SpikeEvent e;
-  e.set_sender( *this );
-  return target.handles_test_event( e, receptor_type );
+  e.set_sender(*this);
+  return target.handles_test_event(e, receptor_type);
 }
 
 inline nest::port
-mynest::pif_psc_alpha::handles_test_event( nest::SpikeEvent&,
-  nest::port receptor_type )
-{
+mynest::pif_psc_alpha::handles_test_event(nest::SpikeEvent &,
+                                          nest::port receptor_type) {
   // You should usually not change the code in this function.
   // It confirms to the connection management system that we are able
   // to handle @c SpikeEvent on port 0. You need to extend the function
   // if you want to differentiate between input ports.
-  if ( receptor_type != 0 )
-  {
-    throw nest::UnknownReceptorType( receptor_type, get_name() );
+  if (receptor_type != 0) {
+    throw nest::UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
 inline nest::port
-mynest::pif_psc_alpha::handles_test_event( nest::CurrentEvent&,
-  nest::port receptor_type )
-{
+mynest::pif_psc_alpha::handles_test_event(nest::CurrentEvent &,
+                                          nest::port receptor_type) {
   // You should usually not change the code in this function.
   // It confirms to the connection management system that we are able
   // to handle @c CurrentEvent on port 0. You need to extend the function
   // if you want to differentiate between input ports.
-  if ( receptor_type != 0 )
-  {
-    throw nest::UnknownReceptorType( receptor_type, get_name() );
+  if (receptor_type != 0) {
+    throw nest::UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
 inline nest::port
-mynest::pif_psc_alpha::handles_test_event( nest::DataLoggingRequest& dlr,
-  nest::port receptor_type )
-{
+mynest::pif_psc_alpha::handles_test_event(nest::DataLoggingRequest &dlr,
+                                          nest::port receptor_type) {
   // You should usually not change the code in this function.
   // It confirms to the connection management system that we are able
   // to handle @c DataLoggingRequest on port 0.
   // The function also tells the built-in UniversalDataLogger that this node
   // is recorded from and that it thus needs to collect data during simulation.
-  if ( receptor_type != 0 )
-  {
-    throw nest::UnknownReceptorType( receptor_type, get_name() );
+  if (receptor_type != 0) {
+    throw nest::UnknownReceptorType(receptor_type, get_name());
   }
 
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-pif_psc_alpha::get_status( DictionaryDatum& d ) const
-{
+inline void pif_psc_alpha::get_status(DictionaryDatum &d) const {
   // get our own parameter and state data
-  P_.get( d );
-  S_.get( d );
+  P_.get(d);
+  S_.get(d);
 
   // get information managed by parent class
-  Archiving_Node::get_status( d );
+  Archiving_Node::get_status(d);
 
-  ( *d )[ nest::names::recordables ] = recordablesMap_.get_list();
+  (*d)[nest::names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-pif_psc_alpha::set_status( const DictionaryDatum& d )
-{
+inline void pif_psc_alpha::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
   State_ stmp = S_;      // temporary copy in case of errors
-  stmp.set( d, ptmp );   // throws if BadProperty
+  stmp.set(d, ptmp);     // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
   S_ = stmp;
 }
 
-} // namespace
+} // namespace mynest
 
 #endif /* #ifndef PIF_PSC_ALPHA_H */

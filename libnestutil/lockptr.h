@@ -81,107 +81,66 @@
  Equality for lockPTRs is defined as identity of the data object.
 */
 
-template < class D >
-class lockPTR
-{
-  class PointerObject
-  {
+template <class D> class lockPTR {
+  class PointerObject {
 
   private:
-    D* pointee; // pointer to handled Datum object
+    D *pointee; // pointer to handled Datum object
     size_t number_of_references;
     bool deletable;
     bool locked;
 
     // forbid this constructor!
-    PointerObject( PointerObject const& );
+    PointerObject(PointerObject const &);
 
   public:
-    PointerObject( D* p = NULL )
-      : pointee( p )
-      , number_of_references( 1 )
-      , deletable( true )
-      , locked( false )
-    {
-    }
+    PointerObject(D *p = NULL)
+        : pointee(p), number_of_references(1), deletable(true), locked(false) {}
 
-    PointerObject( D& p_o )
-      : pointee( &p_o )
-      , number_of_references( 1 )
-      , deletable( false )
-      , locked( false )
-    {
-    }
+    PointerObject(D &p_o)
+        : pointee(&p_o), number_of_references(1), deletable(false),
+          locked(false) {}
 
-    ~PointerObject()
-    {
-      assert( number_of_references == 0 ); // This will invalidate the still
-                                           // existing pointer!
-      assert( not locked );
-      if ( ( pointee != NULL ) && deletable && ( not locked ) )
-      {
+    ~PointerObject() {
+      assert(number_of_references == 0); // This will invalidate the still
+                                         // existing pointer!
+      assert(not locked);
+      if ((pointee != NULL) && deletable && (not locked)) {
         delete pointee;
       }
     }
 
-    D*
-    get( void ) const
-    {
-      return pointee;
-    }
+    D *get(void) const { return pointee; }
 
-    void
-    addReference( void )
-    {
-      ++number_of_references;
-    }
+    void addReference(void) { ++number_of_references; }
 
-    void
-    removeReference( void )
-    {
+    void removeReference(void) {
       //      assert(number_of_references > 0);
 
       --number_of_references;
-      if ( number_of_references == 0 )
-      {
+      if (number_of_references == 0) {
         delete this;
       }
     }
 
-    size_t
-    references( void ) const
-    {
-      return number_of_references;
-    }
+    size_t references(void) const { return number_of_references; }
 
-    bool
-    islocked( void ) const
-    {
-      return locked;
-    }
+    bool islocked(void) const { return locked; }
 
-    bool
-    isdeletable( void ) const
-    {
-      return deletable;
-    }
+    bool isdeletable(void) const { return deletable; }
 
-    void
-    lock( void )
-    {
-      assert( locked == false );
+    void lock(void) {
+      assert(locked == false);
       locked = true;
     }
 
-    void
-    unlock( void )
-    {
-      assert( locked == true );
+    void unlock(void) {
+      assert(locked == true);
       locked = false;
     }
   };
 
-  PointerObject* obj;
+  PointerObject *obj;
 
 public:
   // lockPTR() ; // generated automatically.
@@ -190,34 +149,27 @@ public:
   // object which must then be initialised, for example
   // by assignement.
 
-  explicit lockPTR( D* p = NULL )
-  {
-    obj = new PointerObject( p );
-    assert( obj != NULL );
+  explicit lockPTR(D *p = NULL) {
+    obj = new PointerObject(p);
+    assert(obj != NULL);
   }
 
-  explicit lockPTR( D& p_o )
-  {
-    obj = new PointerObject( p_o );
-    assert( obj != NULL );
+  explicit lockPTR(D &p_o) {
+    obj = new PointerObject(p_o);
+    assert(obj != NULL);
   }
 
-  lockPTR( const lockPTR< D >& spd )
-    : obj( spd.obj )
-  {
-    assert( obj != NULL );
+  lockPTR(const lockPTR<D> &spd) : obj(spd.obj) {
+    assert(obj != NULL);
     obj->addReference();
   }
 
-  virtual ~lockPTR()
-  {
-    assert( obj != NULL );
+  virtual ~lockPTR() {
+    assert(obj != NULL);
     obj->removeReference();
   }
 
-  lockPTR< D >
-  operator=( const lockPTR< D >& spd )
-  {
+  lockPTR<D> operator=(const lockPTR<D> &spd) {
     //  assert(obj != NULL);
     // assert(spd.obj != NULL);
 
@@ -232,75 +184,61 @@ public:
     return *this;
   }
 
-  lockPTR< D >
-  operator=( D& s )
-  {
-    *this = lockPTR< D >( s );
-    assert( not( obj->isdeletable() ) );
+  lockPTR<D> operator=(D &s) {
+    *this = lockPTR<D>(s);
+    assert(not(obj->isdeletable()));
     return *this;
   }
 
-  lockPTR< D >
-  operator=( D const& s )
-  {
-    *this = lockPTR< D >( s );
-    assert( not( obj->isdeletable() ) );
+  lockPTR<D> operator=(D const &s) {
+    *this = lockPTR<D>(s);
+    assert(not(obj->isdeletable()));
     return *this;
   }
 
-  D*
-  get( void )
-  {
-    assert( not obj->islocked() );
+  D *get(void) {
+    assert(not obj->islocked());
     obj->lock(); // Try to lock Object
     return obj->get();
   }
 
-  D*
-  get( void ) const
-  {
-    assert( not obj->islocked() );
+  D *get(void) const {
+    assert(not obj->islocked());
 
     obj->lock(); // Try to lock Object
     return obj->get();
   }
 
-  D* operator->() const
-  {
-    assert( obj->get() != NULL );
+  D *operator->() const {
+    assert(obj->get() != NULL);
 
     return obj->get();
   }
 
-  D* operator->()
-  {
-    assert( obj->get() != NULL );
+  D *operator->() {
+    assert(obj->get() != NULL);
 
     return obj->get();
   }
 
-  D& operator*()
-  {
-    assert( obj->get() != NULL );
+  D &operator*() {
+    assert(obj->get() != NULL);
 
-    return *( obj->get() );
+    return *(obj->get());
   }
 
-  const D& operator*() const
-  {
-    assert( obj->get() != NULL );
-    return *( obj->get() );
+  const D &operator*() const {
+    assert(obj->get() != NULL);
+    return *(obj->get());
   }
-
 
   bool operator not()
-    const //!< returns true if and only if obj->pointee == NULL
+      const //!< returns true if and only if obj->pointee == NULL
   {
     // assert(obj != NULL);
 
-    return ( obj->get() == NULL );
+    return (obj->get() == NULL);
   }
-
 
   /* operator==, !=
      Identity operator. These are inherited by derived types, so they should
@@ -312,64 +250,43 @@ public:
      that are shared by lockPTR<D>s, so this is equivalent to comparing the
      address of the D objects.
   */
-  bool
-  operator==( const lockPTR< D >& p ) const
+  bool operator==(const lockPTR<D> &p) const { return (obj == p.obj); }
+
+  bool operator!=(const lockPTR<D> &p) const { return (obj != p.obj); }
+
+  bool valid(void) const //!< returns true if and only if obj->pointee != NULL
   {
-    return ( obj == p.obj );
+    assert(obj != NULL);
+    return (obj->get() != NULL);
   }
 
-  bool
-  operator!=( const lockPTR< D >& p ) const
-  {
-    return ( obj != p.obj );
+  bool islocked(void) const {
+    assert(obj != NULL);
+    return (obj->islocked());
   }
 
-
-  bool valid( void ) const //!< returns true if and only if obj->pointee != NULL
-  {
-    assert( obj != NULL );
-    return ( obj->get() != NULL );
+  bool deletable(void) const {
+    assert(obj != NULL);
+    return (obj->isdeletable());
   }
 
-  bool
-  islocked( void ) const
-  {
-    assert( obj != NULL );
-    return ( obj->islocked() );
-  }
-
-  bool
-  deletable( void ) const
-  {
-    assert( obj != NULL );
-    return ( obj->isdeletable() );
-  }
-
-  void
-  lock( void ) const
-  {
-    assert( obj != NULL );
+  void lock(void) const {
+    assert(obj != NULL);
     obj->lock();
   }
 
-  void
-  unlock( void ) const
-  {
-    assert( obj != NULL );
+  void unlock(void) const {
+    assert(obj != NULL);
     obj->unlock();
   }
 
-  void
-  unlock( void )
-  {
-    assert( obj != NULL );
+  void unlock(void) {
+    assert(obj != NULL);
     obj->unlock();
   }
 
-  size_t
-  references( void ) const
-  {
-    return ( obj == NULL ) ? 0 : obj->references();
+  size_t references(void) const {
+    return (obj == NULL) ? 0 : obj->references();
   }
 };
 

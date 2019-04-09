@@ -46,8 +46,7 @@
 #include "arraydatum.h"
 #include "dictutils.h"
 
-namespace nest
-{
+namespace nest {
 /** @BeginDocumentation
 Name: music_message_in_proxy - A device which receives message strings from
                               MUSIC.
@@ -96,33 +95,26 @@ Availability: Only when compiled with MUSIC
 
 SeeAlso: music_event_out_proxy, music_event_in_proxy, music_cont_in_proxy
 */
-class MsgHandler : public MUSIC::MessageHandler
-{
-  ArrayDatum messages;                 //!< The buffer for incoming message
-  std::vector< double > message_times; //!< The buffer for incoming message
+class MsgHandler : public MUSIC::MessageHandler {
+  ArrayDatum messages;               //!< The buffer for incoming message
+  std::vector<double> message_times; //!< The buffer for incoming message
 
-  void
-  operator()( double t, void* msg, size_t size )
-  {
-    message_times.push_back( t * 1000.0 );
-    messages.push_back( std::string( static_cast< char* >( msg ), size ) );
+  void operator()(double t, void *msg, size_t size) {
+    message_times.push_back(t * 1000.0);
+    messages.push_back(std::string(static_cast<char *>(msg), size));
   }
 
 public:
-  void
-  get_status( DictionaryDatum& d ) const
-  {
-    DictionaryDatum dict( new Dictionary );
-    ( *dict )[ names::messages ] = messages;
-    ( *dict )[ names::message_times ] =
-      DoubleVectorDatum( new std::vector< double >( message_times ) );
-    ( *d )[ names::n_messages ] = messages.size();
-    ( *d )[ names::data ] = dict;
+  void get_status(DictionaryDatum &d) const {
+    DictionaryDatum dict(new Dictionary);
+    (*dict)[names::messages] = messages;
+    (*dict)[names::message_times] =
+        DoubleVectorDatum(new std::vector<double>(message_times));
+    (*d)[names::n_messages] = messages.size();
+    (*d)[names::data] = dict;
   }
 
-  void
-  clear()
-  {
+  void clear() {
     message_times.clear();
     messages.clear();
   }
@@ -133,83 +125,67 @@ public:
  * MUSIC port. The timestamps of the events also contain offsets,
  * which makes it also useful for precise spikes.
  */
-class music_message_in_proxy : public DeviceNode
-{
+class music_message_in_proxy : public DeviceNode {
 
 public:
   music_message_in_proxy();
-  music_message_in_proxy( const music_message_in_proxy& );
+  music_message_in_proxy(const music_message_in_proxy &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  one_node_per_process() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return false; }
+  bool one_node_per_process() const { return true; }
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
-  void
-  update( Time const&, const long, const long )
-  {
-  }
+  void update(Time const &, const long, const long) {}
 
   // ------------------------------------------------------------
   struct State_;
 
-  struct Parameters_
-  {
+  struct Parameters_ {
     std::string port_name_;     //!< the name of MUSIC port to connect to
     double acceptable_latency_; //!< the acceptable latency of the port
 
-    Parameters_();                     //!< Sets default parameter values
-    Parameters_( const Parameters_& ); //!< Recalibrate all times
+    Parameters_();                    //!< Sets default parameter values
+    Parameters_(const Parameters_ &); //!< Recalibrate all times
 
-    void get( DictionaryDatum& ) const;
+    void get(DictionaryDatum &) const;
 
     /**
      * Set values from dicitonary.
      */
-    void set( const DictionaryDatum&, State_& );
+    void set(const DictionaryDatum &, State_ &);
   };
 
   // ------------------------------------------------------------
 
-  struct State_
-  {
+  struct State_ {
     bool published_; //!< indicates whether this node has been published already
                      //!< with MUSIC
     int port_width_; //!< the width of the MUSIC port
 
     State_(); //!< Sets default state value
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
     //! Set values from dictionary
-    void set( const DictionaryDatum&, const Parameters_& );
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ------------------------------------------------------------
 
-  struct Buffers_
-  {
+  struct Buffers_ {
     MsgHandler message_handler_;
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
-    MUSIC::MessageInputPort* MP_; //!< The MUSIC cont port for input of data
+  struct Variables_ {
+    MUSIC::MessageInputPort *MP_; //!< The MUSIC cont port for input of data
   };
 
   // ------------------------------------------------------------
@@ -220,34 +196,26 @@ private:
   Variables_ V_;
 };
 
-inline void
-music_message_in_proxy::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d );
+inline void music_message_in_proxy::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d);
 
-  B_.message_handler_.get_status( d );
+  B_.message_handler_.get_status(d);
 }
 
-inline void
-music_message_in_proxy::set_status( const DictionaryDatum& d )
-{
+inline void music_message_in_proxy::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d, S_ );     // throws if BadProperty
+  ptmp.set(d, S_);       // throws if BadProperty
 
   State_ stmp = S_;
-  stmp.set( d, P_ ); // throws if BadProperty
+  stmp.set(d, P_); // throws if BadProperty
 
   long nm = 0;
-  if ( updateValue< long >( d, names::n_messages, nm ) )
-  {
-    if ( nm == 0 )
-    {
+  if (updateValue<long>(d, names::n_messages, nm)) {
+    if (nm == 0) {
       B_.message_handler_.clear();
-    }
-    else
-    {
-      throw BadProperty( "n_messaged can only be set to 0." );
+    } else {
+      throw BadProperty("n_messaged can only be set to 0.");
     }
   }
 
@@ -256,7 +224,7 @@ music_message_in_proxy::set_status( const DictionaryDatum& d )
   S_ = stmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif
 

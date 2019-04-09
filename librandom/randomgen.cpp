@@ -27,15 +27,12 @@
 
 const unsigned long librandom::RandomGen::DefaultSeed = 0xd37ca59fUL;
 
-void
-librandom::RandomGen::seed( const unsigned long n )
-{
+void librandom::RandomGen::seed(const unsigned long n) {
   // pass seed on to RNG's seeding function
-  seed_( n );
+  seed_(n);
 }
 
 librandom::RngPtr
-librandom::RandomGen::create_knuthlfg_rng( unsigned long seed )
-{
-  return librandom::RngPtr( new librandom::KnuthLFG( seed ) );
+librandom::RandomGen::create_knuthlfg_rng(unsigned long seed) {
+  return librandom::RngPtr(new librandom::KnuthLFG(seed));
 }

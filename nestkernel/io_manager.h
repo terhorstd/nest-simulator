@@ -32,22 +32,20 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 
 /*
   IOManager: Handles data storage files from spike detectors and
   multimeters to file system(s)/memory/output. Distinct from logging
   for error streams.
 */
-class IOManager : public ManagerInterface
-{
+class IOManager : public ManagerInterface {
 public:
   virtual void initialize(); // called from meta-manager to construct
   virtual void finalize();   // called from meta-manger to reinit
 
-  virtual void set_status( const DictionaryDatum& ); // set parameters
-  virtual void get_status( DictionaryDatum& );       // get parameters
+  virtual void set_status(const DictionaryDatum &); // set parameters
+  virtual void get_status(DictionaryDatum &);       // get parameters
 
   IOManager(); // Construct only by meta-manager
 
@@ -56,17 +54,17 @@ public:
    * The prefix must not contain any part of a path.
    * @see get_data_dir(), overwrite_files()
    */
-  const std::string& get_data_prefix() const;
+  const std::string &get_data_prefix() const;
 
   /**
    * The path for files written by devices.
    * It may be the empty string (use current directory).
    * @see get_data_prefix(), overwrite_files()
    */
-  const std::string& get_data_path() const;
+  const std::string &get_data_path() const;
 
   //! Helper function to set device data path and prefix.
-  void set_data_path_prefix_( const DictionaryDatum& d );
+  void set_data_path_prefix_(const DictionaryDatum &d);
 
   /**
    * Indicate if existing data files should be overwritten.
@@ -80,24 +78,17 @@ private:
   std::string data_prefix_; //!< Prefix for all files written by devices
   bool overwrite_files_;    //!< If true, overwrite existing data files.
 };
-}
+} // namespace nest
 
-
-inline const std::string&
-nest::IOManager::get_data_path() const
-{
+inline const std::string &nest::IOManager::get_data_path() const {
   return data_path_;
 }
 
-inline const std::string&
-nest::IOManager::get_data_prefix() const
-{
+inline const std::string &nest::IOManager::get_data_prefix() const {
   return data_prefix_;
 }
 
-inline bool
-nest::IOManager::overwrite_files() const
-{
+inline bool nest::IOManager::overwrite_files() const {
   return overwrite_files_;
 }
 

@@ -35,27 +35,21 @@
 // Includes from sli:
 #include "aggregatedatum.h"
 
-typedef AggregateDatum< nest::ConnectionID, &nest::NestModule::ConnectionType >
-  ConnectionDatum;
-typedef AggregateDatum< nest::GIDCollection,
-  &nest::NestModule::GIDCollectionType >
-  GIDCollectionDatum;
+typedef AggregateDatum<nest::ConnectionID, &nest::NestModule::ConnectionType>
+    ConnectionDatum;
+typedef AggregateDatum<nest::GIDCollection,
+                       &nest::NestModule::GIDCollectionType>
+    GIDCollectionDatum;
 
 #ifndef HAVE_STATIC_TEMPLATE_DECLARATION_FAILS
-template <>
-sli::pool ConnectionDatum::memory;
-template <>
-sli::pool GIDCollectionDatum::memory;
+template <> sli::pool ConnectionDatum::memory;
+template <> sli::pool GIDCollectionDatum::memory;
 #endif
 
-template <>
-void ConnectionDatum::print( std::ostream& ) const;
-template <>
-void GIDCollectionDatum::print( std::ostream& ) const;
+template <> void ConnectionDatum::print(std::ostream &) const;
+template <> void GIDCollectionDatum::print(std::ostream &) const;
 
-template <>
-void ConnectionDatum::pprint( std::ostream& ) const;
-template <>
-void GIDCollectionDatum::pprint( std::ostream& ) const;
+template <> void ConnectionDatum::pprint(std::ostream &) const;
+template <> void GIDCollectionDatum::pprint(std::ostream &) const;
 
 #endif /* #ifndef NEST_DATUMS_H */

@@ -40,83 +40,61 @@
 // Includes from sli:
 #include "dictutils.h"
 
-nest::IOManager::IOManager()
-  : overwrite_files_( false )
-{
-}
+nest::IOManager::IOManager() : overwrite_files_(false) {}
 
-void
-nest::IOManager::set_data_path_prefix_( const DictionaryDatum& d )
-{
+void nest::IOManager::set_data_path_prefix_(const DictionaryDatum &d) {
   std::string tmp;
-  if ( updateValue< std::string >( d, names::data_path, tmp ) )
-  {
-    DIR* testdir = opendir( tmp.c_str() );
-    if ( testdir != NULL )
-    {
-      data_path_ = tmp;    // absolute path & directory exists
-      closedir( testdir ); // we only opened it to check it exists
-    }
-    else
-    {
+  if (updateValue<std::string>(d, names::data_path, tmp)) {
+    DIR *testdir = opendir(tmp.c_str());
+    if (testdir != NULL) {
+      data_path_ = tmp;  // absolute path & directory exists
+      closedir(testdir); // we only opened it to check it exists
+    } else {
       std::string msg;
 
-      switch ( errno )
-      {
+      switch (errno) {
       case ENOTDIR:
-        msg = String::compose( "'%1' is not a directory.", tmp );
+        msg = String::compose("'%1' is not a directory.", tmp);
         break;
       case ENOENT:
-        msg = String::compose( "Directory '%1' does not exist.", tmp );
+        msg = String::compose("Directory '%1' does not exist.", tmp);
         break;
       default:
-        msg = String::compose(
-          "Errno %1 received when trying to open '%2'", errno, tmp );
+        msg = String::compose("Errno %1 received when trying to open '%2'",
+                              errno, tmp);
         break;
       }
 
-      LOG( M_ERROR, "SetStatus", "Variable data_path not set: " + msg );
+      LOG(M_ERROR, "SetStatus", "Variable data_path not set: " + msg);
     }
   }
 
-  if ( updateValue< std::string >( d, names::data_prefix, tmp ) )
-  {
-    if ( tmp.find( '/' ) == std::string::npos )
-    {
+  if (updateValue<std::string>(d, names::data_prefix, tmp)) {
+    if (tmp.find('/') == std::string::npos) {
       data_prefix_ = tmp;
-    }
-    else
-    {
-      LOG(
-        M_ERROR, "SetStatus", "Data prefix must not contain path elements." );
+    } else {
+      LOG(M_ERROR, "SetStatus", "Data prefix must not contain path elements.");
     }
   }
 }
 
-void
-nest::IOManager::initialize()
-{
+void nest::IOManager::initialize() {
   // data_path and data_prefix can be set via environment variables
-  DictionaryDatum dict( new Dictionary );
-  char* data_path = std::getenv( "NEST_DATA_PATH" );
-  if ( data_path )
-  {
-    ( *dict )[ names::data_path ] = std::string( data_path );
+  DictionaryDatum dict(new Dictionary);
+  char *data_path = std::getenv("NEST_DATA_PATH");
+  if (data_path) {
+    (*dict)[names::data_path] = std::string(data_path);
   }
-  char* data_prefix = std::getenv( "NEST_DATA_PREFIX" );
-  if ( data_prefix )
-  {
-    ( *dict )[ names::data_prefix ] = std::string( data_prefix );
+  char *data_prefix = std::getenv("NEST_DATA_PREFIX");
+  if (data_prefix) {
+    (*dict)[names::data_prefix] = std::string(data_prefix);
   }
-  if ( not dict->empty() )
-  {
-    set_data_path_prefix_( dict );
+  if (not dict->empty()) {
+    set_data_path_prefix_(dict);
   }
 }
 
-void
-nest::IOManager::finalize()
-{
+void nest::IOManager::finalize() {
   data_path_ = "";
   data_prefix_ = "";
   overwrite_files_ = false;
@@ -125,17 +103,13 @@ nest::IOManager::finalize()
 /*
      - set the data_path, data_prefix and overwrite_files properties
 */
-void
-nest::IOManager::set_status( const DictionaryDatum& d )
-{
-  set_data_path_prefix_( d );
-  updateValue< bool >( d, names::overwrite_files, overwrite_files_ );
+void nest::IOManager::set_status(const DictionaryDatum &d) {
+  set_data_path_prefix_(d);
+  updateValue<bool>(d, names::overwrite_files, overwrite_files_);
 }
 
-void
-nest::IOManager::get_status( DictionaryDatum& d )
-{
-  ( *d )[ names::data_path ] = data_path_;
-  ( *d )[ names::data_prefix ] = data_prefix_;
-  ( *d )[ names::overwrite_files ] = overwrite_files_;
+void nest::IOManager::get_status(DictionaryDatum &d) {
+  (*d)[names::data_path] = data_path_;
+  (*d)[names::data_prefix] = data_prefix_;
+  (*d)[names::overwrite_files] = overwrite_files_;
 }

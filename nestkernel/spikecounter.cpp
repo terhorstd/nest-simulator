@@ -32,8 +32,5 @@
 
 #include "spikecounter.h"
 
-nest::spikecounter::spikecounter( double spike_time, double multiplicity )
-  : spike_time_( spike_time )
-  , multiplicity_( multiplicity )
-{
-}
+nest::spikecounter::spikecounter(double spike_time, double multiplicity)
+    : spike_time_(spike_time), multiplicity_(multiplicity) {}

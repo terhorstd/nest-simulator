@@ -26,8 +26,7 @@
 // Includes from models:
 #include "binary_neuron.h"
 
-namespace nest
-{
+namespace nest {
 /** @BeginDocumentation
 Name: erfc_neuron - Binary stochastic neuron with complementary error
 function as activation function.
@@ -106,8 +105,7 @@ Authors: Jakob Jordan, Tobias Kuehn
 
 SeeAlso: mcculloch_pitts_neuron, ginzburg_neuron
 */
-class gainfunction_erfc
-{
+class gainfunction_erfc {
 private:
   /** threshold of activation function */
   double_t theta_;
@@ -118,30 +116,22 @@ private:
 public:
   /** sets default parameters */
 
-  gainfunction_erfc()
-    : theta_( 0.0 )
-    , sigma_( 1.0 )
-  {
-  }
+  gainfunction_erfc() : theta_(0.0), sigma_(1.0) {}
 
-  void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-  void set( const DictionaryDatum& ); //!< Set values from dictionary
+  void get(DictionaryDatum &) const; //!< Store current values in dictionary
+  void set(const DictionaryDatum &); //!< Set values from dictionary
 
-  bool operator()( librandom::RngPtr rng, double_t h );
+  bool operator()(librandom::RngPtr rng, double_t h);
 };
 
-inline bool
-gainfunction_erfc::operator()( librandom::RngPtr rng, double_t h )
-{
-  return rng->drand() < 0.5 * erfc( -( h - theta_ ) / ( sqrt( 2. ) * sigma_ ) );
+inline bool gainfunction_erfc::operator()(librandom::RngPtr rng, double_t h) {
+  return rng->drand() < 0.5 * erfc(-(h - theta_) / (sqrt(2.) * sigma_));
 }
 
-typedef binary_neuron< nest::gainfunction_erfc > erfc_neuron;
+typedef binary_neuron<nest::gainfunction_erfc> erfc_neuron;
 
-template <>
-void RecordablesMap< erfc_neuron >::create();
+template <> void RecordablesMap<erfc_neuron>::create();
 
 } // namespace nest
-
 
 #endif /* #ifndef ERFC_NEURON_H */

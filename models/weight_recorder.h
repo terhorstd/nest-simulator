@@ -23,7 +23,6 @@
 #ifndef WEIGHT_RECORDER_H
 #define WEIGHT_RECORDER_H
 
-
 // C++ includes:
 #include <vector>
 
@@ -35,8 +34,7 @@
 #include "nest_types.h"
 #include "recording_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: weight_recorder - Device for detecting single spikes.
@@ -63,24 +61,15 @@ Receives: WeightRecordingEvent
 
 SeeAlso: weight_recorder, spike_detector, Device, RecordingDevice
 */
-class weight_recorder : public DeviceNode
-{
+class weight_recorder : public DeviceNode {
 
 public:
   weight_recorder();
-  weight_recorder( const weight_recorder& );
+  weight_recorder(const weight_recorder &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
 
-  bool
-  local_receiver() const
-  {
-    return true;
-  }
+  bool local_receiver() const { return true; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -91,26 +80,25 @@ public:
   using Node::handles_test_event;
   using Node::receives_signal;
 
-  void handle( WeightRecorderEvent& );
+  void handle(WeightRecorderEvent &);
 
-  port handles_test_event( WeightRecorderEvent&, rport );
+  port handles_test_event(WeightRecorderEvent &, rport);
 
   SignalType receives_signal() const;
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
   void post_run_cleanup();
   void finalize();
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
-  struct Buffers_
-  {
-    std::vector< WeightRecorderEvent > events_;
+  struct Buffers_ {
+    std::vector<WeightRecorderEvent> events_;
   };
 
   RecordingDevice device_;
@@ -118,48 +106,33 @@ private:
 
   bool user_set_precise_times_;
 
-  struct Parameters_
-  {
-    std::vector< long > senders_;
-    std::vector< long > targets_;
+  struct Parameters_ {
+    std::vector<long> senders_;
+    std::vector<long> targets_;
 
     Parameters_();
-    Parameters_( const Parameters_& );
-    void get( DictionaryDatum& ) const;
-    void set( const DictionaryDatum& );
+    Parameters_(const Parameters_ &);
+    void get(DictionaryDatum &) const;
+    void set(const DictionaryDatum &);
   };
 
   Parameters_ P_;
 };
 
-inline port
-weight_recorder::handles_test_event( WeightRecorderEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port weight_recorder::handles_test_event(WeightRecorderEvent &,
+                                                rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline void
-weight_recorder::post_run_cleanup()
-{
-  device_.post_run_cleanup();
-}
+inline void weight_recorder::post_run_cleanup() { device_.post_run_cleanup(); }
 
-inline void
-weight_recorder::finalize()
-{
-  device_.finalize();
-}
+inline void weight_recorder::finalize() { device_.finalize(); }
 
-inline SignalType
-weight_recorder::receives_signal() const
-{
-  return ALL;
-}
+inline SignalType weight_recorder::receives_signal() const { return ALL; }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef WEIGHT_RECORDER_H */

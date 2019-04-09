@@ -26,7 +26,7 @@
 // Generated includes:
 #include "config.h"
 
-#if defined( HAVE_LIBNEUROSIM ) && defined( _IS_PYNEST )
+#if defined(HAVE_LIBNEUROSIM) && defined(_IS_PYNEST)
 
 // External includes:
 #include <neurosim/pyneurosim.h>
@@ -37,32 +37,30 @@
 // Includes from sli:
 #include "datum.h"
 
-#define CYTHON_isConnectionGenerator( x ) PNS::isConnectionGenerator( x )
-Datum* CYTHON_unpackConnectionGeneratorDatum( PyObject* );
+#define CYTHON_isConnectionGenerator(x) PNS::isConnectionGenerator(x)
+Datum *CYTHON_unpackConnectionGeneratorDatum(PyObject *);
 
 #else // #if defined( HAVE_LIBNEUROSIM ) && defined( _IS_PYNEST )
-#define CYTHON_isConnectionGenerator( x ) 0
-#define CYTHON_unpackConnectionGeneratorDatum( x ) NULL
+#define CYTHON_isConnectionGenerator(x) 0
+#define CYTHON_unpackConnectionGeneratorDatum(x) NULL
 #endif // #if defined( HAVE_LIBNEUROSIM ) && defined( _IS_PYNEST )
 
 class SLIInterpreter;
 
 #ifdef _IS_PYNEST
 
-#define CYTHON_DEREF( x ) ( *x )
-#define CYTHON_ADDR( x ) ( &x )
+#define CYTHON_DEREF(x) (*x)
+#define CYTHON_ADDR(x) (&x)
 
 #include <string>
-int neststartup( int* argc,
-  char*** argv,
-  SLIInterpreter& engine,
-  std::string modulepath = "" );
+int neststartup(int *argc, char ***argv, SLIInterpreter &engine,
+                std::string modulepath = "");
 #else  // #ifdef _IS_PYNEST
-int neststartup( int* argc, char*** argv, SLIInterpreter& engine );
+int neststartup(int *argc, char ***argv, SLIInterpreter &engine);
 #endif // #ifdef _IS_PYNEST
 
-void nestshutdown( int exitcode );
+void nestshutdown(int exitcode);
 
-SLIInterpreter& get_engine();
+SLIInterpreter &get_engine();
 
 #endif // #ifndef NEST_STARTUP_H

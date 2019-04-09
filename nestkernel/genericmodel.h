@@ -29,8 +29,7 @@
 // Includes from nestkernel:
 #include "model.h"
 
-namespace nest
-{
+namespace nest {
 /**
  * Generic Model template.
  * The template GenericModel should be used
@@ -40,21 +39,19 @@ namespace nest
  * aspects.
  * @ingroup user_interface
  */
-template < typename ElementT >
-class GenericModel : public Model
-{
+template <typename ElementT> class GenericModel : public Model {
 public:
-  GenericModel( const std::string&, const std::string& deprecation_info );
+  GenericModel(const std::string &, const std::string &deprecation_info);
 
   /**
    * Create copy of model with new name.
    */
-  GenericModel( const GenericModel&, const std::string& );
+  GenericModel(const GenericModel &, const std::string &);
 
   /**
    * Return pointer to cloned model with same name.
    */
-  Model* clone( const std::string& ) const;
+  Model *clone(const std::string &) const;
 
   bool has_proxies();
   bool one_node_per_process();
@@ -73,26 +70,26 @@ public:
      model they represent, they can now answer a call to check
      connection by referring back to the model.
    */
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void sends_secondary_event( GapJunctionEvent& ge );
+  void sends_secondary_event(GapJunctionEvent &ge);
 
   SignalType sends_signal() const;
 
-  void sends_secondary_event( InstantaneousRateConnectionEvent& re );
+  void sends_secondary_event(InstantaneousRateConnectionEvent &re);
 
-  void sends_secondary_event( DiffusionConnectionEvent& de );
+  void sends_secondary_event(DiffusionConnectionEvent &de);
 
-  void sends_secondary_event( DelayedRateConnectionEvent& re );
+  void sends_secondary_event(DelayedRateConnectionEvent &re);
 
-  Node const& get_prototype() const;
+  Node const &get_prototype() const;
 
-  void set_model_id( int );
+  void set_model_id(int);
 
-  void deprecation_warning( const std::string& );
+  void deprecation_warning(const std::string &);
 
 private:
-  void set_status_( DictionaryDatum );
+  void set_status_(DictionaryDatum);
   DictionaryDatum get_status_();
 
   size_t get_element_size() const;
@@ -100,12 +97,12 @@ private:
   /**
    * Call placement new on the supplied memory position.
    */
-  Node* allocate_( void* );
+  Node *allocate_(void *);
 
   /**
    * Initialize the pool allocator with the node specific properties.
    */
-  void init_memory_( sli::pool& );
+  void init_memory_(sli::pool &);
 
   /**
    * Prototype node from which all instances are constructed.
@@ -123,154 +120,113 @@ private:
   bool deprecation_warning_issued_;
 };
 
-template < typename ElementT >
-GenericModel< ElementT >::GenericModel( const std::string& name,
-  const std::string& deprecation_info )
-  : Model( name )
-  , proto_()
-  , deprecation_info_( deprecation_info )
-  , deprecation_warning_issued_( false )
-{
+template <typename ElementT>
+GenericModel<ElementT>::GenericModel(const std::string &name,
+                                     const std::string &deprecation_info)
+    : Model(name), proto_(), deprecation_info_(deprecation_info),
+      deprecation_warning_issued_(false) {
   set_threads();
 }
 
-template < typename ElementT >
-GenericModel< ElementT >::GenericModel( const GenericModel& oldmod,
-  const std::string& newname )
-  : Model( newname )
-  , proto_( oldmod.proto_ )
-  , deprecation_info_( oldmod.deprecation_info_ )
-  , deprecation_warning_issued_( false )
-{
-  set_type_id( oldmod.get_type_id() );
+template <typename ElementT>
+GenericModel<ElementT>::GenericModel(const GenericModel &oldmod,
+                                     const std::string &newname)
+    : Model(newname), proto_(oldmod.proto_),
+      deprecation_info_(oldmod.deprecation_info_),
+      deprecation_warning_issued_(false) {
+  set_type_id(oldmod.get_type_id());
   set_threads();
 }
 
-template < typename ElementT >
-Model*
-GenericModel< ElementT >::clone( const std::string& newname ) const
-{
-  return new GenericModel( *this, newname );
+template <typename ElementT>
+Model *GenericModel<ElementT>::clone(const std::string &newname) const {
+  return new GenericModel(*this, newname);
 }
 
-template < typename ElementT >
-Node*
-GenericModel< ElementT >::allocate_( void* adr )
-{
-  Node* n = new ( adr ) ElementT( proto_ );
+template <typename ElementT>
+Node *GenericModel<ElementT>::allocate_(void *adr) {
+  Node *n = new (adr) ElementT(proto_);
   return n;
 }
 
-template < typename ElementT >
-void
-GenericModel< ElementT >::init_memory_( sli::pool& mem )
-{
-  mem.init( sizeof( ElementT ), 1000, 1 );
+template <typename ElementT>
+void GenericModel<ElementT>::init_memory_(sli::pool &mem) {
+  mem.init(sizeof(ElementT), 1000, 1);
 }
 
-template < typename ElementT >
-inline bool
-GenericModel< ElementT >::has_proxies()
-{
+template <typename ElementT> inline bool GenericModel<ElementT>::has_proxies() {
   return proto_.has_proxies();
 }
 
-template < typename ElementT >
-inline bool
-GenericModel< ElementT >::one_node_per_process()
-{
+template <typename ElementT>
+inline bool GenericModel<ElementT>::one_node_per_process() {
   return proto_.one_node_per_process();
 }
 
-template < typename ElementT >
-inline bool
-GenericModel< ElementT >::is_off_grid()
-{
+template <typename ElementT> inline bool GenericModel<ElementT>::is_off_grid() {
   return proto_.is_off_grid();
 }
 
-template < typename ElementT >
+template <typename ElementT>
 inline port
-GenericModel< ElementT >::send_test_event( Node& target,
-  rport receptor,
-  synindex syn_id,
-  bool dummy_target )
-{
-  return proto_.send_test_event( target, receptor, syn_id, dummy_target );
+GenericModel<ElementT>::send_test_event(Node &target, rport receptor,
+                                        synindex syn_id, bool dummy_target) {
+  return proto_.send_test_event(target, receptor, syn_id, dummy_target);
 }
 
-template < typename ElementT >
+template <typename ElementT>
 inline void
-GenericModel< ElementT >::sends_secondary_event( GapJunctionEvent& ge )
-{
-  return proto_.sends_secondary_event( ge );
+GenericModel<ElementT>::sends_secondary_event(GapJunctionEvent &ge) {
+  return proto_.sends_secondary_event(ge);
 }
 
-template < typename ElementT >
+template <typename ElementT>
+inline void GenericModel<ElementT>::sends_secondary_event(
+    InstantaneousRateConnectionEvent &re) {
+  return proto_.sends_secondary_event(re);
+}
+
+template <typename ElementT>
 inline void
-GenericModel< ElementT >::sends_secondary_event(
-  InstantaneousRateConnectionEvent& re )
-{
-  return proto_.sends_secondary_event( re );
+GenericModel<ElementT>::sends_secondary_event(DiffusionConnectionEvent &de) {
+  return proto_.sends_secondary_event(de);
 }
 
-template < typename ElementT >
+template <typename ElementT>
 inline void
-GenericModel< ElementT >::sends_secondary_event( DiffusionConnectionEvent& de )
-{
-  return proto_.sends_secondary_event( de );
+GenericModel<ElementT>::sends_secondary_event(DelayedRateConnectionEvent &re) {
+  return proto_.sends_secondary_event(re);
 }
 
-template < typename ElementT >
-inline void
-GenericModel< ElementT >::sends_secondary_event(
-  DelayedRateConnectionEvent& re )
-{
-  return proto_.sends_secondary_event( re );
-}
-
-template < typename ElementT >
-inline nest::SignalType
-GenericModel< ElementT >::sends_signal() const
-{
+template <typename ElementT>
+inline nest::SignalType GenericModel<ElementT>::sends_signal() const {
   return proto_.sends_signal();
 }
 
-template < typename ElementT >
-void
-GenericModel< ElementT >::set_status_( DictionaryDatum d )
-{
-  proto_.set_status( d );
+template <typename ElementT>
+void GenericModel<ElementT>::set_status_(DictionaryDatum d) {
+  proto_.set_status(d);
 }
 
-template < typename ElementT >
-DictionaryDatum
-GenericModel< ElementT >::get_status_()
-{
+template <typename ElementT>
+DictionaryDatum GenericModel<ElementT>::get_status_() {
   DictionaryDatum d = proto_.get_status_base();
-  ( *d )[ names::elementsize ] = sizeof( ElementT );
+  (*d)[names::elementsize] = sizeof(ElementT);
   return d;
 }
 
-template < typename ElementT >
-size_t
-GenericModel< ElementT >::get_element_size() const
-{
-  return sizeof( ElementT );
+template <typename ElementT>
+size_t GenericModel<ElementT>::get_element_size() const {
+  return sizeof(ElementT);
 }
 
-template < typename ElementT >
-Node const&
-GenericModel< ElementT >::get_prototype() const
-{
+template <typename ElementT>
+Node const &GenericModel<ElementT>::get_prototype() const {
   return proto_;
 }
 
-template < typename ElementT >
-void
-GenericModel< ElementT >::set_model_id( int i )
-{
-  proto_.set_model_id( i );
+template <typename ElementT> void GenericModel<ElementT>::set_model_id(int i) {
+  proto_.set_model_id(i);
 }
-}
+} // namespace nest
 #endif

@@ -30,95 +30,65 @@
 #include "sliexceptions.h"
 #include "tokenarray.h"
 
-
-librandom::RngDatum
-librandom::create_rng( const long seed, const RngFactoryDatum& factory )
-{
-  return librandom::RngDatum( factory->create( seed ) );
+librandom::RngDatum librandom::create_rng(const long seed,
+                                          const RngFactoryDatum &factory) {
+  return librandom::RngDatum(factory->create(seed));
 }
 
-librandom::RdvDatum
-librandom::create_rdv( const RdvFactoryDatum& factory, const RngDatum& rng )
-{
-  return librandom::RdvDatum( factory->create( rng ) );
+librandom::RdvDatum librandom::create_rdv(const RdvFactoryDatum &factory,
+                                          const RngDatum &rng) {
+  return librandom::RdvDatum(factory->create(rng));
 }
 
-void
-librandom::set_status( const DictionaryDatum& dict, RdvDatum& rdv )
-{
+void librandom::set_status(const DictionaryDatum &dict, RdvDatum &rdv) {
   dict->clear_access_flags();
-  rdv->set_status( dict );
+  rdv->set_status(dict);
   std::string missed;
-  if ( not dict->all_accessed( missed ) )
-  {
-    throw UnaccessedDictionaryEntry( missed );
+  if (not dict->all_accessed(missed)) {
+    throw UnaccessedDictionaryEntry(missed);
   }
 }
 
-DictionaryDatum
-librandom::get_status( const RdvDatum& rdv )
-{
-  DictionaryDatum dict( new Dictionary );
-  assert( dict.valid() );
+DictionaryDatum librandom::get_status(const RdvDatum &rdv) {
+  DictionaryDatum dict(new Dictionary);
+  assert(dict.valid());
 
-  rdv->get_status( dict );
+  rdv->get_status(dict);
 
   return dict;
 }
 
-void
-librandom::seed( const long seed, RngDatum& rng )
-{
-  rng->seed( seed );
+void librandom::seed(const long seed, RngDatum &rng) { rng->seed(seed); }
+
+unsigned long librandom::irand(const long N, RngDatum &rng) {
+  return rng->ulrand(N);
 }
 
-unsigned long
-librandom::irand( const long N, RngDatum& rng )
-{
-  return rng->ulrand( N );
-}
+double librandom::drand(RngDatum &rng) { return rng->drand(); }
 
-double
-librandom::drand( RngDatum& rng )
-{
-  return rng->drand();
-}
-
-ArrayDatum
-librandom::random_array( RdvDatum& rdv, const size_t n )
-{
+ArrayDatum librandom::random_array(RdvDatum &rdv, const size_t n) {
   TokenArray result;
-  result.reserve( n );
+  result.reserve(n);
 
-  if ( rdv->has_ldev() )
-  {
-    for ( size_t j = 0; j < n; ++j )
-    {
-      result.push_back( rdv->ldev() );
+  if (rdv->has_ldev()) {
+    for (size_t j = 0; j < n; ++j) {
+      result.push_back(rdv->ldev());
     }
-  }
-  else
-  {
-    for ( size_t j = 0; j < n; ++j )
-    {
-      result.push_back( ( *rdv )() );
+  } else {
+    for (size_t j = 0; j < n; ++j) {
+      result.push_back((*rdv)());
     }
   }
 
-  return ArrayDatum( result );
+  return ArrayDatum(result);
 }
 
-Token
-librandom::random( RdvDatum& rdv )
-{
-  if ( rdv->has_ldev() )
-  {
+Token librandom::random(RdvDatum &rdv) {
+  if (rdv->has_ldev()) {
     // returns long
-    return Token( rdv->ldev() );
-  }
-  else
-  {
+    return Token(rdv->ldev());
+  } else {
     // returns double
-    return Token( ( *rdv )() );
+    return Token((*rdv)());
   }
 }

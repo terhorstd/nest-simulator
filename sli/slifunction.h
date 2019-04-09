@@ -32,16 +32,11 @@ class SLIInterpreter;
   class SLICommand replaces the old class Function from SYNOD 1.x.
  */
 
-class SLIFunction
-{
+class SLIFunction {
 public:
-  SLIFunction()
-  {
-  }
-  virtual void execute( SLIInterpreter* ) const = 0;
-  virtual ~SLIFunction()
-  {
-  }
+  SLIFunction() {}
+  virtual void execute(SLIInterpreter *) const = 0;
+  virtual ~SLIFunction() {}
 
   /**
    * Show stack backtrace information on error.
@@ -53,10 +48,7 @@ public:
    * backtrace() is only called, if the interpreter flag
    * show_backtrace is set.
    */
-  virtual void
-  backtrace( SLIInterpreter*, int ) const
-  {
-  }
+  virtual void backtrace(SLIInterpreter *, int) const {}
 };
 
 #endif

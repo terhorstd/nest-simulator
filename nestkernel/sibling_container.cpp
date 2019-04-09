@@ -20,7 +20,6 @@
  *
  */
 
-
 #include "sibling_container.h"
 
 // C++ includes:
@@ -38,15 +37,9 @@
 #undef N_DEBUG
 #endif
 
-nest::SiblingContainer::SiblingContainer()
-  : Node()
-  , nodes_()
-{
-  set_frozen_( true ); // freeze SiblingContainer by default
+nest::SiblingContainer::SiblingContainer() : Node(), nodes_() {
+  set_frozen_(true); // freeze SiblingContainer by default
 }
 
-nest::SiblingContainer::SiblingContainer( const SiblingContainer& c )
-  : Node( c )
-  , nodes_( c.nodes_ )
-{
-}
+nest::SiblingContainer::SiblingContainer(const SiblingContainer &c)
+    : Node(c), nodes_(c.nodes_) {}

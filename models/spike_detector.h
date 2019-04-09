@@ -33,8 +33,7 @@
 #include "nest_types.h"
 #include "recording_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: spike_detector - Device for detecting single spikes.
@@ -88,24 +87,15 @@ Receives: SpikeEvent
 
 SeeAlso: spike_detector, Device, RecordingDevice
 */
-class spike_detector : public DeviceNode
-{
+class spike_detector : public DeviceNode {
 
 public:
   spike_detector();
-  spike_detector( const spike_detector& );
+  spike_detector(const spike_detector &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
 
-  bool
-  local_receiver() const
-  {
-    return true;
-  }
+  bool local_receiver() const { return true; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -116,17 +106,17 @@ public:
   using Node::handles_test_event;
   using Node::receives_signal;
 
-  void handle( SpikeEvent& );
+  void handle(SpikeEvent &);
 
-  port handles_test_event( SpikeEvent&, rport );
+  port handles_test_event(SpikeEvent &, rport);
 
   SignalType receives_signal() const;
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
   void post_run_cleanup();
@@ -141,7 +131,7 @@ private:
    *
    * @see RecordingDevice
    */
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   /**
    * Buffer for incoming spikes.
@@ -163,37 +153,26 @@ private:
    * This does not violate order-independence, since all spikes are delivered
    * from the global queue before any node is updated.
    */
-  struct Buffers_
-  {
-    std::vector< std::vector< Event* > > spikes_;
+  struct Buffers_ {
+    std::vector<std::vector<Event *>> spikes_;
   };
 
   RecordingDevice device_;
   Buffers_ B_;
 };
 
-inline port
-spike_detector::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port spike_detector::handles_test_event(SpikeEvent &,
+                                               rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline void
-spike_detector::post_run_cleanup()
-{
-  device_.post_run_cleanup();
-}
+inline void spike_detector::post_run_cleanup() { device_.post_run_cleanup(); }
 
-inline SignalType
-spike_detector::receives_signal() const
-{
-  return ALL;
-}
+inline SignalType spike_detector::receives_signal() const { return ALL; }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef SPIKE_DETECTOR_H */

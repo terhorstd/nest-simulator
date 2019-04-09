@@ -28,10 +28,7 @@
 #include "stringdatum.h"
 #include "tokenutils.h"
 
-
-const TokenArray&
-TokenArray::operator=( const TokenArray& a )
-{
+const TokenArray &TokenArray::operator=(const TokenArray &a) {
   a.data->add_reference(); // protect from a=a
   data->remove_reference();
   data = a.data;
@@ -39,144 +36,110 @@ TokenArray::operator=( const TokenArray& a )
   return *this;
 }
 
-
-TokenArray::TokenArray( const std::vector< long >& a )
-  : data( new TokenArrayObj( a.size(), Token(), 0 ) )
-{
-  assert( data != NULL );
-  for ( size_t i = 0; i < a.size(); ++i )
-  {
-    Token idt( new IntegerDatum( a[ i ] ) );
-    ( *data )[ i ].move( idt );
+TokenArray::TokenArray(const std::vector<long> &a)
+    : data(new TokenArrayObj(a.size(), Token(), 0)) {
+  assert(data != NULL);
+  for (size_t i = 0; i < a.size(); ++i) {
+    Token idt(new IntegerDatum(a[i]));
+    (*data)[i].move(idt);
   }
 }
 
-TokenArray::TokenArray( const std::vector< size_t >& a )
-  : data( new TokenArrayObj( a.size(), Token(), 0 ) )
-{
-  assert( data != NULL );
-  for ( size_t i = 0; i < a.size(); ++i )
-  {
-    Token idt( new IntegerDatum( a[ i ] ) );
-    ( *data )[ i ].move( idt );
+TokenArray::TokenArray(const std::vector<size_t> &a)
+    : data(new TokenArrayObj(a.size(), Token(), 0)) {
+  assert(data != NULL);
+  for (size_t i = 0; i < a.size(); ++i) {
+    Token idt(new IntegerDatum(a[i]));
+    (*data)[i].move(idt);
   }
 }
 
-TokenArray::TokenArray( const std::vector< double >& a )
-  : data( new TokenArrayObj( a.size(), Token(), 0 ) )
-{
-  assert( data != NULL );
-  for ( size_t i = 0; i < a.size(); ++i )
-  {
-    Token ddt( new DoubleDatum( a[ i ] ) );
-    ( *data )[ i ].move( ddt );
+TokenArray::TokenArray(const std::vector<double> &a)
+    : data(new TokenArrayObj(a.size(), Token(), 0)) {
+  assert(data != NULL);
+  for (size_t i = 0; i < a.size(); ++i) {
+    Token ddt(new DoubleDatum(a[i]));
+    (*data)[i].move(ddt);
   }
 }
 
-TokenArray::TokenArray( const std::vector< float >& a )
-  : data( new TokenArrayObj( a.size(), Token(), 0 ) )
-{
-  assert( data != NULL );
-  for ( size_t i = 0; i < a.size(); ++i )
-  {
-    Token ddt( new DoubleDatum( a[ i ] ) );
-    ( *data )[ i ].move( ddt );
+TokenArray::TokenArray(const std::vector<float> &a)
+    : data(new TokenArrayObj(a.size(), Token(), 0)) {
+  assert(data != NULL);
+  for (size_t i = 0; i < a.size(); ++i) {
+    Token ddt(new DoubleDatum(a[i]));
+    (*data)[i].move(ddt);
   }
 }
 
-
-void
-TokenArray::toVector( std::vector< long >& a ) const
-{
+void TokenArray::toVector(std::vector<long> &a) const {
   a.clear();
-  a.reserve( size() );
-  for ( Token* idx = begin(); idx != end(); ++idx )
-  {
-    IntegerDatum* targetid = dynamic_cast< IntegerDatum* >( idx->datum() );
-    if ( targetid == NULL )
-    {
+  a.reserve(size());
+  for (Token *idx = begin(); idx != end(); ++idx) {
+    IntegerDatum *targetid = dynamic_cast<IntegerDatum *>(idx->datum());
+    if (targetid == NULL) {
       IntegerDatum const d;
-      throw TypeMismatch(
-        d.gettypename().toString(), idx->datum()->gettypename().toString() );
+      throw TypeMismatch(d.gettypename().toString(),
+                         idx->datum()->gettypename().toString());
     }
 
-    a.push_back( targetid->get() );
+    a.push_back(targetid->get());
   }
 }
 
-void
-TokenArray::toVector( std::vector< size_t >& a ) const
-{
+void TokenArray::toVector(std::vector<size_t> &a) const {
   a.clear();
-  a.reserve( size() );
-  for ( Token* idx = begin(); idx != end(); ++idx )
-  {
-    IntegerDatum* targetid = dynamic_cast< IntegerDatum* >( idx->datum() );
-    if ( targetid == NULL )
-    {
+  a.reserve(size());
+  for (Token *idx = begin(); idx != end(); ++idx) {
+    IntegerDatum *targetid = dynamic_cast<IntegerDatum *>(idx->datum());
+    if (targetid == NULL) {
       IntegerDatum const d;
-      throw TypeMismatch(
-        d.gettypename().toString(), idx->datum()->gettypename().toString() );
+      throw TypeMismatch(d.gettypename().toString(),
+                         idx->datum()->gettypename().toString());
     }
 
-    a.push_back( targetid->get() );
+    a.push_back(targetid->get());
   }
 }
 
-void
-TokenArray::toVector( std::vector< double >& a ) const
-{
+void TokenArray::toVector(std::vector<double> &a) const {
   a.clear();
-  a.reserve( size() );
-  for ( Token* idx = begin(); idx != end(); ++idx )
-  {
-    DoubleDatum* targetid = dynamic_cast< DoubleDatum* >( idx->datum() );
-    if ( targetid == NULL )
-    {
+  a.reserve(size());
+  for (Token *idx = begin(); idx != end(); ++idx) {
+    DoubleDatum *targetid = dynamic_cast<DoubleDatum *>(idx->datum());
+    if (targetid == NULL) {
       DoubleDatum const d;
-      throw TypeMismatch(
-        d.gettypename().toString(), idx->datum()->gettypename().toString() );
+      throw TypeMismatch(d.gettypename().toString(),
+                         idx->datum()->gettypename().toString());
     }
-    a.push_back( targetid->get() );
+    a.push_back(targetid->get());
   }
 }
 
-void
-TokenArray::toVector( std::vector< std::string >& a ) const
-{
+void TokenArray::toVector(std::vector<std::string> &a) const {
   a.clear();
-  a.reserve( size() );
-  for ( Token* idx = begin(); idx != end(); ++idx )
-  {
-    std::string* target = dynamic_cast< std::string* >( idx->datum() );
-    if ( target == NULL )
-    {
+  a.reserve(size());
+  for (Token *idx = begin(); idx != end(); ++idx) {
+    std::string *target = dynamic_cast<std::string *>(idx->datum());
+    if (target == NULL) {
       StringDatum const d;
-      throw TypeMismatch(
-        d.gettypename().toString(), idx->datum()->gettypename().toString() );
+      throw TypeMismatch(d.gettypename().toString(),
+                         idx->datum()->gettypename().toString());
     }
-    a.push_back( *target );
+    a.push_back(*target);
   }
 }
 
-
-bool
-TokenArray::valid( void ) const
-{
-  if ( data == NULL )
-  {
+bool TokenArray::valid(void) const {
+  if (data == NULL) {
     return false;
   }
   return data->valid();
 }
 
+std::ostream &operator<<(std::ostream &out, const TokenArray &a) {
 
-std::ostream&
-operator<<( std::ostream& out, const TokenArray& a )
-{
-
-  for ( Token* t = a.begin(); t < a.end(); ++t )
-  {
+  for (Token *t = a.begin(); t < a.end(); ++t) {
     out << *t << ' ';
   }
 

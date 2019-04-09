@@ -57,7 +57,6 @@ Date:      18.11.95
 
 *******************************************************************/
 
-
 // C++ includes:
 #include <iostream>
 #include <typeinfo>
@@ -70,11 +69,9 @@ Date:      18.11.95
 #include "tokenstack.h"
 #include "typearray.h"
 
-class TypeTrie
-{
+class TypeTrie {
 private:
-  class TypeNode
-  {
+  class TypeNode {
   private:
     unsigned int refs; // number of references to this Node
 
@@ -82,129 +79,86 @@ private:
     Name type;  // expected type at this stack level
     Token func; // points to the operator or an error func.
 
-    TypeNode* alt;  // points to the next parameter alternative
-    TypeNode* next; // points to the next stack level for this path
+    TypeNode *alt;  // points to the next parameter alternative
+    TypeNode *next; // points to the next stack level for this path
 
+    void addreference(void) { ++refs; }
 
-    void
-    addreference( void )
-    {
-      ++refs;
-    }
-
-    void
-    removereference( void )
-    {
-      if ( --refs == 0 )
-      {
+    void removereference(void) {
+      if (--refs == 0) {
         delete this;
       }
     }
 
-    TypeNode( const Name& n )
-      : refs( 1 )
-      , type( n )
-      , func()
-      , alt( NULL )
-      , next( NULL )
-    {
-    }
+    TypeNode(const Name &n) : refs(1), type(n), func(), alt(NULL), next(NULL) {}
 
-    TypeNode( const Name& n, Token f )
-      : refs( 1 )
-      , type( n )
-      , func( f )
-      , alt( NULL )
-      , next( NULL )
-    {
-    }
+    TypeNode(const Name &n, Token f)
+        : refs(1), type(n), func(f), alt(NULL), next(NULL) {}
 
-    ~TypeNode()
-    {
-      if ( next != NULL )
-      {
+    ~TypeNode() {
+      if (next != NULL) {
         next->removereference();
       }
-      if ( alt != NULL )
-      {
+      if (alt != NULL) {
         alt->removereference();
       }
     }
-    void toTokenArray( TokenArray& ) const;
-    void info( std::ostream&, std::vector< TypeNode const* >& ) const;
+    void toTokenArray(TokenArray &) const;
+    void info(std::ostream &, std::vector<TypeNode const *> &) const;
   };
 
-  TypeNode* root;
+  TypeNode *root;
 
   //    TypeTrie operator=(const TypeTrie &){}; // disable this operator
-  TypeNode* getalternative( TypeNode*, const Name& );
+  TypeNode *getalternative(TypeNode *, const Name &);
 
-  TypeNode* newnode( const TokenArray& ) const;
+  TypeNode *newnode(const TokenArray &) const;
 
 public:
-  TypeTrie()
-    : root( new TypeNode( Name() ) )
-  {
-  }
+  TypeTrie() : root(new TypeNode(Name())) {}
 
-  TypeTrie( const TokenArray& ta )
-    : root( NULL )
-  {
-    root = newnode( ta );
-  }
+  TypeTrie(const TokenArray &ta) : root(NULL) { root = newnode(ta); }
 
-  TypeTrie( const TypeTrie& tt )
-    : root( tt.root )
-  {
-    if ( root != NULL )
-    {
+  TypeTrie(const TypeTrie &tt) : root(tt.root) {
+    if (root != NULL) {
       root->addreference();
     }
   }
 
   ~TypeTrie();
 
-  void insert_move( const TypeArray&, Token& );
-  void
-  insert( const TypeArray& a, const Token& t )
-  {
-    Token tmp( t );
+  void insert_move(const TypeArray &, Token &);
+  void insert(const TypeArray &a, const Token &t) {
+    Token tmp(t);
     // We have no insert variant, that's why we copy the token
     // to a temporary and then move it to the trie.
-    insert_move( a, tmp );
+    insert_move(a, tmp);
   }
 
-  const Token& lookup( const TokenStack& st ) const;
+  const Token &lookup(const TokenStack &st) const;
 
-  bool operator==( const TypeTrie& ) const;
+  bool operator==(const TypeTrie &) const;
 
-  inline bool equals( const Name&, const Name& ) const;
-  void toTokenArray( TokenArray& ) const;
-  void info( std::ostream& ) const;
+  inline bool equals(const Name &, const Name &) const;
+  void toTokenArray(TokenArray &) const;
+  void info(std::ostream &) const;
 };
 
-inline TypeTrie::~TypeTrie()
-{
-  if ( root != NULL )
-  {
+inline TypeTrie::~TypeTrie() {
+  if (root != NULL) {
     root->removereference();
   }
 }
 /*_____ end ~TypeTrie() __________________________________________*/
 
-
 // Typename comparison including /anytype which compares
 // positively for all other typenames
 
-inline bool
-TypeTrie::equals( const Name& t1, const Name& t2 ) const
-{
-  return ( t1 == t2 || t2 == sli::any || t1 == sli::any );
+inline bool TypeTrie::equals(const Name &t1, const Name &t2) const {
+  return (t1 == t2 || t2 == sli::any || t1 == sli::any);
 }
 
-inline const Token&
-TypeTrie::lookup( const TokenStack& st ) const
-{
+inline const Token &TypeTrie::lookup(const TokenStack &st) const {
   /*
   Task:      Tokens on stack 'st' will be compared with the TypeTrie.
              Each stack element must have an equivalent type on the
@@ -222,45 +176,36 @@ TypeTrie::lookup( const TokenStack& st ) const
   const unsigned int load = st.load();
   unsigned int level = 0;
 
-  TypeNode* pos = root;
+  TypeNode *pos = root;
 
-  while ( level < load )
-  {
-    Name find_type = st.pick( level )->gettypename();
+  while (level < load) {
+    Name find_type = st.pick(level)->gettypename();
 
     // Step 1: find the type at the current stack level in the
     // list of alternatives. Unfortunately, this search is O(n).
 
-    while ( not equals( find_type, pos->type ) )
-    {
-      if ( pos->alt != NULL )
-      {
+    while (not equals(find_type, pos->type)) {
+      if (pos->alt != NULL) {
         pos = pos->alt;
-      }
-      else
-      {
-        throw ArgumentType( level );
+      } else {
+        throw ArgumentType(level);
       }
     }
 
     // Now go to the next argument.
     pos = pos->next;
-    if ( pos->type == sli::object )
-    {
+    if (pos->type == sli::object) {
       return pos->func;
     }
 
     ++level;
   }
 
-  throw StackUnderflow( level + 1, load );
+  throw StackUnderflow(level + 1, load);
 }
 
-
-inline bool
-TypeTrie::operator==( const TypeTrie& tt ) const
-{
-  return ( root == tt.root );
+inline bool TypeTrie::operator==(const TypeTrie &tt) const {
+  return (root == tt.root);
 }
 
 #endif

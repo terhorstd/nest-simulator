@@ -38,8 +38,7 @@
 #include "nest_types.h"
 #include "stimulating_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: poisson_generator - simulate neuron firing with Poisson processes
@@ -97,8 +96,7 @@ http://ken.brainworks.uni-freiburg.de/cgi-bin/mailman/private/nest_developer/201
 
 SeeAlso: poisson_generator_ps, Device, parrot_neuron
 */
-class poisson_generator : public DeviceNode
-{
+class poisson_generator : public DeviceNode {
 
 public:
   /**
@@ -106,13 +104,9 @@ public:
    * at run-time, depending on thread.
    */
   poisson_generator();
-  poisson_generator( poisson_generator const& );
+  poisson_generator(poisson_generator const &);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -121,87 +115,76 @@ public:
    */
   using Node::event_hook;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
-  void event_hook( DSSpikeEvent& );
+  void update(Time const &, const long, const long);
+  void event_hook(DSSpikeEvent &);
 
   // ------------------------------------------------------------
 
   /**
    * Store independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double rate_; //!< process rate in Hz
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     librandom::PoissonRandomDev poisson_dev_; //!< Random deviate generator
   };
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< SpikeEvent > device_;
+  StimulatingDevice<SpikeEvent> device_;
   Parameters_ P_;
   Variables_ V_;
 };
 
-inline port
-poisson_generator::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool dummy_target )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port poisson_generator::send_test_event(Node &target,
+                                               rport receptor_type,
+                                               synindex syn_id,
+                                               bool dummy_target) {
+  device_.enforce_single_syn_type(syn_id);
 
-  if ( dummy_target )
-  {
+  if (dummy_target) {
     DSSpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
-  }
-  else
-  {
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
+  } else {
     SpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
   }
 }
 
-inline void
-poisson_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  device_.get_status( d );
+inline void poisson_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  device_.get_status(d);
 }
 
-inline void
-poisson_generator::set_status( const DictionaryDatum& d )
-{
+inline void poisson_generator::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
 
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

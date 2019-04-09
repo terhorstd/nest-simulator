@@ -31,88 +31,64 @@
 // Includes from sli:
 #include "dictdatum.h"
 
-namespace nest
-{
+namespace nest {
 //
 // Implementation of class STDPDopaCommonProperties.
 //
 
 STDPDopaCommonProperties::STDPDopaCommonProperties()
-  : CommonSynapseProperties()
-  , vt_( 0 )
-  , A_plus_( 1.0 )
-  , A_minus_( 1.5 )
-  , tau_plus_( 20.0 )
-  , tau_c_( 1000.0 )
-  , tau_n_( 200.0 )
-  , b_( 0.0 )
-  , Wmin_( 0.0 )
-  , Wmax_( 200.0 )
-{
-}
+    : CommonSynapseProperties(), vt_(0), A_plus_(1.0), A_minus_(1.5),
+      tau_plus_(20.0), tau_c_(1000.0), tau_n_(200.0), b_(0.0), Wmin_(0.0),
+      Wmax_(200.0) {}
 
-void
-STDPDopaCommonProperties::get_status( DictionaryDatum& d ) const
-{
-  CommonSynapseProperties::get_status( d );
-  if ( vt_ != 0 )
-  {
-    def< long >( d, names::vt, vt_->get_gid() );
-  }
-  else
-  {
-    def< long >( d, names::vt, -1 );
+void STDPDopaCommonProperties::get_status(DictionaryDatum &d) const {
+  CommonSynapseProperties::get_status(d);
+  if (vt_ != 0) {
+    def<long>(d, names::vt, vt_->get_gid());
+  } else {
+    def<long>(d, names::vt, -1);
   }
 
-  def< double >( d, names::A_plus, A_plus_ );
-  def< double >( d, names::A_minus, A_minus_ );
-  def< double >( d, names::tau_plus, tau_plus_ );
-  def< double >( d, names::tau_c, tau_c_ );
-  def< double >( d, names::tau_n, tau_n_ );
-  def< double >( d, names::b, b_ );
-  def< double >( d, names::Wmin, Wmin_ );
-  def< double >( d, names::Wmax, Wmax_ );
+  def<double>(d, names::A_plus, A_plus_);
+  def<double>(d, names::A_minus, A_minus_);
+  def<double>(d, names::tau_plus, tau_plus_);
+  def<double>(d, names::tau_c, tau_c_);
+  def<double>(d, names::tau_n, tau_n_);
+  def<double>(d, names::b, b_);
+  def<double>(d, names::Wmin, Wmin_);
+  def<double>(d, names::Wmax, Wmax_);
 }
 
-void
-STDPDopaCommonProperties::set_status( const DictionaryDatum& d,
-  ConnectorModel& cm )
-{
-  CommonSynapseProperties::set_status( d, cm );
+void STDPDopaCommonProperties::set_status(const DictionaryDatum &d,
+                                          ConnectorModel &cm) {
+  CommonSynapseProperties::set_status(d, cm);
 
   long vtgid;
-  if ( updateValue< long >( d, names::vt, vtgid ) )
-  {
-    vt_ = dynamic_cast< volume_transmitter* >( kernel().node_manager.get_node(
-      vtgid, kernel().vp_manager.get_thread_id() ) );
-    if ( vt_ == 0 )
-    {
-      throw BadProperty( "Dopamine source must be volume transmitter" );
+  if (updateValue<long>(d, names::vt, vtgid)) {
+    vt_ = dynamic_cast<volume_transmitter *>(kernel().node_manager.get_node(
+        vtgid, kernel().vp_manager.get_thread_id()));
+    if (vt_ == 0) {
+      throw BadProperty("Dopamine source must be volume transmitter");
     }
   }
 
-  updateValue< double >( d, names::A_plus, A_plus_ );
-  updateValue< double >( d, names::A_minus, A_minus_ );
-  updateValue< double >( d, names::tau_plus, tau_plus_ );
-  updateValue< double >( d, names::tau_c, tau_c_ );
-  updateValue< double >( d, names::tau_n, tau_n_ );
-  updateValue< double >( d, names::b, b_ );
-  updateValue< double >( d, names::Wmin, Wmin_ );
-  updateValue< double >( d, names::Wmax, Wmax_ );
+  updateValue<double>(d, names::A_plus, A_plus_);
+  updateValue<double>(d, names::A_minus, A_minus_);
+  updateValue<double>(d, names::tau_plus, tau_plus_);
+  updateValue<double>(d, names::tau_c, tau_c_);
+  updateValue<double>(d, names::tau_n, tau_n_);
+  updateValue<double>(d, names::b, b_);
+  updateValue<double>(d, names::Wmin, Wmin_);
+  updateValue<double>(d, names::Wmax, Wmax_);
 }
 
-Node*
-STDPDopaCommonProperties::get_node()
-{
-  if ( vt_ == 0 )
-  {
+Node *STDPDopaCommonProperties::get_node() {
+  if (vt_ == 0) {
     throw BadProperty(
-      "No volume transmitter has been assigned to the dopamine synapse." );
-  }
-  else
-  {
+        "No volume transmitter has been assigned to the dopamine synapse.");
+  } else {
     return vt_;
   }
 }
 
-} // of namespace nest
+} // namespace nest

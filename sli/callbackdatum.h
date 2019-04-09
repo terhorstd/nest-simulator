@@ -30,6 +30,6 @@
 #include "genericdatum.h"
 #include "interpret.h"
 
-typedef GenericDatum< Token, &SLIInterpreter::Callbacktype > CallbackDatum;
+typedef GenericDatum<Token, &SLIInterpreter::Callbacktype> CallbackDatum;
 
 #endif

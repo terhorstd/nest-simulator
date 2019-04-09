@@ -30,16 +30,15 @@
 #include "lockptrdatum.h"
 #include "slitype.h"
 
-typedef std::vector< ConnectionGenerator::ClosedInterval > RangeSet;
+typedef std::vector<ConnectionGenerator::ClosedInterval> RangeSet;
 typedef ConnectionGenerator::ClosedInterval Range;
 
-namespace nest
-{
+namespace nest {
 
 extern SLIType ConnectionGeneratorType;
 
-typedef lockPTRDatum< ConnectionGenerator, &ConnectionGeneratorType >
-  ConnectionGeneratorDatum;
+typedef lockPTRDatum<ConnectionGenerator, &ConnectionGeneratorType>
+    ConnectionGeneratorDatum;
 
 } // namespace nest
 

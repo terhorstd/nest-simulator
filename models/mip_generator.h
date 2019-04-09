@@ -33,13 +33,11 @@
 #include "nest_types.h"
 #include "stimulating_device.h"
 
-namespace nest
-{
+namespace nest {
 //! class mip_generator
 /*! Class mip_generator generates spike trains as described
     in the MIP model.
 */
-
 
 /** @BeginDocumentation
 Name: mip_generator - create spike trains as described by the MIP model.
@@ -97,8 +95,7 @@ Author: May 2006, Helias
 SeeAlso: Device
 
 */
-class mip_generator : public DeviceNode
-{
+class mip_generator : public DeviceNode {
 
 public:
   /**
@@ -113,13 +110,9 @@ public:
    * Needs to be overrwritten to initialize the random generator
    * for the mother process.
    */
-  mip_generator( const mip_generator& rhs );
+  mip_generator(const mip_generator &rhs);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -128,22 +121,22 @@ public:
    */
   using Node::event_hook;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   /**
    * @todo Should use binomial distribution
    */
-  void event_hook( DSSpikeEvent& );
+  void event_hook(DSSpikeEvent &);
 
   // ------------------------------------------------------------
 
@@ -154,73 +147,60 @@ private:
    * updates. But okay in the sense that it thus is not reset on
    * ResetNetwork. Should go once we have proper global RNG scheme.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double rate_;   //!< process rate in Hz
     double p_copy_; //!< copy probability for each spike in the mother process
     unsigned long mother_seed_; //!< seed of the mother process
     librandom::RngPtr rng_;     //!< random number generator for mother process
 
     Parameters_(); //!< Sets default parameter values
-    Parameters_( const Parameters_& );
+    Parameters_(const Parameters_ &);
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     librandom::PoissonRandomDev poisson_dev_; //!< random deviate generator
   };
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< SpikeEvent > device_;
+  StimulatingDevice<SpikeEvent> device_;
   Parameters_ P_;
   Variables_ V_;
 };
 
-inline port
-mip_generator::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool dummy_target )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port mip_generator::send_test_event(Node &target, rport receptor_type,
+                                           synindex syn_id, bool dummy_target) {
+  device_.enforce_single_syn_type(syn_id);
 
-  if ( dummy_target )
-  {
+  if (dummy_target) {
     DSSpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
-  }
-  else
-  {
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
+  } else {
     SpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
   }
 }
 
-inline void
-mip_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  device_.get_status( d );
+inline void mip_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  device_.get_status(d);
 }
 
-inline void
-mip_generator::set_status( const DictionaryDatum& d )
-{
+inline void mip_generator::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
 
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

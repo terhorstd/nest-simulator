@@ -23,7 +23,6 @@
 #ifndef CORRELOMATRIX_DETECTOR_H
 #define CORRELOMATRIX_DETECTOR_H
 
-
 // C++ includes:
 #include <deque>
 #include <vector>
@@ -34,9 +33,7 @@
 #include "node.h"
 #include "pseudo_recording_device.h"
 
-
-namespace nest
-{
+namespace nest {
 /** @BeginDocumentation
 Name: correlomatrix_detector - Device for measuring the covariance matrix
 from several inputs
@@ -148,22 +145,17 @@ SeeAlso: correlation_detector, spike_detector, Device, PseudoRecordingDevice
 
 Availability: NEST
 */
-class correlomatrix_detector : public Node
-{
+class correlomatrix_detector : public Node {
 
 public:
   correlomatrix_detector();
-  correlomatrix_detector( const correlomatrix_detector& );
+  correlomatrix_detector(const correlomatrix_detector &);
 
   /**
    * This device has proxies, so that it will receive
    * spikes also from sources which live on other threads.
    */
-  bool
-  has_proxies() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return true; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -173,19 +165,19 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  void handle( SpikeEvent& );
+  void handle(SpikeEvent &);
 
-  port handles_test_event( SpikeEvent&, rport );
+  port handles_test_event(SpikeEvent &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   // ------------------------------------------------------------
 
@@ -193,37 +185,30 @@ private:
    * Spike structure to store in the deque of recently
    * received events
    */
-  struct Spike_
-  {
+  struct Spike_ {
     long timestep_;
     double weight_;
     long receptor_channel_;
 
-    Spike_( long timestep, double weight, long receptorchannel )
-      : timestep_( timestep )
-      , weight_( weight )
-      , receptor_channel_( receptorchannel )
-    {
-    }
+    Spike_(long timestep, double weight, long receptorchannel)
+        : timestep_(timestep), weight_(weight),
+          receptor_channel_(receptorchannel) {}
 
     /**
      * Greater operator needed for insertion sort.
      */
-    inline bool
-    operator>( const Spike_& second ) const
-    {
+    inline bool operator>(const Spike_ &second) const {
       return timestep_ > second.timestep_;
     }
   };
 
-  typedef std::deque< Spike_ > SpikelistType;
+  typedef std::deque<Spike_> SpikelistType;
 
   // ------------------------------------------------------------
 
   struct State_;
 
-  struct Parameters_
-  {
+  struct Parameters_ {
 
     Time delta_tau_;  //!< width of correlation histogram bins
     Time tau_max_;    //!< maximum time difference of events to detect
@@ -231,17 +216,17 @@ private:
     Time Tstop_;      //!< end of recording
     long N_channels_; //!< number of channels
 
-    Parameters_();                     //!< Sets default parameter values
-    Parameters_( const Parameters_& ); //!< Recalibrate all times
+    Parameters_();                    //!< Sets default parameter values
+    Parameters_(const Parameters_ &); //!< Recalibrate all times
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
     /**
      * Set values from dicitonary.
      * @returns true if the state needs to be reset after a change of
      *          binwidth or tau_max.
      */
-    bool set( const DictionaryDatum&, const correlomatrix_detector& );
+    bool set(const DictionaryDatum &, const correlomatrix_detector &);
   };
 
   // ------------------------------------------------------------
@@ -255,30 +240,29 @@ private:
    * @note State_ only contains read-out values, so we copy-construct
    *       using the default c'tor.
    */
-  struct State_
-  {
+  struct State_ {
 
-    std::vector< long > n_events_; //!< spike counters
-    SpikelistType incoming_;       //!< incoming spikes, sorted
-                                   /** Weighted covariance matrix.
-                                    *  @note Data type is double to accomodate weights.
-                                    */
-    std::vector< std::vector< std::vector< double > > > covariance_;
+    std::vector<long> n_events_; //!< spike counters
+    SpikelistType incoming_;     //!< incoming spikes, sorted
+                                 /** Weighted covariance matrix.
+                                  *  @note Data type is double to accomodate weights.
+                                  */
+    std::vector<std::vector<std::vector<double>>> covariance_;
 
     /** Unweighted covariance matrix.
      */
-    std::vector< std::vector< std::vector< long > > > count_covariance_;
+    std::vector<std::vector<std::vector<long>>> count_covariance_;
 
     State_(); //!< initialize default state
 
-    void get( DictionaryDatum& ) const;
+    void get(DictionaryDatum &) const;
 
     /**
      * @param bool if true, force state reset
      */
-    void set( const DictionaryDatum&, const Parameters_&, bool );
+    void set(const DictionaryDatum &, const Parameters_ &, bool);
 
-    void reset( const Parameters_& );
+    void reset(const Parameters_ &);
   };
 
   // ------------------------------------------------------------
@@ -288,40 +272,33 @@ private:
   State_ S_;
 };
 
-inline port
-correlomatrix_detector::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type < 0 || receptor_type > P_.N_channels_ - 1 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port correlomatrix_detector::handles_test_event(SpikeEvent &,
+                                                       rport receptor_type) {
+  if (receptor_type < 0 || receptor_type > P_.N_channels_ - 1) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return receptor_type;
 }
 
-inline void
-nest::correlomatrix_detector::get_status( DictionaryDatum& d ) const
-{
-  device_.get_status( d );
-  P_.get( d );
-  S_.get( d );
+inline void nest::correlomatrix_detector::get_status(DictionaryDatum &d) const {
+  device_.get_status(d);
+  P_.get(d);
+  S_.get(d);
 
-  ( *d )[ names::element_type ] = LiteralDatum( names::recorder );
+  (*d)[names::element_type] = LiteralDatum(names::recorder);
 }
 
-inline void
-nest::correlomatrix_detector::set_status( const DictionaryDatum& d )
-{
+inline void nest::correlomatrix_detector::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_;
-  const bool reset_required = ptmp.set( d, *this );
+  const bool reset_required = ptmp.set(d, *this);
 
-  device_.set_status( d );
+  device_.set_status(d);
   P_ = ptmp;
-  if ( reset_required == true )
-  {
-    S_.reset( P_ );
+  if (reset_required == true) {
+    S_.reset(P_);
   }
 }
 
-} // namespace
+} // namespace nest
 
 #endif /* #ifndef CORRELOMATRIX_DETECTOR_H */

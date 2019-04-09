@@ -38,8 +38,7 @@
 #include "dictutils.h"
 #include "name.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: multimeter - Device to record analog data from neurons.
@@ -136,22 +135,17 @@ Author: Hans Ekkehard Plesser, Barna Zajzon (added offset support March 2017)
 
 SeeAlso: Device, RecordingDevice
 */
-class Multimeter : public DeviceNode
-{
+class Multimeter : public DeviceNode {
 
 public:
   Multimeter();
-  Multimeter( const Multimeter& );
+  Multimeter(const Multimeter &);
 
   /**
    * @note Multimeters never have proxies, since they must
    *       sample their targets through local communication.
    */
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
+  bool has_proxies() const { return false; }
 
   /**
    * Import sets of overloaded virtual functions.
@@ -162,17 +156,17 @@ public:
   using Node::handles_test_event;
   using Node::sends_signal;
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void handle( DataLoggingReply& );
+  void handle(DataLoggingReply &);
 
   SignalType sends_signal() const;
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 protected:
-  void init_state_( Node const& );
+  void init_state_(Node const &);
   void init_buffers_();
   void calibrate();
   void post_run_cleanup();
@@ -185,14 +179,14 @@ protected:
    * that information. The sampled nodes must provide data from
    * the previous time slice.
    */
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
 private:
   /** Indicate if recording device is active.
    *  The argument is the time stamp of the data requested,
    *  device is active if start_ < T <= stop_ and (T-start_)%interval_ == 0.
    */
-  bool is_active( Time const& T ) const;
+  bool is_active(Time const &T) const;
 
   /**
    * "Print" one value to file or screen, depending on settings in
@@ -201,7 +195,7 @@ private:
    *       RecordingDevice::print_value() can handle. Otherwise, specialization
    *       is required.
    */
-  void print_value_( const std::vector< double >& );
+  void print_value_(const std::vector<double> &);
 
   /**
    * Add recorded data to dictionary.
@@ -209,7 +203,7 @@ private:
    *       otherwise be specialized.
    * @param /events dictionary to be placed in properties dictionary
    */
-  void add_data_( DictionaryDatum& ) const;
+  void add_data_(DictionaryDatum &) const;
 
   // ------------------------------------------------------------
 
@@ -219,22 +213,20 @@ private:
 
   struct Buffers_;
 
-  struct Parameters_
-  {
+  struct Parameters_ {
     Time interval_; //!< recording interval, in ms
     Time offset_;   //!< offset relative to which interval is calculated, in ms
-    std::vector< Name > record_from_; //!< which data to record
+    std::vector<Name> record_from_; //!< which data to record
 
     Parameters_();
-    Parameters_( const Parameters_& );
-    void get( DictionaryDatum& ) const;
-    void set( const DictionaryDatum&, const Buffers_& );
+    Parameters_(const Parameters_ &);
+    void get(DictionaryDatum &) const;
+    void set(const DictionaryDatum &, const Buffers_ &);
   };
 
   // ------------------------------------------------------------
 
-  struct State_
-  {
+  struct State_ {
     /** Recorded data.
      * First dimension: time
      * Second dimension: recorded variables
@@ -245,13 +237,12 @@ private:
      *       In accumulating mode, only one data point is stored per time step
      *          and values are added across nodes.
      */
-    std::vector< std::vector< double > > data_; //!< Recorded data
+    std::vector<std::vector<double>> data_; //!< Recorded data
   };
 
   // ------------------------------------------------------------
 
-  struct Buffers_
-  {
+  struct Buffers_ {
     /** Does this multimeter have targets?
      * Placed here since it is implementation detail.
      * @todo Ideally, one should be able to ask ConnectionManager.
@@ -263,8 +254,7 @@ private:
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     /** Flag active till first DataLoggingReply during an update() call
      * processed. This flag is set to true by update() before dispatching the
      * DataLoggingRequest event and is reset to false by handle() as soon as the
@@ -290,60 +280,48 @@ private:
   Variables_ V_;
 };
 
-
-inline void
-nest::Multimeter::get_status( DictionaryDatum& d ) const
-{
+inline void nest::Multimeter::get_status(DictionaryDatum &d) const {
   // get the data from the device
-  device_.get_status( d );
+  device_.get_status(d);
 
   // we need to add analog data to the events dictionary
-  DictionaryDatum dd = getValue< DictionaryDatum >( d, names::events );
-  add_data_( dd );
+  DictionaryDatum dd = getValue<DictionaryDatum>(d, names::events);
+  add_data_(dd);
 
   // if we are the device on thread 0, also get the data from the
   // siblings on other threads
-  if ( get_thread() == 0 )
-  {
-    const SiblingContainer* siblings =
-      kernel().node_manager.get_thread_siblings( get_gid() );
-    std::vector< Node* >::const_iterator sibling;
-    for ( sibling = siblings->begin() + 1; sibling != siblings->end();
-          ++sibling )
-    {
-      ( *sibling )->get_status( d );
+  if (get_thread() == 0) {
+    const SiblingContainer *siblings =
+        kernel().node_manager.get_thread_siblings(get_gid());
+    std::vector<Node *>::const_iterator sibling;
+    for (sibling = siblings->begin() + 1; sibling != siblings->end();
+         ++sibling) {
+      (*sibling)->get_status(d);
     }
   }
 
-  P_.get( d );
+  P_.get(d);
 }
 
-inline void
-nest::Multimeter::set_status( const DictionaryDatum& d )
-{
+inline void nest::Multimeter::set_status(const DictionaryDatum &d) {
   // protect Multimeter from being frozen
   bool freeze = false;
-  if ( updateValue< bool >( d, names::frozen, freeze ) && freeze )
-  {
-    throw BadProperty( "Multimeter cannot be frozen." );
+  if (updateValue<bool>(d, names::frozen, freeze) && freeze) {
+    throw BadProperty("Multimeter cannot be frozen.");
   }
 
   Parameters_ ptmp = P_;
-  ptmp.set( d, B_ );
+  ptmp.set(d, B_);
 
   // Set properties in device. As a side effect, this will clear data_,
   // if /clear_events set in d
-  device_.set_status( d, S_.data_ );
+  device_.set_status(d, S_.data_);
 
   P_ = ptmp;
 }
 
-inline SignalType
-nest::Multimeter::sends_signal() const
-{
-  return ALL;
-}
+inline SignalType nest::Multimeter::sends_signal() const { return ALL; }
 
-} // Namespace
+} // namespace nest
 
 #endif

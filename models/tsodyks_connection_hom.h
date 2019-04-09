@@ -23,13 +23,11 @@
 #ifndef TSODYKS_CONNECTION_HOM_H
 #define TSODYKS_CONNECTION_HOM_H
 
-
 // Includes from nestkernel:
 #include "common_properties_hom_w.h"
 #include "connection.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: tsodyks_synapse_hom - Synapse type with short term plasticity using
@@ -117,8 +115,7 @@ iaf_psc_exp, iaf_tum_2000
  * Class containing the common properties for all synapses of type
  * TsodyksConnectionHom.
  */
-class TsodyksHomCommonProperties : public CommonPropertiesHomW
-{
+class TsodyksHomCommonProperties : public CommonPropertiesHomW {
 
 public:
   /**
@@ -130,12 +127,12 @@ public:
   /**
    * Get all properties and put them into a dictionary.
    */
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
   /**
    * Set properties from the values given in dictionary.
    */
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
   double tau_psc_; //!< [ms] time constant of postsyn current
   double tau_fac_; //!< [ms] time constant for fascilitation
@@ -143,13 +140,11 @@ public:
   double U_;       //!< asymptotic value of probability of release
 };
 
-
-template < typename targetidentifierT >
-class TsodyksConnectionHom : public Connection< targetidentifierT >
-{
+template <typename targetidentifierT>
+class TsodyksConnectionHom : public Connection<targetidentifierT> {
 public:
   typedef TsodyksHomCommonProperties CommonPropertiesType;
-  typedef Connection< targetidentifierT > ConnectionBase;
+  typedef Connection<targetidentifierT> ConnectionBase;
 
   /**
    * Default Constructor.
@@ -161,14 +156,12 @@ public:
    * Copy constructor from a property object.
    * Needs to be defined properly in order for GenericConnector to work.
    */
-  TsodyksConnectionHom( const TsodyksConnectionHom& );
+  TsodyksConnectionHom(const TsodyksConnectionHom &);
 
   /**
    * Default Destructor.
    */
-  ~TsodyksConnectionHom()
-  {
-  }
+  ~TsodyksConnectionHom() {}
 
   // Explicitly declare all methods inherited from the dependent base
   // ConnectionBase. This avoids explicit name prefixes in all places these
@@ -181,50 +174,39 @@ public:
   /**
    * Get all properties of this connection and put them into a dictionary.
    */
-  void get_status( DictionaryDatum& d ) const;
+  void get_status(DictionaryDatum &d) const;
 
   /**
    * Set properties of this connection from the values given in dictionary.
    */
-  void set_status( const DictionaryDatum& d, ConnectorModel& cm );
+  void set_status(const DictionaryDatum &d, ConnectorModel &cm);
 
   /**
    * Send an event to the receiver of this connection.
    * \param e The event to send
    * \param cp Common properties to all synapses (empty).
    */
-  void send( Event& e, thread t, const TsodyksHomCommonProperties& cp );
+  void send(Event &e, thread t, const TsodyksHomCommonProperties &cp);
 
-  class ConnTestDummyNode : public ConnTestDummyNodeBase
-  {
+  class ConnTestDummyNode : public ConnTestDummyNodeBase {
   public:
     // Ensure proper overriding of overloaded virtual functions.
     // Return values from functions are ignored.
     using ConnTestDummyNodeBase::handles_test_event;
-    port
-    handles_test_event( SpikeEvent&, rport )
-    {
-      return invalid_port_;
-    }
+    port handles_test_event(SpikeEvent &, rport) { return invalid_port_; }
   };
 
-  void
-  check_connection( Node& s,
-    Node& t,
-    rport receptor_type,
-    const CommonPropertiesType& )
-  {
+  void check_connection(Node &s, Node &t, rport receptor_type,
+                        const CommonPropertiesType &) {
     ConnTestDummyNode dummy_target;
-    ConnectionBase::check_connection_( dummy_target, s, t, receptor_type );
+    ConnectionBase::check_connection_(dummy_target, s, t, receptor_type);
   }
 
-  void
-  set_weight( double )
-  {
+  void set_weight(double) {
     throw BadProperty(
-      "Setting of individual weights is not possible! The common weights can "
-      "be changed via "
-      "CopyModel()." );
+        "Setting of individual weights is not possible! The common weights can "
+        "be changed via "
+        "CopyModel().");
   }
 
 private:
@@ -234,18 +216,14 @@ private:
   double t_lastspike_; //!< time point of last spike emitted
 };
 
-
 /**
  * Send an event to the receiver of this connection.
  * \param e The event to send
  * \param p The port under which this connection is stored in the Connector.
  */
-template < typename targetidentifierT >
-inline void
-TsodyksConnectionHom< targetidentifierT >::send( Event& e,
-  thread t,
-  const TsodyksHomCommonProperties& cp )
-{
+template <typename targetidentifierT>
+inline void TsodyksConnectionHom<targetidentifierT>::send(
+    Event &e, thread t, const TsodyksHomCommonProperties &cp) {
   const double t_spike = e.get_stamp().get_ms();
   const double h = t_spike - t_lastspike_;
 
@@ -255,12 +233,12 @@ TsodyksConnectionHom< targetidentifierT >::send( Event& e,
 
   // propagator
   // TODO: use expm1 here instead, where applicable
-  double Puu = ( cp.tau_fac_ == 0.0 ) ? 0.0 : std::exp( -h / cp.tau_fac_ );
-  double Pyy = std::exp( -h / cp.tau_psc_ );
-  double Pzz = std::exp( -h / cp.tau_rec_ );
+  double Puu = (cp.tau_fac_ == 0.0) ? 0.0 : std::exp(-h / cp.tau_fac_);
+  double Pyy = std::exp(-h / cp.tau_psc_);
+  double Pzz = std::exp(-h / cp.tau_rec_);
 
-  double Pxy = ( ( Pzz - 1.0 ) * cp.tau_rec_ - ( Pyy - 1.0 ) * cp.tau_psc_ )
-    / ( cp.tau_psc_ - cp.tau_rec_ );
+  double Pxy = ((Pzz - 1.0) * cp.tau_rec_ - (Pyy - 1.0) * cp.tau_psc_) /
+               (cp.tau_psc_ - cp.tau_rec_);
   double Pxz = 1.0 - Pzz;
 
   double z = 1.0 - x_ - y_;
@@ -273,7 +251,7 @@ TsodyksConnectionHom< targetidentifierT >::send( Event& e,
   y_ *= Pyy;
 
   // delta function u
-  u_ += cp.U_ * ( 1.0 - u_ );
+  u_ += cp.U_ * (1.0 - u_);
 
   // postsynaptic current step caused by incoming spike
   double delta_y_tsp = u_ * x_;
@@ -282,74 +260,57 @@ TsodyksConnectionHom< targetidentifierT >::send( Event& e,
   x_ -= delta_y_tsp;
   y_ += delta_y_tsp;
 
-
-  e.set_receiver( *get_target( t ) );
-  e.set_weight( delta_y_tsp * cp.get_weight() );
-  e.set_delay_steps( get_delay_steps() );
-  e.set_rport( get_rport() );
+  e.set_receiver(*get_target(t));
+  e.set_weight(delta_y_tsp * cp.get_weight());
+  e.set_delay_steps(get_delay_steps());
+  e.set_rport(get_rport());
   e();
 
   t_lastspike_ = t_spike;
 }
 
-template < typename targetidentifierT >
-TsodyksConnectionHom< targetidentifierT >::TsodyksConnectionHom()
-  : ConnectionBase()
-  , x_( 1.0 )
-  , y_( 0.0 )
-  , u_( 0.0 )
-  , t_lastspike_( 0.0 )
-{
+template <typename targetidentifierT>
+TsodyksConnectionHom<targetidentifierT>::TsodyksConnectionHom()
+    : ConnectionBase(), x_(1.0), y_(0.0), u_(0.0), t_lastspike_(0.0) {}
+
+template <typename targetidentifierT>
+TsodyksConnectionHom<targetidentifierT>::TsodyksConnectionHom(
+    const TsodyksConnectionHom &rhs)
+    : ConnectionBase(rhs), x_(rhs.x_), y_(rhs.y_), u_(rhs.u_),
+      t_lastspike_(rhs.t_lastspike_) {}
+
+template <typename targetidentifierT>
+void TsodyksConnectionHom<targetidentifierT>::get_status(
+    DictionaryDatum &d) const {
+  ConnectionBase::get_status(d);
+
+  def<double>(d, names::x, x_);
+  def<double>(d, names::y, y_);
+  def<double>(d, names::u, u_);
 }
 
-template < typename targetidentifierT >
-TsodyksConnectionHom< targetidentifierT >::TsodyksConnectionHom(
-  const TsodyksConnectionHom& rhs )
-  : ConnectionBase( rhs )
-  , x_( rhs.x_ )
-  , y_( rhs.y_ )
-  , u_( rhs.u_ )
-  , t_lastspike_( rhs.t_lastspike_ )
-{
-}
-
-template < typename targetidentifierT >
-void
-TsodyksConnectionHom< targetidentifierT >::get_status(
-  DictionaryDatum& d ) const
-{
-  ConnectionBase::get_status( d );
-
-  def< double >( d, names::x, x_ );
-  def< double >( d, names::y, y_ );
-  def< double >( d, names::u, u_ );
-}
-
-template < typename targetidentifierT >
-void
-TsodyksConnectionHom< targetidentifierT >::set_status( const DictionaryDatum& d,
-  ConnectorModel& cm )
-{
+template <typename targetidentifierT>
+void TsodyksConnectionHom<targetidentifierT>::set_status(
+    const DictionaryDatum &d, ConnectorModel &cm) {
   // Handle parameters that may throw an exception first, so we can leave the
   // synapse untouched in case of invalid parameter values
   double x = x_;
   double y = y_;
-  updateValue< double >( d, names::x, x );
-  updateValue< double >( d, names::y, y );
+  updateValue<double>(d, names::x, x);
+  updateValue<double>(d, names::y, y);
 
-  if ( x + y > 1.0 )
-  {
-    throw BadProperty( "x + y must be <= 1.0." );
+  if (x + y > 1.0) {
+    throw BadProperty("x + y must be <= 1.0.");
   }
 
   x_ = x;
   y_ = y;
 
-  ConnectionBase::set_status( d, cm );
+  ConnectionBase::set_status(d, cm);
 
-  updateValue< double >( d, names::u, u_ );
+  updateValue<double>(d, names::u, u_);
 }
 
-} // namespace
+} // namespace nest
 
 #endif // TSODYKS_CONNECTION_HOM_H

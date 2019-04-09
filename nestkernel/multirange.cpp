@@ -25,18 +25,14 @@
 // C++ includes:
 #include <stdexcept>
 
-nest::index nest::Multirange::operator[]( index n ) const
-{
-  for ( RangeVector::const_iterator iter = ranges_.begin();
-        iter != ranges_.end();
-        ++iter )
-  {
-    if ( n <= iter->second - iter->first )
-    {
+nest::index nest::Multirange::operator[](index n) const {
+  for (RangeVector::const_iterator iter = ranges_.begin();
+       iter != ranges_.end(); ++iter) {
+    if (n <= iter->second - iter->first) {
       return iter->first + n;
     }
 
     n -= 1 + iter->second - iter->first;
   }
-  throw std::out_of_range( "Multirange::operator[]: index out of range." );
+  throw std::out_of_range("Multirange::operator[]: index out of range.");
 }

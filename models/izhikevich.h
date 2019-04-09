@@ -31,8 +31,7 @@
 #include "ring_buffer.h"
 #include "universal_data_logger.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
    Name: izhikevich - Izhikevich neuron model
@@ -94,12 +93,11 @@ namespace nest
 
    SeeAlso: iaf_psc_delta, mat2_psc_exp
 */
-class izhikevich : public Archiving_Node
-{
+class izhikevich : public Archiving_Node {
 
 public:
   izhikevich();
-  izhikevich( const izhikevich& );
+  izhikevich(const izhikevich &);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -109,36 +107,35 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  void handle( DataLoggingRequest& );
-  void handle( SpikeEvent& );
-  void handle( CurrentEvent& );
+  void handle(DataLoggingRequest &);
+  void handle(SpikeEvent &);
+  void handle(CurrentEvent &);
 
-  port handles_test_event( DataLoggingRequest&, rport );
-  port handles_test_event( SpikeEvent&, rport );
-  port handles_test_event( CurrentEvent&, rport );
+  port handles_test_event(DataLoggingRequest &, rport);
+  port handles_test_event(SpikeEvent &, rport);
+  port handles_test_event(CurrentEvent &, rport);
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  friend class RecordablesMap< izhikevich >;
-  friend class UniversalDataLogger< izhikevich >;
+  friend class RecordablesMap<izhikevich>;
+  friend class UniversalDataLogger<izhikevich>;
 
-  void init_state_( const Node& proto );
+  void init_state_(const Node &proto);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
   // ----------------------------------------------------------------
 
   /**
    * Independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double a_;
     double b_;
     double c_;
@@ -158,8 +155,8 @@ private:
 
     Parameters_(); //!< Sets default parameter values
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
   // ----------------------------------------------------------------
@@ -167,12 +164,10 @@ private:
   /**
    * State variables of the model.
    */
-  struct State_
-  {
+  struct State_ {
     double v_; // membrane potential
     double u_; // membrane recovery variable
     double I_; // input current
-
 
     /** Accumulate spikes arriving during refractory period, discounted for
         decay until end of refractory period.
@@ -180,8 +175,8 @@ private:
 
     State_(); //!< Default initialization
 
-    void get( DictionaryDatum&, const Parameters_& ) const;
-    void set( const DictionaryDatum&, const Parameters_& );
+    void get(DictionaryDatum &, const Parameters_ &) const;
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ----------------------------------------------------------------
@@ -189,14 +184,13 @@ private:
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
+  struct Buffers_ {
     /**
      * Buffer for recording
      */
-    Buffers_( izhikevich& );
-    Buffers_( const Buffers_&, izhikevich& );
-    UniversalDataLogger< izhikevich > logger_;
+    Buffers_(izhikevich &);
+    Buffers_(const Buffers_ &, izhikevich &);
+    UniversalDataLogger<izhikevich> logger_;
 
     /** buffers and sums up incoming spikes/currents */
     RingBuffer spikes_;
@@ -208,24 +202,14 @@ private:
   /**
    * Internal variables of the model.
    */
-  struct Variables_
-  {
-  };
+  struct Variables_ {};
 
   // Access functions for UniversalDataLogger -----------------------
 
   //! Read out the membrane potential
-  double
-  get_V_m_() const
-  {
-    return S_.v_;
-  }
+  double get_V_m_() const { return S_.v_; }
   //! Read out the recovery variable
-  double
-  get_U_m_() const
-  {
-    return S_.u_;
-  }
+  double get_U_m_() const { return S_.u_; }
 
   // ----------------------------------------------------------------
 
@@ -235,71 +219,59 @@ private:
   Buffers_ B_;
 
   //! Mapping of recordables names to access functions
-  static RecordablesMap< izhikevich > recordablesMap_;
+  static RecordablesMap<izhikevich> recordablesMap_;
   /** @} */
 };
 
-inline port
-izhikevich::send_test_event( Node& target, rport receptor_type, synindex, bool )
-{
+inline port izhikevich::send_test_event(Node &target, rport receptor_type,
+                                        synindex, bool) {
   SpikeEvent e;
-  e.set_sender( *this );
+  e.set_sender(*this);
 
-  return target.handles_test_event( e, receptor_type );
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-izhikevich::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port izhikevich::handles_test_event(SpikeEvent &, rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-izhikevich::handles_test_event( CurrentEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port izhikevich::handles_test_event(CurrentEvent &,
+                                           rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline port
-izhikevich::handles_test_event( DataLoggingRequest& dlr, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port izhikevich::handles_test_event(DataLoggingRequest &dlr,
+                                           rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-izhikevich::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d, P_ );
-  Archiving_Node::get_status( d );
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+inline void izhikevich::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d, P_);
+  Archiving_Node::get_status(d);
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-izhikevich::set_status( const DictionaryDatum& d )
-{
+inline void izhikevich::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
   State_ stmp = S_;      // temporary copy in case of errors
-  stmp.set( d, ptmp );   // throws if BadProperty
+  stmp.set(d, ptmp);     // throws if BadProperty
 
   // We now know that (ptmp, stmp) are consistent. We do not
   // write them back to (P_, S_) before we are also sure that
   // the properties to be set in the parent class are internally
   // consistent.
-  Archiving_Node::set_status( d );
+  Archiving_Node::set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

@@ -38,7 +38,6 @@
 #include <cmath>
 #endif
 
-
 #ifndef HAVE_M_PI
 
 #ifdef HAVE_CMATH_MAKROS_IGNORED
@@ -49,9 +48,9 @@
 #define M_PI_OK
 #endif
 
-#if defined( HAVE_STD_NAN )
+#if defined(HAVE_STD_NAN)
 #include <cmath>
-#elif defined( HAVE_NAN )
+#elif defined(HAVE_NAN)
 #include <math.h>
 #endif
 
@@ -80,32 +79,22 @@ const double numerics::pi = 3.14159265358979323846264338328;
 
 #endif
 
-#if defined( HAVE_STD_NAN )
-const double numerics::nan = ::nan( "" );
-#elif defined( HAVE_NAN )
+#if defined(HAVE_STD_NAN)
+const double numerics::nan = ::nan("");
+#elif defined(HAVE_NAN)
 const double numerics::nan = NAN;
 #else
 const double numerics::nan = 0.0 / 0.0;
 #endif
 
 // later also in namespace
-long
-ld_round( double x )
-{
-  return ( long ) std::floor( x + 0.5 );
-}
+long ld_round(double x) { return (long)std::floor(x + 0.5); }
 
-double
-dround( double x )
-{
-  return std::floor( x + 0.5 );
-}
+double dround(double x) { return std::floor(x + 0.5); }
 
-double
-dtruncate( double x )
-{
+double dtruncate(double x) {
   double ip;
 
-  std::modf( x, &ip );
+  std::modf(x, &ip);
   return ip;
 }

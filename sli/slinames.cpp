@@ -22,11 +22,11 @@
 
 #include "slinames.h"
 
-Name sli::any( "anytype" );
-Name sli::object( "trie:object" );
-Name sli::imap( "::Map" );
-Name sli::imap_dv( "::Map_dv" );
-Name sli::imap_iv( "::Map_iv" );
-Name sli::imapindexed( "::MapIndexed" );
-Name sli::iforall_iv( "::forall_iv" );
-Name sli::iforall_dv( "::forall_dv" );
+Name sli::any("anytype");
+Name sli::object("trie:object");
+Name sli::imap("::Map");
+Name sli::imap_dv("::Map_dv");
+Name sli::imap_iv("::Map_iv");
+Name sli::imapindexed("::MapIndexed");
+Name sli::iforall_iv("::forall_iv");
+Name sli::iforall_dv("::forall_dv");

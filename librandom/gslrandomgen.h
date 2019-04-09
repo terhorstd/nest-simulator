@@ -52,8 +52,7 @@
 // External includes:
 #include <gsl/gsl_rng.h>
 
-namespace librandom
-{
+namespace librandom {
 
 /**
  * class GslRandomGen
@@ -64,89 +63,64 @@ namespace librandom
  * @ingroup RandomNumberGenerators
  */
 
-class GslRandomGen : public RandomGen
-{
+class GslRandomGen : public RandomGen {
   friend class GSL_BinomialRandomDev;
 
 public:
-  explicit GslRandomGen( const gsl_rng_type*, //!< given RNG, given seed
-    unsigned long );
+  explicit GslRandomGen(const gsl_rng_type *, //!< given RNG, given seed
+                        unsigned long);
 
   ~GslRandomGen();
 
   //! Add all GSL RNGs to rngdict
-  static void add_gsl_rngs( Dictionary& );
+  static void add_gsl_rngs(Dictionary &);
 
-  RngPtr
-  clone( unsigned long s )
-  {
-    return RngPtr( new GslRandomGen( rng_type_, s ) );
+  RngPtr clone(unsigned long s) {
+    return RngPtr(new GslRandomGen(rng_type_, s));
   }
 
+private:
+  void seed_(unsigned long);
+  double drand_(void);
 
 private:
-  void seed_( unsigned long );
-  double drand_( void );
-
-private:
-  gsl_rng_type const* rng_type_;
-  gsl_rng* rng_;
+  gsl_rng_type const *rng_type_;
+  gsl_rng *rng_;
 };
 
-inline void
-GslRandomGen::seed_( unsigned long s )
-{
-  gsl_rng_set( rng_, s );
-}
+inline void GslRandomGen::seed_(unsigned long s) { gsl_rng_set(rng_, s); }
 
-inline double
-GslRandomGen::drand_( void )
-{
-  return gsl_rng_uniform( rng_ );
-}
+inline double GslRandomGen::drand_(void) { return gsl_rng_uniform(rng_); }
 
 //! Factory class for GSL-based random generators
-class GslRNGFactory : public GenericRNGFactory
-{
+class GslRNGFactory : public GenericRNGFactory {
 public:
-  GslRNGFactory( gsl_rng_type const* const );
-  RngPtr create( unsigned long ) const;
+  GslRNGFactory(gsl_rng_type const *const);
+  RngPtr create(unsigned long) const;
 
 private:
   //! GSL generator type information
-  gsl_rng_type const* const gsl_rng_;
+  gsl_rng_type const *const gsl_rng_;
 };
-}
+} // namespace librandom
 
 #else
 
 // NO GSL Available---Implement class as empty shell
-namespace librandom
-{
+namespace librandom {
 
-class GslRandomGen : public RandomGen
-{
+class GslRandomGen : public RandomGen {
 public:
   //! Add all GSL RNGs to rngdict
   //! Do nothing if GSL not available
-  static void
-  add_gsl_rngs( Dictionary& )
-  {
-  }
+  static void add_gsl_rngs(Dictionary &) {}
 
 private:
-  GslRandomGen()
-  {
-    assert( false );
-  }
-  ~GslRandomGen()
-  {
-    assert( false );
-  }
+  GslRandomGen() { assert(false); }
+  ~GslRandomGen() { assert(false); }
 };
-}
+} // namespace librandom
 
 #endif
-
 
 #endif

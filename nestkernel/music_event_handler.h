@@ -36,27 +36,23 @@
 #include "nest_types.h"
 #include "node.h"
 
-
-namespace nest
-{
+namespace nest {
 
 /**
  * Event handler for all events of a MUSIC port received on this process.
  */
-class MusicEventHandler : public MUSIC::EventHandlerGlobalIndex
-{
+class MusicEventHandler : public MUSIC::EventHandlerGlobalIndex {
 public:
   MusicEventHandler();
-  MusicEventHandler( std::string portname,
-    double acceptable_latency,
-    int max_buffered );
+  MusicEventHandler(std::string portname, double acceptable_latency,
+                    int max_buffered);
 
   virtual ~MusicEventHandler();
 
   /**
    * Register a new node to a specific channel on this port.
    */
-  void register_channel( int channel, nest::Node* mp );
+  void register_channel(int channel, nest::Node *mp);
 
   /**
    * Publish the MUSIC port.
@@ -70,23 +66,23 @@ public:
    * NEST. This function only queues the events. Delivery to the
    * targets takes place in update().
    */
-  void operator()( double t, MUSIC::GlobalIndex channel );
+  void operator()(double t, MUSIC::GlobalIndex channel);
 
   /**
    * This function is called by the scheduler and delivers the queued
    * events to the target music_in_proxies.
    */
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
 private:
-  MUSIC::EventInputPort* music_port_;
-  MUSIC::PermutationIndex* music_perm_ind_;
+  MUSIC::EventInputPort *music_port_;
+  MUSIC::PermutationIndex *music_perm_ind_;
   bool published_;
   std::string portname_;
   //! Maps channel number to music_event_in_proxy
-  std::vector< nest::Node* > channelmap_;
+  std::vector<nest::Node *> channelmap_;
   //! Maps local index to global MUSIC index (channel)
-  std::vector< MUSIC::GlobalIndex > indexmap_;
+  std::vector<MUSIC::GlobalIndex> indexmap_;
   double acceptable_latency_; //!< The acceptable latency of the port in ms
   int max_buffered_;
 
@@ -95,9 +91,9 @@ private:
    * one entry per channel. The priority queues used within the vector
    * implement min-heaps stored in vectors.
    */
-  std::vector< std::
-      priority_queue< double, std::vector< double >, std::greater< double > > >
-    eventqueue_;
+  std::vector<
+      std::priority_queue<double, std::vector<double>, std::greater<double>>>
+      eventqueue_;
 };
 
 } // namespace nest

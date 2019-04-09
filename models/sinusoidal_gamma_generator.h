@@ -42,8 +42,7 @@
 #include "stimulating_device.h"
 #include "universal_data_logger.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: sinusoidal_gamma_generator - Generates sinusoidally modulated gamma
@@ -133,14 +132,13 @@ SeeAlso: sinusoidal_poisson_generator, gamma_sup_generator
  *       the same synapse type, see #737. Once #681 is fixed, we need to add a
          check that his assumption holds.
  */
-class sinusoidal_gamma_generator : public DeviceNode
-{
+class sinusoidal_gamma_generator : public DeviceNode {
 
 public:
   sinusoidal_gamma_generator();
-  sinusoidal_gamma_generator( const sinusoidal_gamma_generator& );
+  sinusoidal_gamma_generator(const sinusoidal_gamma_generator &);
 
-  port send_test_event( Node&, rport, synindex, bool );
+  port send_test_event(Node &, rport, synindex, bool);
 
   /**
    * Import sets of overloaded virtual functions.
@@ -151,37 +149,28 @@ public:
   using Node::handle;
   using Node::handles_test_event;
 
-  void handle( DataLoggingRequest& );
+  void handle(DataLoggingRequest &);
 
-  port handles_test_event( DataLoggingRequest&, rport );
+  port handles_test_event(DataLoggingRequest &, rport);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
   //! Model can be switched between proxies (single spike train) and not
-  bool
-  has_proxies() const
-  {
-    return not P_.individual_spike_trains_;
-  }
+  bool has_proxies() const { return not P_.individual_spike_trains_; }
 
   //! Allow multimeter to connect to local instances
-  bool
-  local_receiver() const
-  {
-    return true;
-  }
+  bool local_receiver() const { return true; }
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
-  void event_hook( DSSpikeEvent& );
+  void event_hook(DSSpikeEvent &);
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
-  struct Parameters_
-  {
+  struct Parameters_ {
     /** Frequency in radian/ms */
     double om_;
 
@@ -212,47 +201,45 @@ private:
     size_t num_trains_;
 
     Parameters_(); //!< Sets default parameter values
-    Parameters_( const Parameters_& );
-    Parameters_& operator=( const Parameters_& p );
+    Parameters_(const Parameters_ &);
+    Parameters_ &operator=(const Parameters_ &p);
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
 
     /**
      * Set values from dictionary.
      * @note State is passed so that the position can be reset if the
      *       spike_times_ vector has been filled with new data.
      */
-    void set( const DictionaryDatum&, const sinusoidal_gamma_generator& );
+    void set(const DictionaryDatum &, const sinusoidal_gamma_generator &);
   };
 
-  struct State_
-  {
+  struct State_ {
 
     double rate_; //!< current rate, kept for recording
 
     State_(); //!< Sets default state value
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
     //! Set values from dictionary
-    void set( const DictionaryDatum&, const Parameters_& );
+    void set(const DictionaryDatum &, const Parameters_ &);
   };
 
   // ------------------------------------------------------------
 
   // The next two classes need to be friends to access the State_ class/member.
-  friend class RecordablesMap< sinusoidal_gamma_generator >;
-  friend class UniversalDataLogger< sinusoidal_gamma_generator >;
+  friend class RecordablesMap<sinusoidal_gamma_generator>;
+  friend class UniversalDataLogger<sinusoidal_gamma_generator>;
 
   // ----------------------------------------------------------------
 
   /**
    * Buffers of the model.
    */
-  struct Buffers_
-  {
-    Buffers_( sinusoidal_gamma_generator& );
-    Buffers_( const Buffers_&, sinusoidal_gamma_generator& );
-    UniversalDataLogger< sinusoidal_gamma_generator > logger_;
+  struct Buffers_ {
+    Buffers_(sinusoidal_gamma_generator &);
+    Buffers_(const Buffers_ &, sinusoidal_gamma_generator &);
+    UniversalDataLogger<sinusoidal_gamma_generator> logger_;
 
     /**
      * Beginning of current integration interval in ms.
@@ -262,21 +249,20 @@ private:
      * most recent spike to t0_ is given as Lambda_t0_.
      * Entries are indexed by port, one per target.
      */
-    std::vector< double > t0_ms_;
+    std::vector<double> t0_ms_;
 
     /**
      * Integral Lambda from most recent spike up to t0_.
      * See t0_ for details.
      */
-    std::vector< double > Lambda_t0_;
+    std::vector<double> Lambda_t0_;
 
     Parameters_ P_prev_; //!< parameter values prior to last SetStatus
   };
 
   // ------------------------------------------------------------
 
-  struct Variables_
-  {
+  struct Variables_ {
     double h_;    //!< time resolution (ms)
     double t_ms_; //!< current time in ms, for communication with event_hook()
     //! current time in steps, for communication with event_hook()
@@ -284,20 +270,16 @@ private:
     librandom::RngPtr rng_; //!< thread-specific random generator
   };
 
-  double
-  get_rate_() const
-  {
-    return 1000.0 * S_.rate_;
-  }
+  double get_rate_() const { return 1000.0 * S_.rate_; }
 
   //! compute deltaLambda for given parameters from ta to tb
-  double deltaLambda_( const Parameters_&, double, double ) const;
+  double deltaLambda_(const Parameters_ &, double, double) const;
 
   //! compute hazard for given target index, including time-step factor
-  double hazard_( port ) const;
+  double hazard_(port) const;
 
-  StimulatingDevice< SpikeEvent > device_;
-  static RecordablesMap< sinusoidal_gamma_generator > recordablesMap_;
+  StimulatingDevice<SpikeEvent> device_;
+  static RecordablesMap<sinusoidal_gamma_generator> recordablesMap_;
 
   Parameters_ P_;
   State_ S_;
@@ -305,82 +287,67 @@ private:
   Buffers_ B_;
 };
 
-inline port
-sinusoidal_gamma_generator::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool dummy_target )
-{
-  device_.enforce_single_syn_type( syn_id );
+inline port sinusoidal_gamma_generator::send_test_event(Node &target,
+                                                        rport receptor_type,
+                                                        synindex syn_id,
+                                                        bool dummy_target) {
+  device_.enforce_single_syn_type(syn_id);
 
   // to ensure correct overloading resolution, we need explicit event types
   // therefore, we need to duplicate the code here
-  if ( P_.individual_spike_trains_ )
-  {
-    if ( dummy_target )
-    {
+  if (P_.individual_spike_trains_) {
+    if (dummy_target) {
       DSSpikeEvent e;
-      e.set_sender( *this );
-      return target.handles_test_event( e, receptor_type );
-    }
-    else
-    {
+      e.set_sender(*this);
+      return target.handles_test_event(e, receptor_type);
+    } else {
       SpikeEvent e;
-      e.set_sender( *this );
-      const rport r = target.handles_test_event( e, receptor_type );
-      if ( r != invalid_port_ and not is_model_prototype() )
-      {
+      e.set_sender(*this);
+      const rport r = target.handles_test_event(e, receptor_type);
+      if (r != invalid_port_ and not is_model_prototype()) {
         ++P_.num_trains_;
       }
       return r;
     }
-  }
-  else
-  {
+  } else {
     // We do not count targets here, since connections may be created through
     // proxies. Instead, we set P_.num_trains_ to 1 in Parameters_::set().
     SpikeEvent e;
-    e.set_sender( *this );
-    return target.handles_test_event( e, receptor_type );
+    e.set_sender(*this);
+    return target.handles_test_event(e, receptor_type);
   }
 }
 
 inline port
-sinusoidal_gamma_generator::handles_test_event( DataLoggingRequest& dlr,
-  rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+sinusoidal_gamma_generator::handles_test_event(DataLoggingRequest &dlr,
+                                               rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
-  return B_.logger_.connect_logging_device( dlr, recordablesMap_ );
+  return B_.logger_.connect_logging_device(dlr, recordablesMap_);
 }
 
-inline void
-sinusoidal_gamma_generator::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  S_.get( d );
-  device_.get_status( d );
-  ( *d )[ names::recordables ] = recordablesMap_.get_list();
+inline void sinusoidal_gamma_generator::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  S_.get(d);
+  device_.get_status(d);
+  (*d)[names::recordables] = recordablesMap_.get_list();
 }
 
-inline void
-sinusoidal_gamma_generator::set_status( const DictionaryDatum& d )
-{
+inline void sinusoidal_gamma_generator::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
 
-  ptmp.set( d, *this ); // throws if BadProperty
+  ptmp.set(d, *this); // throws if BadProperty
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;
 }
 
-} // namespace
+} // namespace nest
 
 #endif // SINUSOIDAL_GAMMA_GENERATOR_H
 

@@ -33,9 +33,7 @@
 #include "randomdev.h"
 #include "randomgen.h"
 
-
-namespace librandom
-{
+namespace librandom {
 
 /** @BeginDocumentation
 Name: rdevdict::lognormal - lognormal random deviate generator
@@ -64,29 +62,28 @@ Author: Hans Ekkehard Plesser
  * @ingroup RandomDeviateGenerators
  */
 
-class LognormalRandomDev : public RandomDev
-{
+class LognormalRandomDev : public RandomDev {
 
 public:
   // accept only lockPTRs for initialization,
   // otherwise creation of a lock ptr would
   // occur as side effect---might be unhealthy
-  LognormalRandomDev( RngPtr );
+  LognormalRandomDev(RngPtr);
   LognormalRandomDev(); // threaded
 
   using RandomDev::operator();
-  double operator()( RngPtr ) const; // threaded
+  double operator()(RngPtr) const; // threaded
 
   //! set distribution parameters from SLI dict
-  void set_status( const DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
 
   //! get distribution parameters from SLI dict
-  void get_status( DictionaryDatum& ) const;
+  void get_status(DictionaryDatum &) const;
 
 private:
   double mu_;
   double sigma_;
 };
-}
+} // namespace librandom
 
 #endif

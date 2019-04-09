@@ -69,111 +69,78 @@ typedef std::iostream fdstream;
 // ::fdopen is fine then.
 // 28.6.04, Plesser
 #ifdef __PURE_CNAME
-extern "C" std::FILE* fdopen( int, const char* );
+extern "C" std::FILE *fdopen(int, const char *);
 #endif
 
-
-class fdbuf : public std::streambuf
-{
+class fdbuf : public std::streambuf {
   static std::streamsize const s_bufsiz = 1024;
 
 public:
-  fdbuf()
-    : m_fd( -1 )
-    , m_isopen( false )
-  {
-    setp( m_outbuf, m_outbuf + s_bufsiz );
+  fdbuf() : m_fd(-1), m_isopen(false) { setp(m_outbuf, m_outbuf + s_bufsiz); }
+
+  fdbuf(int fd) : m_fd(fd), m_isopen(true) {
+    setp(m_outbuf, m_outbuf + s_bufsiz);
   }
 
-  fdbuf( int fd )
-    : m_fd( fd )
-    , m_isopen( true )
-  {
-    setp( m_outbuf, m_outbuf + s_bufsiz );
-  }
-
-  ~fdbuf()
-  {
+  ~fdbuf() {
     // sync();
     close();
   }
 
+  bool is_open() const { return m_isopen; }
 
-  bool
-  is_open() const
-  {
-    return m_isopen;
-  }
+  fdbuf *open(const char *, std::ios_base::openmode);
 
-  fdbuf* open( const char*, std::ios_base::openmode );
-
-  fdbuf* close();
+  fdbuf *close();
 
   /** Return the underlying file descriptor.
    *  Now this is why we are doing all this!!
    */
-  int
-  fd()
-  {
-    return m_fd;
-  }
+  int fd() { return m_fd; }
 
 protected:
-  int_type
-  underflow()
-  {
-    if ( gptr() == egptr() )
-    {
-      int size = ::read( m_fd, m_inbuf, s_bufsiz );
-      if ( size < 1 )
-      {
+  int_type underflow() {
+    if (gptr() == egptr()) {
+      int size = ::read(m_fd, m_inbuf, s_bufsiz);
+      if (size < 1) {
         return traits_type::eof();
       }
-      setg( m_inbuf, m_inbuf, m_inbuf + size );
+      setg(m_inbuf, m_inbuf, m_inbuf + size);
     }
-    return traits_type::to_int_type( *gptr() );
+    return traits_type::to_int_type(*gptr());
   }
 
-  int_type
-  overflow( int_type c )
-  {
-    if ( sync() == -1 )
-    {
+  int_type overflow(int_type c) {
+    if (sync() == -1) {
       // std::cerr<<"sync failed!"<<std::endl;
       return traits_type::eof();
     }
 
-    if ( not traits_type::eq_int_type( c, traits_type::eof() ) )
-    {
-      *pptr() = traits_type::to_char_type( c );
-      pbump( 1 );
+    if (not traits_type::eq_int_type(c, traits_type::eof())) {
+      *pptr() = traits_type::to_char_type(c);
+      pbump(1);
       return c;
     }
-    return traits_type::not_eof( c );
+    return traits_type::not_eof(c);
   }
 
-  int
-  sync()
-  {
+  int sync() {
     std::streamsize size = pptr() - pbase();
-    if ( size > 0 && ::write( m_fd, m_outbuf, size ) != size )
-    {
+    if (size > 0 && ::write(m_fd, m_outbuf, size) != size) {
       return -1;
     }
-    setp( m_outbuf, m_outbuf + s_bufsiz );
+    setp(m_outbuf, m_outbuf + s_bufsiz);
     return 0;
   }
 
 private:
   int m_fd;
   bool m_isopen;
-  char m_inbuf[ s_bufsiz ];
-  char m_outbuf[ s_bufsiz ];
+  char m_inbuf[s_bufsiz];
+  char m_outbuf[s_bufsiz];
 };
 
-
-class ofdstream : public std::ostream
-{
+class ofdstream : public std::ostream {
 public:
   /**
    * @note In this an all other constructors, we initialize the stream with
@@ -184,52 +151,35 @@ public:
    *       using the PGI compiler.
    */
 
-  ofdstream()
-    : std::ostream( 0 )
-    , sb()
-  {
-    std::ostream::rdbuf( &sb );
-    init( &sb );
+  ofdstream() : std::ostream(0), sb() {
+    std::ostream::rdbuf(&sb);
+    init(&sb);
   }
 
-  explicit ofdstream( const char* s,
-    std::ios_base::openmode mode = std::ios_base::out )
-    : std::ostream( 0 )
-    , sb()
-  {
-    std::ostream::rdbuf( &sb );
-    init( &sb );
-    assert( good() );
-    open( s, mode );
+  explicit ofdstream(const char *s,
+                     std::ios_base::openmode mode = std::ios_base::out)
+      : std::ostream(0), sb() {
+    std::ostream::rdbuf(&sb);
+    init(&sb);
+    assert(good());
+    open(s, mode);
   }
 
-  explicit ofdstream( int fd )
-    : std::ostream( 0 )
-    , sb( fd )
-  {
-    std::ostream::rdbuf( &sb );
-    init( &sb );
+  explicit ofdstream(int fd) : std::ostream(0), sb(fd) {
+    std::ostream::rdbuf(&sb);
+    init(&sb);
   }
 
-  fdbuf*
-  rdbuf() const
-  {
+  fdbuf *rdbuf() const {
     // return type is non-const, member is const, by C++ specs!
-    return const_cast< fdbuf* >( &sb );
+    return const_cast<fdbuf *>(&sb);
   }
 
-  bool
-  is_open()
-  {
-    return rdbuf()->is_open();
-  }
+  bool is_open() { return rdbuf()->is_open(); }
 
-  void
-  open( const char* s, std::ios_base::openmode mode = std::ios_base::out )
-  {
-    if ( rdbuf()->open( s, mode | std::ios_base::out ) == NULL )
-    {
-      setstate( failbit );
+  void open(const char *s, std::ios_base::openmode mode = std::ios_base::out) {
+    if (rdbuf()->open(s, mode | std::ios_base::out) == NULL) {
+      setstate(failbit);
     }
   }
 
@@ -239,55 +189,36 @@ private:
   fdbuf sb;
 };
 
-class ifdstream : public std::istream
-{
+class ifdstream : public std::istream {
 public:
-  ifdstream()
-    : std::istream( 0 )
-    , sb()
-  {
-    std::istream::rdbuf( &sb );
-    init( &sb );
+  ifdstream() : std::istream(0), sb() {
+    std::istream::rdbuf(&sb);
+    init(&sb);
   }
 
-  explicit ifdstream( const char* s,
-    std::ios_base::openmode mode = std::ios_base::in )
-    : std::istream( 0 )
-    , sb()
-  {
-    std::istream::rdbuf( &sb );
-    init( &sb );
-    open( s, mode );
+  explicit ifdstream(const char *s,
+                     std::ios_base::openmode mode = std::ios_base::in)
+      : std::istream(0), sb() {
+    std::istream::rdbuf(&sb);
+    init(&sb);
+    open(s, mode);
   }
 
-  explicit ifdstream( int fd )
-    : std::istream( 0 )
-    , sb( fd )
-  {
-    std::istream::rdbuf( &sb );
-    init( &sb );
+  explicit ifdstream(int fd) : std::istream(0), sb(fd) {
+    std::istream::rdbuf(&sb);
+    init(&sb);
   }
 
-
-  fdbuf*
-  rdbuf() const
-  {
+  fdbuf *rdbuf() const {
     // return type is non-const, member is const, by C++ specs!
-    return const_cast< fdbuf* >( &sb );
+    return const_cast<fdbuf *>(&sb);
   }
 
-  bool
-  is_open()
-  {
-    return rdbuf()->is_open();
-  }
+  bool is_open() { return rdbuf()->is_open(); }
 
-  void
-  open( const char* s, std::ios_base::openmode mode = std::ios_base::in )
-  {
-    if ( rdbuf()->open( s, mode | std::ios_base::in ) == NULL )
-    {
-      setstate( failbit );
+  void open(const char *s, std::ios_base::openmode mode = std::ios_base::in) {
+    if (rdbuf()->open(s, mode | std::ios_base::in) == NULL) {
+      setstate(failbit);
     }
   }
 
@@ -297,55 +228,40 @@ private:
   fdbuf sb;
 };
 
-class fdstream : public std::iostream
-{
+class fdstream : public std::iostream {
 public:
   fdstream()
-    : std::iostream( 0 )
-    , sb() // See Constructor comment above.
+      : std::iostream(0), sb() // See Constructor comment above.
   {
-    std::iostream::rdbuf( &sb );
-    init( &sb ); // See Constructor comment above.
+    std::iostream::rdbuf(&sb);
+    init(&sb); // See Constructor comment above.
   }
 
-  explicit fdstream( const char* s, std::ios_base::openmode mode )
-    : std::iostream( 0 )
-    , sb() // See Constructor comment above.
+  explicit fdstream(const char *s, std::ios_base::openmode mode)
+      : std::iostream(0), sb() // See Constructor comment above.
   {
-    std::iostream::rdbuf( &sb );
-    init( &sb ); // See Constructor comment above.
-    open( s, mode );
+    std::iostream::rdbuf(&sb);
+    init(&sb); // See Constructor comment above.
+    open(s, mode);
   }
 
-  explicit fdstream( int fd )
-    : // See Constructor comment above.
-    std::iostream( 0 )
-    , sb( fd )
-  {
-    std::iostream::rdbuf( &sb );
-    init( &sb ); // See Constructor comment above.
+  explicit fdstream(int fd)
+      : // See Constructor comment above.
+        std::iostream(0), sb(fd) {
+    std::iostream::rdbuf(&sb);
+    init(&sb); // See Constructor comment above.
   }
 
-
-  fdbuf*
-  rdbuf() const
-  {
+  fdbuf *rdbuf() const {
     // return type is non-const, member is const, by C++ specs!
-    return const_cast< fdbuf* >( &sb );
+    return const_cast<fdbuf *>(&sb);
   }
 
-  bool
-  is_open()
-  {
-    return rdbuf()->is_open();
-  }
+  bool is_open() { return rdbuf()->is_open(); }
 
-  void
-  open( const char* s, std::ios_base::openmode mode )
-  {
-    if ( rdbuf()->open( s, mode ) == NULL )
-    {
-      setstate( failbit );
+  void open(const char *s, std::ios_base::openmode mode) {
+    if (rdbuf()->open(s, mode) == NULL) {
+      setstate(failbit);
     }
   }
 

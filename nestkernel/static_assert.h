@@ -23,8 +23,7 @@
 #ifndef STATIC_ASSERT
 #define STATIC_ASSERT
 
-namespace nest
-{
+namespace nest {
 
 /**
  * Compile time assertions.
@@ -42,18 +41,11 @@ namespace nest
  * Allows compilation if the bool-test is true. If bool-test is false,
  * fails to compile because success is not defined.
  */
-template < bool >
-struct StaticAssert
-{
-};
+template <bool> struct StaticAssert {};
 
-template <>
-struct StaticAssert< true >
-{
-  struct success
-  {
-  };
+template <> struct StaticAssert<true> {
+  struct success {};
 };
-}
+} // namespace nest
 
 #endif // STATIC_ASSERT

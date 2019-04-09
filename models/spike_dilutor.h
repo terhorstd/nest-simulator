@@ -31,8 +31,7 @@
 #include "ring_buffer.h"
 #include "stimulating_device.h"
 
-namespace nest
-{
+namespace nest {
 
 /** @BeginDocumentation
 Name: spike_dilutor - repeats incoming spikes with a certain probability.
@@ -59,113 +58,92 @@ ported to Nest 2.6 by: Setareh, April 2015
 
 SeeAlso: mip_generator
 */
-class spike_dilutor : public DeviceNode
-{
+class spike_dilutor : public DeviceNode {
 
 public:
   spike_dilutor();
-  spike_dilutor( const spike_dilutor& rhs );
+  spike_dilutor(const spike_dilutor &rhs);
 
-  bool
-  has_proxies() const
-  {
-    return false;
-  }
-  bool
-  local_receiver() const
-  {
-    return true;
-  }
+  bool has_proxies() const { return false; }
+  bool local_receiver() const { return true; }
 
   using Node::event_hook;
   using Node::handle;
   using Node::handles_test_event; // new
 
-  port send_test_event( Node&, rport, synindex, bool );
-  port handles_test_event( SpikeEvent&, rport );
-  void handle( SpikeEvent& );
+  port send_test_event(Node &, rport, synindex, bool);
+  port handles_test_event(SpikeEvent &, rport);
+  void handle(SpikeEvent &);
 
-  void get_status( DictionaryDatum& ) const;
-  void set_status( const DictionaryDatum& );
+  void get_status(DictionaryDatum &) const;
+  void set_status(const DictionaryDatum &);
 
 private:
-  void init_state_( const Node& );
+  void init_state_(const Node &);
   void init_buffers_();
   void calibrate();
 
-  void update( Time const&, const long, const long );
+  void update(Time const &, const long, const long);
 
-  void event_hook( DSSpikeEvent& );
+  void event_hook(DSSpikeEvent &);
 
   // ------------------------------------------------------------
 
   /**
    * Store independent parameters of the model.
    */
-  struct Parameters_
-  {
+  struct Parameters_ {
     double p_copy_; //!< copy probability for each incoming spike
 
     Parameters_(); //!< Sets default parameter values
-    Parameters_( const Parameters_& );
+    Parameters_(const Parameters_ &);
 
-    void get( DictionaryDatum& ) const; //!< Store current values in dictionary
-    void set( const DictionaryDatum& ); //!< Set values from dicitonary
+    void get(DictionaryDatum &) const; //!< Store current values in dictionary
+    void set(const DictionaryDatum &); //!< Set values from dicitonary
   };
 
-  struct Buffers_
-  {
+  struct Buffers_ {
     RingBuffer n_spikes_;
   };
 
   // ------------------------------------------------------------
 
-  StimulatingDevice< SpikeEvent > device_;
+  StimulatingDevice<SpikeEvent> device_;
   Parameters_ P_;
   Buffers_ B_;
 };
 
-inline port
-spike_dilutor::send_test_event( Node& target,
-  rport receptor_type,
-  synindex syn_id,
-  bool )
-{
+inline port spike_dilutor::send_test_event(Node &target, rport receptor_type,
+                                           synindex syn_id, bool) {
 
-  device_.enforce_single_syn_type( syn_id );
+  device_.enforce_single_syn_type(syn_id);
 
   SpikeEvent e;
-  e.set_sender( *this );
-  return target.handles_test_event( e, receptor_type );
+  e.set_sender(*this);
+  return target.handles_test_event(e, receptor_type);
 }
 
-inline port
-spike_dilutor::handles_test_event( SpikeEvent&, rport receptor_type )
-{
-  if ( receptor_type != 0 )
-  {
-    throw UnknownReceptorType( receptor_type, get_name() );
+inline port spike_dilutor::handles_test_event(SpikeEvent &,
+                                              rport receptor_type) {
+  if (receptor_type != 0) {
+    throw UnknownReceptorType(receptor_type, get_name());
   }
   return 0;
 }
 
-inline void
-spike_dilutor::get_status( DictionaryDatum& d ) const
-{
-  P_.get( d );
-  device_.get_status( d );
+inline void spike_dilutor::get_status(DictionaryDatum &d) const {
+  P_.get(d);
+  device_.get_status(d);
 }
 
-inline void
-spike_dilutor::set_status( const DictionaryDatum& d )
-{
+inline void spike_dilutor::set_status(const DictionaryDatum &d) {
   Parameters_ ptmp = P_; // temporary copy in case of errors
-  ptmp.set( d );         // throws if BadProperty
+  ptmp.set(d);           // throws if BadProperty
 
   // We now know that ptmp is consistent. We do not write it back
   // to P_ before we are also sure that the properties to be set
   // in the parent class are internally consistent.
-  device_.set_status( d );
+  device_.set_status(d);
 
   // if we get here, temporaries contain consistent set of properties
   P_ = ptmp;

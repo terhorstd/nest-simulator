@@ -25,14 +25,11 @@
 // Includes from sli:
 #include "dictutils.h"
 
-long librandom::RandomDev::ldev( RngPtr ) const
-{
-  assert( false );
+long librandom::RandomDev::ldev(RngPtr) const {
+  assert(false);
   return 0;
 }
 
-void
-librandom::RandomDev::get_status( DictionaryDatum& dict ) const
-{
-  def< bool >( dict, names::is_discrete, has_ldev() );
+void librandom::RandomDev::get_status(DictionaryDatum &dict) const {
+  def<bool>(dict, names::is_discrete, has_ldev());
 }

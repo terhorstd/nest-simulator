@@ -26,75 +26,43 @@
 // Includes from sli:
 #include "sliexceptions.h"
 
-namespace librandom
-{
+namespace librandom {
 
 /**
  * Exception to be thrown if no (suitable)
  * RNG is available.
  */
-class MissingRNG : public SLIException
-{
+class MissingRNG : public SLIException {
   std::string msg_;
 
 public:
   //! @param detailed error message
-  MissingRNG()
-    : SLIException( "MissingRNG" )
-    , msg_()
-  {
-  }
+  MissingRNG() : SLIException("MissingRNG"), msg_() {}
 
-  MissingRNG( std::string msg )
-    : SLIException( "MissingRNG" )
-    , msg_( msg )
-  {
-  }
+  MissingRNG(std::string msg) : SLIException("MissingRNG"), msg_(msg) {}
 
-  ~MissingRNG() throw()
-  {
-  }
+  ~MissingRNG() throw() {}
 
-  std::string
-  message() const
-  {
-    return msg_;
-  }
+  std::string message() const { return msg_; }
 };
 
 /**
  * Exception to be thrown if no (suitable)
  * RNG is available.
  */
-class UnsuitableRNG : public SLIException
-{
+class UnsuitableRNG : public SLIException {
   std::string msg_;
 
 public:
   //! @param detailed error message
-  UnsuitableRNG()
-    : SLIException( "UnsuitableRNG" )
-    , msg_()
-  {
-  }
+  UnsuitableRNG() : SLIException("UnsuitableRNG"), msg_() {}
 
-  UnsuitableRNG( std::string msg )
-    : SLIException( "UnsuitableRNG" )
-    , msg_( msg )
-  {
-  }
+  UnsuitableRNG(std::string msg) : SLIException("UnsuitableRNG"), msg_(msg) {}
 
-  ~UnsuitableRNG() throw()
-  {
-  }
+  ~UnsuitableRNG() throw() {}
 
-  std::string
-  message() const
-  {
-    return msg_;
-  }
+  std::string message() const { return msg_; }
 };
-}
-
+} // namespace librandom
 
 #endif

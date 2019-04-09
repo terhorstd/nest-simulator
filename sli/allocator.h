@@ -31,8 +31,7 @@
 #include <cstdlib>
 #include <string>
 
-namespace sli
-{
+namespace sli {
 
 /**
  * @addtogroup MemoryManagement Memory management
@@ -53,41 +52,28 @@ namespace sli
  * @ingroup PoolAllocator
  */
 
-class pool
-{
-  struct link
-  {
-    link* next;
+class pool {
+  struct link {
+    link *next;
   };
 
-  class chunk
-  {
+  class chunk {
     const size_t csize;
-    chunk( const chunk& );            //!< not implemented
-    chunk& operator=( const chunk& ); //!< not implemented
+    chunk(const chunk &);            //!< not implemented
+    chunk &operator=(const chunk &); //!< not implemented
 
   public:
-    chunk* next;
-    char* mem;
+    chunk *next;
+    char *mem;
 
-    chunk( size_t s )
-      : csize( s )
-      , next( 0 )
-      , mem( new char[ csize ] )
-    {
-    }
+    chunk(size_t s) : csize(s), next(0), mem(new char[csize]) {}
 
-    ~chunk()
-    {
+    ~chunk() {
       delete[] mem;
       mem = NULL;
     }
 
-    size_t
-    size( void )
-    {
-      return csize;
-    }
+    size_t size(void) { return csize; }
   };
 
   size_t initial_block_size;
@@ -98,14 +84,13 @@ class pool
   size_t instantiations; //!< number of instantiated elements
   size_t total;          //!< total number of allocated elements
   size_t capacity;       //!< number of free elements
-  chunk* chunks;         //!< linked list of memory chunks
-  link* head;            //!< head of free list
+  chunk *chunks;         //!< linked list of memory chunks
+  link *head;            //!< head of free list
 
   bool initialized_; //!< True if the pool is initialized.
 
-  void grow( size_t ); //!< make pool larger by n elements
-  void grow();         //!< make pool larger
-
+  void grow(size_t); //!< make pool larger by n elements
+  void grow();       //!< make pool larger
 
 public:
   /** Create pool for objects of size n. Initial is the initial allocation
@@ -114,11 +99,11 @@ public:
    *  each growth.
    */
   pool();
-  pool( const pool& );
-  pool& operator=( const pool& );
+  pool(const pool &);
+  pool &operator=(const pool &);
 
-  pool( size_t n, size_t initial = 100, size_t growth = 1 );
-  void init( size_t n, size_t initial = 100, size_t growth = 1 );
+  pool(size_t n, size_t initial = 100, size_t growth = 1);
+  void init(size_t n, size_t initial = 100, size_t growth = 1);
 
   ~pool(); //!< deallocate ALL memory
 
@@ -130,38 +115,27 @@ public:
         before more memory needs to be allocated from the operating
         system.
   */
-  void reserve_additional( size_t n );
+  void reserve_additional(size_t n);
 
-  size_t
-  available( void ) const
-  {
-    return total - instantiations;
-  }
+  size_t available(void) const { return total - instantiations; }
 
-  inline void* alloc( void );  //!< allocate one element
-  inline void free( void* p ); //!< put element back into the pool
-  size_t
-  size_of( void ) const
-  {
-    return el_size;
-  }
+  inline void *alloc(void);  //!< allocate one element
+  inline void free(void *p); //!< put element back into the pool
+  size_t size_of(void) const { return el_size; }
 
   inline size_t get_el_size() const;
   inline size_t get_instantiations() const;
   inline size_t get_total() const;
 };
 
-inline void*
-pool::alloc( void )
-{
+inline void *pool::alloc(void) {
 
-  if ( head == 0 )
-  {
-    grow( block_size );
+  if (head == 0) {
+    grow(block_size);
     block_size *= growth_factor;
   }
 
-  link* p = head;
+  link *p = head;
 
   head = head->next;
   ++instantiations;
@@ -169,33 +143,19 @@ pool::alloc( void )
   return p;
 }
 
-inline void
-pool::free( void* elp )
-{
-  link* p = static_cast< link* >( elp );
+inline void pool::free(void *elp) {
+  link *p = static_cast<link *>(elp);
   p->next = head;
   head = p;
   --instantiations;
 }
 
-inline size_t
-pool::get_el_size() const
-{
-  return el_size;
-}
+inline size_t pool::get_el_size() const { return el_size; }
 
-inline size_t
-pool::get_instantiations() const
-{
-  return instantiations;
-}
+inline size_t pool::get_instantiations() const { return instantiations; }
 
-inline size_t
-pool::get_total() const
-{
-  return total;
-}
-}
+inline size_t pool::get_total() const { return total; }
+} // namespace sli
 
 #ifdef USE_PMA
 
@@ -215,20 +175,16 @@ const int MAX_THREAD = 128;
  * end of the current chunk, a new chunk is allocated from the OS and
  * appends it to the linked list of chunks.
  */
-class PoorMansAllocator
-{
+class PoorMansAllocator {
 private:
   /**
    * A chunk of memory, one element in the linked list of the memory
    * pool.
    */
-  struct chunk
-  {
-    chunk( char* mem, chunk* next )
-      : mem_( mem )
-      , next_( next ){};
-    char* mem_;
-    chunk* next_;
+  struct chunk {
+    chunk(char *mem, chunk *next) : mem_(mem), next_(next){};
+    char *mem_;
+    chunk *next_;
   };
 
 public:
@@ -237,9 +193,9 @@ public:
    * pool before declaring it thread-private by the compiler.
    * Therefore we have our own init() and destruct() functions.
    */
-  void init( size_t chunk_size = 1048576 );
+  void init(size_t chunk_size = 1048576);
   void destruct();
-  void* alloc( size_t obj_size );
+  void *alloc(size_t obj_size);
 
 private:
   /**
@@ -263,12 +219,12 @@ private:
    * adding sizeof(object) directly to advance the pointer to the
    * next free location.
    */
-  char* head_;
+  char *head_;
 
   /**
    * First element of the linked list of chunks.
    */
-  chunk* chunks_;
+  chunk *chunks_;
 
   /**
    * Remaining capacity of the current chunk.
@@ -284,10 +240,9 @@ private:
  * that the instantiations for different threads lie on different
  * cache lines.
  */
-class PaddedPMA : public PoorMansAllocator
-{
+class PaddedPMA : public PoorMansAllocator {
   // Only works for sizeof(PoorMansAllocator) < 64
-  char padding[ 64 - sizeof( PoorMansAllocator ) ];
+  char padding[64 - sizeof(PoorMansAllocator)];
 };
 #endif /* #ifdef IS_K */
 

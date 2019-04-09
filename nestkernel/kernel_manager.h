@@ -113,18 +113,16 @@
  */
 // clang-format on
 
-namespace nest
-{
+namespace nest {
 
-class KernelManager
-{
+class KernelManager {
 private:
   KernelManager();
   ~KernelManager();
-  static KernelManager* kernel_manager_instance_;
+  static KernelManager *kernel_manager_instance_;
 
-  KernelManager( KernelManager const& );  // do not implement
-  void operator=( KernelManager const& ); // do not implement
+  KernelManager(KernelManager const &);  // do not implement
+  void operator=(KernelManager const &); // do not implement
 
 public:
   /**
@@ -132,7 +130,7 @@ public:
    */
   static void create_kernel_manager();
   static void destroy_kernel_manager();
-  static KernelManager& get_kernel_manager();
+  static KernelManager &get_kernel_manager();
 
   /**
    * Prepare kernel for operation.
@@ -170,10 +168,10 @@ public:
    *
    * @see initialize(), finalize()
    */
-  void change_num_threads( size_t num_threads );
+  void change_num_threads(size_t num_threads);
 
-  void set_status( const DictionaryDatum& );
-  void get_status( DictionaryDatum& );
+  void set_status(const DictionaryDatum &);
+  void get_status(DictionaryDatum &);
 
   //! Returns true if kernel is initialized
   bool is_initialized() const;
@@ -196,27 +194,19 @@ private:
   bool initialized_; //!< true if all sub-managers initialized
 };
 
-KernelManager& kernel();
+KernelManager &kernel();
 
 } // namespace nest
 
-inline nest::KernelManager&
-nest::KernelManager::get_kernel_manager()
-{
-  assert( kernel_manager_instance_ );
+inline nest::KernelManager &nest::KernelManager::get_kernel_manager() {
+  assert(kernel_manager_instance_);
   return *kernel_manager_instance_;
 }
 
-inline nest::KernelManager&
-nest::kernel()
-{
+inline nest::KernelManager &nest::kernel() {
   return KernelManager::get_kernel_manager();
 }
 
-inline bool
-nest::KernelManager::is_initialized() const
-{
-  return initialized_;
-}
+inline bool nest::KernelManager::is_initialized() const { return initialized_; }
 
 #endif /* KERNEL_MANAGER_H */
