@@ -6,8 +6,7 @@
 # e.g. by executing `CLANG_FORMAT=clang-format-3.6 ./format_all_c_c++_files.sh`.
 # By default the script starts at the current working directory ($PWD), but
 # supply a different starting directory as the first argument to the command.
-CLANG_FORMAT=${CLANG_FORMAT-clang-format-3.6}
-CLANG_FORMAT_FILE=${CLANG_FORMAT_FILE-.clang-format}
+CLANG_FORMAT=${CLANG_FORMAT-clang-format}
 
 # Recursively process all C/C++ files in all sub-directories.
 function process_dir {
@@ -25,7 +24,7 @@ function process_dir {
         *.cpp | *.cc | *.c | *.h | *.hpp )
           # Format C/C++ files.
           echo " - Format C/C++ file: $f"
-          $CLANG_FORMAT -i $f
+          $CLANG_FORMAT -style=file -i $f
           ;;
         * )
           # Ignore all other files.
@@ -35,15 +34,9 @@ function process_dir {
 }
 
 function help_output {
-  echo "The $CLANG_FORMAT_FILE requires clang-format version 3.6 or later."
-  echo "Use like: [CLANG_FORMAT=<clang-format-3.6>] ./extras/`basename $0` [start folder, defaults to '$PWD']"
+  echo "Use like: [CLANG_FORMAT=<clang-format>] ./extras/`basename $0` [start folder, defaults to '$PWD']"
   exit 0
 }
-
-if [[ ! -f $CLANG_FORMAT_FILE ]]; then
-  echo "Cannot find $CLANG_FORMAT_FILE file. Please start '`basename $0`' from the NEST base source directory."
-  help_output
-fi
 
 if [[ $# -eq 0 ]]; then
   # Start with current directory.
