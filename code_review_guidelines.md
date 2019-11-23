@@ -29,7 +29,7 @@ lists](http://www.nest-simulator.org/community/).
   tracker](https://github.com/nest/nest-simulator/issues) explaining the reason
   for the changes and the solution. The issue is also the place for discussions
   about the code. The description of the pull request must include `Fixes
-  #`*issue_number* in the commit message (see [keywords understood by
+  #<issue_number>` in the commit message (see [keywords understood by
   GitHub](https://help.github.com/en/github/managing-your-work-on-github/closing-issues-using-keywords))
 * All discussions and suggestions must be resolved in order to not miss points
   of discussion that came up during the review.
