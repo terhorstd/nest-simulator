@@ -41,9 +41,9 @@ lists](http://www.nest-simulator.org/community/).
 * Each change to the code has to be reflected also in the corresponding
   examples and documentation.
 * All source code has to be adhering to the Coding Guidelines for
-  [C++](coding_guidelines_c++), [Python
+  [C++](coding_guidelines_c++.md), [Python
   PEP8](https://www.python.org/dev/peps/pep-0008/) and
-  [SLI](coding_guidelines_sli) in order to pass the [continuous integration
+  [SLI](coding_guidelines_sli.md) in order to pass the [continuous integration
   system checks](continuous_integration).
 * All Commits should be coherent and contain only changes that belong together.
 * Pull requests should contain the smallest set of necessary changes for the
