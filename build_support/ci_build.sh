@@ -32,10 +32,6 @@
 set -euo pipefail
 
 env
-if [ "$xNEST_BUILD_COMPILER" = "CLANG" ]; then
-    export CC=clang-11
-    export CXX=clang++-11
-fi
 
 NEST_VPATH=build
 mkdir -p "$NEST_VPATH/reports"
@@ -44,66 +40,6 @@ echo
 echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +"
 echo "+               C O N F I G U R E   N E S T   B U I L D                       +"
 echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +"
-echo "MSGBLD0230: Reading build type."
-
-# This defines the base settings of all build options off. The base
-# settings are also used for NEST_BUILD_TYPE=MINIMAL, which is not
-# explicitly checked for below.
-
-xGSL=0
-xLIBBOOST=0
-xLIBNEUROSIM=0
-xLTDL=0
-xMPI=0
-xMUSIC=0
-xOPENMP=0
-xPYTHON=0
-xREADLINE=0
-xSIONLIB=0
-
-CXX_FLAGS="-pedantic -Wextra -Wno-unknown-pragmas -D_GLIBCXX_ASSERTIONS"
-
-if [ "$xNEST_BUILD_TYPE" = "OPENMP_ONLY" ]; then
-    xGSL=1
-    xLIBBOOST=1
-    xLTDL=1
-    xOPENMP=1
-    CXX_FLAGS="-pedantic -Wextra -D_GLIBCXX_ASSERTIONS"
-fi
-
-if [ "$xNEST_BUILD_TYPE" = "MPI_ONLY" ]; then
-    xGSL=1
-    xLIBBOOST=1
-    xLTDL=1
-    xMPI=1
-fi
-
-if [ "$xNEST_BUILD_TYPE" = "FULL" ]; then
-    xGSL=1
-    xLIBBOOST=1
-    xLIBNEUROSIM=1
-    xLTDL=1
-    xMPI=1
-    xMUSIC=1
-    xOPENMP=1
-    xPYTHON=1
-    xREADLINE=1
-    xSIONLIB=1
-    CXX_FLAGS="-pedantic -Wextra -D_GLIBCXX_ASSERTIONS"
-fi
-
-if [ "$xNEST_BUILD_TYPE" = "FULL_NO_EXTERNAL_FEATURES" ]; then
-    xGSL=1
-    xLIBBOOST=1
-    xLIBNEUROSIM=0
-    xLTDL=1
-    xMPI=0
-    xMUSIC=0
-    xOPENMP=1
-    xPYTHON=1
-    xREADLINE=1
-    xSIONLIB=0
-fi
 
 echo "MSGBLD0232: Setting configuration variables."
 
@@ -111,19 +47,10 @@ echo "MSGBLD0232: Setting configuration variables."
 # set above based on the ones set in the build stage matrix in
 # '.github/workflows/nestbuildmatrix.yml'.
 
-if [ "$xOPENMP" = "1" ] ; then
-    CONFIGURE_OPENMP="-Dwith-openmp=ON"
-else
-    CONFIGURE_OPENMP="-Dwith-openmp=OFF"
-fi
+CONFIGURE_OPENMP="-Dwith-openmp=${WITH_OPENMP:-OFF}"
+CONFIGURE_MPI="-Dwith-mpi=${WITH_MPI:-OFF}"
 
-if [ "$xMPI" = "1" ] ; then
-    CONFIGURE_MPI="-Dwith-mpi=ON"
-else
-    CONFIGURE_MPI="-Dwith-mpi=OFF"
-fi
-
-if [ "$xPYTHON" = "1" ] ; then
+if [ "$WITH_PYTHON" = "ON" ] ; then
     export PYTHON_INCLUDE_DIR="$(python3 -c "import sysconfig; print(sysconfig.get_path('include'))")"
     export PYLIB_BASE="lib$(basename $PYTHON_INCLUDE_DIR)"
     export PYLIB_DIR="$(dirname $PYTHON_INCLUDE_DIR | sed 's/include/lib/')"
@@ -134,44 +61,34 @@ if [ "$xPYTHON" = "1" ] ; then
     mkdir -p $HOME/.matplotlib
     echo "backend : svg" > $HOME/.matplotlib/matplotlibrc
 else
-    CONFIGURE_PYTHON="-Dwith-python=OFF"
+    CONFIGURE_PYTHON="-Dwith-python=${WITH_PYTHON:-OFF}"
 fi
-if [ "$xMUSIC" = "1" ] ; then
+
+if [ "$WITH_MUSIC" = "ON" ] ; then
     CONFIGURE_MUSIC="-Dwith-music=$HOME/.cache/music.install"
     ./build_support/install_music.sh
 else
-    CONFIGURE_MUSIC="-Dwith-music=OFF"
+    CONFIGURE_MUSIC="-Dwith-music=${WITH_MUSIC:-OFF}"
 fi
 
-if [ "$xGSL" = "1" ] ; then
-    CONFIGURE_GSL="-Dwith-gsl=ON"
-else
-    CONFIGURE_GSL="-Dwith-gsl=OFF"
-fi
-if [ "$xLTDL" = "1" ] ; then
-    CONFIGURE_LTDL="-Dwith-ltdl=ON"
-else
-    CONFIGURE_LTDL="-Dwith-ltdl=OFF"
-fi
-if [ "$xREADLINE" = "1" ] ; then
-    CONFIGURE_READLINE="-Dwith-readline=ON"
-else
-    CONFIGURE_READLINE="-Dwith-readline=OFF"
-fi
-if [ "$xLIBBOOST" = "1" ] ; then
+CONFIGURE_GSL="-Dwith-gsl=${WITH_GSL:-OFF}"
+CONFIGURE_LTDL="-Dwith-ltdl=${WITH_LTDL:-OFF}"
+CONFIGURE_READLINE="-Dwith-readline=${WITH_READLINE:-OFF}"
+
+if [ "$WITH_LIBBOOST" = "ON" ] ; then
     #CONFIGURE_BOOST="-Dwith-boost=$HOME/.cache/boost_1_72_0.install"
     CONFIGURE_BOOST="-Dwith-boost=$HOME/.cache/boost_1_71_0.install"
     ./build_support/install_libboost.sh
 else
-    CONFIGURE_BOOST="-Dwith-boost=OFF"
+    CONFIGURE_BOOST="-Dwith-boost=${WITH_LIBBOOST:-OFF}"
 fi
-if [ "$xSIONLIB" = "1" ] ; then
+if [ "$WITH_SIONLIB" = "1" ] ; then
     CONFIGURE_SIONLIB="-Dwith-sionlib=$HOME/.cache/sionlib.install"
     ./build_support/install_sionlib.sh
 else
-    CONFIGURE_SIONLIB="-Dwith-sionlib=OFF"
+    CONFIGURE_SIONLIB="-Dwith-sionlib=${WITH_SIONLIB:-OFF}"
 fi
-if [ "$xLIBNEUROSIM" = "1" ] ; then
+if [ "$WITH_LIBNEUROSIM" = "ON" ] ; then
     CONFIGURE_LIBNEUROSIM="-Dwith-libneurosim=$HOME/.cache/libneurosim.install"
     ./build_support/install_csa-libneurosim.sh $PYLIB_DIR
     PYMAJOR="$(python3 -c 'import sys; print("%i.%i" % sys.version_info[:2])')"
@@ -182,8 +99,10 @@ if [ "$xLIBNEUROSIM" = "1" ] ; then
         export LD_LIBRARY_PATH=$HOME/.cache/csa.install/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
     fi
 else
-    CONFIGURE_LIBNEUROSIM="-Dwith-libneurosim=OFF"
+    CONFIGURE_LIBNEUROSIM="-Dwith-libneurosim=${WITH_LIBNEUROSIM:-OFF}"
 fi
+
+
 cp examples/sli/nestrc.sli ~/.nestrc
 # Explicitly allow MPI oversubscription. This is required by Open MPI versions > 3.0.
 # Not having this in place leads to a "not enough slots available" error.
@@ -200,24 +119,7 @@ fi
 mkdir "$NEST_RESULT"
 echo "MSGBLD0235: Running CMake."
 cd "$NEST_VPATH"
-echo "MSGBLD0236: $(pwd)\$ cmake \
-    -DCMAKE_INSTALL_PREFIX=\"$NEST_RESULT\" \
-    -DCMAKE_CXX_FLAGS=\"$CXX_FLAGS\" \
-    -Dwith-optimize=ON \
-    -Dwith-warning=ON \
-    $CONFIGURE_BOOST \
-    $CONFIGURE_OPENMP \
-    $CONFIGURE_MPI \
-    $CONFIGURE_PYTHON \
-    $CONFIGURE_MUSIC \
-    $CONFIGURE_GSL \
-    $CONFIGURE_LTDL \
-    $CONFIGURE_READLINE \
-    $CONFIGURE_SIONLIB \
-    $CONFIGURE_LIBNEUROSIM \
-    .."
-
-cmake \
+CMAKE_LINE="cmake \
     -DCMAKE_INSTALL_PREFIX="$NEST_RESULT" \
     -DCMAKE_CXX_FLAGS="$CXX_FLAGS" \
     -Dwith-optimize=ON \
@@ -232,7 +134,10 @@ cmake \
     $CONFIGURE_READLINE \
     $CONFIGURE_SIONLIB \
     $CONFIGURE_LIBNEUROSIM \
-    ..
+    .."
+echo "MSGBLD0236: $(pwd)\$ $CMAKE_LINE"
+$CMAKE_LINE                          # <---- RUN CMAKE IS HERE
+
 echo "MSGBLD0240: CMake configure completed."
 echo
 echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +"
