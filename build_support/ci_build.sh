@@ -29,7 +29,7 @@
 
 
 # Exit shell if any subcommand or pipline returns a non-zero status.
-set -ex
+set -euo pipefail
 
 env
 if [ "$xNEST_BUILD_COMPILER" = "CLANG" ]; then
@@ -39,100 +39,6 @@ fi
 
 NEST_VPATH=build
 mkdir -p "$NEST_VPATH/reports"
-
-if [ "$xNEST_BUILD_TYPE" = "STATIC_CODE_ANALYSIS" ]; then
-    echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +"
-    echo "+               S T A T I C   C O D E   A N A L Y S I S                       +"
-    echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +"
-
-    echo "MSGBLD0010: Initializing VERA++ static code analysis."
-    export PYTHON_EXECUTABLE="$(which python3)"
-    export PYTHON_INCLUDE_DIR="`python3 -c "import sysconfig; print(sysconfig.get_path('include'))"`"
-    export PYLIB_BASE="lib`basename $PYTHON_INCLUDE_DIR`"
-    export PYLIB_DIR="$(dirname `sed 's/include/lib/' <<< $PYTHON_INCLUDE_DIR`)"
-    export PYTHON_LIBRARY="`find $PYLIB_DIR \( -name $PYLIB_BASE.so -o -name $PYLIB_BASE.dylib \) -print -quit`"
-    echo "--> Detected PYTHON_LIBRARY=$PYTHON_LIBRARY"
-    echo "--> Detected PYTHON_INCLUDE_DIR=$PYTHON_INCLUDE_DIR"
-    CONFIGURE_PYTHON="-DPYTHON_EXECUTABLE=$PYTHON_EXECUTABLE -DPYTHON_LIBRARY=$PYTHON_LIBRARY -DPYTHON_INCLUDE_DIR=$PYTHON_INCLUDE_DIR"
-    # Add the NEST profile to the VERA++ profiles.
-    sudo cp build_support/vera++.profile /usr/lib/vera++/profiles/nest
-    echo "MSGBLD0020: VERA++ initialization completed."
-    if [ ! -f "$HOME/.cache/bin/cppcheck" ]; then
-        echo "MSGBLD0030: Installing CPPCHECK version 1.69."
-        # Build cppcheck version 1.69
-        git clone https://github.com/danmar/cppcheck.git
-        cd cppcheck
-        git checkout tags/1.69
-        mkdir -p install
-        make PREFIX=$HOME/.cache CFGDIR=$HOME/.cache/cfg HAVE_RULES=yes install
-        cd -
-        echo "MSGBLD0040: CPPCHECK installation completed."
-
-        echo "MSGBLD0050: Installing CLANG-FORMAT."
-        wget --no-verbose http://llvm.org/releases/3.6.2/clang+llvm-3.6.2-x86_64-linux-gnu-ubuntu-14.04.tar.xz
-        tar xf clang+llvm-3.6.2-x86_64-linux-gnu-ubuntu-14.04.tar.xz
-        # Copy and not move because '.cache' may aleady contain other subdirectories and files.
-        cp -R clang+llvm-3.6.2-x86_64-linux-gnu-ubuntu-14.04/* $HOME/.cache
-        echo "MSGBLD0060: CLANG-FORMAT installation completed."
-
-        # Remove these directories, otherwise the copyright-header check will complain.
-        rm -rf cppcheck clang+llvm-3.6.2-x86_64-linux-gnu-ubuntu-14.04
-    fi
-
-    # Ensure that the cppcheck and clang-format installation can be found.
-    export PATH=$HOME/.cache/bin:$PATH
-
-    echo "MSGBLD0070: Retrieving changed files."
-    file_names=$CHANGED_FILES
-    echo "MSGBLD0071: $file_names"
-
-    # Note: uncomment the following line to static check *all* files, not just those that have changed.
-    # Warning: will run for a very long time
-
-    # file_names=`find . -name "*.h" -o -name "*.c" -o -name "*.cc" -o -name "*.hpp" -o -name "*.cpp" -o -name "*.py"`
-
-    for single_file_name in $file_names
-    do
-        echo "MSGBLD0095: File changed: $single_file_name"
-    done
-    echo "MSGBLD0100: Retrieving changed files completed."
-    echo
-
-    # Set the command line arguments for the static code analysis script and execute it.
-
-    # The names of the static code analysis tools executables.
-    VERA=vera++
-    CPPCHECK=cppcheck
-    CLANG_FORMAT=clang-format
-    PEP8=pycodestyle
-    PYCODESTYLE_IGNORES="E121,E123,E126,E226,E24,E704,W503,W504"
-
-    # Perform or skip a certain analysis.
-    PERFORM_VERA=true
-    PERFORM_CPPCHECK=true
-    PERFORM_CLANG_FORMAT=true
-    PERFORM_PEP8=true
-
-    # The following command line parameters indicate whether static code analysis error messages
-    # will cause the CI build to fail or are ignored.
-    IGNORE_MSG_VERA=false
-    IGNORE_MSG_CPPCHECK=true
-    IGNORE_MSG_CLANG_FORMAT=false
-    IGNORE_MSG_PYCODESTYLE=false
-
-    # The script is called within the CI environment and thus can not be run incremental.
-    RUNS_ON_CI=true
-    INCREMENTAL=false
-
-    chmod +x build_support/static_code_analysis.sh
-    ./build_support/static_code_analysis.sh "$RUNS_ON_CI" "$INCREMENTAL" "$file_names" "$NEST_VPATH" \
-    "$VERA" "$CPPCHECK" "$CLANG_FORMAT" "$PEP8" \
-    "$PERFORM_VERA" "$PERFORM_CPPCHECK" "$PERFORM_CLANG_FORMAT" "$PERFORM_PEP8" \
-    "$IGNORE_MSG_VERA" "$IGNORE_MSG_CPPCHECK" "$IGNORE_MSG_CLANG_FORMAT" "$IGNORE_MSG_PYCODESTYLE" \
-    "$PYCODESTYLE_IGNORES"
-
-    exit $?
-fi
 
 echo
 echo "+ + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +"
@@ -218,10 +124,10 @@ else
 fi
 
 if [ "$xPYTHON" = "1" ] ; then
-    export PYTHON_INCLUDE_DIR=`python3 -c "import sysconfig; print(sysconfig.get_path('include'))"`
-    export PYLIB_BASE=lib`basename $PYTHON_INCLUDE_DIR`
-    export PYLIB_DIR=$(dirname `sed 's/include/lib/' <<< $PYTHON_INCLUDE_DIR`)
-    export PYTHON_LIBRARY=`find $PYLIB_DIR \( -name $PYLIB_BASE.so -o -name $PYLIB_BASE.dylib \) -print -quit`
+    export PYTHON_INCLUDE_DIR="$(python3 -c "import sysconfig; print(sysconfig.get_path('include'))")"
+    export PYLIB_BASE="lib$(basename $PYTHON_INCLUDE_DIR)"
+    export PYLIB_DIR="$(dirname $PYTHON_INCLUDE_DIR | sed 's/include/lib/')"
+    export PYTHON_LIBRARY="$(find $PYLIB_DIR \( -name $PYLIB_BASE.so -o -name $PYLIB_BASE.dylib \) -print -quit)"
     echo "--> Detected PYTHON_LIBRARY=$PYTHON_LIBRARY"
     echo "--> Detected PYTHON_INCLUDE_DIR=$PYTHON_INCLUDE_DIR"
     CONFIGURE_PYTHON="-DPYTHON_LIBRARY=$PYTHON_LIBRARY -DPYTHON_INCLUDE_DIR=$PYTHON_INCLUDE_DIR"
@@ -232,7 +138,6 @@ else
 fi
 if [ "$xMUSIC" = "1" ] ; then
     CONFIGURE_MUSIC="-Dwith-music=$HOME/.cache/music.install"
-    chmod +x build_support/install_music.sh
     ./build_support/install_music.sh
 else
     CONFIGURE_MUSIC="-Dwith-music=OFF"
@@ -256,23 +161,20 @@ fi
 if [ "$xLIBBOOST" = "1" ] ; then
     #CONFIGURE_BOOST="-Dwith-boost=$HOME/.cache/boost_1_72_0.install"
     CONFIGURE_BOOST="-Dwith-boost=$HOME/.cache/boost_1_71_0.install"
-    chmod +x build_support/install_libboost.sh
     ./build_support/install_libboost.sh
 else
     CONFIGURE_BOOST="-Dwith-boost=OFF"
 fi
 if [ "$xSIONLIB" = "1" ] ; then
     CONFIGURE_SIONLIB="-Dwith-sionlib=$HOME/.cache/sionlib.install"
-    chmod +x build_support/install_sionlib.sh
     ./build_support/install_sionlib.sh
 else
     CONFIGURE_SIONLIB="-Dwith-sionlib=OFF"
 fi
 if [ "$xLIBNEUROSIM" = "1" ] ; then
     CONFIGURE_LIBNEUROSIM="-Dwith-libneurosim=$HOME/.cache/libneurosim.install"
-    chmod +x build_support/install_csa-libneurosim.sh
     ./build_support/install_csa-libneurosim.sh $PYLIB_DIR
-    PYMAJOR=`python3 -c 'import sys; print("%i.%i" % sys.version_info[:2])'`
+    PYMAJOR="$(python3 -c 'import sys; print("%i.%i" % sys.version_info[:2])')"
     export PYTHONPATH=$HOME/.cache/csa.install/lib/python$PYMAJOR/site-packages${PYTHONPATH:+:$PYTHONPATH}
     if [[ $OSTYPE == darwin* ]]; then
         export DYLD_LIBRARY_PATH=$HOME/.cache/csa.install/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH}
