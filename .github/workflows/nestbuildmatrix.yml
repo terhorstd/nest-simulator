@@ -14,8 +14,6 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     strategy:
       fail-fast: true
-    env:
-      xNEST_BUILD_TYPE: "STATIC_CODE_ANALYSIS"
     runs-on: "ubuntu-20.04"
     steps:
       - name: "Checkout repository content"
@@ -103,7 +101,6 @@ jobs:
       - name: "Static Code Analysis"
         run: ./build_support/ci_checks.sh
         env:
-          xNEST_BUILD_TYPE: 'STATIC_CODE_ANALYSIS'
           CHANGED_FILES: ${{ env.CHANGED_FILES }}
 
       - name: "DEBUG: list files"
@@ -294,30 +291,26 @@ jobs:
       fail-fast: true
       matrix:
         os: [macos-latest]
-        cpp_compiler: ["gcc", "clang"]
-        xNEST_BUILD_TYPE: ["MINIMAL", "MPI_ONLY", "OPENMP_ONLY", "FULL"]
-        exclude:
-          - xNEST_BUILD_TYPE: "MPI_ONLY"
-            cpp_compiler: "clang"
-            os: macos-latest
-          - xNEST_BUILD_TYPE: "OPENMP_ONLY"
-            cpp_compiler: "clang"
-            os: macos-latest
-          - xNEST_BUILD_TYPE: "FULL"
-            os: macos-latest
-            cpp_compiler: "clang"
-          - xNEST_BUILD_TYPE: "MINIMAL"
-            os: macos-latest
-            cpp_compiler: "gcc"
-          - xNEST_BUILD_TYPE: "MPI_ONLY"
-            cpp_compiler: "gcc"
-            os: macos-latest
-          - xNEST_BUILD_TYPE: "OPENMP_ONLY"
-            cpp_compiler: "gcc"
-            os: macos-latest
-          - xNEST_BUILD_TYPE: "FULL"
-            os: macos-latest
-            cpp_compiler: "gcc"
+        cpp_compiler: ["clang"]
+        include:
+          - NEST_BUILD_NAME: "MINIMAL"
+            WITH_GSL: OFF
+            WITH_LIBBOOST: OFF
+            WITH_LIBNEUROSIM: OFF
+            WITH_LTDL: OFF
+            WITH_MPI: OFF
+            WITH_MUSIC: OFF
+            WITH_OPENMP: OFF
+            WITH_PYTHON: OFF
+            WITH_READLINE: OFF
+            WITH_SIONLIB: OFF
+          - cpp_compiler: "gcc"
+            CC: "gcc"
+            CXX: "gxx"
+            CXX_FLAGS: "-pedantic -Wextra -Wno-unknown-pragmas -D_GLIBCXX_ASSERTIONS"
+          - cpp_compiler: "clang"
+            CC: "clang-11"
+            CXX: "clang++-11"
 
     steps:
       - name: "Checkout repository content"
@@ -384,7 +377,6 @@ jobs:
           ./build_support/ci_build.sh 2>&1 | tee ci_build.sh.log
           python build_support/parse_build_log.py ci_build.sh.log ${{ github.workspace }}
         env:
-          xNEST_BUILD_TYPE: ${{ matrix.xNEST_BUILD_TYPE }}
           CHANGED_FILES: ${{ env.CHANGED_FILES }}
           #get changed files: https://github.com/marketplace/actions/get-changed-files
 
@@ -392,7 +384,7 @@ jobs:
         uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: "test_macos-${{ matrix.os }}-${{ matrix.cpp_compiler }}-${{ matrix.xNEST_BUILD_TYPE }}-logs"
+          name: "test_macos-${{ matrix.os }}-${{ matrix.cpp_compiler }}-${{ matrix.NEST_BUILD_NAME }}-logs"
           path: |
             ci_build.sh.log
             install_manifest.txt
