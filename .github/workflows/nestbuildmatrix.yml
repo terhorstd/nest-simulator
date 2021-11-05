@@ -169,13 +169,13 @@ jobs:
             WITH_READLINE: "ON"
             WITH_SIONLIB: OFF
 
-          - cpp_compiler: "gcc"
-            CC: "gcc"
-            CXX: "gxx"
-            CXX_FLAGS: "-pedantic -Wextra -Wno-unknown-pragmas -D_GLIBCXX_ASSERTIONS"
-          - cpp_compiler: "clang"
-            CC: "clang-11"
-            CXX: "clang++-11"
+          #- cpp_compiler: "gcc"
+          #  CC: "gcc"
+          #  CXX: "gxx"
+          #  CXX_FLAGS: "-pedantic -Wextra -Wno-unknown-pragmas -D_GLIBCXX_ASSERTIONS"
+          #- cpp_compiler: "clang"
+          #  CC: "clang-11"
+          #  CXX: "clang++-11"
 
     steps:
       - name: "Checkout repository content"
