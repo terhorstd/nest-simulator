@@ -134,63 +134,65 @@ jobs:
         os: ["ubuntu-20.04"]
         cpp_compiler: ["gcc", "clang"]
         NEST_BUILD_NAME: ["MINIMAL"]
-        WITH_GSL: ["OFF"]
-        WITH_LIBBOOST: ["OFF"]
-        WITH_LIBNEUROSIM: ["OFF"]
-        WITH_LTDL: ["OFF"]
-        WITH_MPI: ["OFF"]
-        WITH_MUSIC: ["OFF"]
-        WITH_OPENMP: ["OFF"]
-        WITH_PYTHON: ["OFF"]
-        WITH_READLINE: ["OFF"]
-        WITH_SIONLIB: ["OFF"]
+        #WITH_GSL: ["OFF"]
+        #WITH_LIBBOOST: ["OFF"]
+        #WITH_LIBNEUROSIM: ["OFF"]
+        #WITH_LTDL: ["OFF"]
+        #WITH_MPI: ["OFF"]
+        #WITH_MUSIC: ["OFF"]
+        #WITH_OPENMP: ["OFF"]
+        #WITH_PYTHON: ["OFF"]
+        #WITH_READLINE: ["OFF"]
+        #WITH_SIONLIB: ["OFF"]
 
         include:
-          - NEST_BUILD_NAME: "OPENMP_ONLY"
+          - os: "ubuntu-20.04"
+            cpp_compiler: "gcc"
+            NEST_BUILD_NAME: "OPENMP_ONLY"
             WITH_GSL: "ON"
             WITH_LIBBOOST: "ON"
             WITH_LTDL: "ON"
             WITH_OPENMP: "ON"
             CXX_FLAGS: "-pedantic -Wextra -D_GLIBCXX_ASSERTIONS"
 
-          - NEST_BUILD_NAME: "MPI_ONLY"
-            WITH_GSL: "ON"
-            WITH_LIBBOOST: "ON"
-            WITH_LTDL: "ON"
-            WITH_MPI: "ON"
+        #  - NEST_BUILD_NAME: "MPI_ONLY"
+        #    WITH_GSL: "ON"
+        #    WITH_LIBBOOST: "ON"
+        #    WITH_LTDL: "ON"
+        #    WITH_MPI: "ON"
 
-          - NEST_BUILD_NAME: "FULL"
-            WITH_GSL: "ON"
-            WITH_LIBBOOST: "ON"
-            WITH_LIBNEUROSIM: "ON"
-            WITH_LTDL: "ON"
-            WITH_MPI: "ON"
-            WITH_MUSIC: "ON"
-            WITH_OPENMP: "ON"
-            WITH_PYTHON: "ON"
-            WITH_READLINE: "ON"
-            WITH_SIONLIB: "ON"
-            CXX_FLAGS: "-pedantic -Wextra -D_GLIBCXX_ASSERTIONS"
+        #  - NEST_BUILD_NAME: "FULL"
+        #    WITH_GSL: "ON"
+        #    WITH_LIBBOOST: "ON"
+        #    WITH_LIBNEUROSIM: "ON"
+        #    WITH_LTDL: "ON"
+        #    WITH_MPI: "ON"
+        #    WITH_MUSIC: "ON"
+        #    WITH_OPENMP: "ON"
+        #    WITH_PYTHON: "ON"
+        #    WITH_READLINE: "ON"
+        #    WITH_SIONLIB: "ON"
+        #    CXX_FLAGS: "-pedantic -Wextra -D_GLIBCXX_ASSERTIONS"
 
-          - NEST_BUILD_NAME: "FULL_NO_EXTERNAL_FEATURES"
-            WITH_GSL: "ON"
-            WITH_LIBBOOST: "ON"
-            WITH_LIBNEUROSIM: OFF
-            WITH_LTDL: "ON"
-            WITH_MPI: OFF
-            WITH_MUSIC: OFF
-            WITH_OPENMP: "ON"
-            WITH_PYTHON: "ON"
-            WITH_READLINE: "ON"
-            WITH_SIONLIB: OFF
+        #  - NEST_BUILD_NAME: "FULL_NO_EXTERNAL_FEATURES"
+        #    WITH_GSL: "ON"
+        #    WITH_LIBBOOST: "ON"
+        #    WITH_LIBNEUROSIM: OFF
+        #    WITH_LTDL: "ON"
+        #    WITH_MPI: OFF
+        #    WITH_MUSIC: OFF
+        #    WITH_OPENMP: "ON"
+        #    WITH_PYTHON: "ON"
+        #    WITH_READLINE: "ON"
+        #    WITH_SIONLIB: OFF
 
-          - cpp_compiler: "gcc"
-            CC: "gcc"
-            CXX: "gxx"
-            CXX_FLAGS: "-pedantic -Wextra -Wno-unknown-pragmas -D_GLIBCXX_ASSERTIONS"
-          - cpp_compiler: "clang"
-            CC: "clang-11"
-            CXX: "clang++-11"
+        #  - cpp_compiler: "gcc"
+        #    CC: "gcc"
+        #    CXX: "gxx"
+        #    CXX_FLAGS: "-pedantic -Wextra -Wno-unknown-pragmas -D_GLIBCXX_ASSERTIONS"
+        #  - cpp_compiler: "clang"
+        #    CC: "clang-11"
+        #    CXX: "clang++-11"
 
     steps:
       - name: "Checkout repository content"
