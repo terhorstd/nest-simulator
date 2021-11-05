@@ -113,25 +113,39 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     runs-on: ${{ matrix.os }}
     needs: [static_checks]
+    env:
+      NEST_BUILD_NAME: ${{ matrix.NEST_BUILD_NAME }}
+      WITH_GSL: ${{ matrix.WITH_GSL }}
+      WITH_LIBBOOST: ${{ matrix.WITH_LIBBOOST }}
+      WITH_LIBNEUROSIM: ${{ matrix.WITH_LIBNEUROSIM }}
+      WITH_LTDL: ${{ matrix.WITH_LTDL }}
+      WITH_MPI: ${{ matrix.WITH_MPI }}
+      WITH_MUSIC: ${{ matrix.WITH_MUSIC }}
+      WITH_OPENMP: ${{ matrix.WITH_OPENMP }}
+      WITH_PYTHON: ${{ matrix.WITH_PYTHON }}
+      WITH_READLINE: ${{ matrix.WITH_READLINE }}
+      WITH_SIONLIB: ${{ matrix.WITH_SIONLIB }}
+      CC: ${{ matrix.CC }}
+      CXX: ${{ matrix.CXX }}
+      CXX_FLAGS: ${{ matrix.CXX_FLAGS }}
     strategy:
       fail-fast: true
       matrix:
         os: ["ubuntu-20.04"]
         cpp_compiler: ["gcc", "clang"]
-        NEST_BUILD_NAME: []
-        include:
-          - NEST_BUILD_NAME: "MINIMAL"
-            WITH_GSL: OFF
-            WITH_LIBBOOST: OFF
-            WITH_LIBNEUROSIM: OFF
-            WITH_LTDL: OFF
-            WITH_MPI: OFF
-            WITH_MUSIC: OFF
-            WITH_OPENMP: OFF
-            WITH_PYTHON: OFF
-            WITH_READLINE: OFF
-            WITH_SIONLIB: OFF
+        NEST_BUILD_NAME: ["MINIMAL"]
+        WITH_GSL: ["OFF"]
+        WITH_LIBBOOST: ["OFF"]
+        WITH_LIBNEUROSIM: ["OFF"]
+        WITH_LTDL: ["OFF"]
+        WITH_MPI: ["OFF"]
+        WITH_MUSIC: ["OFF"]
+        WITH_OPENMP: ["OFF"]
+        WITH_PYTHON: ["OFF"]
+        WITH_READLINE: ["OFF"]
+        WITH_SIONLIB: ["OFF"]
 
+        include:
           - NEST_BUILD_NAME: "OPENMP_ONLY"
             WITH_GSL: "ON"
             WITH_LIBBOOST: "ON"
