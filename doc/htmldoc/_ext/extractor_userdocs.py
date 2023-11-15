@@ -39,7 +39,7 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 
@@ -233,6 +233,50 @@ class UserDocExtractor:
         except ValueError as e:
             log.info("Failed to rebuild 'See also' section: %s", e)
         return UserDoc(doc, tags, self._outdir / outname)
+
+
+    def CreateTagIndices(self) -> list[str]:
+        """
+        This function generates all combinations of tags and creates an index page
+        for each combination using `rst_index`.
+
+        Returns
+        -------
+
+        list
+            list of names of generated files. (relative to `_outdir`)
+        """
+        tags = self.tagdict
+        taglist = list(tags.keys())
+        maxtaglen = max([len(t) for t in tags])
+        for tag, count in sorted([(tag, len(lst)) for tag, lst in tags.items()], key=lambda x: x[1]):
+            log.info("    %%%ds tag in %%d files" % maxtaglen, tag, count)
+        if "" in taglist:
+            taglist.remove("")
+        indexfiles = list()
+        depth = min(4, len(taglist))  # how many levels of indices to create at most
+        nindices = sum([comb(len(taglist), L) for L in range(depth - 1)])
+        log.info("indices down to level %d → %d possible keyword combinations", depth, nindices)
+        for current_tags in tqdm(
+            chain(*[combinations(taglist, L) for L in range(depth - 1)]), unit="idx", desc="keyword indices", total=nindices
+        ):
+            current_tags = sorted(current_tags)
+            indexname = "index%s.rst" % "".join(["_" + x for x in current_tags])
+            hier = make_hierarchy(tags.copy(), *current_tags)
+            if not any(hier.values()):
+                log.debug("index %s is empty!", str(current_tags))
+                continue
+            #subtags = [set(subtag) for subtag in hier.values()]
+            #log.debug("subtags = %s", subtags)
+            #nfiles = len(set.union(*chain([set(subtag) for subtag in hier.values()])))
+            #log.debug("%3d docs in index for %s...", nfiles, str(current_tags))
+            log.debug("generating index for %s...", str(current_tags))
+            indextext = rst_index(hier, current_tags)
+            with open(os.path.join(outdir, indexname), "w") as outfile:
+                outfile.write(indextext)
+            indexfiles.append(indexname)
+        log.info("%4d non-empty index files generated", len(indexfiles))
+        return indexfiles
 
 
 def rewrite_short_description(doc, filename, short_description="Short description"):
@@ -488,53 +532,6 @@ def reverse_dict(tags):
     return revdict
 
 
-def CreateTagIndices(tags, outdir="userdocs/"):
-    """
-    This function generates all combinations of tags and creates an index page
-    for each combination using `rst_index`.
-
-    Parameters
-    ----------
-
-    tags : dict
-       dictionary of tags
-
-    outdir : str, path
-       path to the intended output directory (handed to `rst_index`.
-
-    Returns
-    -------
-
-    list
-        list of names of generated files.
-    """
-    taglist = list(tags.keys())
-    maxtaglen = max([len(t) for t in tags])
-    for tag, count in sorted([(tag, len(lst)) for tag, lst in tags.items()], key=lambda x: x[1]):
-        log.info("    %%%ds tag in %%d files" % maxtaglen, tag, count)
-    if "" in taglist:
-        taglist.remove("")
-    indexfiles = list()
-    depth = min(4, len(taglist))  # how many levels of indices to create at most
-    nindices = sum([comb(len(taglist), L) for L in range(depth - 1)])
-    log.info("indices down to level %d → %d possible keyword combinations", depth, nindices)
-    for current_tags in tqdm(
-        chain(*[combinations(taglist, L) for L in range(depth - 1)]), unit="idx", desc="keyword indices", total=nindices
-    ):
-        current_tags = sorted(current_tags)
-        indexname = "index%s.rst" % "".join(["_" + x for x in current_tags])
-        hier = make_hierarchy(tags.copy(), *current_tags)
-        if not any(hier.values()):
-            log.debug("index %s is empyt!", str(current_tags))
-            continue
-        nfiles = len(set.union(*chain([set(subtag) for subtag in hier.values()])))
-        log.debug("generating index for %s...", str(current_tags))
-        indextext = rst_index(hier, current_tags)
-        with open(os.path.join(outdir, indexname), "w") as outfile:
-            outfile.write(indextext)
-        indexfiles.append(indexname)
-    log.info("%4d non-empty index files generated", len(indexfiles))
-    return indexfiles
 
 
 class JsonWriter:
@@ -589,42 +586,6 @@ def getTitles(text):
     return titles
 
 
-#class ExtractUserDocs:
-#    def __init__(self, basedir="..", outdir="userdocs/"):
-#        self._basedir = basedir
-#        self._outdir = outdir
-#
-#    def extract_from(self, listoffiles):
-#        """
-#        Extract and build all user documentation and build tag indices.
-#
-#        Writes extracted information to JSON files in outdir. In particular the
-#        list of seen tags mapped to files they appear in, and the indices generated
-#        from all combinations of tags.
-#
-#        Parameters are the same as for `UserDocExtractor` and are handed to it
-#        unmodified.
-#
-#        Returns
-#        -------
-#
-#        None
-#        """
-#        data = JsonWriter(self._outdir)
-#        # Gather all information and write RSTs
-#        self._tags = UserDocExtractor(listoffiles, basedir=self._basedir, outdir=self._outdir)
-#        data.write(tags, "tags")
-#
-#        indexfiles = CreateTagIndices(tags, outdir=self._outdir)
-#        data.write(indexfiles, "indexfiles")
-#
-#        toc_list = [name[:-4] for names in tags.values() for name in names]
-#        idx_list = [indexfile[:-4] for indexfile in indexfiles]
-#
-#        with open(os.path.join(self._outdir, "toc-tree.json"), "w") as tocfile:
-#            json.dump(list(set(toc_list)) + list(set(idx_list)), tocfile)
-
-
 def got_args(*names):
     "Returns True if sys.argv contains the given strings."
     if len(sys.argv) < len(names):
@@ -637,7 +598,10 @@ def got_args(*names):
 def output_exit(result):
     json.dump(result, sys.stdout, indent="  ", check_circular=True)
     print()  # add \n at the end.
+    if isinstance(result, list):
+        log.info("result list with %d entries", len(result))
     sys.exit(0)
+
 
 if __name__ == "__main__":
     globs = ("models/*.h", "nestkernel/*.h")
@@ -645,18 +609,19 @@ if __name__ == "__main__":
     outdir = "userdocs/"
     log.debug("args: %s", repr(sys.argv))
 
+    output = JsonWriter(outdir)
     files = relative_glob(*globs, basedir=basedir)
     if got_args("list", "files"):
         output_exit(files)
 
     extractor = UserDocExtractor(outdir=outdir, basedir=basedir)
-    tags = extractor.extract_all(files)
+    extractor.extract_all(files)
+    tags = extractor.tagdict
     if got_args("list", "tags"):
         output_exit(tags)
-    #data.write(tags, "tags")
-    #
-    #indexfiles = CreateTagIndices(tags, outdir=self._outdir)
-    #data.write(indexfiles, "indexfiles")
-    #
-    #toc_list = [name[:-4] for names in tags.values() for name in names]
-    #idx_list = [indexfile[:-4] for indexfile in indexfiles]
+    output.write(tags, "tags")
+
+    indexfiles = extractor.CreateTagIndices()
+    if got_args("list", "indices"):
+        output_exit(indexfiles)
+    output.write(indexfiles, "indexfiles")
