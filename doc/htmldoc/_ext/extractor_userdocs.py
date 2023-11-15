@@ -18,21 +18,33 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
+'''
+Extract user-documentation from C++ code files.
 
+Usage: extract_userdocs list files
+       extract_userdocs run
+
+'''
 import glob
 import json
 import logging
 import os
 import re
+import sys
 from collections import Counter
 from itertools import chain, combinations
 from math import comb
 from pprint import pformat
+from pathlib import Path
 
 from tqdm import tqdm
 
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
+
+
+class NoUserDocsFound(AttributeError):
+    pass
 
 
 def relative_glob(*pattern, basedir=os.curdir, **kwargs):
@@ -43,91 +55,184 @@ def relative_glob(*pattern, basedir=os.curdir, **kwargs):
     return [name[len(tobase) + 1 :] for name in names]
 
 
-def UserDocExtractor(filenames, basedir="..", replace_ext=".rst", outdir="userdocs/"):
-    """
-    Extract all user documentation from given files.
+class UserDoc:
+    def __init__(self, document: str, tags: list, filename: Path):
+        self._doc = document
+        self._tags = tags.copy()
+        self._filename = filename
 
-    This method searches for "BeginUserDocs" and "EndUserDocs" keywords and
-    extracts all text inbetween as user-level documentation. The keyword
-    "BeginUserDocs" may optionally be followed by a colon ":" and a comma
-    separated list of tags till the end of the line. Note that this allows tags
-    to contain spaces, i.e. you do not need to introduce underscores or hyphens
-    for multi-word tags.
+    def save(self):
+        """
+        Write the raw document to disk.
+        """
+        log.debug("writing userdoc to %s", self._filename)
+        with self._filename.open("w", encoding="utf8") as outfile:
+            outfile.write(self._doc)
 
-    Example
-    -------
+    @property
+    def doc(self):
+        return self._doc
 
-    /* BeginUserDocs: example, user documentation generator
+    @property
+    def tags(self):
+        return self._tags.copy()
 
-    [...]
+    @property
+    def filename(self):
+        return self._filename
 
-    EndUserDocs */
 
-    This will extract "[...]" as documentation for the file and tag it with
-    'example' and 'user documentation generator'.
+class UserDocExtractor:
+    def __init__(self, outdir: str="userdocs/", basedir: str ="..", replace_ext: str=".rst"):
+        """
+        Create a userdoc extractor instance.
 
-    The extracted documentation is written to a file in `basedir` named after
-    the sourcefile with ".rst" replacing the original extension.
+        Instanciation already prepares for all kinds of operations, so outdir
+        is created, checks are being done, etc.
 
-    Parameters
-    ----------
+        Parameters
+        ----------
 
-    filenames : iterable
-       Any iterable with input file names (relative to `basedir`).
+        basedir : str, path
+           Directory to which input `filenames` are relative.
 
-    basedir : str, path
-       Directory to which input `filenames` are relative.
+        replace_ext : str
+           Replacement for the extension of the original filename when writing to `outdir`.
 
-    replace_ext : str
-       Replacement for the extension of the original filename when writing to `outdir`.
+        outdir : str, path
+           Directory where output files are created.
+        """
+        self._outdir = Path(outdir)
+        self._basedir = Path(basedir)
+        self._replace_ext = replace_ext
 
-    outdir : str, path
-       Directory where output files are created.
+        if not self._outdir.exists() or not self._outdir.is_dir():
+            log.info("creating output directory %s", self._outdir)
+            self._outdir.mkdir()
 
-    Returns
-    -------
+        self._documents : list[UserDoc] = []
 
-    dict
-       mapping tags to lists of documentation filenames (relative to `outdir`).
-    """
-    if not os.path.exists(outdir):
-        log.info("creating output directory " + outdir)
-        os.mkdir(outdir)
-    userdoc_re = re.compile(r"BeginUserDocs:?\s*(?P<tags>([\w -]+(,\s*)?)*)\n+(?P<doc>(.|\n)*)EndUserDocs")
-    tagdict = dict()  # map tags to lists of documents
-    nfiles_total = 0
-    with tqdm(unit="files", total=len(filenames)) as progress:
-        for filename in filenames:
-            progress.set_postfix(file=os.path.basename(filename)[:15], refresh=False)
-            progress.update(1)
-            log.info("extracting user documentation from %s...", filename)
-            nfiles_total += 1
-            match = None
-            with open(os.path.join(basedir, filename), "r", encoding="utf8") as infile:
-                match = userdoc_re.search(infile.read())
-            if not match:
-                log.info("No user documentation found in " + filename)
-                continue
-            outname = os.path.basename(os.path.splitext(filename)[0]) + replace_ext
-            tags = [t.strip() for t in match.group("tags").split(",")]
-            for tag in tags:
-                tagdict.setdefault(tag, list()).append(outname)
-            doc = match.group("doc")
-            try:
-                doc = rewrite_short_description(doc, filename)
-            except ValueError as e:
-                log.warning("Documentation added unfixed: %s", e)
-            try:
-                doc = rewrite_see_also(doc, filename, tags)
-            except ValueError as e:
-                log.info("Failed to rebuild 'See also' section: %s", e)
-            write_rst_files(doc, tags, outdir, outname)
 
-    log.info("%4d tags found:\n%s", len(tagdict), pformat(list(tagdict.keys())))
-    nfiles = len(set.union(*[set(x) for x in tagdict.values()]))
-    log.info("%4d files in input", nfiles_total)
-    log.info("%4d files with documentation", nfiles)
-    return tagdict
+    def extract_all(self, filenames: list[Path]) -> int:
+        """
+        Extract all user documentation from given files.
+
+        This method calls ``extract()`` on all given files and stores documents
+        in this instance.
+
+        The extracted documentation is written to a file via `UserDoc.save()`.
+
+        Parameters
+        ----------
+
+        filenames : iterable
+           Any iterable with input file names (relative to `_basedir`).
+
+        Returns
+        -------
+        int
+           number of successfully extraced UserDoc objects.
+        """
+        nfiles_total = 0    # count one-by-one to not exhaust iterators
+        n_extracted = 0
+        with tqdm(unit="files", total=len(filenames)) as progress:
+            for filename in filenames:
+                progress.set_postfix(file=os.path.basename(filename)[:15], refresh=False)
+                progress.update(1)
+                nfiles_total += 1
+                try:
+                    userdoc = self.extract(filename)
+                    self._documents.append(userdoc)
+                    n_extracted += 1
+                    userdoc.save()
+                except NoUserDocsFound:
+                    log.info("No user documentation found in " + filename)
+
+        tagdict = self.tagdict
+        log.info("%4d tags found:\n%s", len(tagdict), pformat(list(tagdict.keys())))
+        nfiles = len(set.union(*[set(x) for x in tagdict.values()]))
+        log.info("%4d files in input", nfiles_total)
+        log.info("%4d files with documentation", nfiles)
+        return n_extracted
+
+
+    @property
+    def tagdict(self) -> dict[str, list[str]]:
+        """
+        Create a reverse index of tags to document names.
+
+        Returns
+        -------
+        dict
+           mapping tags to lists of documentation filenames (relative to `_outdir`).
+        """
+        tagdict = dict()  # map tags to lists of documents
+        for userdoc in self._documents:
+            for tag in userdoc.tags:
+                tagdict.setdefault(tag, list()).append(userdoc.filename.name)
+        return tagdict
+
+
+    def extract(self, filename: Path):
+        """
+        Extract user documentation from a file.
+
+        This method searches for "BeginUserDocs" and "EndUserDocs" keywords and
+        extracts all text inbetween as user-level documentation. The keyword
+        "BeginUserDocs" may optionally be followed by a colon ":" and a comma
+        separated list of tags till the end of the line. Note that this allows tags
+        to contain spaces, i.e. you do not need to introduce underscores or hyphens
+        for multi-word tags.
+
+        Example
+        -------
+
+        /* BeginUserDocs: example, user documentation generator
+
+        [...]
+
+        EndUserDocs */
+
+        This will extract "[...]" as documentation for the file and tag it with
+        'example' and 'user documentation generator'.
+
+        Parameters
+        ----------
+
+        filename : Path
+           Source-code filename from which userdocs should be extracted.
+           (relative to `_basedir`).
+
+        Returns
+        -------
+
+        UserDoc
+           Extracted user-documentation object.
+
+        Raises
+        ------
+        NoUserDocsFound
+           If no section "BeginUserDoc" … "EndUserDoc" could be found.
+        """
+        userdoc_re = re.compile(r"BeginUserDocs:?\s*(?P<tags>([\w -]+(,\s*)?)*)\n+(?P<doc>(.|\n)*)EndUserDocs")
+        log.info("extracting user documentation from %s...", filename)
+        match = None
+        with (self._basedir / filename).open("r", encoding="utf8") as infile:
+            match = userdoc_re.search(infile.read())
+        if not match:
+            raise NoUserDocsFound()
+        outname = Path(filename).with_suffix(self._replace_ext).name
+        tags = [t.strip() for t in match.group("tags").split(",")]
+        doc = match.group("doc")
+        try:
+            doc = rewrite_short_description(doc, filename)
+        except ValueError as e:
+            log.warning("Documentation added unfixed: %s", e)
+        try:
+            doc = rewrite_see_also(doc, filename, tags)
+        except ValueError as e:
+            log.info("Failed to rebuild 'See also' section: %s", e)
+        return UserDoc(doc, tags, self._outdir / outname)
 
 
 def rewrite_short_description(doc, filename, short_description="Short description"):
@@ -233,14 +338,6 @@ def rewrite_see_also(doc, filename, tags, see_also="See also"):
             + doc[secend:]
         )
     raise ValueError("No section '%s' found in %s!" % (see_also, filename))
-
-
-def write_rst_files(doc, tags, outdir, outname):
-    """
-    Write raw rst to a file and generate a wrapper with index
-    """
-    with open(os.path.join(outdir, outname), "w") as outfile:
-        outfile.write(doc)
 
 
 def make_hierarchy(tags, *basetags):
@@ -492,36 +589,74 @@ def getTitles(text):
     return titles
 
 
-def ExtractUserDocs(listoffiles, basedir="..", outdir="userdocs/"):
-    """
-    Extract and build all user documentation and build tag indices.
+#class ExtractUserDocs:
+#    def __init__(self, basedir="..", outdir="userdocs/"):
+#        self._basedir = basedir
+#        self._outdir = outdir
+#
+#    def extract_from(self, listoffiles):
+#        """
+#        Extract and build all user documentation and build tag indices.
+#
+#        Writes extracted information to JSON files in outdir. In particular the
+#        list of seen tags mapped to files they appear in, and the indices generated
+#        from all combinations of tags.
+#
+#        Parameters are the same as for `UserDocExtractor` and are handed to it
+#        unmodified.
+#
+#        Returns
+#        -------
+#
+#        None
+#        """
+#        data = JsonWriter(self._outdir)
+#        # Gather all information and write RSTs
+#        self._tags = UserDocExtractor(listoffiles, basedir=self._basedir, outdir=self._outdir)
+#        data.write(tags, "tags")
+#
+#        indexfiles = CreateTagIndices(tags, outdir=self._outdir)
+#        data.write(indexfiles, "indexfiles")
+#
+#        toc_list = [name[:-4] for names in tags.values() for name in names]
+#        idx_list = [indexfile[:-4] for indexfile in indexfiles]
+#
+#        with open(os.path.join(self._outdir, "toc-tree.json"), "w") as tocfile:
+#            json.dump(list(set(toc_list)) + list(set(idx_list)), tocfile)
 
-    Writes extracted information to JSON files in outdir. In particular the
-    list of seen tags mapped to files they appear in, and the indices generated
-    from all combinations of tags.
 
-    Parameters are the same as for `UserDocExtractor` and are handed to it
-    unmodified.
+def got_args(*names):
+    "Returns True if sys.argv contains the given strings."
+    if len(sys.argv) < len(names):
+        return False
+    if all([arg == names[i] for i, arg in enumerate(sys.argv[1:])]):
+        return True
+    return False
 
-    Returns
-    -------
 
-    None
-    """
-    data = JsonWriter(outdir)
-    # Gather all information and write RSTs
-    tags = UserDocExtractor(listoffiles, basedir=basedir, outdir=outdir)
-    data.write(tags, "tags")
-
-    indexfiles = CreateTagIndices(tags, outdir=outdir)
-    data.write(indexfiles, "indexfiles")
-
-    toc_list = [name[:-4] for names in tags.values() for name in names]
-    idx_list = [indexfile[:-4] for indexfile in indexfiles]
-
-    with open(os.path.join(outdir, "toc-tree.json"), "w") as tocfile:
-        json.dump(list(set(toc_list)) + list(set(idx_list)), tocfile)
-
+def output_exit(result):
+    json.dump(result, sys.stdout, indent="  ", check_circular=True)
+    print()  # add \n at the end.
+    sys.exit(0)
 
 if __name__ == "__main__":
-    ExtractUserDocs(relative_glob("models/*.h", "nestkernel/*.h", basedir=".."), outdir="userdocs/")
+    globs = ("models/*.h", "nestkernel/*.h")
+    basedir = ".."
+    outdir = "userdocs/"
+    log.debug("args: %s", repr(sys.argv))
+
+    files = relative_glob(*globs, basedir=basedir)
+    if got_args("list", "files"):
+        output_exit(files)
+
+    extractor = UserDocExtractor(outdir=outdir, basedir=basedir)
+    tags = extractor.extract_all(files)
+    if got_args("list", "tags"):
+        output_exit(tags)
+    #data.write(tags, "tags")
+    #
+    #indexfiles = CreateTagIndices(tags, outdir=self._outdir)
+    #data.write(indexfiles, "indexfiles")
+    #
+    #toc_list = [name[:-4] for names in tags.values() for name in names]
+    #idx_list = [indexfile[:-4] for indexfile in indexfiles]
