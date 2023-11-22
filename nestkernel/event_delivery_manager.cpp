@@ -135,8 +135,8 @@ EventDeliveryManager::finalize()
 
   for ( auto it : spike_recv_register_ )
   {
-    ( *it )->clear();
-    delete ( *it );
+    it->clear();
+    delete ( it );
   }
   spike_recv_register_.clear();
 
@@ -694,9 +694,9 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
         se.set_stamp( prepared_timestamps[ lag ] );
         for ( auto it_spike_data : srr_w_tid[ syn_id ][ lag ] )
         {
-          se.set_offset( it_spike_data->get_offset() );
+          se.set_offset( it_spike_data.get_offset() );
 
-          index lcid = it_spike_data->get_lcid();
+          index lcid = it_spike_data.get_lcid();
           se.set_sender_node_id_info( tid, syn_id, lcid );
 
           kernel().connection_manager.send( tid, syn_id, lcid, cm, se ); // TODO: tid, syn_id and lcid are already in se
@@ -721,17 +721,17 @@ EventDeliveryManager::resize_spike_recv_register_()
   spike_recv_register_.resize( num_threads );
   for ( auto it_w_tid : spike_recv_register_ )
   {
-    if ( ( *it_w_tid ) == NULL )
+    if ( it_w_tid == NULL )
     {
-      ( *it_w_tid ) = new std::vector< std::vector< std::vector< std::vector< SpikeData > > > >();
+      it_w_tid = new std::vector< std::vector< std::vector< std::vector< SpikeData > > > >();
     }
-    ( *it_w_tid )->resize( num_threads );
-    for ( auto it_r_tid = ( *it_w_tid ) )
+    it_w_tid->resize( num_threads );
+    for ( auto it_r_tid : it_w_tid )
     {
-      it_r_tid->resize( num_synapse_types );
-      for ( auto it_syn_id = it_r_tid )
+      it_r_tid.resize( num_synapse_types );
+      for ( auto it_syn_id : it_r_tid )
       {
-        it_syn_id->resize( mindelay_steps );
+        it_syn_id.resize( mindelay_steps );
       }
     }
   }
@@ -740,13 +740,13 @@ EventDeliveryManager::resize_spike_recv_register_()
 void
 EventDeliveryManager::reset_spike_recv_register_( const thread tid )
 {
-  for ( auto it_r_tid : spike_recv_register_[ tid ] )
+  for ( auto it_r_tid : ( *spike_recv_register_[ tid ] ) )
   {
     for ( auto it_syn_id : it_r_tid )
     {
       for ( auto it_lag : it_syn_id )
       {
-        it_lag->clear();
+        it_lag.clear();
       }
     }
   }
