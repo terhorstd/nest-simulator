@@ -2,6 +2,7 @@
 __pycache__/
 build/
 conda/
+venv/
 _build/
 install/
 reports/

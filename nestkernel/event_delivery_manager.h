@@ -328,6 +328,21 @@ private:
   void reset_spike_register_( const size_t tid );
 
   /**
+   * Change dimensionality of the allocated data structure to fit current
+   * simulator setup.
+   */
+  void resize_spike_recv_register_();
+
+  /**
+   * Removes all spike data from the inner-most dimension of the data
+   * structure.
+   *
+   * This preserves the outer dimensions to keep the allocated inner
+   * 4-dimensional ``(w_tid, r_tid, syn_id, lag)`` structure.
+   */
+  void reset_spike_recv_register_( const size_t tid );
+
+  /**
    * Returns true if spike has been moved to MPI buffer, such that it
    * can be removed by clean_spike_register. Required static function
    * by std::remove_if.
@@ -423,6 +438,20 @@ private:
    * administrative metadata will be stored in thread-local memory.
    */
   std::vector< std::vector< OffGridSpikeDataWithRank >* > off_grid_emitted_spikes_register_;
+
+  /**
+   * Register for incoming spike data. This is a 4-dim structure.
+   * While spikes are written to the buffer they are immediately
+   * sorted by the thread that will later deliver the spikes to
+   * their local targets.
+   * - First dim:  thread that writes to register
+   *               (reads MPI recv buffer for a range of ranks)
+   * - Second dim: thread that delivers from register to local targets (read-only)
+   * - Third dim:  synapse type id (syn_id)
+   * - Fourth dim: lag
+   * - Fifth dim:  SpikeData
+   */
+  std::vector< std::vector< std::vector< std::vector< std::vector< SpikeData > > > >* > spike_recv_register_;
 
   /**
    * Buffer to collect the secondary events after serialization.
