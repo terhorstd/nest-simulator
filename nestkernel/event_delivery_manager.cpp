@@ -661,14 +661,17 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
       if ( kernel().connection_manager.use_compressed_spikes() )
       {
         // when compressed, spikes do not have lcid set, so we need to do a lookup here and uncompress
-        for (auto spike_data : kernel().connection_manager.get_compressed_spike_data( spike_data.get_syn_id(), spike_data.get_lcid() ) )
+        for (auto spike_data :
+          kernel().connection_manager.get_compressed_spike_data( spike_data.get_syn_id(), spike_data.get_lcid() ) )
         {
-          ( *spike_recv_register_[ tid ] )[ spike_data.get_tid() ][ spike_data.get_syn_id() ][ spike_data.get_lag() ].push_back( spike_data );
+          ( *spike_recv_register_[ tid ] )[ spike_data.get_tid() ][ spike_data.get_syn_id() ][ spike_data.get_lag() ]
+            .push_back( spike_data );
         }
       }
-      else  // spikes are already uncompressed
+      else // spikes are already uncompressed
       {
-        ( *spike_recv_register_[ tid ] )[ spike_data.get_tid() ][ spike_data.get_syn_id() ][ spike_data.get_lag() ].push_back( spike_data );
+        ( *spike_recv_register_[ tid ] )[ spike_data.get_tid() ][ spike_data.get_syn_id() ][ spike_data.get_lag() ]
+          .push_back( spike_data );
       }
       // break if this was the last valid entry from this rank
       if ( spike_data.is_end_marker() )
@@ -676,7 +679,7 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
         break;
       }
     }
-  }   // for rank (closes thread parallel omp)
+  } // for rank (closes thread parallel omp)
 
   SpikeEvent se;
 
@@ -685,7 +688,7 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
   for ( size_t w_tid = 0; w_tid < spike_recv_register_.size(); ++w_tid )
   {
     const auto& srr_w_tid = ( *spike_recv_register_[ w_tid ] )[ tid ];
-    for ( size_t syn_id = 0; syn_id < srr_w_tid.size(); ++syn_id)
+    for ( size_t syn_id = 0; syn_id < srr_w_tid.size(); ++syn_id )
     {
       for ( size_t lag = 0; lag < srr_w_tid[ syn_id ].size(); ++lag )
       {
@@ -697,7 +700,7 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
           index lcid = it_spike_data->get_lcid();
           se.set_sender_node_id_info( tid, syn_id, lcid );
 
-          kernel().connection_manager.send( tid, syn_id, lcid, cm, se );      // TODO: tid, syn_id and lcid are already in se
+          kernel().connection_manager.send( tid, syn_id, lcid, cm, se ); // TODO: tid, syn_id and lcid are already in se
         }
       }
     }
