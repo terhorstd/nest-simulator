@@ -696,7 +696,7 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
         {
           se.set_offset( it_spike_data.get_offset() );
 
-          index lcid = it_spike_data.get_lcid();
+          size_t lcid = it_spike_data.get_lcid();
           se.set_sender_node_id_info( tid, syn_id, lcid );
 
           kernel().connection_manager.send( tid, syn_id, lcid, cm, se ); // TODO: tid, syn_id and lcid are already in se
@@ -726,7 +726,7 @@ EventDeliveryManager::resize_spike_recv_register_()
       it_w_tid = new std::vector< std::vector< std::vector< std::vector< SpikeData > > > >();
     }
     it_w_tid->resize( num_threads );
-    for ( auto it_r_tid : it_w_tid )
+    for ( auto it_r_tid : *it_w_tid )
     {
       it_r_tid.resize( num_synapse_types );
       for ( auto it_syn_id : it_r_tid )
@@ -738,7 +738,7 @@ EventDeliveryManager::resize_spike_recv_register_()
 }
 
 void
-EventDeliveryManager::reset_spike_recv_register_( const thread tid )
+EventDeliveryManager::reset_spike_recv_register_( const size_t tid )
 {
   for ( auto it_r_tid : ( *spike_recv_register_[ tid ] ) )
   {
