@@ -146,7 +146,6 @@ EventDeliveryManager::finalize()
   recv_buffer_spike_data_.clear();
   send_buffer_off_grid_spike_data_.clear();
   recv_buffer_off_grid_spike_data_.clear();
-
 }
 
 void
@@ -661,7 +660,7 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
       if ( kernel().connection_manager.use_compressed_spikes() )
       {
         // when compressed, spikes do not have lcid set, so we need to do a lookup here and uncompress
-        for (auto spike_data :
+        for ( auto spike_data :
           kernel().connection_manager.get_compressed_spike_data( spike_data.get_syn_id(), spike_data.get_lcid() ) )
         {
           ( *spike_recv_register_[ tid ] )[ spike_data.get_tid() ][ spike_data.get_syn_id() ][ spike_data.get_lag() ]
