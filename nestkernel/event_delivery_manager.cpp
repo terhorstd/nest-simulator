@@ -715,7 +715,7 @@ void
 EventDeliveryManager::resize_spike_recv_register_()
 {
   const long num_threads = kernel().vp_manager.get_num_threads();
-  const long num_synapse_types = kernel().model_manager.get_num_synapse_prototypes();
+  const long num_synapse_types = kernel().model_manager.get_num_connection_models();
   const long mindelay_steps = kernel().connection_manager.get_min_delay();
 
   spike_recv_register_.resize( num_threads );
