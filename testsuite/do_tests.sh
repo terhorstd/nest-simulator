@@ -64,6 +64,7 @@ EOF
     exit $1
 }
 
+echo "> parse commandline…"
 PREFIX=""
 PYTHON=""
 MUSIC=""
@@ -92,6 +93,7 @@ if test ! "${PREFIX:-}"; then
     usage 2 "--prefix";
 fi
 
+echo "> test for Python…"
 if test "${PYTHON}"; then
       TIME_LIMIT=120  # seconds, for each of the Python tests
       PYTEST_VERSION="$(${PYTHON} -m pytest --version --timeout ${TIME_LIMIT} --numprocesses=1 2>&1)" || {
@@ -102,16 +104,21 @@ if test "${PYTHON}"; then
       PYTEST_VERSION="$(echo "${PYTEST_VERSION}" | cut -d' ' -f2)"
 fi
 
-if ! python3 -c "import junitparser" >/dev/null 2>&1; then
+echo "> test python junitparser"
+if ! ${PYTHON} -c "import junitparser" >/dev/null 2>&1; then
     echo "Error: Required Python package 'junitparser' not found."
     exit 1
 fi
 
 # source helpers to set environment variables and make functions available
+echo "> source nest_vars.sh…"
 . "${PREFIX}/bin/nest_vars.sh"
+echo "> source junit_xml.sh…"
 . "$(dirname $0)/junit_xml.sh"
+echo "> source run_test.sh…"
 . "$(dirname $0)/run_test.sh"
 
+echo "> prepare test result directories…"
 TEST_BASEDIR="${PREFIX}/share/nest/testsuite"
 
 # create the report directory in TEST_BASEDIR. Save and restore the old value
@@ -144,6 +151,7 @@ echo "${TEST_BASEDIR}"
 ls -la "${TEST_BASEDIR}"
 
 NEST="nest_serial"
+echo "> ask SLI for MPI setting…"
 HAVE_MPI="$(sli -c 'statusdict/have_mpi :: =only')"
 
 if test "${HAVE_MPI}" = "true"; then
@@ -157,6 +165,7 @@ if test "${HAVE_MPI}" = "true"; then
     fi
 fi
 
+echo "> check for special Mac OS settings…"
 # Under Mac OS X, suppress crash reporter dialogs. Restore old state at end.
 echo "INFO_OS=${INFO_OS}"
 if test "x${INFO_OS}" = "xDarwin"; then
@@ -203,11 +212,13 @@ echo "  PATH ............... `print_paths ${PATH}`"
 echo
 echo "================================================================================"
 
+echo "> headline…"
 HEADLINE="$(nest -v) testsuite log"
 echo >  "${TEST_LOGFILE}" "$HEADLINE"
 echo >> "${TEST_LOGFILE}" "$(printf '%0.s=' $(seq 1 ${#HEADLINE}))"
 echo >> "${TEST_LOGFILE}" "Running tests from ${TEST_BASEDIR}"
 
+echo "> start test phases…"
 CODES_SKIPPED=\
 ' 200 Skipped,'\
 ' 201 Skipped (MPI required),'\
