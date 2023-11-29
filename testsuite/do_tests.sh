@@ -104,8 +104,8 @@ if test "${PYTHON}"; then
       PYTEST_VERSION="$(echo "${PYTEST_VERSION}" | cut -d' ' -f2)"
 fi
 
-echo "> test python junitparser"
-if ! ${PYTHON} -c "import junitparser" >/dev/null 2>&1; then
+echo "> test if junitparser is available in python3…"
+if ! python3 -c "import junitparser" >/dev/null 2>&1; then
     echo "Error: Required Python package 'junitparser' not found."
     exit 1
 fi
