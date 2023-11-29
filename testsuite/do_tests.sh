@@ -213,7 +213,7 @@ echo
 echo "================================================================================"
 
 echo "> headline…"
-HEADLINE="$(nest -v) testsuite log"
+HEADLINE="NEST testsuite log"
 echo >  "${TEST_LOGFILE}" "$HEADLINE"
 echo >> "${TEST_LOGFILE}" "$(printf '%0.s=' $(seq 1 ${#HEADLINE}))"
 echo >> "${TEST_LOGFILE}" "Running tests from ${TEST_BASEDIR}"
