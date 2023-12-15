@@ -272,7 +272,7 @@ class UserDocExtractor:
             #log.debug("%3d docs in index for %s...", nfiles, str(current_tags))
             log.debug("generating index for %s...", str(current_tags))
             indextext = rst_index(hier, current_tags)
-            with open(os.path.join(outdir, indexname), "w") as outfile:
+            with open(os.path.join(self._outdir, indexname), "w") as outfile:
                 outfile.write(indextext)
             indexfiles.append(indexname)
         log.info("%4d non-empty index files generated", len(indexfiles))
@@ -601,6 +601,58 @@ def output_exit(result):
     if isinstance(result, list):
         log.info("result list with %d entries", len(result))
     sys.exit(0)
+
+
+def ExtractUserDocs(listoffiles, basedir="..", outdir="userdocs/"):
+    """
+    Extract and build all user documentation and build tag indices.
+    Writes extracted information to JSON files in outdir. In particular the
+    list of seen tags mapped to files they appear in, and the indices generated
+    from all combinations of tags.
+    Parameters are the same as for `UserDocExtractor` and are handed to it
+    unmodified.
+    Returns
+    -------
+    None
+    """
+    data = JsonWriter(outdir)
+    # Gather all information and write RSTs
+    extractor = UserDocExtractor(outdir=outdir, basedir=basedir)
+    extractor.extract_all(listoffiles)
+    tags = extractor.tagdict
+    data.write(tags, "tags")
+
+    indexfiles = extractor.CreateTagIndices()
+
+    data.write(indexfiles, "indexfiles")
+
+    toc_list = [name[:-4] for names in tags.values() for name in names]
+    idx_list = [indexfile[:-4] for indexfile in indexfiles]
+
+    with open(os.path.join(outdir, "toc-tree.json"), "w") as tocfile:
+        json.dump(list(set(toc_list)) + list(set(idx_list)), tocfile)
+
+
+def config_inited_handler(app, config):
+    """
+    This is the entrypoint called by the registered Sphinx hook.
+    """
+    models_rst_dir = os.path.abspath("models")
+    repo_root_dir = os.path.abspath("../..")
+    ExtractUserDocs(
+        listoffiles=relative_glob("models/*.h", "nestkernel/*.h", basedir=repo_root_dir),
+        basedir=repo_root_dir,
+        outdir=models_rst_dir,
+    )
+
+
+def setup(app):
+    app.connect("config-inited", config_inited_handler)
+    return {
+        'version': '0.1',
+        'parallel_read_safe': True,
+        'parallel_write_safe': True,
+    }
 
 
 if __name__ == "__main__":

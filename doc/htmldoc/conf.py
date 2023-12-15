@@ -32,8 +32,6 @@ from urllib.request import urlretrieve
 extension_module_dir = os.path.abspath("./_ext")
 sys.path.append(extension_module_dir)
 
-from extractor_userdocs import ExtractUserDocs, relative_glob  # noqa
-
 repo_root_dir = os.path.abspath("../..")
 pynest_dir = os.path.join(repo_root_dir, "pynest")
 # Add the NEST Python module to the path (just the py files, the binaries are mocked)
@@ -63,6 +61,7 @@ extensions = [
     "VersionSyncRole",
     "sphinx_copybutton",
     "notfound.extension",
+    "extractor_userdocs",
 ]
 
 autodoc_mock_imports = ["nest.pynestkernel", "nest.ll_api"]
@@ -208,14 +207,6 @@ intersphinx_mapping = {
 }
 
 
-def config_inited_handler(app, config):
-    models_rst_dir = os.path.abspath("models")
-    ExtractUserDocs(
-        listoffiles=relative_glob("models/*.h", "nestkernel/*.h", basedir=repo_root_dir),
-        basedir=repo_root_dir,
-        outdir=models_rst_dir,
-    )
-
 
 def toc_customizer(app, docname, source):
     if docname == "models/models-toc":
@@ -233,7 +224,6 @@ def setup(app):
     app.add_css_file("css/custom.css")
     app.add_css_file("css/pygments.css")
     app.add_js_file("js/custom.js")
-    app.connect("config-inited", config_inited_handler)
 
 
 nitpick_ignore = [
