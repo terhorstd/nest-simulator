@@ -31,6 +31,7 @@ import logging
 import os
 import re
 import sys
+from typing import Optional, List, Dict
 from collections import Counter
 from itertools import chain, combinations
 from math import comb
@@ -251,6 +252,8 @@ class UserDocExtractor:
         maxtaglen = max([len(t) for t in tags])
         for tag, count in sorted([(tag, len(lst)) for tag, lst in tags.items()], key=lambda x: x[1]):
             log.info("    %%%ds tag in %%d files" % maxtaglen, tag, count)
+        if "NOINDEX" in taglist:
+            taglist.remove("NOINDEX")
         if "" in taglist:
             taglist.remove("")
         indexfiles = list()
@@ -258,10 +261,11 @@ class UserDocExtractor:
         nindices = sum([comb(len(taglist), L) for L in range(depth - 1)])
         log.info("indices down to level %d → %d possible keyword combinations", depth, nindices)
         for current_tags in tqdm(
-            chain(*[combinations(taglist, L) for L in range(depth - 1)]), unit="idx", desc="keyword indices", total=nindices
+            chain(*[combinations(taglist, L) for L in range(depth+1)]), unit="idx", desc="keyword indices", total=nindices
         ):
             current_tags = sorted(current_tags)
             indexname = "index%s.rst" % "".join(["_" + x for x in current_tags])
+            log.debug("generating index level %d for %s", len(current_tags), current_tags)
             hier = make_hierarchy(tags.copy(), *current_tags)
             if not any(hier.values()):
                 log.debug("index %s is empty!", str(current_tags))
@@ -275,7 +279,7 @@ class UserDocExtractor:
             with open(os.path.join(self._outdir, indexname), "w") as outfile:
                 outfile.write(indextext)
             indexfiles.append(indexname)
-        log.info("%4d non-empty index files generated", len(indexfiles))
+        log.warning("%4d non-empty index files generated", len(indexfiles))
         return indexfiles
 
 
@@ -457,7 +461,7 @@ def rst_index(hierarchy, current_tags=[], underlines="=-~", top=True):
        formatted pretty index.
     """
 
-    def mktitle(t, ul, link=None):
+    def mktitle(t: str, ul: str, link: Optional[str]=None) -> str:
         text = t
         if t != t.upper():
             text = t.title()  # title-case any tag that is not an acronym
@@ -465,7 +469,7 @@ def rst_index(hierarchy, current_tags=[], underlines="=-~", top=True):
         text = title + "\n" + ul * len(title) + "\n\n"
         return text
 
-    def mkitem(t):
+    def mkitem(t) -> str:
         return "* :doc:`%s`" % os.path.splitext(t)[0]
 
     output = list()
@@ -494,7 +498,11 @@ def rst_index(hierarchy, current_tags=[], underlines="=-~", top=True):
         else:
             title = " & ".join(tags)
         if title and not len(hierarchy) == 1:  # not print title if already selected by current_tags
-            output.append(mktitle(title, underlines[0]))
+            if isinstance(tags, str):
+                subindex = 'index_' + "_".join(sorted([tags]+current_tags))
+            else:
+                subindex = 'index_' + "_".join(sorted(tags+current_tags))
+            output.append(mktitle(title, underlines[0], subindex))
         if isinstance(items, dict):
             output.append(rst_index(items, current_tags, underlines[1:], top=False))
         else:
