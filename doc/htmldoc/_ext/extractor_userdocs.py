@@ -18,25 +18,25 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with NEST.  If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 Extract user-documentation from C++ code files.
 
 Usage: extract_userdocs list files
        extract_userdocs run
 
-'''
+"""
 import glob
 import json
 import logging
 import os
 import re
 import sys
-from typing import Optional, List, Dict
 from collections import Counter
 from itertools import chain, combinations
 from math import comb
-from pprint import pformat
 from pathlib import Path
+from pprint import pformat
+from typing import Dict, List, Optional
 
 from tqdm import tqdm
 
@@ -84,7 +84,7 @@ class UserDoc:
 
 
 class UserDocExtractor:
-    def __init__(self, outdir: str="userdocs/", basedir: str ="..", replace_ext: str=".rst"):
+    def __init__(self, outdir: str = "userdocs/", basedir: str = "..", replace_ext: str = ".rst"):
         """
         Create a userdoc extractor instance.
 
@@ -111,8 +111,7 @@ class UserDocExtractor:
             log.info("creating output directory %s", self._outdir)
             self._outdir.mkdir()
 
-        self._documents : list[UserDoc] = []
-
+        self._documents: list[UserDoc] = []
 
     def extract_all(self, filenames: list[Path]) -> int:
         """
@@ -134,7 +133,7 @@ class UserDocExtractor:
         int
            number of successfully extraced UserDoc objects.
         """
-        nfiles_total = 0    # count one-by-one to not exhaust iterators
+        nfiles_total = 0  # count one-by-one to not exhaust iterators
         n_extracted = 0
         with tqdm(unit="files", total=len(filenames)) as progress:
             for filename in filenames:
@@ -147,7 +146,7 @@ class UserDocExtractor:
                     n_extracted += 1
                     userdoc.save()
                 except NoUserDocsFound:
-                    log.info("No user documentation found in " + filename)
+                    log.info("No user documentation found in %s", filename)
 
         tagdict = self.tagdict
         log.info("%4d tags found:\n%s", len(tagdict), pformat(list(tagdict.keys())))
@@ -155,7 +154,6 @@ class UserDocExtractor:
         log.info("%4d files in input", nfiles_total)
         log.info("%4d files with documentation", nfiles)
         return n_extracted
-
 
     @property
     def tagdict(self) -> dict[str, list[str]]:
@@ -167,12 +165,11 @@ class UserDocExtractor:
         dict
            mapping tags to lists of documentation filenames (relative to `_outdir`).
         """
-        tagdict = dict()  # map tags to lists of documents
+        tagdict: Dict[str, List[str]] = dict()  # map tags to lists of documents
         for userdoc in self._documents:
             for tag in userdoc.tags:
                 tagdict.setdefault(tag, list()).append(userdoc.filename.name)
         return tagdict
-
 
     def extract(self, filename: Path):
         """
@@ -235,7 +232,6 @@ class UserDocExtractor:
             log.info("Failed to rebuild 'See also' section: %s", e)
         return UserDoc(doc, tags, self._outdir / outname)
 
-
     def CreateTagIndices(self) -> list[str]:
         """
         This function generates all combinations of tags and creates an index page
@@ -261,19 +257,22 @@ class UserDocExtractor:
         nindices = sum([comb(len(taglist), L) for L in range(depth - 1)])
         log.info("indices down to level %d → %d possible keyword combinations", depth, nindices)
         for current_tags in tqdm(
-            chain(*[combinations(taglist, L) for L in range(depth+1)]), unit="idx", desc="keyword indices", total=nindices
+            chain(*[combinations(taglist, L) for L in range(depth + 1)]),
+            unit="idx",
+            desc="keyword indices",
+            total=nindices,
         ):
-            current_tags = sorted(current_tags)
+            current_tags = tuple(sorted(current_tags))
             indexname = "index%s.rst" % "".join(["_" + x for x in current_tags])
             log.debug("generating index level %d for %s", len(current_tags), current_tags)
             hier = make_hierarchy(tags.copy(), *current_tags)
             if not any(hier.values()):
                 log.debug("index %s is empty!", str(current_tags))
                 continue
-            #subtags = [set(subtag) for subtag in hier.values()]
-            #log.debug("subtags = %s", subtags)
-            #nfiles = len(set.union(*chain([set(subtag) for subtag in hier.values()])))
-            #log.debug("%3d docs in index for %s...", nfiles, str(current_tags))
+            # subtags = [set(subtag) for subtag in hier.values()]
+            # log.debug("subtags = %s", subtags)
+            # nfiles = len(set.union(*chain([set(subtag) for subtag in hier.values()])))
+            # log.debug("%3d docs in index for %s...", nfiles, str(current_tags))
             log.debug("generating index for %s...", str(current_tags))
             indextext = rst_index(hier, current_tags)
             with open(os.path.join(self._outdir, indexname), "w") as outfile:
@@ -461,7 +460,7 @@ def rst_index(hierarchy, current_tags=[], underlines="=-~", top=True):
        formatted pretty index.
     """
 
-    def mktitle(t: str, ul: str, link: Optional[str]=None) -> str:
+    def mktitle(t: str, ul: str, link: Optional[str] = None) -> str:
         text = t
         if t != t.upper():
             text = t.title()  # title-case any tag that is not an acronym
@@ -499,9 +498,9 @@ def rst_index(hierarchy, current_tags=[], underlines="=-~", top=True):
             title = " & ".join(tags)
         if title and not len(hierarchy) == 1:  # not print title if already selected by current_tags
             if isinstance(tags, str):
-                subindex = 'index_' + "_".join(sorted([tags]+current_tags))
+                subindex = "index_" + "_".join(sorted([tags] + current_tags))
             else:
-                subindex = 'index_' + "_".join(sorted(tags+current_tags))
+                subindex = "index_" + "_".join(sorted(tags + current_tags))
             output.append(mktitle(title, underlines[0], subindex))
         if isinstance(items, dict):
             output.append(rst_index(items, current_tags, underlines[1:], top=False))
@@ -538,8 +537,6 @@ def reverse_dict(tags):
         for item in items:
             revdict.setdefault(item, list()).append(tag)
     return revdict
-
-
 
 
 class JsonWriter:
@@ -657,9 +654,9 @@ def config_inited_handler(app, config):
 def setup(app):
     app.connect("config-inited", config_inited_handler)
     return {
-        'version': '0.1',
-        'parallel_read_safe': True,
-        'parallel_write_safe': True,
+        "version": "0.1",
+        "parallel_read_safe": True,
+        "parallel_write_safe": True,
     }
 
 
