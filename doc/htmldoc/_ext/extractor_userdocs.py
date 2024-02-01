@@ -165,7 +165,7 @@ class UserDocExtractor:
         dict
            mapping tags to lists of documentation filenames (relative to `_outdir`).
         """
-        tagdict: Dict[str, List[str]] = dict()  # map tags to lists of documents
+        tagdict: dict[str, list[str]] = dict()  # map tags to lists of documents
         for userdoc in self._documents:
             for tag in userdoc.tags:
                 tagdict.setdefault(tag, list()).append(userdoc.filename.name)
@@ -269,6 +269,8 @@ class UserDocExtractor:
             if not any(hier.values()):
                 log.debug("index %s is empty!", str(current_tags))
                 continue
+            log.warning("generating index level %d for %s", len(current_tags), current_tags)
+            log.warning(f"{hier=}")
             # subtags = [set(subtag) for subtag in hier.values()]
             # log.debug("subtags = %s", subtags)
             # nfiles = len(set.union(*chain([set(subtag) for subtag in hier.values()])))
@@ -498,9 +500,9 @@ def rst_index(hierarchy, current_tags=[], underlines="=-~", top=True):
             title = " & ".join(tags)
         if title and not len(hierarchy) == 1:  # not print title if already selected by current_tags
             if isinstance(tags, str):
-                subindex = "index_" + "_".join(sorted([tags] + current_tags))
+                subindex = "index_" + "_".join(sorted(chain([tags], current_tags)))
             else:
-                subindex = "index_" + "_".join(sorted(tags + current_tags))
+                subindex = "index_" + "_".join(sorted(chain(tags, current_tags)))
             output.append(mktitle(title, underlines[0], subindex))
         if isinstance(items, dict):
             output.append(rst_index(items, current_tags, underlines[1:], top=False))
@@ -642,13 +644,17 @@ def config_inited_handler(app, config):
     """
     This is the entrypoint called by the registered Sphinx hook.
     """
-    models_rst_dir = os.path.abspath("models")
-    repo_root_dir = os.path.abspath("../..")
-    ExtractUserDocs(
-        listoffiles=relative_glob("models/*.h", "nestkernel/*.h", basedir=repo_root_dir),
-        basedir=repo_root_dir,
-        outdir=models_rst_dir,
-    )
+    try:
+        models_rst_dir = os.path.abspath("models")
+        repo_root_dir = os.path.abspath("../..")
+        ExtractUserDocs(
+            listoffiles=relative_glob("models/*.h", "nestkernel/*.h", basedir=repo_root_dir),
+            basedir=repo_root_dir,
+            outdir=models_rst_dir,
+        )
+    except Exception as exc:
+        log.exception(exc)
+        raise
 
 
 def setup(app):
