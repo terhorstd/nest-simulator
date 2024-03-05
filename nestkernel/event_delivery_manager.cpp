@@ -133,7 +133,7 @@ EventDeliveryManager::finalize()
   }
   off_grid_emitted_spikes_register_.clear();
 
-  for ( auto it : spike_recv_register_ )
+  for ( auto& it : spike_recv_register_ )
   {
     it->clear();
     delete ( it );
@@ -660,11 +660,14 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
       if ( kernel().connection_manager.use_compressed_spikes() )
       {
         // when compressed, spikes do not have lcid set, so we need to do a lookup here and uncompress
-        for ( auto spike_data :
+        for ( auto& uncompressed_spike_data :
           kernel().connection_manager.get_compressed_spike_data( spike_data.get_syn_id(), spike_data.get_lcid() ) )
         {
-          ( *spike_recv_register_[ tid ] )[ spike_data.get_tid() ][ spike_data.get_syn_id() ][ spike_data.get_lag() ]
-            .push_back( spike_data );
+	  if ( uncompressed_spike_data.get_lcid() != invalid_lcid )
+	  {
+	    ( *spike_recv_register_[ tid ] )[ uncompressed_spike_data.get_tid() ][ uncompressed_spike_data.get_syn_id() ][ uncompressed_spike_data.get_lag() ]
+	      .push_back( uncompressed_spike_data );
+	  }
         }
       }
       else // spikes are already uncompressed
@@ -692,7 +695,7 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
       for ( size_t lag = 0; lag < srr_w_tid[ syn_id ].size(); ++lag )
       {
         se.set_stamp( prepared_timestamps[ lag ] );
-        for ( auto it_spike_data : srr_w_tid[ syn_id ][ lag ] )
+        for ( const auto it_spike_data : srr_w_tid[ syn_id ][ lag ] )
         {
           se.set_offset( it_spike_data.get_offset() );
 
@@ -719,17 +722,17 @@ EventDeliveryManager::resize_spike_recv_register_()
   const long mindelay_steps = kernel().connection_manager.get_min_delay();
 
   spike_recv_register_.resize( num_threads );
-  for ( auto it_w_tid : spike_recv_register_ )
+  for ( auto& it_w_tid : spike_recv_register_ )
   {
-    if ( it_w_tid == NULL )
+    if ( it_w_tid == nullptr )
     {
       it_w_tid = new std::vector< std::vector< std::vector< std::vector< SpikeData > > > >();
     }
     it_w_tid->resize( num_threads );
-    for ( auto it_r_tid : *it_w_tid )
+    for ( auto& it_r_tid : *it_w_tid )
     {
       it_r_tid.resize( num_synapse_types );
-      for ( auto it_syn_id : it_r_tid )
+      for ( auto& it_syn_id : it_r_tid )
       {
         it_syn_id.resize( mindelay_steps );
       }
@@ -740,11 +743,11 @@ EventDeliveryManager::resize_spike_recv_register_()
 void
 EventDeliveryManager::reset_spike_recv_register_( const size_t tid )
 {
-  for ( auto it_r_tid : ( *spike_recv_register_[ tid ] ) )
+  for ( auto& it_r_tid : ( *spike_recv_register_[ tid ] ) )
   {
-    for ( auto it_syn_id : it_r_tid )
+    for ( auto& it_syn_id : it_r_tid )
     {
-      for ( auto it_lag : it_syn_id )
+      for ( auto& it_lag : it_syn_id )
       {
         it_lag.clear();
       }
