@@ -665,7 +665,7 @@ EventDeliveryManager::deliver_events_( const size_t tid, const std::vector< Spik
         {
 	  if ( uncompressed_spike_data.get_lcid() != invalid_lcid )
 	  {
-	    ( *spike_recv_register_[ tid ] )[ uncompressed_spike_data.get_tid() ][ uncompressed_spike_data.get_syn_id() ][ uncompressed_spike_data.get_lag() ]
+	    ( *spike_recv_register_[ tid ] )[ uncompressed_spike_data.get_tid() ][ uncompressed_spike_data.get_syn_id() ][ spike_data.get_lag() ]
 	      .push_back( uncompressed_spike_data );
 	  }
         }
