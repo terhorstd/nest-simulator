@@ -83,77 +83,21 @@ class UserDoc:
         return self._filename
 
 
-class UserDocExtractor:
-    def __init__(self, outdir: str = "userdocs/", basedir: str = "..", replace_ext: str = ".rst"):
-        """
-        Create a userdoc extractor instance.
+class KeywordIndex:
 
-        Instanciation already prepares for all kinds of operations, so outdir
-        is created, checks are being done, etc.
-
-        Parameters
-        ----------
-
-        basedir : str, path
-           Directory to which input `filenames` are relative.
-
-        replace_ext : str
-           Replacement for the extension of the original filename when writing to `outdir`.
-
-        outdir : str, path
-           Directory where output files are created.
-        """
-        self._outdir = Path(outdir)
-        self._basedir = Path(basedir)
-        self._replace_ext = replace_ext
-
-        if not self._outdir.exists() or not self._outdir.is_dir():
-            log.info("creating output directory %s", self._outdir)
-            self._outdir.mkdir()
-
+    def __init__(self):
         self._documents: list[UserDoc] = []
 
-    def extract_all(self, filenames: list[Path]) -> int:
+    def add(self, userdoc: UserDoc):
         """
-        Extract all user documentation from given files.
-
-        This method calls ``extract()`` on all given files and stores documents
-        in this instance.
-
-        The extracted documentation is written to a file via `UserDoc.save()`.
+        Add the given document to the index.
 
         Parameters
         ----------
-
-        filenames : iterable
-           Any iterable with input file names (relative to `_basedir`).
-
-        Returns
-        -------
-        int
-           number of successfully extraced UserDoc objects.
+        userdoc : UserDoc
+           Parsed document to be added.
         """
-        nfiles_total = 0  # count one-by-one to not exhaust iterators
-        n_extracted = 0
-        with tqdm(unit="files", total=len(filenames)) as progress:
-            for filename in filenames:
-                progress.set_postfix(file=os.path.basename(filename)[:15], refresh=False)
-                progress.update(1)
-                nfiles_total += 1
-                try:
-                    userdoc = self.extract(filename)
-                    self._documents.append(userdoc)
-                    n_extracted += 1
-                    userdoc.save()
-                except NoUserDocsFound:
-                    log.info("No user documentation found in %s", filename)
-
-        tagdict = self.tagdict
-        log.info("%4d tags found:\n%s", len(tagdict), pformat(list(tagdict.keys())))
-        nfiles = len(set.union(*[set(x) for x in tagdict.values()]))
-        log.info("%4d files in input", nfiles_total)
-        log.info("%4d files with documentation", nfiles)
-        return n_extracted
+        self._documents.append(userdoc)
 
     @property
     def tagdict(self) -> dict[str, list[str]]:
@@ -170,6 +114,66 @@ class UserDocExtractor:
             for tag in userdoc.tags:
                 tagdict.setdefault(tag, list()).append(userdoc.filename.name)
         return tagdict
+
+
+class UserDocExtractor:
+    def __init__(self, basedir: str = ".."):
+        """
+        Create a userdoc extractor instance.
+
+        Instanciation already prepares for all kinds of operations, so outdir
+        is created, checks are being done, etc.
+
+        Parameters
+        ----------
+
+        basedir : str, path
+           Directory to which input `filenames` are relative.
+        """
+        self._basedir = Path(basedir)
+
+    def extract_all(self, filenames: list[Path]) -> KeywordIndex:
+        """
+        Extract all user documentation from given files.
+
+        This method calls ``extract()`` on all given files and stores documents
+        in this instance.
+
+        The extracted documentation is written to a file via `UserDoc.save()`.
+
+        Parameters
+        ----------
+
+        filenames : iterable
+           Any iterable with input file names (relative to `_basedir`).
+
+        Returns
+        -------
+        KeywordIndex
+           Index of successfully extraced UserDoc objects.
+        """
+        index = KeywordIndex()
+        nfiles_total = 0  # count one-by-one to not exhaust iterators
+        n_extracted = 0
+        with tqdm(unit="files", total=len(filenames)) as progress:
+            for filename in filenames:
+                progress.set_postfix(file=os.path.basename(filename)[:15], refresh=False)
+                progress.update(1)
+                nfiles_total += 1
+                try:
+                    userdoc = self.extract(filename)
+                    index.add(userdoc)
+                    n_extracted += 1
+                    userdoc.save()
+                except NoUserDocsFound:
+                    log.info("No user documentation found in %s", filename)
+
+        tagdict = index.tagdict
+        log.info("%4d tags found:\n%s", len(tagdict), pformat(list(tagdict.keys())))
+        nfiles = len(set.union(*[set(x) for x in tagdict.values()]))
+        log.info("%4d files in input", nfiles_total)
+        log.info("%4d files with documentation", nfiles)
+        return index
 
     def extract(self, filename: Path):
         """
@@ -232,7 +236,33 @@ class UserDocExtractor:
             log.info("Failed to rebuild 'See also' section: %s", e)
         return UserDoc(doc, tags, self._outdir / outname)
 
-    def CreateTagIndices(self) -> list[str]:
+
+class RstWriter:
+    """
+    Class holding all output methods for writing RST files.
+
+    Handled objects are of internal types only: UserDoc, KeywordIndex.
+    """
+    def __init__(self, outdir: str = "userdocs/", replace_ext: str = ".rst"):
+        """
+        Parameters
+        ----------
+        replace_ext : str
+           Replacement for the extension of the original filename when writing to `outdir`.
+
+        outdir : str, path
+           Directory where output files are created.
+        """
+        self._outdir = Path(outdir)
+        self._replace_ext = replace_ext
+
+        self._outdir = Path(outdir)
+        if not self._outdir.exists() or not self._outdir.is_dir():
+            log.info("creating output directory %s", self._outdir)
+            self._outdir.mkdir()
+
+
+    def CreateTagIndices(self, index: KeywordIndex) -> list[str]:
         """
         This function generates all combinations of tags and creates an index page
         for each combination using `rst_index`.
@@ -243,7 +273,7 @@ class UserDocExtractor:
         list
             list of names of generated files. (relative to `_outdir`)
         """
-        tags = self.tagdict
+        tags = index.tagdict
         taglist = list(tags.keys())
         maxtaglen = max([len(t) for t in tags])
         for tag, count in sorted([(tag, len(lst)) for tag, lst in tags.items()], key=lambda x: x[1]):
@@ -503,6 +533,8 @@ def rst_index(hierarchy, current_tags=[], underlines="=-~", top=True):
                 subindex = "index_" + "_".join(sorted(chain([tags], current_tags)))
             else:
                 subindex = "index_" + "_".join(sorted(chain(tags, current_tags)))
+            if isinstance(items, list):
+                title += f" ({len(items)})"
             output.append(mktitle(title, underlines[0], subindex))
         if isinstance(items, dict):
             output.append(rst_index(items, current_tags, underlines[1:], top=False))
@@ -625,7 +657,7 @@ def ExtractUserDocs(listoffiles, basedir="..", outdir="userdocs/"):
     data = JsonWriter(outdir)
     # Gather all information and write RSTs
     extractor = UserDocExtractor(outdir=outdir, basedir=basedir)
-    extractor.extract_all(listoffiles)
+    index = extractor.extract_all(listoffiles)
     tags = extractor.tagdict
     data.write(tags, "tags")
 
@@ -667,6 +699,11 @@ def setup(app):
 
 
 if __name__ == "__main__":
+    #
+    # NOTE: This code is only executed when called from the command line. The
+    # normal mode of operation is to place a hook via `setup()` and then be
+    # called by Sphinx at the appropriate point(s) in the process.
+    #
     globs = ("models/*.h", "nestkernel/*.h")
     basedir = ".."
     outdir = "userdocs/"
