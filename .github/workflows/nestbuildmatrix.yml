@@ -515,6 +515,11 @@ jobs:
       BUILD_PATH: "build"
       NEST_RESULT: "result"
 
+      # Wether this job will save or restore the build direcotry of this pipeline run (github.run_number)
+      # note that this cannot be in strategy:matrix because 'if' is evaluated before matrix (see
+      # https://docs.github.com/en/actions/using-jobs/using-conditions-to-control-job-execution#overview )
+      USE_CACHED_BUILD_DIR: false
+
     strategy:
       fail-fast: false
       matrix:
@@ -529,7 +534,7 @@ jobs:
           - "mpi, python, gsl, ltdl, boost, optimize, warning"
           - "openmp, mpi, python, gsl, ltdl, boost, hdf5, sionlib, libneurosim, optimize, warning"
 
-    steps:
+    steps: &build_linux_steps
       - name: Harden Runner
         uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
         with:
@@ -543,7 +548,16 @@ jobs:
 
       - name: Cache build directory
         id: build-cache
+        if: ${{ ! env.USE_CACHED_BUILD_DIR }}
         uses: actions/cache/save@v4
+        with:
+          path: ${{ env.BUILD_PATH }}
+          key: ${{ runner.os }}-${{ runner.cpp_compiler }}-python${{ matrix.python_version }}-${{ runner.use }}-${{ github.run_number }}-build
+
+      - name: Cache build directory
+        id: build-cache
+        if: ${{ env.USE_CACHED_BUILD_DIR }}
+        uses: actions/cache/restore@v4
         with:
           path: ${{ env.BUILD_PATH }}
           key: ${{ runner.os }}-${{ runner.cpp_compiler }}-python${{ matrix.python_version }}-${{ runner.use }}-${{ github.run_number }}-build
@@ -721,7 +735,7 @@ jobs:
             **.log
             ${{ env.BUILD_PATH }}/reports/**
 
-  build_python_matrix_linux:
+  build_linux_python_matrix:
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
     runs-on: ${{ matrix.os }}
     needs: [clang-format, mypy, copyright_headers, unused_names, forbidden_types, pylint, isort, black, flake8]
@@ -729,6 +743,7 @@ jobs:
       CXX_FLAGS: "-pedantic -Wextra -Woverloaded-virtual -Wno-unknown-pragmas"
       BUILD_PATH: "build"
       NEST_RESULT: "result"
+      USE_CACHED_BUILD_DIR: true    # this makes it be fast
 
     strategy:
       fail-fast: false
@@ -740,197 +755,9 @@ jobs:
         cpp_compiler: ["gcc"]
         use: ["openmp, mpi, python, gsl, ltdl, boost, hdf5, sionlib, libneurosim, optimize, warning"]
 
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
-        with:
-          egress-policy: audit
-          disable-telemetry: true
+    steps: *build_linux_steps
 
-      - name: "Checkout repository content"
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          fetch-depth: 0
 
-      - name: Cache build directory
-        id: build-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: ${{ env.BUILD_PATH }}
-          key: ${{ runner.os }}-${{ runner.cpp_compiler }}-python${{ matrix.python_version }}-${{ runner.use }}-${{ github.run_number }}-build
-
-      - name: "Set up Python 3.x"
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
-        with:
-          python-version: ${{ matrix.python_version }}
-
-      - name: "Restore apt cache"
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
-        env:
-          cache-name: "apt-cache"
-        with:
-          path: |
-            !/var/cache/apt/archives/lock
-            !/var/cache/apt/archives/partial
-            /var/cache/apt
-          key: ${{ runner.os }}-system-${{ env.cache-name }}-${{ hashFiles('**/environment.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-system-${{ env.cache-name }}-
-            ${{ runner.os }}-system-
-
-      - name: "Install Linux system dependencies"
-        run: |
-          sudo apt-get update
-          # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md
-          sudo apt-get install ccache
-          sudo apt-get install libltdl-dev libreadline6-dev libncurses5-dev libgsl0-dev python3-all-dev jq libpcre3 libpcre3-dev
-          sudo apt-get install tcl8.6 tcl8.6-dev tk8.6-dev
-          # Install MPI dependencies regardless of whether we compile NEST with or without MPI, so the installation of MPI4Py works
-          sudo apt-get install openmpi-bin libopenmpi-dev
-          sudo apt-get install libboost-filesystem-dev libboost-regex-dev libboost-wave-dev libboost-python-dev libboost-program-options-dev libboost-test-dev
-          sudo apt-get install pkg-config
-          sudo ldconfig
-
-      - name: "Install GSL system dependencies"
-        if: "${{ contains(matrix.use, 'gsl') }}"
-        run: |
-          sudo apt-get install libgsl0-dev
-
-      - name: "Install HDF5 system dependencies"
-        if: "${{ contains(matrix.use, 'hdf5') }}"
-        run: |
-          sudo apt-get install libhdf5-dev
-
-      - name: "Restore ccache"
-        # Using CCache to re-use compiled objects from prior runs that have the same
-        # source (hashed), compiler (mtime+size) and compile flags.
-        env:
-          cache-name: "ccache"
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
-        with:
-          path: |
-            $HOME/.ccache
-            .ccache
-            /home/runner/.ccache
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.cpp_compiler }}-${{ matrix.NEST_BUILD_TYPE }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.cpp_compiler }}-${{ matrix.NEST_BUILD_TYPE }}
-            ${{ runner.os }}-${{ env.cache-name }}-${{ matrix.cpp_compiler }}
-            ${{ runner.os }}-${{ env.cache-name }}
-            ${{ runner.os }}
-
-      - name: "Restore pip cache"
-        env:
-          cache-name: "pip-cache"
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
-        with:
-          path: |
-            /opt/hostedtoolcache/Python/**/site-packages/*
-            $HOME/.cache/pip
-          key: ${{ runner.os }}-python${{ matrix.python_version }}-${{ env.cache-name }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-python${{ matrix.python_version }}-${{ env.cache-name }}-
-            ${{ runner.os }}-python${{ matrix.python_version }}-
-
-      - name: "Install Python dependencies"
-        run: |
-          python -m pip install --upgrade pip setuptools
-          python -c "import setuptools; print('package location:', setuptools.__file__)"
-          python -m pip install --force-reinstall --upgrade scipy 'junitparser>=2' numpy pytest pytest-timeout pytest-xdist cython matplotlib terminaltables pandoc pandas
-          # Install mpi4py regardless of whether we compile NEST with or without MPI, so regressiontests/issue-1703.py will run in both cases
-          python -m pip install --force-reinstall --upgrade mpi4py
-          test \! -e "=2"   # assert junitparser is correctly quoted and '>' is not interpreted as shell redirect
-          python -c "import pytest; print('package location:', pytest.__file__)"
-          pip list
-
-      - name: "Install h5py"
-        if: "${{ contains(matrix.use, 'hdf5') }}"
-        run: |
-          python -m pip install --force-reinstall --upgrade --no-binary=h5py h5py
-
-      - name: "Install MUSIC"
-        if: "${{ contains(matrix.use, 'music') }}"
-        run: |
-          chmod +x build_support/install_music.sh
-          ./build_support/install_music.sh
-
-      - name: "Install SIONlib"
-        if: "${{ contains(matrix.use, 'sionlib') }}"
-        run: |
-          chmod +x build_support/install_sionlib.sh
-          ./build_support/install_sionlib.sh
-
-      - name: "Install LibNeurosim – WARNING WARNING NO PROPER PYTHON INSTALL!"
-        if: "${{ contains(matrix.use, 'libneurosim') }}"
-        run: |
-          chmod +x build_support/install_csa-libneurosim.sh
-          PYLIB_DIR="$(python3 -c "import sysconfig; print(sysconfig.get_path('include'))" | sed 's/include/lib/')"
-          ./build_support/install_csa-libneurosim.sh $PYLIB_DIR
-
-      - name: "Configure NEST build"
-        env:
-          CMAKE_C_COMPILER_LAUNCHER: ccache
-          CMAKE_CXX_COMPILER_LAUNCHER: ccache
-        run: |
-          mkdir -p "$BUILD_PATH/reports" "$NEST_RESULT"
-
-          if [ "$xNEST_BUILD_COMPILER" = "CLANG" ]; then
-              export CC=clang-11
-              export CXX=clang++-11
-          fi
-          export CXX_FLAGS="-pedantic -Wextra -Wno-unknown-pragmas -D_GLIBCXX_ASSERTIONS"
-
-          cd "$BUILD_PATH"
-          cmake \
-              -DCMAKE_INSTALL_PREFIX="$NEST_RESULT" \
-              -DCMAKE_CXX_FLAGS="$CXX_FLAGS" \
-              -Dwith-optimize=${{ contains(matrix.use, 'optimize') && 'ON' || 'OFF' }} \
-              -Dwith-warning=${{ contains(matrix.use, 'warning') && 'ON' || 'OFF' }} \
-              -Dwith-boost=${{ contains(matrix.use, 'boost') && 'ON' || 'OFF' }} \
-              -Dwith-openmp=${{ contains(matrix.use, 'openmp') && 'ON' || 'OFF' }} \
-              -Dwith-mpi=${{ contains(matrix.use, 'mpi') && 'ON' || 'OFF' }} \
-              -Dwith-python=${{ contains(matrix.use, 'python') && 'ON' || 'OFF' }} \
-              -Dwith-gsl=${{ contains(matrix.use, 'gsl') && 'ON' || 'OFF' }} \
-              -Dwith-ltdl=${{ contains(matrix.use, 'ltdl') && 'ON' || 'OFF' }} \
-              -Dwith-readline=${{ contains(matrix.use, 'readline') && 'ON' || 'OFF' }} \
-              -Dwith-hdf5=${{ contains(matrix.use, 'hdf5') && 'ON' || 'OFF' }} \
-              -Dwith-sionlib=${{ contains(matrix.use, 'sionlib') && '$HOME/.cache/sionlib.install' || 'OFF' }} \
-              -Dwith-libneurosim=${{ contains(matrix.use, 'libneurosim') && '$HOME/.cache/libneurosim.install' || 'OFF' }} \
-              ..
-
-      - name: "Build NEST"
-        run: |
-          cd "$BUILD_PATH"
-          env
-          make VERBOSE=1
-
-      - name: "Install NEST"
-        run: |
-          cd "$BUILD_PATH"
-          make install
-
-      - name: "Initialize Matplotlibrc"
-        run: |
-          # initialize matplotlib backend
-          mkdir -p $HOME/.matplotlib
-          echo "backend : svg" > $HOME/.matplotlib/matplotlibrc
-
-      - name: "Run NEST testsuite"
-        run: |
-          pwd
-          cd "$BUILD_PATH"
-          chmod -v u+x ${NEST_RESULT}/share/nest/testsuite/do_tests.sh
-          make VERBOSE=1 installcheck
-
-      - name: "Upload install and test results"
-        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-        if: always()
-        with:
-          name: "build-logs-${{ matrix.os }}-${{ matrix.cpp_compiler }}-${{ matrix.use }}"
-          path: |
-            install_manifest.txt
-            **.log
-            ${{ env.BUILD_PATH }}/reports/**
 
   build_macos:
     if: ${{ !contains(github.event.head_commit.message, 'ci skip') }}
