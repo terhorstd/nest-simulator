@@ -1,0 +1,136 @@
+# -*- coding: utf-8 -*-
+#
+# setup.py
+#
+# This file is part of NEST.
+#
+# Copyright (C) 2004 The NEST Initiative
+#
+# NEST is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# NEST is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with NEST.  If not, see <http://www.gnu.org/licenses/>.
+
+[project]
+name = "nest"
+description = "Python bindings for NEST Simulator."
+version = "@NEST_VERSION@"
+readme = "README.rst"
+license = "gpl-2.0-or-later"
+url = "https://www.nest-simulator.org"
+keywords = "nest,simulator,neuroscience,neural,neuron,network,ai,spike,spiking"
+authors = [
+    { name = "The NEST Initiative", email = "users@nest-simulator.org" }
+]
+
+requires-python = ">=3.8, <4"
+
+dependencies = [
+    "docopt-ng",
+    "cython",
+    "ruamel.yaml",
+
+    "numpy",  # hl_api
+    "scipy",  # recheck: src/nest/ll_api.py:# scipy *after* nest. See https://github.com/numpy/numpy/issues/2521
+    "pandas",  # raster_plot, hl_api, examples
+
+    "pydot",  # for visualization
+    "h5py",  # for sonata interface
+]
+
+[project.urls]
+"Homepage" = "https://www.nest-simulator.org"
+"Source" = "https://github.com/nest/nest-simulator"
+"Documentation" = "https://nest-simulator.org/documentation"
+"Bug Tracker" = "https://github.com/nest/nest-simulator/issues"
+
+[metadata]
+description-file = "README.rst"
+classifiers = [
+    "Development Status :: 6 - Mature",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+examples = [
+    "csa",
+    "matplotlib",
+    "pandas"
+    #"notebook",  # not really required, but convenient for looking at examples
+    #"jupyterlab",  # not really required, but convenient for looking at examples
+]
+server = [
+    "numpy",
+    "Flask",
+    "flask-cors",
+    "gunicorn",
+    "requests",
+    "RestrictedPython",
+]
+mpi = [
+    "mpi4py"
+]
+dev = [
+    "junitparser >= 2",
+    "data-science-types",
+    "terminaltables",
+    "attrs",
+
+    "bump2version",
+    "pre-commit",
+    "black",
+    "isort",
+    "flake8",
+    "mypy >= 0.8",
+    "pydocstyle",
+    "rstcheck",
+    "pylint",
+    "pytest",
+    "pytest-black",
+    "pytest-cov",
+    "pytest-flake8",
+    "pytest-mypy",
+    "pytest-pydocstyle",
+    "pytest-pylint",
+    "pytest-xdist",
+    "pytest-timeout"
+]
+doc = [
+    "sphinx",
+    "sphinx-autodoc-typehints",
+    "pygments",
+    "recommonmark",
+]
+
+[project.scripts]
+#pynest = "nest.__main__:main"
+
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]
+
+[tool.black]
+line-length = 120
+
+[tool.flake8]
+# This is ignored
+# see discussions around https://github.com/PyCQA/flake8/issues/234
+
+[tool.isort]
+atomic = true
+line_length = 120
+multi_line_output = 3
+profile = "black"
+skip_gitignore = true
