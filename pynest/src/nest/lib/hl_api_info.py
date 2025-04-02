@@ -30,13 +30,7 @@ import webbrowser
 import nest
 
 from ..ll_api import check_stack, sli_func, spp, sps, sr
-from .hl_api_helper import (
-    broadcast,
-    is_iterable,
-    is_literal,
-    load_help,
-    show_help_with_pager,
-)
+from .hl_api_helper import broadcast, is_iterable, is_literal, load_help, show_help_with_pager
 from .hl_api_types import to_json
 
 __all__ = [
