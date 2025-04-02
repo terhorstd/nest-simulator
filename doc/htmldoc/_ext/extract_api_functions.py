@@ -37,11 +37,11 @@ def find_all_variables(file_path):
     """
     This function gets the names of all functions listed in ``__all__``
     in each of the PyNEST API files, along with the Kernel Attributes
-    found in ``__init__.py`` of ``pynest/nest/``.
+    found in ``__init__.py`` of ``pynest/src/nest/``.
     """
     all_variables = None
 
-    if "pynest/nest/__init__" in file_path:
+    if "pynest/src/nest/__init__" in file_path:
         # Read the __init__.py file
         with open(file_path, "r") as init_file:
             file_content = init_file.read()
@@ -85,7 +85,7 @@ def process_directory(directory):
             continue
 
         # get the NestModule for the kernel attributes
-        if "pynest/nest/__init__" in file:
+        if "pynest/src/nest/__init__" in file:
             api_name = "nest.NestModule"
 
         parts = file.split(os.path.sep)
@@ -107,7 +107,7 @@ def process_directory(directory):
 
 
 def get_pynest_list(app, env, docname):
-    directory = "../../pynest/nest/"
+    directory = "../../pynest/src/nest/"
 
     if not hasattr(env, "pynest_dict"):
         env.pynest_dict = {}

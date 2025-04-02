@@ -73,7 +73,7 @@ if ( HAVE_PYTHON )
       -D_IS_PYNEST
       )
 
-  install(DIRECTORY  nest/ ${PROJECT_BINARY_DIR}/pynest/nest/
+  install(DIRECTORY  src/nest/ ${PROJECT_BINARY_DIR}/pynest/src/nest/
       DESTINATION ${CMAKE_INSTALL_PREFIX}/${PYEXECDIR}/nest
       PATTERN "versionchecker.py.in" EXCLUDE
   )

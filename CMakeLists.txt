@@ -326,8 +326,8 @@ configure_file(
 )
 
 configure_file(
-    "${PROJECT_SOURCE_DIR}/pynest/setup.py.in"
-    "${PROJECT_BINARY_DIR}/pynest/setup.py" @ONLY
+    "${PROJECT_SOURCE_DIR}/pynest/pyproject.toml.in"
+    "${PROJECT_BINARY_DIR}/pynest/pyproject.toml" @ONLY
 )
 
 configure_file(
@@ -346,8 +346,8 @@ configure_file(
 )
 
 configure_file(
-    "${PROJECT_SOURCE_DIR}/pynest/nest/versionchecker.py.in"
-    "${PROJECT_BINARY_DIR}/pynest/nest/versionchecker.py" @ONLY
+    "${PROJECT_SOURCE_DIR}/pynest/src/nest/versionchecker.py.in"
+    "${PROJECT_BINARY_DIR}/pynest/src/nest/versionchecker.py" @ONLY
 )
 
 

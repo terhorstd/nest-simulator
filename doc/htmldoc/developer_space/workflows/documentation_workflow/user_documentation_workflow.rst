@@ -168,7 +168,7 @@ If you want to edit Model docs, PyNEST API files, or PyNEST examples, you will n
    * - Model docs
      - ``nest-simulator/models/*.h`` in the section `BeginUserDocs`
    * - PyNEST API
-     - ``nest-simulator/pynest/nest/**/*.py``
+     - ``nest-simulator/pynest/src/nest/**/*.py``
    * - PyNEST examples
      - ``nest-simulator/pynest/examples/**/*.py``
 
