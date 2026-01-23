@@ -445,12 +445,7 @@ jobs:
         uses: psf/black@af0ba72a73598c76189d6dd1b21d8532255d5942  # 25.9.0
         with:
           jupyter: true
-          src:
-            - testsuite
-            - doc
-            - build_support
-            - examples
-            - pynest
+          src: testsuite doc build_support examples pynest
 
   flake8:
     runs-on: "ubuntu-22.04"
